@@ -1,0 +1,39 @@
+今はB差分から派生しておいて次の機会にB差分を作り直した時と、即B差分を作り直すののどちらが得かを考える。
+作り直したB差分のサイズは今やっても次やっても変わらないものとする。
+なのでC差分ファイルの予定容量も変わらない。
+C差分ファイルのうち、最初の差分をCb差分、続く差分をCp差分と呼ぶ。
+
+次で作り直す場合、平均のファイル増加量は
+Cb差分+Cp*x + B差分 + Cp*y / (2+x+y)
+今すぐやる場合
+B差分 + Cp*y / (1+y)
+
+(Cb差分+Cp*x + B差分 + Cp*y) / (2+x+y) < B差分 + Cp*y / (1+y)　となる条件は
+(1 + y)(Cb差分+Cp*x + B差分 + Cp*y) < (2+x+y)(B差分 + Cp*y)
+
+(Cb差分+Cp*x + B差分 + Cp*y) + (Cb差分+Cp*x + B差分 + Cp*y)y < 2(B差分 + Cp*y) + (B差分 + Cp*y)x + (B差分 + Cp*y)y
+(Cb差分+Cp*x + B差分 + Cp*y) + (Cb差分+Cp*x)y + (B差分 + Cp*y)y < 2(B差分 + Cp*y) + (B差分 + Cp*y)x + (B差分 + Cp*y)y
+(Cb差分+Cp*x + B差分 + Cp*y) + (Cb差分+Cp*x)y < 2(B差分 + Cp*y) + (B差分 + Cp*y)x
+Cb差分+Cp*x - B差分 - Cp*y + (Cb差分+Cp*x)y <  (B差分 + Cp*y)x
+Cb差分+Cp*x - B差分 - Cp*y + Cb差分y <  B差分x
+Cb差分 - B差分 - Cp*y + Cb差分y < x(B差分-Cp)
+Cb差分(1+y) < B差分(x+1) + Cp(y-x)
+関係として Cb < B, x < y となるはずである。Cpは非常に小さいことが想定される。
+大いに単純化すれば
+Cb < B であれば次に送るのが良いように見える。しかしほとんどすべての場合において、Cb < Bになるはずである。
+yは M / cp, x は (M-Cb)/Cpなので、適用してみる
+
+Cb(1 + M/Cp) < B((M-Cb)/Cp + 1) + Cp(M/CP - (M-Cb)/Cp)
+(Cb + MCb)/Cp < (B(M-Cb) + Cp)/Cp + M - M + Cb
+Cb + MCb < B(M-Cb) + Cp + Cb*Cp
+
+Cpは小さいので無視する
+
+Cb + MCb < BM - BCb
+Mを仮に2Bとする
+Cb + 2BCb < 2B^2 - BCb
+(3B+1)Cb < 2B^2 +1は無視する
+3BCb < 2B^2
+3Cb < 2B
+
+CbがBの2/3より小さければ、次に送るのが良い。

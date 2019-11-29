@@ -1,0 +1,19 @@
+まず初期値をjsonファイルで記述する。そして初期ファイルからスキーマを取り出す。
+共通のスキーマを持つ２つのデータからは差分を取得することが出来る。
+
+スキーマを文字列表現したときの可読性を高めるため、スキーマにはデフォルト値も含まれる。
+
+{
+  schema_typename : "top",
+  hogeNumber : 10,
+  hogeString : "hoge",
+  hogeObj : ["obj"]
+}
+
+{
+  schema_typename : "top-hogeObj",
+  hugaNumber : "30",
+  "hugaNumber?" : null,
+}
+
+名前が?で終わるメンバはnull値を含むことが出来る。
