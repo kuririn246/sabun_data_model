@@ -139,7 +139,7 @@ Rustでいえばenumにしてパターンマッチすることになるので、
 ["multiple-ref-list-IDs",
   {
     impl1 : //どのリスト群を使うのかを指定するための名前
-    ["weapons", "usables"],
+    ["weapons", "usables"], //この場合武器でありかつ使用可能であるものを記述できないので不適切と思われる。
     hoge : ["hoge"],
     "hego?" : ["hego"] //nullableにも出来る
   },

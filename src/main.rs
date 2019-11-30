@@ -11,7 +11,7 @@ fn main() {
         println!("{} {} {} {}", big, turn, current, next);
     }
 
-   
+
 
 
 
