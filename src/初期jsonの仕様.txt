@@ -93,30 +93,34 @@ RootFolder+
 		}
 	],
 
-	"prevName-change-name" : "currentName", //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
+	changeNames : { prevName : "currentName",
+	                prevName2 : "currentName2"... }, //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
 
 	"member?" : 3,
-	"member-undefined" : null, //スキーマ変換時にmemberが元のスキーマに定義されていなかった場合、初期値をnullにする。
-	                           //プログラム側ではnullを発見したら、特定の計算式を使ってmemberに初期値を入れることになるだろう。
+	ifUndefined : {
+    member : null,  //スキーマ変換時にmemberが元のスキーマに定義されていなかった場合、初期値をnullにする。
+	                  //プログラム側ではnullを発見したら、特定の計算式を使ってmemberに初期値を入れることになるだろう。
+	  member2 : null, //多分この機能はnullを入れる以外に使わないと思う・・・
+	}
 }
+changeNamesとifUndefinedは予約語。
 
 差分生成システムとは直接関係しないが、俺の考えるデータモデルでは、データの継承ができる。
 {
-	"ref-list-ID" : "hogehoge",
-	"ref-ID" : "first",
+	refID : "first",
 	hogeNumber : 21 //オーバーライド
 }
 
 listIDとIDをrefとして指定することで、そのアイテムを参照し、さらに自分のところでオーバーライドできる。オーバーライドしても元データは変化しない。
 Ref-list-IDはいちいち指定しなくても、このアイテムの親リストにRef-list-IDが一つだけあればそれを使う
 
-hugaList : [
+itemList : [
 	"list",
-	["list-ID", "hugahuga"],
-	["ref-list-ID", "hogehoge"], //このリスト内のアイテムはrefする時にこのlistから探す
+	["listID", "itemList"], //これは参照可能にするべきではないのでlistIDをつけるのは間違いだな・・・参照可能にするとアイテムを削除できない縛りを設けるつもりだ
+	["refListID", "usables"], //このリスト内のアイテムはrefする時にこのlistから探す
 	{
 		ID : "1",
-		"ref-ID" : "first",
+		refID : "yakusou",
 		hogeString : "huga",
 		mishikibetsu : true,
 		unknown_name : "緑の草",
@@ -133,31 +137,37 @@ hugaList : [
 薬草とどうたぬきのデータ型が同じとは思えない。どちらもrefしたいのでそうなるのが自然かなという気がする。
 Rustでいえばenumにしてパターンマッチすることになるので、どれが来る可能性があるのか予め列挙しておくべきだろう。
 
-["ref-list-IDs", "weapons", "usables" ], //このリスト内のオブジェクトはrefする時にこれらのリストのうちどれかを使う
+["refListID", "weapons", "usables" ], //このリスト内のオブジェクトはrefする時にこれらのリストのうちどれかを使う
+
+{
+	refListID : "weapons",
+	refID : "doutanuki"
+}
 
 単一継承では済まない場合も考え、多重継承も可能にしておくべきだろう
-["multiple-ref-list-IDs",
+["multipleRefListIDs",
   {
     impl1 : //どのリスト群を使うのかを指定するための名前
-    ["weapons", "usables"], //この場合武器でありかつ使用可能であるものを記述できないので不適切と思われる。
+    ["weapons", "usables"], //このやり方だと武器でありかつ使用可能であるものを記述できないので不適切と思われる。 nullableな weapon と usableを別個で作るべきか
     hoge : ["hoge"],
     "hego?" : ["hego"] //nullableにも出来る
   },
 ]
 
 {
-  "multiple-ref-IDs" : {
-    impl1 : ["weapons", "doutanuki" ],//リストとIDを指定する。
+  refIDs : {
+    impl1 : ["weapons", "doutanuki"],//リストとIDを指定する。
     hoge : ["hogeItem"], //一つしかlistがない場合は１つ目を省略できる
+    //hoge : "hogeItem", //角カッコをなくしてしまってもいい
     hego : null //nullableの場合nullにしても良い。nullableの場合はnullと明示しなくてもデフォルトでnullになる。
   }
 }
 
 プログラム側からはこのようにアクセスする予定
 
-obj.RefIDs.hego == null
+obj.refIDs.hego == null
 
-if let Some((list_name, id)) = obj.RefIDs.hego
+if let Some((list_name, id)) = obj.refIDs["hego"]
 
 リストの変化はこのようにデータ化される。
 
