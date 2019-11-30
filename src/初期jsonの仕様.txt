@@ -138,14 +138,26 @@ Rustでいえばenumにしてパターンマッチすることになるので、
 単一継承では済まない場合も考え、多重継承も可能にしておくべきだろう
 ["multiple-ref-list-IDs",
   {
-    lists1 : //どのリスト群を使うのかを指定するための名前
+    impl1 : //どのリスト群を使うのかを指定するための名前
     ["weapons", "usables"],
-    lists2 : ["hoge", "huga"] },
+    hoge : ["hoge"],
+    "hego?" : ["hego"] //nullableにも出来る
+  },
 ]
 
 {
-  "multiple-ref-IDs" : { lists1 : ["weapons", "doutanuki" ], lists2 : ["huga","hego] } //リストとIDを指定する。
+  "multiple-ref-IDs" : {
+    impl1 : ["weapons", "doutanuki" ],//リストとIDを指定する。
+    hoge : ["hogeItem"], //一つしかlistがない場合は１つ目を省略できる
+    hego : null //nullableの場合nullにしても良い。nullableの場合はnullと明示しなくてもデフォルトでnullになる。
+  }
 }
+
+プログラム側からはこのようにアクセスする予定
+
+obj.RefIDs.hego == null
+
+if let Some((list_name, id)) = obj.RefIDs.hego
 
 リストの変化はこのようにデータ化される。
 
