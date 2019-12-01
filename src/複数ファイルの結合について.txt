@@ -1,0 +1,31 @@
+初期jsonは複数ファイルの結合機能がある。
+
+{
+  "schema-include" : {
+    memberName : "fileName.json"
+    memberName2 : "fileName2.json"
+  }
+}
+
+fileName.json
+{
+  hoge : "someData"
+}
+
+結合した結果こうなる
+
+{
+  //schema-includeはちゃんと残る。
+  "schema-include" : {
+    memberName : "fileName.json"
+    memberName2 : "fileName2.json"
+  }
+  memberName : {
+    hoge : "someData"
+  }
+  memberName2 : {
+    huga : "anotherData"
+  }
+}
+
+バックアップファイルにもschema-includeは残るので、必要なら元の複数ファイルに戻しても良い
