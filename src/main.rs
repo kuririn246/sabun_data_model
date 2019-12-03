@@ -8,6 +8,9 @@ struct StartFrom{
 
 impl StartFrom{
     fn size(&self) -> usize{ self.vec.len() }
+    fn last_index(&self) -> usize{
+        return self.index + self.vec.len();
+    }
 }
 
 struct ASabun{
@@ -31,16 +34,34 @@ struct Sabuns{
     last_sabun : String,
 }
 
-fn last(vec : &Vec<StartFrom>) -> &StartFrom{
-    return vec.last().unwrap();
-}
+impl Sabuns{
+    fn get_a_mut(&mut self) -> &mut ASabun{
+        self.a_sabuns.last_mut().unwrap()
+    }
 
-fn last_index(sabun : &StartFrom) -> usize{
-    return sabun.index + sabun.vec.len();
+    fn get_b_mut(&mut self) -> &mut BSabun{
+        self.get_a_mut().b_sabuns.last_mut().unwrap()
+    }
+
+    fn get_c_mut(&mut self) -> &mut CSabuns{
+        self.get_b_mut().c_sabuns.last_mut().unwrap()
+    }
+
+    fn get_a(&self) -> &ASabun{
+        self.a_sabuns.last().unwrap()
+    }
+
+    fn get_b(&self) -> &BSabun{
+        self.get_a().b_sabuns.last().unwrap()
+    }
+
+    fn get_c(&self) -> &CSabuns{
+        self.get_b().c_sabuns.last().unwrap()
+    }
 }
 
 fn apply(vec : &mut Vec<i32>, sabun : &StartFrom){
-    for n in sabun.index..last_index(sabun){
+    for n in sabun.index..sabun.last_index(){
         if n < vec.len(){
             vec[n] = sabun.vec[n - sabun.index];
         }
@@ -51,11 +72,6 @@ fn apply(vec : &mut Vec<i32>, sabun : &StartFrom){
     }
 }
 
-fn apply_c(vec : &mut Vec<i32>, sabuns : &Vec<StartFrom>){
-    for sabun in sabuns{
-        apply(vec, sabun);
-    }
-}
 
 fn construct(last_sabun : &str, sabuns : &Sabuns) -> Vec<i32>{
     let last_sabun = match last_sabun{
@@ -68,19 +84,24 @@ fn construct(last_sabun : &str, sabuns : &Sabuns) -> Vec<i32>{
     };
 
     let mut vec = sabuns.initial.clone();
-    if last_sabun <= 1{
-        apply(&mut vec,last(&sabuns.a_sabuns));
-    }
-    if last_sabun <= 2{
-        apply(&mut vec, last(&sabuns.b_sabuns));
-    }
-    let c = sabuns.c_sabuns.last().unwrap();
-    if last_sabun <= 3{
-        apply(&mut vec, c[0]);
-    }
-    if last_sabun <= 4{
-        for n in c.vec[1..]{
-           apply(&mut vec, n);
+    if last_sabun <= 1 {
+        let a = sabuns.a_sabuns.last().unwrap();
+        apply(&mut vec, &a.sabun);
+
+        if last_sabun <= 2 {
+            let b = a.b_sabuns.last().unwrap();
+            apply(&mut vec, &b.sabun);
+
+            if last_sabun <= 3{
+                let c = b.c_sabuns.last().unwrap();
+                apply(&mut vec, &c.vec[0]);
+
+                if last_sabun <= 4{
+                    for item in &c.vec[1..]{
+                        apply(&mut vec, item);
+                    }
+                }
+            }
         }
     }
     return vec;
@@ -118,7 +139,7 @@ fn calc_common_size(a : &StartFrom, b : &StartFrom) -> usize{
 
 fn should_update_b(current : &Vec<i32>, sabuns : &Sabuns) -> bool{
 
-    let prev_cb_sabun = &sabuns.c_sabuns.last().unwrap().vec[0];
+    let prev_cb_sabun = &sabuns.get_c().vec[0];
 
     let b_data = construct("b", sabuns);
     let new_cb_sabun = &make_sabun(current, &b_data);
@@ -132,7 +153,9 @@ fn should_update_b(current : &Vec<i32>, sabuns : &Sabuns) -> bool{
 
     let b_sabun = sabuns.b_sabuns.last().unwrap();
 
-    4 * b_sabun.size() - 2 * (new_cb_sabun.size() + guessed_cb_size) <
+    let c = sabuns.get_b().c_sabuns.len();
+
+    4 * b_sabun.size() - 2 * (new_cb_sabun.size() + guessed_cb_size) < c * (new_cb_sabun.size() - guessed_cb_size)
     //4A - 2(B' + B) < n(B' - B)
 }
 
@@ -140,37 +163,43 @@ fn try_push_c_sabun(sabuns : &mut Sabuns, current : Vec<i32>){
     if !c_is_full(sabuns){
         let prev = construct("cp", sabuns);
         let last_sabun = make_sabun(&current, &prev);
-        sabuns.c_sabuns.last_mut().unwrap().vec.push(last_sabun);
+        sabuns.get_c_mut().vec.push(last_sabun);
     }
     else{
-        let prev_cb = construct("cb", sabuns);
-        let prev_b = construct("b", sabuns);
-        let current_cb = make_sabun(&current, &prev_b);
+       if should_update_b(&current, sabuns){
+
+       }
 
     }
 }
 
 fn calc(sabuns : &mut Sabuns, current : &Vec<i32>){
-    let prev = construct(&sabuns.last_sabun, current);
+    let prev = construct(&sabuns.last_sabun, sabuns);
 
     let sabun = make_sabun(current, &prev);
     let last_sabun = sabuns.last_sabun.clone();
-    match &last_sabun{
+    match last_sabun.as_str(){
         "i" =>{
-            sabuns.a_sabuns.push(sabun);
+            sabuns.a_sabuns.push(ASabun{ sabun, b_sabuns : vec![] });
             sabuns.last_sabun = "a".to_string();
         },
         "a" =>{
-            sabuns.b_sabuns.push(sabun);
+            let a = sabuns.a_sabuns.last_mut().unwrap();
+            a.b_sabuns.push(BSabun{ sabun, c_sabuns : vec![] });
             sabuns.last_sabun = "b".to_string();
         }
         "b" =>{
-            sabuns.c_sabuns.push(vec![sabun]);
+            let b = sabuns.a_sabuns.last_mut().unwrap().b_sabuns.last_mut().unwrap();
+            b.c_sabuns.push(CSabuns{ vec: vec![ sabun ]};
             sabuns.last_sabun = "cb".to_string();
         }
         "cb" =>{
 
         }
+        "cp" =>{
+
+        }
+        _=> panic!(),
     }
 }
 
@@ -186,8 +215,6 @@ fn main() {
     let mut sabuns = Sabuns{
         initial : current.clone(),
         a_sabuns : vec![],
-        b_sabuns : vec![],
-        c_sabuns : vec![],
         start_index : current.len() - rewrite + increase,
         last_sabun : "i".to_string(),
     };
