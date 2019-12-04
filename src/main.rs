@@ -119,7 +119,10 @@ fn make_sabun(current : &Vec<i32>, prev : &Vec<i32>) -> StartFrom {
 }
 
 fn c_is_full(sabuns : &Sabuns) -> bool{
-    return sabuns.get_c().vec.len() >= 2;
+    let a_size = sabuns.get_a().sabun.size();
+    let b_size = sabuns.get_b().sabun.size();
+    let c_sum = sabuns.get_c().vec.iter().map(|s| s.size()).sum();
+    return a_size + b_size < c_sum;
 }
 
 fn calc_common_size(a : &StartFrom, b : &StartFrom) -> usize{
@@ -136,7 +139,36 @@ fn calc_common_size(a : &StartFrom, b : &StartFrom) -> usize{
 }
 
 fn should_update_b(current : &Vec<i32>, sabuns : &Sabuns) -> bool{
+    //should_update_b_easy(current, sabuns)
+    should_update_b_detailed(current, sabuns)
+    //should_update_b_super_easy(current, sabuns)
+}
 
+fn should_update_b_easy(current : &Vec<i32>, sabuns : &Sabuns) -> bool {
+    let prev_cb_sabun = &sabuns.get_c().vec[0];
+
+    let b_data = construct(&Sabun::B, sabuns);
+    let new_cb_sabun = &make_sabun(current, &b_data);
+
+    let b = sabuns.get_b().sabun.size();
+    let cb = new_cb_sabun.size();
+    let answer = b * 2 < cb * 3;
+    if answer {
+        println!("a {} b {} cb {}", sabuns.get_a().sabun.size(), b, cb);
+    }
+    return answer;
+}
+
+fn should_update_b_super_easy(current : &Vec<i32>, sabuns : &Sabuns) -> bool {
+    let prev_cb_sabun = &sabuns.get_c().vec[0];
+
+    let b_data = construct(&Sabun::B, sabuns);
+    let new_cb_sabun = &make_sabun(current, &b_data);
+
+    sabuns.get_b().sabun.size() < new_cb_sabun.size()
+}
+
+fn should_update_b_detailed(current : &Vec<i32>, sabuns : &Sabuns) -> bool {
     let prev_cb_sabun = &sabuns.get_c().vec[0];
 
     let b_data = construct(&Sabun::B, sabuns);
@@ -144,9 +176,9 @@ fn should_update_b(current : &Vec<i32>, sabuns : &Sabuns) -> bool{
 
     let common_size = calc_common_size(prev_cb_sabun, new_cb_sabun);
 
-    //new_cb_sabunのうちprev_cb_sabunとの共通部分がどれだけあるか調べる
-    //その共通部分はBをアップデートすればそこに取り込まれ続くファイルのサイズを減らすことができるので、
-    //それを引いてアップデート後の新サイズを推測する
+//new_cb_sabunのうちprev_cb_sabunとの共通部分がどれだけあるか調べる
+//その共通部分はBをアップデートすればそこに取り込まれ続くファイルのサイズを減らすことができるので、
+//それを引いてアップデート後の新サイズを推測する
     let guessed_cb_size = new_cb_sabun.size() - common_size;
 
     let b_sabun = sabuns.get_b();
@@ -157,8 +189,13 @@ fn should_update_b(current : &Vec<i32>, sabuns : &Sabuns) -> bool{
     let cb = new_cb_sabun.size() as i64;
     let guessed_cb = guessed_cb_size as i64;
 
-    4 * b - 2 * (cb + guessed_cb) < n * (cb - guessed_cb)
-    //4A - 2(B' + B) < n(B' - B)
+    let answer = 4 * b - 2 * (cb + guessed_cb) < n * (cb - guessed_cb);
+
+    if answer{
+        println!("a {} b {} cb {} guess {} n {} common {}", sabuns.get_a().sabun.size(), b, cb, guessed_cb, n, common_size);
+    }
+    return answer;
+//4A - 2(B' + B) < n(B' - B)
 }
 
 fn should_update_a(current : &Vec<i32>, sabuns : &Sabuns) -> bool{
@@ -246,16 +283,29 @@ fn calc(sabuns : &mut Sabuns, current : &Vec<i32>){
 }
 
 fn print_sabun(sabuns : &Sabuns){
+    let mut sum : usize = 0;
+    let mut a_sum : usize = 0;
+    let mut b_sum : usize = 0;
+    let mut c_sum : usize = 0;
     for ia in 0..sabuns.a_sabuns.len(){
         let a = &sabuns.a_sabuns[ia];
-        println!("A{} size {}",ia, a.sabun.size());
+        let asize = a.sabun.size();
+        sum += asize;
+        a_sum += asize;
+        println!("A{} size {} {} a_sum {}",ia, asize, sum, a_sum);
         for ib in 0..a.b_sabuns.len(){
             let b = &a.b_sabuns[ib];
-            println!("B{} size {}", ib, b.sabun.size());
+            let bsize = b.sabun.size();
+            sum += bsize;
+            b_sum += bsize;
+            println!("B{}-{} size {} {} b_sum {}", ia, ib, bsize, sum, b_sum);
             for ic in 0..b.c_sabuns.len(){
                 let c = &b.c_sabuns[ic];
+                let total : usize = c.vec.iter().map(|s| s.size()).sum();
+                sum += total;
+                c_sum += total;
                 let vec : Vec<String> = c.vec.iter().map(|a| a.size().to_string()).collect();
-                println!("C{} size {:?}", ic, vec.join(", "));
+                println!("C{}-{}-{} size {:?} {} c_sum {}", ia, ib, ic, vec.join(", "), sum, c_sum);
             }
         }
     }
@@ -277,7 +327,7 @@ fn main() {
         last_sabun : Sabun::Initial,
     };
 
-    for n in 1..100{
+    for n in 1..2000{
         current.push(n);
         let start = current.len() - rewrite;
         for i in start..current.len(){
