@@ -1,4 +1,3 @@
-use std::iter::repeat;
 use std::cmp::{max, min};
 
 struct StartFrom{
@@ -87,15 +86,15 @@ fn construct(last_sabun : &Sabun, sabuns : &Sabuns) -> Vec<i32>{
     };
 
     let mut vec = sabuns.initial.clone();
-    if last_sabun <= 1 {
+    if last_sabun >= 1 {
         let a = sabuns.get_a();
         apply(&mut vec, &a.sabun);
 
-        if last_sabun <= 2 {
+        if last_sabun >= 2 {
             let b = a.b_sabuns.last().unwrap();
             apply(&mut vec, &b.sabun);
 
-            if last_sabun <= 3{
+            if last_sabun >= 3{
                 let c = b.c_sabuns.last().unwrap();
                 for item in &c.vec{
                     apply(&mut vec, item);
@@ -120,7 +119,7 @@ fn make_sabun(current : &Vec<i32>, prev : &Vec<i32>) -> StartFrom {
 }
 
 fn c_is_full(sabuns : &Sabuns) -> bool{
-    return sabuns.get_c().vec.len() > 3;
+    return sabuns.get_c().vec.len() >= 2;
 }
 
 fn calc_common_size(a : &StartFrom, b : &StartFrom) -> usize{
@@ -145,16 +144,20 @@ fn should_update_b(current : &Vec<i32>, sabuns : &Sabuns) -> bool{
 
     let common_size = calc_common_size(prev_cb_sabun, new_cb_sabun);
 
-    ///new_cb_sabunのうちprev_cb_sabunとの共通部分がどれだけあるか調べる
-    ///その共通部分はBをアップデートすればそこに取り込まれ続くファイルのサイズを減らすことができるので、
-    ///それを引いてアップデート後の新サイズを推測する
+    //new_cb_sabunのうちprev_cb_sabunとの共通部分がどれだけあるか調べる
+    //その共通部分はBをアップデートすればそこに取り込まれ続くファイルのサイズを減らすことができるので、
+    //それを引いてアップデート後の新サイズを推測する
     let guessed_cb_size = new_cb_sabun.size() - common_size;
 
     let b_sabun = sabuns.get_b();
 
-    let n = b_sabun.c_sabuns.len();
+    let n = b_sabun.c_sabuns.len() as i64;
 
-    4 * b_sabun.sabun.size() - 2 * (new_cb_sabun.size() + guessed_cb_size) < n * (new_cb_sabun.size() - guessed_cb_size)
+    let b = b_sabun.sabun.size() as i64;
+    let cb = new_cb_sabun.size() as i64;
+    let guessed_cb = guessed_cb_size as i64;
+
+    4 * b - 2 * (cb + guessed_cb) < n * (cb - guessed_cb)
     //4A - 2(B' + B) < n(B' - B)
 }
 
@@ -167,16 +170,20 @@ fn should_update_a(current : &Vec<i32>, sabuns : &Sabuns) -> bool{
 
     let common_size = calc_common_size(prev_b_sabun, new_b_sabun);
 
-    ///new_cb_sabunのうちprev_cb_sabunとの共通部分がどれだけあるか調べる
-    ///その共通部分はBをアップデートすればそこに取り込まれ続くファイルのサイズを減らすことができるので、
-    ///それを引いてアップデート後の新サイズを推測する
+    //new_cb_sabunのうちprev_cb_sabunとの共通部分がどれだけあるか調べる
+    //その共通部分はBをアップデートすればそこに取り込まれ続くファイルのサイズを減らすことができるので、
+    //それを引いてアップデート後の新サイズを推測する
     let guessed_b_size = new_b_sabun.size() - common_size;
 
     let a_sabun = sabuns.get_a();
 
-    let n = a_sabun.b_sabuns.len();
+    let n = a_sabun.b_sabuns.len() as i64;
 
-    4 * a_sabun.sabun.size() - 2 * (new_b_sabun.size() + guessed_b_size) < n * (new_b_sabun.size() - guessed_b_size)
+    let a = a_sabun.sabun.size() as i64;
+    let b = new_b_sabun.size() as i64;
+    let guessed_b = guessed_b_size as i64;
+
+    4 * a - 2 * (b + guessed_b) < n * (b - guessed_b)
     //4A - 2(B' + B) < n(B' - B)
 }
 
@@ -238,6 +245,22 @@ fn calc(sabuns : &mut Sabuns, current : &Vec<i32>){
     }
 }
 
+fn print_sabun(sabuns : &Sabuns){
+    for ia in 0..sabuns.a_sabuns.len(){
+        let a = &sabuns.a_sabuns[ia];
+        println!("A{} size {}",ia, a.sabun.size());
+        for ib in 0..a.b_sabuns.len(){
+            let b = &a.b_sabuns[ib];
+            println!("B{} size {}", ib, b.sabun.size());
+            for ic in 0..b.c_sabuns.len(){
+                let c = &b.c_sabuns[ic];
+                let vec : Vec<String> = c.vec.iter().map(|a| a.size().to_string()).collect();
+                println!("C{} size {:?}", ic, vec.join(", "));
+            }
+        }
+    }
+}
+
 fn main() {
     let mut current = vec![0; 100];
 
@@ -261,15 +284,7 @@ fn main() {
             current[i] = n;
         }
         calc(&mut sabuns, &current)
-
-
-
-
     }
 
-
-
-
-
-
+    print_sabun(&sabuns);
 }
