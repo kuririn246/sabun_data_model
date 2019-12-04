@@ -32,7 +32,6 @@ struct CSabuns{
 }
 
 struct Sabuns{
-    start_index : usize,
     initial : Vec<i32>,
     a_sabuns : Vec<ASabun>,
     last_sabun : Sabun,
@@ -70,8 +69,7 @@ fn apply(vec : &mut Vec<i32>, sabun : &StartFrom){
             vec[n] = sabun.vec[n - sabun.index];
         }
         else{
-            vec.push(0);
-            vec[n] = sabun.vec[n - sabun.index];
+            vec.push(sabun.vec[n - sabun.index]);
         }
     }
 }
@@ -121,8 +119,10 @@ fn make_sabun(current : &Vec<i32>, prev : &Vec<i32>) -> StartFrom {
 fn c_is_full(sabuns : &Sabuns) -> bool{
     let a_size = sabuns.get_a().sabun.size();
     let b_size = sabuns.get_b().sabun.size();
-    let c_sum = sabuns.get_c().vec.iter().map(|s| s.size()).sum();
-    return a_size + b_size < c_sum;
+    let c_size = sabuns.get_c().vec[0].size();
+    let cp_sum : usize = sabuns.get_c().vec[1..].iter().map(|s| s.size()).sum();
+    return a_size + b_size + c_size < cp_sum;
+    //return 20 < cp_sum;
 }
 
 fn calc_common_size(a : &StartFrom, b : &StartFrom) -> usize{
@@ -142,6 +142,7 @@ fn should_update_b(current : &Vec<i32>, sabuns : &Sabuns) -> bool{
     //should_update_b_easy(current, sabuns)
     should_update_b_detailed(current, sabuns)
     //should_update_b_super_easy(current, sabuns)
+    //true
 }
 
 fn should_update_b_easy(current : &Vec<i32>, sabuns : &Sabuns) -> bool {
@@ -221,6 +222,7 @@ fn should_update_a(current : &Vec<i32>, sabuns : &Sabuns) -> bool{
     let guessed_b = guessed_b_size as i64;
 
     4 * a - 2 * (b + guessed_b) < n * (b - guessed_b)
+    //true
     //4A - 2(B' + B) < n(B' - B)
 }
 
@@ -305,7 +307,7 @@ fn print_sabun(sabuns : &Sabuns){
                 sum += total;
                 c_sum += total;
                 let vec : Vec<String> = c.vec.iter().map(|a| a.size().to_string()).collect();
-                println!("C{}-{}-{} size {:?} {} c_sum {}", ia, ib, ic, vec.join(", "), sum, c_sum);
+                println!("C{}-{}-{} {} c_sum {} size {:?}", ia, ib, ic, sum, c_sum, vec.join(", "));
             }
         }
     }
@@ -323,7 +325,6 @@ fn main() {
     let mut sabuns = Sabuns{
         initial : current.clone(),
         a_sabuns : vec![],
-        start_index : current.len() - rewrite + increase,
         last_sabun : Sabun::Initial,
     };
 
