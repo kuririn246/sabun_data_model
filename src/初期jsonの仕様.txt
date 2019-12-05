@@ -165,9 +165,19 @@ Rustでいえばenumにしてパターンマッチすることになるので、
 
 プログラム側からはこのようにアクセスする予定
 
-obj.refIDs.hego == null
+obj.refIDs.hego　//ここからlist id と IDを取得可能
+obj.hego == null //nullかどうかチェック可能
+obj.hego.member
+obj.member <-継承してるのでmemberを直接呼んでも良い
 
 if let Some((list_name, id)) = obj.refIDs["hego"]
+match obj.impl1{
+  Impl1::Weapons{ a, b } => ...,
+  Impl1::Usables{ c, d } => ...,
+}
+
+let m = obj.hego.member;
+let n = obj.member;
 
 リストの変化はこのようにデータ化される。
 

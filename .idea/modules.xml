@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/sabun_data_model.iml" filepath="$PROJECT_DIR$/sabun_data_model.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sabun_data_model_run.iml" filepath="$PROJECT_DIR$/sabun_data_model_run.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sabun_maker/sabun_maker.iml" filepath="$PROJECT_DIR$/sabun_maker/sabun_maker.iml" />
     </modules>
   </component>
 </project>
