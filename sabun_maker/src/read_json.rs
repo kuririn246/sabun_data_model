@@ -13,7 +13,8 @@ pub fn untyped_example() -> Result<Value> {
 
     //名前が?で終わるメンバはnull値を含むことが出来る。
     //プログラム側のメンバ名にはこの?は反映されず、型が変わるだけと想定される
-    "hegoNumber?" : null,
+    //初期値をnullに設定することは出来ない(undefinedの時にnullを入れる機能しかない）
+    "hegoNumber?" : 21,
 
     //配列はnumber配列、string配列、bool配列、それぞれ中身がnullableであるかの6通りとなる。最初に型を示し、その後初期値をいれる。
     numArray : [ "Num-Array", 0, 3, 10 ],
@@ -21,10 +22,9 @@ pub fn untyped_example() -> Result<Value> {
     emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
     emptyNullableNumArray : [ "Num?-Array" ], //初期値が空配列のnullableなnumのarray
 
-    "numArray?" : [ "Num-Array?" ], //初期値がnullの場合、array?とする
-    "numArray2?" : [ "Num?-Array?" ], //num?-array?もある。nullable整数配列であり初期値はnullである
-	"strArray" : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
-	"boolArray" : [ "Bool-Array", true, false ], //bool配列(必要か？）
+    "numArray?" : [ "Num-Array" ], //nullableにすることも出来るが、初期値をnullにする機能はない。undefinedのときにnullにすることは出来る。nullの使いみちってそれだけだと思う。
+	strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
+	boolArray : [ "Bool-Array", true, false ], //bool配列(必要か？）
 
 	hogeList : [
 		"List", //listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
@@ -71,15 +71,17 @@ pub fn untyped_example() -> Result<Value> {
 	],
 
 	commonType : {
-	  "TypeName" : "thisTypesName",
+	  "Typename" : "thisTypesName",
 	  "IsDefault" : true, //typeNameが同じものは同じ型になる。型のデフォルトが存在する。
 	  memberName : "commonMemberName",
+	  member2 : 20,
 	},
   },
 
   commonType2 : {
-    TypeName : "typeName", //同じ型名にすれば同じ型と認識される。これは主にプログラム側から使う設定
+    Typename : "typename", //同じ型名にすれば同じ型と認識される。これは主にプログラム側から使う設定
     memberName : "this is common",
+    //Typenameがあってデフォルトでない場合、デフォルトのままのメンバは書かなくて良い。
   },
 
   usables : [
@@ -164,7 +166,10 @@ pub fn untyped_example() -> Result<Value> {
       }
     }
   ],
-
+  //Undefinedの設定でnullにすることはできる
+  "nullableObj?" : {
+    member1 : 31,
+  }
 }"#;
 
     // Parse the string of data into serde_json::Value.

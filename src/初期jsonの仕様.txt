@@ -58,6 +58,7 @@ RootFolder+
     //JavaScriptで使う場合はメンバ名に?が入ると使いにくくなるだろうけれど・・・直接JSで初期値を読むユースケースがあるだろうか・・・？
     "hegoNumber?" : null,
 
+    
     //配列はnumber配列、string配列、bool配列、それぞれ中身がnullableであるかの6通りとなる。最初に型を示し、その後初期値をいれる。
     numArray : [ "num-array", 0, 3, 10 ],
     nullableNumArray : [ "num?-array", 0, null, 10 ], //nullableの場合num?のようになる

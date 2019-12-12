@@ -1,7 +1,7 @@
 初期jsonは複数ファイルの結合機能がある。
 
 {
-  "schema-include" : {
+  "Include" : {
     memberName : "fileName.json"
     memberName2 : "fileName2.json"
   }
@@ -15,8 +15,8 @@ fileName.json
 結合した結果こうなる
 
 {
-  //schema-includeはちゃんと残る。
-  "schema-include" : {
+  //Includeはちゃんと残る。
+  "Include" : {
     memberName : "fileName.json"
     memberName2 : "fileName2.json"
   }
@@ -28,4 +28,4 @@ fileName.json
   }
 }
 
-バックアップファイルは1ファイルに結合されたものになるが、schema-includeは残るので、必要なら元の複数ファイルに戻しても良い
+バックアップファイルは1ファイルに結合されたものになるが、Includeは残るので、必要なら元の複数ファイルに戻しても良い
