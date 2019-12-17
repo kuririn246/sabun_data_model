@@ -14,13 +14,13 @@ pub fn untyped_example() -> Result<Value> {
     //名前が?で終わるメンバはnull値を含むことが出来る。
     //プログラム側のメンバ名にはこの?は反映されず、型が変わるだけと想定される
     //初期値をnullに設定することは出来ない(undefinedの時にnullを入れる機能しかない）
+    //これにより初期値で型を特定できる
     "hegoNumber?" : 21,
 
-    //配列はnumber配列、string配列、bool配列、それぞれ中身がnullableであるかの6通りとなる。最初に型を示し、その後初期値をいれる。
+    //配列はnumber配列、string配列、bool配列、number配列の配列、bool配列の配列の5通りとなる。最初に型を示し、その後初期値をいれる。
     numArray : [ "Num-Array", 0, 3, 10 ],
-    nullableNumArray : [ "Num?-Array", 0, null, 10 ], //nullableの場合num?のようになる
     emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
-    emptyNullableNumArray : [ "Num?-Array" ], //初期値が空配列のnullableなnumのarray
+    numArray2 : [ "Num-Array2", [2,3], [3,1] ], //二次元のnumarray
 
     "numArray?" : [ "Num-Array" ], //nullableにすることも出来るが、初期値をnullにする機能はない。undefinedのときにnullにすることは出来る。nullの使いみちってそれだけだと思う。
 	strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
