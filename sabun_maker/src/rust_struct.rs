@@ -1,9 +1,9 @@
 use std::collections::{HashMap, BTreeMap};
 
-//There's no NullableNullableNumber in this system
-pub enum RustArrayValueType{
-    Number,
+pub enum ArrayType{
+    Num,
     String,
+    Num2, //two dimensional num array
 }
 
 pub enum RustValue{
@@ -13,17 +13,21 @@ pub enum RustValue{
     NullableNumber(Option<f64>),
     String(String),
     NullableString(Option<String>),
-    //Although Array can store any value in this implementation, it must declare it's type of the value.
     Array(RustArray),
-    //There's no Array's Array in this system. That's too hard to differentiate efficiently.
     NullableArray(Option<RustArray>),
+    List(RustList),
+    NullableList(Option<RustList>),
     Object(RustObject),
     NullableObject(Option<RustObject>)
 }
 
 pub struct RustArray{
     pub vec : Vec<RustValue>,
-    pub val_type : RustArrayValueType,
+    pub array_type : ArrayType,
+}
+
+pub struct RustList{
+
 }
 
 pub type RustObject = BTreeMap<String, RustValue>;
