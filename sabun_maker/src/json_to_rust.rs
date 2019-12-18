@@ -15,8 +15,10 @@ pub fn json_obj_to_rust(v : &Value) -> Option<RustObject>{
                     r.insert(name, RustValue::Bool(*b));
                 }
             },
-            Value::Array(a) => {},
-            _ =>{},
+            Value::Array(a) => {
+                let k = a;
+            },
+            _ =>{panic!(); },
         }
         //println!("key {} value {}", k, v);
     }

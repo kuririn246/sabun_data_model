@@ -160,6 +160,7 @@ fn should_update_b_easy(current : &Vec<i32>, sabuns : &Sabuns) -> bool {
     return answer;
 }
 
+
 fn should_update_b_super_easy(current : &Vec<i32>, sabuns : &Sabuns) -> bool {
     let prev_cb_sabun = &sabuns.get_c().vec[0];
 
