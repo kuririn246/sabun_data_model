@@ -17,18 +17,17 @@ pub fn untyped_example() -> Result<Value> {
     //これにより初期値で型を特定できる
     "hegoNumber?" : 21,
 
-    //配列はnumber配列、string配列、bool配列、number配列の配列、bool配列の配列の5通りとなる。最初に型を示し、その後初期値をいれる。
+    //配列はいまのところnumber配列、string配列、number配列の配列の4通り。最初に型を示し、その後初期値をいれる。
     numArray : [ "Num-Array", 0, 3, 10 ],
     emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
     numArray2 : [ "Num-Array2", [2,3], [3,1] ], //二次元のnumarray
 
     "numArray?" : [ "Num-Array" ], //nullableにすることも出来るが、初期値をnullにする機能はない。undefinedのときにnullにすることは出来る。nullの使いみちってそれだけだと思う。
 	strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
-	boolArray : [ "Bool-Array", true, false ], //bool配列(必要か？）
 
 	hogeList : [
-		"List", //listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
-		["ListID", "hogehoge"], //任意でlist-IDを与えることが出来る。list-IDは全データの中で一意である必要がある。
+		"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
+		["ListID", "hogehoge"], //任意でListIDを与えることが出来る。ListIDは全データの中で一意である必要がある。
 		["Dummy", "dummy"], //dummyのIDを設定。デフォルト値を設定でき、実際のリストには加わらない。
 		{
 			ID : "dummy",
@@ -46,19 +45,16 @@ pub fn untyped_example() -> Result<Value> {
 		}
 	],
 
-	"Rename" : { prevName : "currentName",
-	                prevName2 : "currentName2" }, //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
+	"Rename" : [ "prevName->currentName",
+	             "prevName2->currentName2" ], //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
 
-	"member?" : 3,
-	"member2?" : 4,
-	"IfUndefined" : {
-      member : null,  //スキーマ変換時にmemberが元のスキーマに定義されていなかった場合、初期値をnullにする。
-	                  //プログラム側ではnullを発見したら、特定の計算式を使ってmemberに初期値を入れることになるだろう。
-	  member2 : null, //多分この機能はnullを入れる以外に使わないと思う・・・
-	},
+	"member?" : 3,//nullableメンバにはundefinedの時にnullを入れられる。
+
 
 	hogeList2 : [
 	  "List",
+	  ["Default", "second" ], //デフォルトのIDを指定。dummy指定とは違いこれは実際にリストに加わる。
+	                          //DummyもDefaultも指定しない場合最初のものがデフォルトになる。
 	  {
 	    ID : "first",
 	    member1 : "hoge"
@@ -69,19 +65,6 @@ pub fn untyped_example() -> Result<Value> {
 	    member2 : "this_is_default", //これがデフォルト値となり、差分が取られる。
 	  }
 	],
-
-	commonType : {
-	  "Typename" : "thisTypesName",
-	  "IsDefault" : true, //typeNameが同じものは同じ型になる。型のデフォルトが存在する。
-	  memberName : "commonMemberName",
-	  member2 : 20,
-	},
-  },
-
-  commonType2 : {
-    Typename : "typename", //同じ型名にすれば同じ型と認識される。これは主にプログラム側から使う設定
-    memberName : "this is common",
-    //Typenameがあってデフォルトでない場合、デフォルトのままのメンバは書かなくて良い。
   },
 
   usables : [
@@ -115,30 +98,31 @@ pub fn untyped_example() -> Result<Value> {
     ["AutoID"],
     ["RefListID", "weapon"],
     {
-      RefID : "doutanuki",
-      atk : 8 //上書きしてみる
+      RefID : "doutanuki", //どうたぬきを参照。参照すると継承される。
+      atk : 8 //overrideしてみる
     }
   ],
 
-  itemList2 : [
-    "List",
-    ["AutoID"],
-    ["RefListIDs", "weapons", "usables"], //RefListIDsを設定すると、アイテムにはRefListIDが絶対に必要。
-    {
-      RefListID : "weapon",
-      RefID : "doutanuki",
-    },
-    {
-      RefListID : "usable",
-      RefID : "yakusou",
-    }
-  ],
+//  itemList2 : [　この機能についてはない方が良い可能性があると思うので、今の所実装しない。
+//    "List",
+//    ["AutoID"],
+//    ["RefListIDs", "weapons", "usables"], //RefListIDsを設定すると、アイテムにはRefListIDが絶対に必要。
+//    {
+//      RefListID : "weapon",
+//      RefID : "doutanuki",
+//    },
+//    {
+//      RefListID : "usable",
+//      RefID : "yakusou",
+//    }
+//  ],
 
   hogeList : [
     "List",
     ["ListID", "hoge"],
     {
-      ID : "hogehoge"
+      ID : "hogehoge",
+      mem : "a",
     }
   ],
 
@@ -150,27 +134,48 @@ pub fn untyped_example() -> Result<Value> {
     }
   ],
 
+  hegoList: [
+    "List",
+    ["ListID", "hego"],
+    {
+      ID : "hegohego",
+      mem : "b",
+    }
+  ],
+
   itemList3 : [
     "List",
     ["AutoID"],
-    ["MultipleRefListIDs", {
-      impl1 : ["weapons", "usables"],
-      hoge : ["hoge"],
-      "huga?" : ["huga"] //nullableにも出来る
-    }],
+    ["Multiple",  //多重継承が必要な場合、Multipleを設定する。
+      "hoge", "huga?" //nullableにも出来る
+    ],
     {
-      RefIDs : {
-        impl1 : ["weapons", "doutanuki"],
+      RefIDs : { //Multipleが設定されている場合、RefIDsが必要。必要なメンバを設定する。
         hoge : "hogehoge",
         //nullableは入力しなければデフォルトでnull
+        hego : "hegohego",
       }
     }
   ],
-  //Undefinedの設定でnullにすることはできる
   "nullableObj?" : {
     member1 : 31,
   }
-}"#;
+}
+
+//使用側 概念コード
+//let item = itemList3[0]; //item は hogehoge と hegohego を継承している
+//item.mem <これは後に継承した方が優先なので、hegohegoの"b"になる
+//item.RefIDs.hoge.mem <これは"a"である
+//item.RefIDs.hego.mem = "c" //hegoのmemをオーバーライドする。overrideなので、元のListにあるhegoの方に影響はない。
+//item.RefIDs.mem <これは"c"に変わっている。　
+//item.RefIDs.hoge.mem = "d"
+//item.RefIDs.mem <これは変わらない。hegoの方の中身が出るだけだから。
+//実際は三角継承しているわけではなく、AもBも継承していて、便宜上itemから直接アクセスする場合は、後に継承したものを優先しているだけ。何も難しいことはない。
+//let hegohego = list["hego"]["hegohego"];
+//hegohego.mem <これは"b"のままである。
+//hegohego.mem = "e" //eに変わる。overrideしていなければ、refしてるitemの方もこの値に変わる。
+
+"#;
 
     // Parse the string of data into serde_json::Value.
     match json5::from_str(data){
