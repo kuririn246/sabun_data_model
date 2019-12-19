@@ -22,7 +22,7 @@ pub fn untyped_example() -> Result<Value> {
     emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
     numArray2 : [ "Num-Array2", [2,3], [3,1] ], //二次元のnumarray
 
-    "numArray?" : [ "Num-Array" ], //nullableにすることも出来るが、初期値をnullにする機能はない。undefinedのときにnullにすることは出来る。nullの使いみちってそれだけだと思う。
+    "nullableNumArray?" : [ "Num-Array" ], //nullableにすることも出来るが、初期値をnullにする機能はない。undefinedのときにnullにすることは出来る。nullの使いみちってそれだけだと思う。
 	strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
 
 	hogeList : [

@@ -9,6 +9,7 @@ mod tests {
     #[test]
     fn it_works() {
         let v = crate::read_json::untyped_example().unwrap();
-        json_obj_to_rust(&v);
+        let r = json_obj_to_rust(&v);
+        println!("{:?}", r);
     }
 }

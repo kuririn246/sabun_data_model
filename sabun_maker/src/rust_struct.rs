@@ -1,11 +1,13 @@
-use std::collections::{HashMap, BTreeMap};
+use std::collections::{BTreeMap};
 
+#[derive(Debug)]
 pub enum ArrayType{
     Num,
     String,
     Num2, //two dimensional num array
 }
 
+#[derive(Debug)]
 pub enum RustValue{
     Bool(bool),
     NullableBool(Option<bool>),
@@ -21,11 +23,13 @@ pub enum RustValue{
     NullableObject(Option<RustObject>)
 }
 
+#[derive(Debug)]
 pub struct RustArray{
     pub vec : Vec<RustValue>,
     pub array_type : ArrayType,
 }
 
+#[derive(Debug)]
 pub struct RustList{
 
 }

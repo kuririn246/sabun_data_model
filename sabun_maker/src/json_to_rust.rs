@@ -1,9 +1,12 @@
-use serde_json::Value;
-use std::collections::BTreeMap;
+use serde_json::{Value, Map };
 use crate::rust_struct::{RustValue, RustObject, RustArray, ArrayType};
 
-pub fn json_obj_to_rust(v : &Value) -> Option<RustObject>{
+pub fn json_obj_to_rust(v : &Value) -> Option<RustObject> {
     let v = v.as_object()?;
+    return json_obj_to_rust2(v);
+}
+
+fn json_obj_to_rust2(v : &Map<String, Value>) -> Option<RustObject>{
     let mut r : RustObject = RustObject::new();
     for (k,v) in v{
         match v{
@@ -15,20 +18,41 @@ pub fn json_obj_to_rust(v : &Value) -> Option<RustObject>{
                     r.insert(name, RustValue::Bool(*b));
                 }
             },
+            Value::Number(num)=>{
+                let (is_nullable,name) = is_nullable(k);
+                let num = num.as_f64()?;
+                if is_nullable {
+                    r.insert(name, RustValue::NullableNumber(Some(num)));
+                } else{
+                    r.insert(name, RustValue::Number(num));
+                }
+            },
+            Value::String(s) =>{
+                let (is_nullable,name) = is_nullable(k);
+                let s = s.to_string();
+                if is_nullable {
+                    r.insert(name, RustValue::NullableString(Some(s)));
+                } else{
+                    r.insert(name, RustValue::String(s));
+                }
+            },
             Value::Array(a) => {
                 let (is_nullable, name) = is_nullable(k);
 
-                if let Some(array) = json_array_to_rust(a){
-                    if is_nullable{
-                        r.insert(name, RustValue::NullableArray(Some(array)));
-                    } else{
-                        r.insert(name, )
-                    }
+                if let Some(value) = json_array_to_rust(a, is_nullable) {
+                    r.insert(name, value);
                 }
-
-
-
             },
+            Value::Object(o) =>{
+                let (is_nullable, name) = is_nullable(k);
+                let obj = json_obj_to_rust2(o)?;
+
+                if is_nullable{
+                    r.insert(name, RustValue::NullableObject(Some(obj)));
+                } else{
+                    r.insert(name, RustValue::Object(obj));
+                }
+            }
             _ =>{panic!(); },
         }
         //println!("key {} value {}", k, v);
@@ -65,24 +89,70 @@ fn json_array_to_rust(array : &Vec<Value>, is_nullable : bool) -> Option<RustVal
         GatResult::None
     }
 
-    fn get_array(t : ArrayType, a : &Vec<Value>) -> Option<RustArray>{
+    fn get_array(t : ArrayType, a : &Vec<Value>, is_nullable : bool) -> Option<RustValue>{
         let a = &a[1..];
         match t{
-            ArrayType::Num =>{ return Some(RustArray{ vec : get_num_array(a)?, array_type : ArrayType::Num }); },
-            ArrayType::String{}
+            ArrayType::Num =>{
+                let array = get_num_array(a)?;
+                if is_nullable{
+                    return Some(RustValue::NullableArray(Some(array)));
+                } else{
+                    return Some(RustValue::Array(array));
+                }
+            },
+            ArrayType::String =>{
+                let array = get_str_array(a)?;
+                if is_nullable{
+                    return Some(RustValue::NullableArray(Some(array)));
+                } else{
+                    return Some(RustValue::Array(array));
+                }
+            },
+            ArrayType::Num2 =>{
+                let array = get_num_array2(a)?;
+                if is_nullable{
+                    return Some(RustValue::NullableArray(Some(array)));
+                } else{
+                    return Some(RustValue::Array(array));
+                }
+            },
         }
     }
 
-    fn get_num_array(a : &[Value]) -> Option<Vec<RustValue::Number>>{
-        Some(a.iter().map(|v| RustValue::Number(v.as_f64()?)).collect())
+    fn get_num_array(a : &[Value]) -> Option<RustArray>{
+        let mut vec : Vec<RustValue> = vec![];
+        for item in a{
+            vec.push(RustValue::Number(item.as_f64()?));
+        }
+        return Some(RustArray{ vec, array_type : ArrayType::Num });
     }
 
-    fn get_str_array(a : &[Value]) -> Option<Vec<RustValue::String>>{
-        Some(a.iter().map(|v| RustValue::Number(v.as_f64()?)).collect())
+    fn get_str_array(a : &[Value]) -> Option<RustArray>{
+        let mut vec : Vec<RustValue> = vec![];
+        for item in a{
+            vec.push(RustValue::String(item.as_str()?.to_string()));
+        }
+        return Some(RustArray{ vec, array_type : ArrayType::String });
     }
 
-    match get_array_type(a){
-        GatResult::AT(a) =>{ return RustValue::Array(get_array(t, a)?); }
+    fn get_num_array2(a : &[Value]) -> Option<RustArray>{
+        let mut vec : Vec<RustValue> = vec![];
+        for item in a{
+            match item{
+                Value::Array(a) =>{
+                    let array = get_num_array(a)?;
+                    vec.push(RustValue::Array(array));
+                }
+                _=>{ return None; }
+            }
+        }
+        return Some(RustArray{ vec, array_type : ArrayType::Num2 })
     }
-    let array = get_array(t, a);
+
+    match get_array_type(array){
+        GatResult::AT(array_type) =>{ return Some(get_array(array_type, array, is_nullable)?); }
+        GatResult::None =>{ return None; },
+        GatResult::List =>{ return None; },
+    }
+
 }
