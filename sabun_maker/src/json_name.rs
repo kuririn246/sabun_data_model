@@ -1,4 +1,5 @@
 use regex::Regex;
+use lazy_static::lazy_static;
 
 pub enum SystemNames{
     Include,
@@ -27,7 +28,10 @@ pub fn json_name(s : &str) -> Result<NameType,String>{
         "RefIDs" => return ok(RefIDs),
         _=>{},
     }
-    let re = Regex::new(r"[a-z][a-zA-Z0-9]*").unwrap();
+
+    lazy_static! {
+        static ref re : Regex = Regex::new(r"[a-z][a-zA-Z0-9]*").unwrap();
+    }
     if re.is_match(s){
         Ok(NameType::Normal)
     } else{

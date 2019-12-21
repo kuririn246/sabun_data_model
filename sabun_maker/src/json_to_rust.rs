@@ -1,65 +1,74 @@
 use serde_json::{Value, Map };
 use crate::rust_struct::{RustValue, RustObject, RustArray, ArrayType};
 use crate::convert_from_json_error::ConvertFromJsonError;
+use crate::json_name::{json_name, NameType, SystemNames};
+use crate::json_item_to_rust::json_item_to_rust;
 
 pub fn json_obj_to_rust(v : &Value) -> Result<RustObject,String> {
     let v = v.as_object().ok_or("v is not an object".to_string())?;
-    return Ok(json_obj_to_rust2(v).unwrap());
+    return Ok(json_obj_to_rust2(v, &Names::new("")).unwrap());
 }
 
-fn json_obj_to_rust2(v : &Map<String, Value>) -> Option<RustObject>{ //}, String>{
+struct Names<'a>{
+    name : &'a str,
+    next : Option<&'a Names<'a>>,
+}
+
+impl Names{
+    fn to_string(&self, name : &str) -> String{
+        let mut vec : Vec<String> = vec![name.to_string()];
+        let mut cur = self;
+        loop{
+            vec.push(cur.name.to_string());
+            if cur.next.is_none(){
+                break;
+            }
+            cur = cur.next.unwrap();
+        }
+        vec.reverse();
+        vec.join(".")
+    }
+
+    fn append(&self, name : &str) -> Self{
+        Names{ name, next : Some(self)}
+    }
+
+    fn new(name : &str) -> Self{
+        Names{ name, next : None }
+    }
+}
+
+fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<RustObject, String>{
     let mut r : RustObject = RustObject::new();
     for (k,v) in v{
+        let name = json_name(k)?;
+        match name{
+            NameType::Normal =>{
+                let v = json_item_to_rust(v)?;
+                r.insert(k.to_string(), v);
+            }
 
-        match v{
-            Value::Bool(b) =>{
-                let (is_nullable,name) = is_nullable(k);
-                if is_nullable {
-                    r.insert(name, RustValue::NullableBool(Some(*b)));
-                } else{
-                    r.insert(name, RustValue::Bool(*b));
-                }
-            },
-            Value::Number(num)=>{
-                let (is_nullable,name) = is_nullable(k);
-                let num = num.as_f64()?;
-                if is_nullable {
-                    r.insert(name, RustValue::NullableNumber(Some(num)));
-                } else{
-                    r.insert(name, RustValue::Number(num));
-                }
-            },
-            Value::String(s) =>{
-                let (is_nullable,name) = is_nullable(k);
-                let s = s.to_string();
-                if is_nullable {
-                    r.insert(name, RustValue::NullableString(Some(s)));
-                } else{
-                    r.insert(name, RustValue::String(s));
-                }
-            },
-            Value::Array(a) => {
-                let (is_nullable, name) = is_nullable(k);
+            NameType::SystemName(sn) =>{
+                match sn{
+                    SystemNames::ID =>{
+                        if r.id.is_none() {
+                            r.id = Some(v.as_str().ok_or(format!("ID must be string : {}\n{}", v, names.to_string(k)))?.to_string())
+                        } else{
+                            return Err(format!("ID is defined multiple times {}", names.to_string(k)));
+                        }
+                    },
+                    SystemNames::Include=>{
+                        //TODO: implement "Include"
+                    },
+                    SystemNames::RefID =>{
 
-                if let Some(value) = json_array_to_rust(a, is_nullable) {
-                    r.insert(name, value);
-                }
-            },
-            Value::Object(o) =>{
-                let (is_nullable, name) = is_nullable(k);
-                let obj = json_obj_to_rust2(o)?;
-
-                if is_nullable{
-                    r.insert(name, RustValue::NullableObject(Some(obj)));
-                } else{
-                    r.insert(name, RustValue::Object(obj));
+                    },
                 }
             }
-            _ =>{panic!(); },
         }
-        //println!("key {} value {}", k, v);
+
     }
-    Some(r)
+    Ok(r)
 }
 
 

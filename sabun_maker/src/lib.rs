@@ -1,8 +1,9 @@
 pub mod read_json;
 pub mod json_to_rust;
 pub mod rust_struct;
-pub mod convert_from_json_error;
 pub mod json_name;
+pub mod json_item_to_rust;
+pub mod json_array_to_rust;
 
 #[cfg(test)]
 mod tests {
