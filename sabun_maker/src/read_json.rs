@@ -61,7 +61,6 @@ pub fn untyped_example() -> Result<Value> {
 	  },
 	  {
 	    ID : "second",
-	    IsDefault : "true", //デフォルトのメンバにisDefaultを設定することでデフォルトオブジェクトを最初のものから変えることができる。
 	    member2 : "this_is_default", //これがデフォルト値となり、差分が取られる。
 	  }
 	],

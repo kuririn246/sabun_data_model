@@ -1,14 +1,16 @@
 use serde_json::{Value, Map };
 use crate::rust_struct::{RustValue, RustObject, RustArray, ArrayType};
+use crate::convert_from_json_error::ConvertFromJsonError;
 
-pub fn json_obj_to_rust(v : &Value) -> Option<RustObject> {
-    let v = v.as_object()?;
-    return json_obj_to_rust2(v);
+pub fn json_obj_to_rust(v : &Value) -> Result<RustObject,String> {
+    let v = v.as_object().ok_or("v is not an object".to_string())?;
+    return Ok(json_obj_to_rust2(v).unwrap());
 }
 
-fn json_obj_to_rust2(v : &Map<String, Value>) -> Option<RustObject>{
+fn json_obj_to_rust2(v : &Map<String, Value>) -> Option<RustObject>{ //}, String>{
     let mut r : RustObject = RustObject::new();
     for (k,v) in v{
+
         match v{
             Value::Bool(b) =>{
                 let (is_nullable,name) = is_nullable(k);
@@ -59,6 +61,8 @@ fn json_obj_to_rust2(v : &Map<String, Value>) -> Option<RustObject>{
     }
     Some(r)
 }
+
+
 
 fn is_nullable(s : &str) -> (bool, String){
     if s.ends_with("?"){
