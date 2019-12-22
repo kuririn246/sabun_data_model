@@ -9,13 +9,13 @@ pub fn json_obj_to_rust(v : &Value) -> Result<RustObject,String> {
     return Ok(json_obj_to_rust2(v, &Names::new("")).unwrap());
 }
 
-struct Names<'a>{
-    name : &'a str,
-    next : Option<&'a Names<'a>>,
+pub struct Names<'a>{
+    pub name : &'a str,
+    pub next : Option<&'a Names<'a>>,
 }
 
 impl Names{
-    fn to_string(&self, name : &str) -> String{
+    pub fn to_string(&self, name : &str) -> String{
         let mut vec : Vec<String> = vec![name.to_string()];
         let mut cur = self;
         loop{
@@ -29,11 +29,11 @@ impl Names{
         vec.join(".")
     }
 
-    fn append(&self, name : &str) -> Self{
+    pub fn append(&self, name : &str) -> Self{
         Names{ name, next : Some(self)}
     }
 
-    fn new(name : &str) -> Self{
+    pub fn new(name : &str) -> Self{
         Names{ name, next : None }
     }
 }
@@ -61,8 +61,19 @@ fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<RustObje
                         //TODO: implement "Include"
                     },
                     SystemNames::RefID =>{
-
+                        if r.ref_id.is_none(){
+                            r.ref_id = Some(v.as_str().ok_or(format!("RefID must be string : {}\n{}", v, names.to_string(k)))?.to_string());
+                        } else {
+                            return Err(format!("RefID is defined multiple times {}", names.to_string(k)));
+                        }
                     },
+                    SystemNames::RefIDs =>{
+                        if r.ref_ids.is_none(){
+                            r.ref_ids = Some(v.as_str().ok_or(format!("RefID must be string : {}\n{}", v, names.to_string(k)))?.to_string());
+                        } else {
+                            return Err(format!("RefID is defined multiple times {}", names.to_string(k)));
+                        }
+                    }
                 }
             }
         }

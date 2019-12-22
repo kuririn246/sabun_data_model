@@ -38,7 +38,7 @@ pub struct RustObject{
     pub map : BTreeMap<String, RustValue>,
     pub id : Option<String>,
     pub ref_id : Option<String>,
-    pub ref_ids : Option<Vec<String>>,
+    pub ref_ids : Option<BTreeMap<String, String>>,
     pub rename : HashMap<String, String>,
 }
 

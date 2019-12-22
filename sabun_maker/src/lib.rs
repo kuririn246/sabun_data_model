@@ -4,6 +4,7 @@ pub mod rust_struct;
 pub mod json_name;
 pub mod json_item_to_rust;
 pub mod json_array_to_rust;
+pub mod get_ref_ids;
 
 #[cfg(test)]
 mod tests {
