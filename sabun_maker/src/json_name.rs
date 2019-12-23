@@ -11,30 +11,57 @@ pub enum SystemNames{
 
 pub enum NameType{
     Normal,
+    Nullable(String),
     SystemName(SystemNames)
 }
 
-pub fn json_name(s : &str) -> Result<NameType,String>{
-    fn ok(sn : SystemNames) -> Result<NameType, String>{
-        return Ok(NameType::SystemName(sn));
+pub fn json_name(s : &str) -> Option<NameType>{
+    fn some(sn: SystemNames) -> Option<NameType> {
+        return Some(NameType::SystemName(sn));
     }
     use SystemNames::*;
 
-    match s{
-        "Include" => return ok(Include),
-        "Rename" => return ok(Rename),
-        "ID" => return ok(ID),
-        "RefID" => return ok(RefID),
-        "RefIDs" => return ok(RefIDs),
-        _=>{},
+    match s {
+        "Include" => return some(Include),
+        "Rename" => return some(Rename),
+        "ID" => return some(ID),
+        "RefID" => return some(RefID),
+        "RefIDs" => return some(RefIDs),
+        _ => {},
     }
 
-    lazy_static! {
-        static ref re : Regex = Regex::new(r"[a-z][a-zA-Z0-9]*").unwrap();
+    let (is_nullable, s) = is_possible_name(s)?;
+
+    if is_nullable {
+        Some(NameType::Nullable(s.to_string()))
+    } else {
+        Some(NameType::Normal)
     }
-    if re.is_match(s){
-        Ok(NameType::Normal)
+}
+
+///[a-z_][a-zA-Z0-9]*
+pub fn is_valid_name(s : &str) -> bool{
+    lazy_static! {
+        static ref re : Regex = Regex::new(r"[a-z_][a-zA-Z0-9]*").unwrap();
+    }
+    re.is_match(s)
+}
+
+
+pub fn is_nullable(s : &str) -> (bool, &str){
+    if s.ends_with("?"){
+        (true, &s[0..s.len()-1])
     } else{
-        Err(format!("{} is not a valid name [a-z][a-zA-Z0-9]*",s))
+        (false, s)
+    }
+}
+
+///[a-z_][a-zA-Z0-9]*\??
+pub fn is_possible_name(s : &str) -> Option<(bool, &str)>{
+    let (b,s) = is_nullable(s);
+    if is_valid_name(s){
+        return Some((b,s))
+    } else{
+        return None;
     }
 }

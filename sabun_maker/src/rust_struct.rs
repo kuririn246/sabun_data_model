@@ -34,6 +34,7 @@ pub struct RustList{
     pub auto_id : Option<u64>,
 }
 
+#[derive(Debug)]
 pub struct RustObject{
     pub map : BTreeMap<String, RustValue>,
     pub id : Option<String>,

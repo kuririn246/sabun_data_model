@@ -1,8 +1,8 @@
 use serde_json::{Value, Map };
 use crate::rust_struct::{RustValue, RustObject, RustArray, ArrayType};
-use crate::convert_from_json_error::ConvertFromJsonError;
 use crate::json_name::{json_name, NameType, SystemNames};
 use crate::json_item_to_rust::json_item_to_rust;
+use crate::get_ref_ids::get_ref_ids;
 
 pub fn json_obj_to_rust(v : &Value) -> Result<RustObject,String> {
     let v = v.as_object().ok_or("v is not an object".to_string())?;
@@ -14,9 +14,9 @@ pub struct Names<'a>{
     pub next : Option<&'a Names<'a>>,
 }
 
-impl Names{
-    pub fn to_string(&self, name : &str) -> String{
-        let mut vec : Vec<String> = vec![name.to_string()];
+impl<'a> Names<'a>{
+    pub fn to_string(&self) -> String{
+        let mut vec : Vec<String> = vec![];
         let mut cur = self;
         loop{
             vec.push(cur.name.to_string());
@@ -29,23 +29,33 @@ impl Names{
         vec.join(".")
     }
 
-    pub fn append(&self, name : &str) -> Self{
-        Names{ name, next : Some(self)}
+    pub fn to_string_with(&self, name : &str) -> String{
+        let s = self.to_string();
+        format!("{}.{}",s, name)
     }
 
-    pub fn new(name : &str) -> Self{
-        Names{ name, next : None }
+    pub fn append(&'a self, name : &'a str) -> Self{
+        Names::<'a>{ name, next : Some(self)}
+    }
+
+    pub fn new(name : &'a str) -> Self{
+        Names::<'a>{ name, next : None }
     }
 }
 
 fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<RustObject, String>{
     let mut r : RustObject = RustObject::new();
     for (k,v) in v{
-        let name = json_name(k)?;
+        let name = json_name(k).ok_or(format!("{} is not a valid name", k))?;
         match name{
             NameType::Normal =>{
-                let v = json_item_to_rust(v)?;
+                let v = json_item_to_rust(k,v, names)?;
                 r.insert(k.to_string(), v);
+            },
+
+            NameType::Nullable(ref s) =>{
+                let v = json_item_to_rust(s,v, names)?;
+                r.insert(s.to_string(), v);
             }
 
             NameType::SystemName(sn) =>{
@@ -69,7 +79,7 @@ fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<RustObje
                     },
                     SystemNames::RefIDs =>{
                         if r.ref_ids.is_none(){
-                            r.ref_ids = Some(v.as_str().ok_or(format!("RefID must be string : {}\n{}", v, names.to_string(k)))?.to_string());
+                            r.ref_ids = Some(get_ref_ids(v, names)?);
                         } else {
                             return Err(format!("RefID is defined multiple times {}", names.to_string(k)));
                         }
@@ -84,13 +94,7 @@ fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<RustObje
 
 
 
-fn is_nullable(s : &str) -> (bool, String){
-    if s.ends_with("?"){
-        (true, s[0..s.len()-1].to_string())
-    } else{
-        (false, s.to_string())
-    }
-}
+
 
 fn json_array_to_rust(array : &Vec<Value>, is_nullable : bool) -> Option<RustValue>{
     enum GatResult{
