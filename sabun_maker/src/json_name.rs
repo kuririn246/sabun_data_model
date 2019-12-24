@@ -42,9 +42,9 @@ pub fn json_name(s : &str) -> Option<NameType>{
 ///[a-z_][a-zA-Z0-9]*
 pub fn is_valid_name(s : &str) -> bool{
     lazy_static! {
-        static ref re : Regex = Regex::new(r"[a-z_][a-zA-Z0-9]*").unwrap();
+        static ref RE : Regex = Regex::new(r"[a-z_][a-zA-Z0-9]*").unwrap();
     }
-    re.is_match(s)
+    RE.is_match(s)
 }
 
 

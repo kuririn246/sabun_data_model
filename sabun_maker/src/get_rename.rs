@@ -1,5 +1,5 @@
 use serde_json::Value;
-use crate::json_name::{json_name, NameType, is_valid_name};
+use crate::json_name::{is_valid_name};
 use crate::json_to_rust::{Names};
 use std::collections::HashMap;
 
