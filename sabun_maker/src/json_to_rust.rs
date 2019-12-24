@@ -3,6 +3,7 @@ use crate::rust_struct::{RustValue, RustObject, RustArray, ArrayType};
 use crate::json_name::{json_name, NameType, SystemNames};
 use crate::json_item_to_rust::json_item_to_rust;
 use crate::get_ref_ids::get_ref_ids;
+use crate::get_rename::get_rename;
 
 pub fn json_obj_to_rust(v : &Value) -> Result<RustObject,String> {
     let v = v.as_object().ok_or("v is not an object".to_string())?;
@@ -29,11 +30,6 @@ impl<'a> Names<'a>{
         vec.join(".")
     }
 
-    pub fn to_string_with(&self, name : &str) -> String{
-        let s = self.to_string();
-        format!("{}.{}",s, name)
-    }
-
     pub fn append(&'a self, name : &'a str) -> Self{
         Names::<'a>{ name, next : Some(self)}
     }
@@ -43,10 +39,10 @@ impl<'a> Names<'a>{
     }
 }
 
-fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<RustObject, String>{
+pub fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<RustObject, String>{
     let mut r : RustObject = RustObject::new();
     for (k,v) in v{
-        let name = json_name(k).ok_or(format!("{} is not a valid name", k))?;
+        let name = json_name(k).ok_or(format!("{} is not a valid name {}", k, names.to_string()))?;
         match name{
             NameType::Normal =>{
                 let v = json_item_to_rust(k,v, names)?;
@@ -62,9 +58,9 @@ fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<RustObje
                 match sn{
                     SystemNames::ID =>{
                         if r.id.is_none() {
-                            r.id = Some(v.as_str().ok_or(format!("ID must be string : {}\n{}", v, names.to_string(k)))?.to_string())
+                            r.id = Some(v.as_str().ok_or(format!("ID must be string : {} {}", v, names.to_string()))?.to_string())
                         } else{
-                            return Err(format!("ID is defined multiple times {}", names.to_string(k)));
+                            return Err(format!("ID is defined multiple times {}", names.to_string()));
                         }
                     },
                     SystemNames::Include=>{
@@ -72,16 +68,24 @@ fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<RustObje
                     },
                     SystemNames::RefID =>{
                         if r.ref_id.is_none(){
-                            r.ref_id = Some(v.as_str().ok_or(format!("RefID must be string : {}\n{}", v, names.to_string(k)))?.to_string());
+                            r.ref_id = Some(v.as_str().ok_or(format!("RefID must be string : {} {}", v, names.to_string()))?.to_string());
                         } else {
-                            return Err(format!("RefID is defined multiple times {}", names.to_string(k)));
+                            return Err(format!("RefID is defined multiple times {}", names.to_string()));
                         }
                     },
                     SystemNames::RefIDs =>{
                         if r.ref_ids.is_none(){
                             r.ref_ids = Some(get_ref_ids(v, names)?);
                         } else {
-                            return Err(format!("RefID is defined multiple times {}", names.to_string(k)));
+                            return Err(format!("RefID is defined multiple times {}", names.to_string()));
+                        }
+                    },
+                    SystemNames::Rename =>{
+                        if r.rename.len() == 0{
+                            r.rename = get_rename(v, names)?;
+                        } else{
+                            //そもそも複数回の定義はjsonパーサーによって弾かれるはずだが、いずれjsonパーサーを自作した時にこの処理が必要になるはず。
+                            return Err(format!("Rename is defined multiple times {}", names.to_string()));
                         }
                     }
                 }

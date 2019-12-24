@@ -5,6 +5,7 @@ pub mod json_name;
 pub mod json_item_to_rust;
 pub mod json_array_to_rust;
 pub mod get_ref_ids;
+pub mod get_rename;
 
 #[cfg(test)]
 mod tests {
