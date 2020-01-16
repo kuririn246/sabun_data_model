@@ -1,6 +1,7 @@
 use serde_json::Value;
 use crate::rust_struct::{RustValue, ArrayType, RustArray, Qv};
 use crate::json_to_rust::Names;
+use crate::json_list_to_rust::json_list_to_rust;
 
 pub fn json_array_to_rust(array : &Vec<Value>, is_nullable : bool, names : &Names) -> Result<RustValue, String>{
     match get_array_type(array){
@@ -9,8 +10,7 @@ pub fn json_array_to_rust(array : &Vec<Value>, is_nullable : bool, names : &Name
         },
         GatResult::None =>{ return Err(format!(r#"Array must be "...-Array" or "List" "#)); },
         GatResult::List =>{
-            //TODO: implement List
-            return Err("list unimplemented".to_string());
+            Ok(json_list_to_rust(array, is_nullable, names)?);
         },
     }
 }

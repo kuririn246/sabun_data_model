@@ -28,12 +28,10 @@ pub fn untyped_example() -> Result<Value> {
 	hogeList : [
 		"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
 		["ListID", "hogehoge"], //任意でListIDを与えることが出来る。ListIDは全データの中で一意である必要がある。
-		["Dummy", "dummy"], //dummyのIDを設定。デフォルト値を設定でき、実際のリストには加わらない。
-		{
-			ID : "dummy",
+		["Default", {
 			hogeNumber : 0,
 			hogeString : "hoge"
-		},
+		}], //デフォルト値を設定。実際のリストには加わらない。
 		{
 			ID : "first",
 			hogeNumber : 12,
@@ -102,20 +100,6 @@ pub fn untyped_example() -> Result<Value> {
     }
   ],
 
-//  itemList2 : [　この機能についてはない方が良い可能性があると思うので、今の所実装しない。
-//    "List",
-//    ["AutoID"],
-//    ["RefListIDs", "weapons", "usables"], //RefListIDsを設定すると、アイテムにはRefListIDが絶対に必要。
-//    {
-//      RefListID : "weapon",
-//      RefID : "doutanuki",
-//    },
-//    {
-//      RefListID : "usable",
-//      RefID : "yakusou",
-//    }
-//  ],
-
   hogeList : [
     "List",
     ["ListID", "hoge"],
@@ -145,12 +129,13 @@ pub fn untyped_example() -> Result<Value> {
   itemList3 : [
     "List",
     ["AutoID"],
-    ["Multiple",  //多重継承が必要な場合、Multipleを設定する。
-      "hoge", "huga?" //nullableにも出来る
+    ["RefListIDs",  //多重継承が必要な場合、RefListIDsを設定する
+      "hoge", "huga?", //nullableにも出来る
+      "hego",
     ],
     {
-      RefIDs : { //Multipleが設定されている場合、RefIDsが必要。必要なメンバを設定する。
-        hoge : "hogehoge",
+      RefIDs : { //RefListIDsが設定されている場合、RefIDsが必要。必要なメンバを設定する。
+        hoge : "hogehoge", //RefListIDと、RefIDをセットで記述していく。
         //nullableは入力しなければデフォルトでnull
         hego : "hegohego",
       }
@@ -163,16 +148,13 @@ pub fn untyped_example() -> Result<Value> {
 
 //使用側 概念コード
 //let item = itemList3[0]; //item は hogehoge と hegohego を継承している
-//item.mem <これは後に継承した方が優先なので、hegohegoの"b"になる
+//item.mem <エラー。同じメンバを複数継承してしまった場合、曖昧なのでアクセスできない
 //item.RefIDs.hoge.mem <これは"a"である
 //item.RefIDs.hego.mem = "c" //hegoのmemをオーバーライドする。overrideなので、元のListにあるhegoの方に影響はない。
-//item.RefIDs.mem <これは"c"に変わっている。　
-//item.RefIDs.hoge.mem = "d"
-//item.RefIDs.mem <これは変わらない。hegoの方の中身が出るだけだから。
-//実際は三角継承しているわけではなく、AもBも継承していて、便宜上itemから直接アクセスする場合は、後に継承したものを優先しているだけ。何も難しいことはない。
+//item.RefIDs.hoge.mem = "d" //hogeの方もoverride
 //let hegohego = list["hego"]["hegohego"];
 //hegohego.mem <これは"b"のままである。
-//hegohego.mem = "e" //eに変わる。overrideしていなければ、refしてるitemの方もこの値に変わる。
+//hegohego.mem = "e" //eに変わる。overrideしていなければ、refしてるitemの方もこの値に変わる。今回の場合はoverrideしてるのでdのまま
 
 "#;
 
