@@ -68,23 +68,21 @@ pub struct RustList{
 pub struct RustObject{
     //listの場合、defaultはlist側にあるのでここにはない。
     pub default : Option<BTreeMap<String, RustValue>>,
-    //デフォルト値からの変更を記録。差分変更時に、defaultと同じになったらここから削除する
+    //デフォルト値から変更されたものを記録。差分変更時に、defaultと同じになったらここから削除するかもしれない？
     pub sabun : BTreeMap<String, RustValue>,
     //listの場合idがなければならず、list内で一意である必要もある。
     //listのオブジェクトでない場合はNone
     pub id : Option<String>,
     //単一のref_idしかない時は、キーはRefIDである。
     //RefIDもRefIDsもない場合は空
-    pub ref_ids : BTreeMap<String, String>,
+    pub ref_ids : Option<BTreeMap<String, String>>,
     pub rename : HashMap<String, String>,
-    //継承したメンバをoverrideした場合、ここにいれていく
-    pub ref_override : BTreeMap<String, BTreeMap<String, RustValue>>,
 }
 
 impl RustObject{
     pub fn new() -> RustObject{
         RustObject{ default : None, sabun : BTreeMap::new(),id : None, ref_ids : None,
-            rename : HashMap::new(), ref_override : BTreeMap::new(), }
+            rename : HashMap::new() }
     }
 
     pub fn insert_default(&mut self, key : String, value : RustValue) -> Option<RustValue>{

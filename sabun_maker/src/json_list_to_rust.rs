@@ -14,6 +14,6 @@ pub fn json_list_to_rust(vec : &Vec<Value>, is_nullable : bool, names : &Names) 
     todo!();
 }
 
-fn get_list_array(v : &Vec<Value>) -> Result<(), String>{
-
-}
+//fn get_list_array(v : &Vec<Value>) -> Result<(), String>{
+//
+//}

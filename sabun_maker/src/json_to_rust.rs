@@ -4,6 +4,7 @@ use crate::json_name::{json_name, NameType, SystemNames};
 use crate::json_item_to_rust::json_item_to_rust;
 use crate::get_ref_ids::get_ref_ids;
 use crate::get_rename::get_rename;
+use std::collections::BTreeMap;
 
 pub fn json_obj_to_rust(v : &Value) -> Result<RustObject,String> {
     let v = v.as_object().ok_or("v is not an object".to_string())?;
@@ -46,12 +47,12 @@ pub fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<Rust
         match name{
             NameType::Normal =>{
                 let v = json_item_to_rust(k,v, names)?;
-                r.insert(k.to_string(), v);
+                r.insert_default(k.to_string(), v);
             },
 
             NameType::Nullable(ref s) =>{
                 let v = json_item_to_rust(s,v, names)?;
-                r.insert(s.to_string(), v);
+                r.insert_default(s.to_string(), v);
             }
 
             NameType::SystemName(sn) =>{
@@ -67,8 +68,11 @@ pub fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<Rust
                         //TODO: implement "Include"
                     },
                     SystemNames::RefID =>{
-                        if r.ref_id.is_none(){
-                            r.ref_id = Some(v.as_str().ok_or(format!("RefID must be string : {} {}", v, names.to_string()))?.to_string());
+                        if r.ref_ids.is_none(){
+                            let id = v.as_str().ok_or(format!("RefID must be string : {} {}", v, names.to_string()))?.to_string();
+                            let mut map : BTreeMap<String,String> = BTreeMap::new();
+                            map.insert("RefID".to_string(), id);
+                            r.ref_ids = Some(map);
                         } else {
                             return Err(format!("RefID is defined multiple times {}", names.to_string()));
                         }
