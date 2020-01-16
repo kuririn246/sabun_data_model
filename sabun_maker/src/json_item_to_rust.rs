@@ -1,4 +1,4 @@
-use crate::rust_struct::RustValue;
+use crate::rust_struct::{RustValue, Qv};
 use serde_json::Value;
 use crate::json_array_to_rust::json_array_to_rust;
 use crate::json_to_rust::{Names, json_obj_to_rust2};
@@ -15,26 +15,26 @@ pub fn json_item_to_rust(k : &str, v : &Value, names : &Names) -> Result<RustVal
     match v {
         Value::Bool(b) => {
             if is_nullable(k, names)? {
-                Ok(RustValue::NullableBool(Some(*b)))
+                Ok(RustValue::NullableBool(Qv::Val(Some(*b))))
             } else {
-                Ok(RustValue::Bool(*b))
+                Ok(RustValue::Bool(Qv::Val(*b)))
             }
         },
         Value::Number(num) => {
 
             let num = num.as_f64().ok_or(format!("{} couldn't convert to f64 {}", num, names.to_string()))?; //numberがf64に変換できないなんてことないと思う・・・
             if is_nullable(k, names)? {
-                Ok(RustValue::NullableNumber(Some(num)))
+                Ok(RustValue::NullableNumber(Qv::Val(Some(num))))
             } else {
-                Ok(RustValue::Number(num))
+                Ok(RustValue::Number(Qv::Val(num)))
             }
         },
         Value::String(s) => {
             let s = s.to_string();
             if is_nullable(k, names)? {
-                Ok(RustValue::NullableString(Some(s)))
+                Ok(RustValue::NullableString(Qv::Val(Some(s))))
             } else {
-                Ok(RustValue::String(s))
+                Ok(RustValue::String(Qv::Val(s)))
             }
         },
         Value::Array(a) => {
@@ -47,9 +47,9 @@ pub fn json_item_to_rust(k : &str, v : &Value, names : &Names) -> Result<RustVal
             let obj = json_obj_to_rust2(o, names)?;
 
             if is_nullable(k, names)? {
-                Ok(RustValue::NullableObject(Some(obj)))
+                Ok(RustValue::NullableObject(Qv::Val(Some(obj))))
             } else {
-                Ok(RustValue::Object(obj))
+                Ok(RustValue::Object(Qv::Val(obj)))
             }
         }
         _ => { Err(format!("{} An item must be object or array or number or bool or string {}", v, names.to_string())) },

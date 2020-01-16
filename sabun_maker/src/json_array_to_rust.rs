@@ -1,5 +1,5 @@
 use serde_json::Value;
-use crate::rust_struct::{RustValue, ArrayType, RustArray};
+use crate::rust_struct::{RustValue, ArrayType, RustArray, Qv};
 use crate::json_to_rust::Names;
 
 pub fn json_array_to_rust(array : &Vec<Value>, is_nullable : bool, names : &Names) -> Result<RustValue, String>{
@@ -42,15 +42,15 @@ fn get_array(t : ArrayType, a : &Vec<Value>, is_nullable : bool, names : &Names)
         ArrayType::Num =>{
             let array = get_num_array(a, names)?;
             if is_nullable{
-                return Ok(RustValue::NullableArray(Some(array)));
+                return Ok(RustValue::NullableArray(Qv::Val(Some(array))));
             } else{
-                return Ok(RustValue::Array(array));
+                return Ok(RustValue::Array(Qv::Val(array)));
             }
         },
         ArrayType::String =>{
             let array = get_str_array(a, names)?;
             if is_nullable{
-                return Ok(RustValue::NullableArray(Some(array)));
+                return Ok(RustValue::NullableArray(Qv::Val(Some(array))));
             } else{
                 return Ok(RustValue::Array(array));
             }
