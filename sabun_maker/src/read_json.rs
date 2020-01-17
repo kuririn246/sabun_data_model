@@ -9,21 +9,28 @@ pub fn untyped_example() -> Result<Value> {
   hogeString : "hoge",
   hogeBool : true,
   hogeObj : {
-    hugaNumber : "30",
+    hugaNumber : 30,
+    "@HugaNumber" : 30, //先頭が大文字のメンバ名はすべてシステムが予約しているので認められない。しかしメンバをどうしても大文字で始めたい場合、
+                        //jsonでは戦闘に@をつけ、プログラム側では@なしでもアクセス可能にするという技も使えなくはなかろうと思う。
 
     //名前が?で終わるメンバはnull値を含むことが出来る。
-    //プログラム側のメンバ名にはこの?は反映されず、型が変わるだけと想定される
-    //初期値をnullに設定することは出来ない(undefinedの時にnullを入れる機能しかない）
-    //これにより初期値で型を特定できる
-    "hegoNumber?" : 21,
+    //プログラム側のメンバ名にはこの?は反映されず、型が変わるだけ(もし俺以外の実装が現れたらわからないが・・・）
+    //初期値にnullを入れるには、特殊な記法を使う必要がある
+    "hegoNumber?" : ["Num"], //型だけを指定し、値を入れない。これでnullになる
 
-    //配列はいまのところnumber配列、string配列、number配列の配列の4通り。最初に型を示し、その後初期値をいれる。
-    numArray : [ "Num-Array", 0, 3, 10 ],
-    emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
-    numArray2 : [ "Num-Array2", [2,3], [3,1] ], //二次元のnumarray
+    //配列はいまのところnumber配列、string配列、number配列の配列の4通り。
+    numArray : [0, 3, 10],
+    //最初に型を示し、その後初期値をいれる事もできる。
+    numArray2 : [ "Num-Array", [0, 3, 10] ],
 
-    "nullableNumArray?" : [ "Num-Array" ], //nullableにすることも出来るが、初期値をnullにする機能はない。undefinedのときにnullにすることは出来る。nullの使いみちってそれだけだと思う。
-	strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
+    emptyNumArray : [ "Num-Array", [] ], //初期値が空配列のnum-array
+    "nullableNumArray?" : [ "Num-Array" ], //nullable配列の初期値をnullにする場合
+    numArray2 : [ "Num-Array2", [[2,3], [3,1]] ], //二次元のnumarray
+    numArray2_2 : [[2,3], [3,1]], //型を指定しないバージョン
+
+
+	strArray : [ "Str-Array", ["hoge", "hogehoge"] ], //文字列配列
+	//strArray : ["hoge", "hogehoge"], //直接文字列配列を入れるのはややこしいので認めない。Str-Arrayと書く必要がある
 
 	hogeList : [
 		"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
@@ -131,14 +138,15 @@ pub fn untyped_example() -> Result<Value> {
     ["AutoID"],
     ["RefListIDs",  //多重継承が必要な場合、RefListIDsを設定する
       "hoge", "huga?", //nullableにも出来る
-      "hego",
+      {hegoNew : "hego"} //名前を変更する
     ],
     {
       RefIDs : { //RefListIDsが設定されている場合、RefIDsが必要。必要なメンバを設定する。
         hoge : "hogehoge", //RefListIDと、RefIDをセットで記述していく。
         //nullableは入力しなければデフォルトでnull
-        hego : "hegohego",
+        hegoNew : "hegohego",
       }
+      "memOverride?" : ["String"],
     }
   ],
   "nullableObj?" : {
@@ -148,13 +156,13 @@ pub fn untyped_example() -> Result<Value> {
 
 //使用側 概念コード
 //let item = itemList3[0]; //item は hogehoge と hegohego を継承している
-//item.mem <エラー。同じメンバを複数継承してしまった場合、曖昧なのでアクセスできない
 //item.RefIDs.hoge.mem <これは"a"である
-//item.RefIDs.hego.mem = "c" //hegoのmemをオーバーライドする。overrideなので、元のListにあるhegoの方に影響はない。
-//item.RefIDs.hoge.mem = "d" //hogeの方もoverride
-//let hegohego = list["hego"]["hegohego"];
-//hegohego.mem <これは"b"のままである。
-//hegohego.mem = "e" //eに変わる。overrideしていなければ、refしてるitemの方もこの値に変わる。今回の場合はoverrideしてるのでdのまま
+//item.hoge.mem <直接メンバとして呼び出すことも可能。同名のメンバがある場合はそちらが優先
+//item.hoge.mem = "b" //参照越しに書き換えてもいいのかなあ・・・？
+//item.memOverride = "c" //nullableなメンバを書き換える
+//overrideしたいケースがあるかもしれないが、直接overrideするのではなく、nullableなメンバを上書きしたら実質overrideのようにした方が良かろうと思う
+//継承の仕組みは人間には複雑過ぎ、事故のもと。
+//if(item.memOverride != null){ return item.memOverride } else{ return item.mem }
 
 "#;
 
