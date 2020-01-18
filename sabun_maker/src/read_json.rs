@@ -10,13 +10,17 @@ pub fn untyped_example() -> Result<Value> {
   hogeBool : true,
   hogeObj : {
     hugaNumber : 30,
-    "@HugaNumber" : 30, //先頭が大文字のメンバ名はすべてシステムが予約しているので認められない。しかしメンバをどうしても大文字で始めたい場合、
+    "@HugaNumber" : 30, //先頭が大文字のメンバ名はすべてシステムが予約しているので認められない。しかしメンバ名をどうしても大文字で始めたい場合、
                         //jsonでは戦闘に@をつけ、プログラム側では@なしでもアクセス可能にするという技も使えなくはなかろうと思う。
 
     //名前が?で終わるメンバはnull値を含むことが出来る。
     //プログラム側のメンバ名にはこの?は反映されず、型が変わるだけ(もし俺以外の実装が現れたらわからないが・・・）
     //初期値にnullを入れるには、特殊な記法を使う必要がある
     "hegoNumber?" : ["Num"], //型だけを指定し、値を入れない。これでnullになる
+
+    //!で終わる場合、バージョン違いでこのメンバを持っていなかった場合、デフォルト値でなくincompatibleが入る。
+    "pugyaNumber!" : 10,
+    "pugyaNumber2!?" : ["Num"], //!?も出来る。?!でも良い。
 
     //配列はいまのところnumber配列、string配列、number配列の配列の4通り。
     numArray : [0, 3, 10],
@@ -31,6 +35,8 @@ pub fn untyped_example() -> Result<Value> {
 
 	strArray : [ "Str-Array", ["hoge", "hogehoge"] ], //文字列配列
 	//strArray : ["hoge", "hogehoge"], //直接文字列配列を入れるのはややこしいので認めない。Str-Arrayと書く必要がある
+	strArray2 : [ "Str-Array", "ababa", "ibibi" ], //なんか可愛そうだからStrArrayに関しては囲わなくても良くしようか
+	//そもそも配列なんてこのシステムに必要なんだろうか・・・？　まともに差分生成出来る気もしないしなあ。
 
 	hogeList : [
 		"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。

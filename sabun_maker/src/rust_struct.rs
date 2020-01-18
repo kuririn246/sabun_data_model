@@ -9,23 +9,26 @@ pub enum ArrayType{
 }
 
 #[derive(Debug)]
+pub enum ValueType{
+    Normal,
+    Nullable,
+    Incompatible,
+    IncompatNullable,
+}
+
+
+#[derive(Debug)]
 pub enum RustValue{
-    Bool(Qv<bool>),
-    NullableBool(Qv<Option<bool>>),
-    Number(Qv<f64>),
-    NullableNumber(Qv<Option<f64>>),
-    String(Qv<String>),
-    NullableString(Qv<Option<String>>),
-    Array(Qv<RustArray>),
-    NullableArray(Qv<Option<RustArray>>),
-    List(Qv<RustList>),
-    NullableList(Qv<Option<RustList>>),
-    Object(Qv<RustObject>),
-    NullableObject(Qv<Option<RustObject>>)
+    Bool(Qv<bool>, ValueType),
+    Number(Qv<f64>, ValueType),
+    String(Qv<String>, ValueType),
+    Array(Qv<RustArray>, ValueType),
+    List(Qv<RustList>, ValueType),
+    Object(Qv<RustObject>, ValueType),
 }
 
 #[derive(Debug)]
-pub enum Qv<T>{ Val(T), Undefined }
+pub enum Qv<T>{ Val(T), Incompatible, Null }
 
 #[derive(Debug)]
 pub struct RustArray{
