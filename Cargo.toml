@@ -6,3 +6,4 @@ edition = "2018"
 
 [dependencies]
 sabun_maker = { path = "./sabun_maker"}
+json5 = { path = "./json5" }

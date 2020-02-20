@@ -1,12 +1,4 @@
-// pub mod read_json;
-// pub mod json_to_rust;
-// pub mod rust_struct;
-// pub mod json_name;
-// pub mod json_item_to_rust;
-// pub mod json_array_to_rust;
-// pub mod get_ref_ids;
-// pub mod get_rename;
-// pub mod json_list_to_rust;
+mod json_siyou;
 
 #[cfg(test)]
 mod tests {
