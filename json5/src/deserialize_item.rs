@@ -1,9 +1,7 @@
 use crate::error::Result;
 use std::collections::BTreeMap;
 use crate::jval::JVal;
-use crate::de::{create_err, create_err_from_str, deserialize_any, Seq, Map};
-use pest::iterators::{Pair, Pairs};
-use crate::de::Rule;
+use crate::de::{deserialize_any, Seq, Map};
 use pest::Span;
 
 pub fn get_unit(span : Span) -> JVal { JVal::Null(s(span)) }
@@ -16,7 +14,14 @@ pub fn get_i64(i: i64, span : Span) -> JVal { JVal::Int(i, s(span)) }
 
 pub fn get_f64(f: f64, span : Span) -> JVal { JVal::Double(f, s(span)) }
 
-pub fn get_seq(s: Seq, span : Span) -> Result<JVal> { todo! {} }
+pub fn get_seq(seq: Seq, span : Span) -> Result<JVal> {
+    let mut result : Vec<JVal> = vec![];
+    let pairs = seq.pairs;
+    for pair in pairs{
+        result.push(deserialize_any(pair)?);
+    }
+    return Ok(JVal::Array(result, s(span)));
+}
 
 pub fn get_map(m: Map, span : Span) -> Result<JVal> {
     let mut result : BTreeMap<String, JVal> = BTreeMap::new();

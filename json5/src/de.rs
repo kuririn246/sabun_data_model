@@ -60,6 +60,7 @@ pub fn create_err(s: &str, pair: &Pair<'_, Rule>) -> MyError {
     MyError { message: s.to_string(), source : pair.to_string(), start: Some(span.start()), end: Some(span.end()) }
 }
 
+#[allow(dead_code)]
 pub fn create_err_from_str(s : &str) -> MyError {
     MyError { message: s.to_string(), source : s.to_string(), start: None, end: None }
 }
@@ -129,8 +130,7 @@ fn is_int(s: &str) -> bool {
 }
 
 fn parse_hex(s: &str, p: &Pair<'_, Rule>) -> Result<u32> {
-    todo! {}
-    //u32::from_str_radix(s, 16).or(Err(de::Error::custom("error parsing hex")))
+    u32::from_str_radix(s, 16).or(Err(create_err("error parsing hex", p)))
 }
 
 fn is_hex_literal(s: &str) -> bool {

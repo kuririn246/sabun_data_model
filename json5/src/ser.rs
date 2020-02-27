@@ -17,7 +17,6 @@
 //
 // struct Serializer {
 //     output: String,
-//     // TODO settings for formatting (single vs double quotes, whitespace etc)
 // }
 //
 // impl Serializer {
@@ -114,7 +113,7 @@
 //     }
 //
 //     fn serialize_bytes(self, _v: &[u8]) -> Result<()> {
-//         unimplemented!() // TODO
+//         unimplemented!()
 //     }
 //
 //     fn serialize_none(self) -> Result<()> {
@@ -164,7 +163,7 @@
 //         T: ?Sized + Serialize,
 //     {
 //         self.output += "{";
-//         variant.serialize(&mut *self)?; // TODO drop the quotes where possible
+//         variant.serialize(&mut *self)?;
 //         self.output += ":";
 //         value.serialize(&mut *self)?;
 //         self.output += "}";

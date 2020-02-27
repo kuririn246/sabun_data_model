@@ -1,6 +1,7 @@
 use serde_json::{Result, Value};
 use json5;
 
+#[allow(dead_code)]
 pub fn untyped_example() -> Result<Value> {
     // Some JSON input data as a &str. Maybe this comes from the user.
     let data = r#"

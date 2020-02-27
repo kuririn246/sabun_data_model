@@ -144,9 +144,9 @@ fn should_update_b(current : &Vec<i32>, sabuns : &Sabuns) -> bool{
     //should_update_b_super_easy(current, sabuns)
     //true
 }
-
+#[allow(dead_code)]
 fn should_update_b_easy(current : &Vec<i32>, sabuns : &Sabuns) -> bool {
-    let prev_cb_sabun = &sabuns.get_c().vec[0];
+    let _prev_cb_sabun = &sabuns.get_c().vec[0];
 
     let b_data = construct(&Sabun::B, sabuns);
     let new_cb_sabun = &make_sabun(current, &b_data);
@@ -160,9 +160,9 @@ fn should_update_b_easy(current : &Vec<i32>, sabuns : &Sabuns) -> bool {
     return answer;
 }
 
-
+#[allow(dead_code)]
 fn should_update_b_super_easy(current : &Vec<i32>, sabuns : &Sabuns) -> bool {
-    let prev_cb_sabun = &sabuns.get_c().vec[0];
+    let _prev_cb_sabun = &sabuns.get_c().vec[0];
 
     let b_data = construct(&Sabun::B, sabuns);
     let new_cb_sabun = &make_sabun(current, &b_data);
@@ -170,6 +170,7 @@ fn should_update_b_super_easy(current : &Vec<i32>, sabuns : &Sabuns) -> bool {
     sabuns.get_b().sabun.size() < new_cb_sabun.size()
 }
 
+#[allow(dead_code)]
 fn should_update_b_detailed(current : &Vec<i32>, sabuns : &Sabuns) -> bool {
     let prev_cb_sabun = &sabuns.get_c().vec[0];
 
@@ -320,7 +321,7 @@ fn main() {
     //データが一個ずつふえ、rewrite個のデータがrewriteされる。
     //rewriteする数は一定で、かならず配列の最後の部分だけrewriteする。
     //なので変化しない部分も一つずつ増えていく。
-    let increase = 1;
+    let _increase = 1;
     let rewrite = 10;
 
     let mut sabuns = Sabuns{
