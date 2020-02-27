@@ -11,7 +11,8 @@ pub type Result<T> = std::result::Result<T, MyError>;
 #[derive(Clone, Debug, PartialEq)]
 pub struct MyError{
     pub message : String,
-    pub start : usize,
+    pub source : String,
+    pub start : Option<usize>,
     pub end : Option<usize>,
 }
 
@@ -20,10 +21,10 @@ impl From<pest::error::Error<Rule>> for MyError {
     fn from(err: pest::error::Error<Rule>) -> Self {
         match err.location{
             pest::error::InputLocation::Pos(start) =>{
-                MyError{ message : err.to_string(), start, end : None }
+                MyError{ message : err.to_string(), source : err.to_string(), start : Some(start), end : None }
             },
             pest::error::InputLocation::Span((start, end)) =>{
-                MyError{ message : err.to_string(), start, end : Some(end) }
+                MyError{ message : err.to_string(), source : err.to_string(), start : Some(start),  end : Some(end) }
             }
         }
     }

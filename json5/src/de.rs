@@ -1,214 +1,51 @@
 use pest::iterators::{Pair, Pairs};
 use pest::Parser as P;
 use pest_derive::Parser;
-//use serde::de;
-//use serde::forward_to_deserialize_any;
-use std::char;
-use std::f64;
-use crate::my_visitor::{MyVisitor, MyVisitorValue};
-
 use crate::error::{Result, MyError};
+use crate::deserialize_item::{get_unit, get_bool, get_string, get_i64, get_f64, get_seq, get_map};
+use crate::jval::JVal;
+use std::f64;
+use std::char;
 
 
 #[derive(Parser)]
 #[grammar = "json5.pest"]
-struct Parser;
+pub struct Parser;
 
 /// Deserialize an instance of type `T` from a string of JSON5 text. Can fail if the input is
 /// invalid JSON5, or doesn&rsquo;t match the structure of the target type.
-pub fn from_str<'a>(s: &'a str) -> Result<MyVisitor>
+pub fn from_str<'a>(s: &'a str) -> Result<JVal>
 {
-    let mut deserializer = MyDeserializer::from_str(s)?;
-    todo!{}
-    //T::deserialize(&mut deserializer)
+    let pair = Parser::parse(Rule::text, s)?.next().unwrap();
+    return deserialize_any(pair);
 }
 
-pub struct MyDeserializer<'de> {
-    pub pair: Option<Pair<'de, Rule>>,
-}
-
-pub fn deserialize(s : &str){
-    let de = MyDeserializer::from_str(s);
-    let mut v = MyVisitor::new();
-    match de{
-        Ok(mut c) => c.deserialize_any(&mut v),
-        _ =>{ todo!{} }
-    }
-    ;
-}
-
-impl<'de> MyDeserializer<'de>{
-    /// Creates a JSON5 deserializer from a `&str`. This parses the input at construction time, so
-    /// can fail if the input is not valid JSON5.
-    fn from_str(input: &'de str) -> Result<Self> {
-        let pair = Parser::parse(Rule::text, input)?.next().unwrap();
-        Ok(MyDeserializer::from_pair(pair))
-    }
-
-    fn from_pair(pair: Pair<'de, Rule>) -> Self {
-        MyDeserializer { pair: Some(pair) }
-    }
-}
-
-impl<'de, 'a> MyDeserializer<'de> {
-    fn deserialize_any(&mut self, visitor: &mut MyVisitor) -> Result<MyVisitorValue>
-    {
-        let pair = self.pair.take().unwrap();
-        match pair.as_rule() {
-            Rule::null => visitor.visit_unit(),
-            Rule::boolean => visitor.visit_bool(parse_bool(&pair)),
-            Rule::string | Rule::identifier => visitor.visit_string(parse_string(pair)?),
-            Rule::number => {
-                if is_int(pair.as_str()) {
-                    visitor.visit_i64(parse_integer(&pair)?)
-                } else {
-                    visitor.visit_f64(parse_number(&pair)?)
-                }
+pub fn deserialize_any(pair: Pair<'_, Rule>) -> Result<JVal>
+{
+    let span = pair.as_span();
+    match pair.as_rule() {
+        Rule::null => Ok(get_unit(span)),
+        Rule::boolean => Ok(get_bool(parse_bool(&pair), span)),
+        Rule::string | Rule::identifier => Ok(get_string(parse_string(pair)?, span)),
+        Rule::number => {
+            if is_int(pair.as_str()) {
+                Ok(get_i64(parse_integer(&pair)?, span))
+            } else {
+                Ok(get_f64(parse_number(&pair)?, span))
             }
-            Rule::array => visitor.visit_seq(Seq {
-                pairs: pair.into_inner(),
-            }),
-            Rule::object => visitor.visit_map(Map {
-                pairs: pair.into_inner(),
-            }),
-            _ => unreachable!(),
         }
+        Rule::array => get_seq(Seq {
+            pairs: pair.into_inner(),
+        }, span),
+        Rule::object => {
+            get_map(Map {
+                pairs: pair.into_inner(),
+            }, span)
+        },
+        _ => unreachable!(),
     }
-
-    // fn deserialize_enum<V>(
-    //     self,
-    //     _name: &'static str,
-    //     _variants: &'static [&'static str],
-    //     visitor: V,
-    // ) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     visitor.visit_enum(Enum {
-    //         pair: self.pair.take().unwrap(),
-    //     })
-    // }
-
-    // The below will get us the right types, but won't necessarily give
-    // meaningful results if the source is out of the range of the target type.
-    // fn deserialize_i8<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_i8(parse_number(&pair)? as i8)
-    // }
-
-    // fn deserialize_i16<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_i16(parse_number(&pair)? as i16)
-    // }
-
-    // fn deserialize_i32<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_i32(parse_number(&pair)? as i32)
-    // }
-
-    // fn deserialize_i64<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_i64(parse_number(&pair)? as i64)
-    // }
-    //
-    // fn deserialize_i128<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_i128(parse_number(&pair)? as i128)
-    // }
-
-    // fn deserialize_u8<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_u8(parse_number(&pair)? as u8)
-    // }
-    //
-    // fn deserialize_u16<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_u16(parse_number(&pair)? as u16)
-    // }
-    //
-    // fn deserialize_u32<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_u32(parse_number(&pair)? as u32)
-    // }
-    //
-    // fn deserialize_u64<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_u64(parse_number(&pair)? as u64)
-    // }
-    //
-    // fn deserialize_u128<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_u128(parse_number(&pair)? as u128)
-    // }
-    //
-    // fn deserialize_f32<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_f32(parse_number(&pair)? as f32)
-    // }
-    //
-    // fn deserialize_f64<V>(self, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     let pair = self.pair.take().unwrap();
-    //     visitor.visit_f64(parse_number(&pair)?)
-    // }
-
-    fn deserialize_option(self, visitor: MyVisitor) -> Result<MyVisitorValue>
-    {
-        todo!{}
-        // let pair = self.pair.take().unwrap();
-        // match pair.as_rule() {
-        //     Rule::null => visitor.visit_none(),
-        //     _ => visitor.visit_some(&mut Deserializer::from_pair(pair)),
-        // }
-    }
-
-    // fn deserialize_newtype_struct<V>(self, _name: &str, visitor: V) -> Result<V::Value>
-    // where
-    //     V: de::Visitor<'de>,
-    // {
-    //     visitor.visit_newtype_struct(self)
-    // }
-
-    // forward_to_deserialize_any! {
-    //     bool char str string bytes byte_buf unit unit_struct seq
-    //     tuple tuple_struct map struct identifier ignored_any
-    // }
 }
+
 
 fn parse_bool(pair: &Pair<'_, Rule>) -> bool {
     match pair.as_str() {
@@ -218,11 +55,14 @@ fn parse_bool(pair: &Pair<'_, Rule>) -> bool {
     }
 }
 
-fn create_err<T>(s : &str, pair : &Pair<'_, Rule>) -> Result<T>{
+pub fn create_err(s: &str, pair: &Pair<'_, Rule>) -> MyError {
     let span = pair.as_span();
-    Err(MyError{ message : s.to_string(), start : span.start(), end : Some(span.end()) })
+    MyError { message: s.to_string(), source : pair.to_string(), start: Some(span.start()), end: Some(span.end()) }
 }
 
+pub fn create_err_from_str(s : &str) -> MyError {
+    MyError { message: s.to_string(), source : s.to_string(), start: None, end: None }
+}
 
 
 fn parse_string(pair: Pair<'_, Rule>) -> Result<String> {
@@ -235,7 +75,7 @@ fn parse_string(pair: Pair<'_, Rule>) -> Result<String> {
                 let hex_escape = parse_hex(component.as_str(), &component)?;
                 match char::from_u32(hex_escape) {
                     Some(s) => Ok(s.to_string()),
-                    None => create_err("error parsing hex prefix", &component),
+                    None => Err(create_err("error parsing hex prefix", &component)),
                 }
             }
             _ => unreachable!(),
@@ -266,10 +106,10 @@ fn parse_number(pair: &Pair<'_, Rule>) -> Result<f64> {
                 if r.is_finite() {
                     Ok(r)
                 } else {
-                    create_err("error parsing number: too large", pair)
+                    Err(create_err("error parsing number: too large", pair))
                 }
             } else {
-                create_err("error parsing number", pair)
+                Err(create_err("error parsing number", pair))
             }
         }
     }
@@ -280,7 +120,7 @@ fn parse_integer(pair: &Pair<'_, Rule>) -> Result<i64> {
         s if is_hex_literal(s) => Ok(parse_hex(&s[2..], pair)? as i64),
         s => s
             .parse()
-            .or(create_err("error parsing integer",pair))
+            .or(Err(create_err("error parsing integer", pair)))
     }
 }
 
@@ -288,8 +128,8 @@ fn is_int(s: &str) -> bool {
     !s.contains('.') && (is_hex_literal(s) || (!s.contains('e') && !s.contains('E')))
 }
 
-fn parse_hex(s : &str, p : &Pair<'_, Rule>) -> Result<u32> {
-    todo!{}
+fn parse_hex(s: &str, p: &Pair<'_, Rule>) -> Result<u32> {
+    todo! {}
     //u32::from_str_radix(s, 16).or(Err(de::Error::custom("error parsing hex")))
 }
 
@@ -298,6 +138,11 @@ fn is_hex_literal(s: &str) -> bool {
 }
 
 pub struct Seq<'de> {
+    pub pairs: Pairs<'de, Rule>,
+}
+
+
+pub struct Map<'de> {
     pub pairs: Pairs<'de, Rule>,
 }
 
@@ -316,10 +161,6 @@ pub struct Seq<'de> {
 //         }
 //     }
 // }
-
-pub struct Map<'de> {
-    pub pairs: Pairs<'de, Rule>,
-}
 
 // impl<'de> de::MapAccess<'de> for Map<'de> {
 //     type Error = Error;
@@ -419,4 +260,138 @@ pub struct Map<'de> {
 //             _ => Err(de::Error::custom("expected an object")),
 //         }
 //     }
+// }
+
+// fn deserialize_enum<V>(
+//     self,
+//     _name: &'static str,
+//     _variants: &'static [&'static str],
+//     visitor: V,
+// ) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     visitor.visit_enum(Enum {
+//         pair: self.pair.take().unwrap(),
+//     })
+// }
+
+// The below will get us the right types, but won't necessarily give
+// meaningful results if the source is out of the range of the target type.
+// fn deserialize_i8<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_i8(parse_number(&pair)? as i8)
+// }
+
+// fn deserialize_i16<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_i16(parse_number(&pair)? as i16)
+// }
+
+// fn deserialize_i32<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_i32(parse_number(&pair)? as i32)
+// }
+
+// fn deserialize_i64<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_i64(parse_number(&pair)? as i64)
+// }
+//
+// fn deserialize_i128<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_i128(parse_number(&pair)? as i128)
+// }
+
+// fn deserialize_u8<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_u8(parse_number(&pair)? as u8)
+// }
+//
+// fn deserialize_u16<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_u16(parse_number(&pair)? as u16)
+// }
+//
+// fn deserialize_u32<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_u32(parse_number(&pair)? as u32)
+// }
+//
+// fn deserialize_u64<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_u64(parse_number(&pair)? as u64)
+// }
+//
+// fn deserialize_u128<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_u128(parse_number(&pair)? as u128)
+// }
+//
+// fn deserialize_f32<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_f32(parse_number(&pair)? as f32)
+// }
+//
+// fn deserialize_f64<V>(self, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     let pair = self.pair.take().unwrap();
+//     visitor.visit_f64(parse_number(&pair)?)
+// }
+
+// fn deserialize_option(self, visitor: MyVisitor) -> Result<MyVisitorValue>
+// {
+//
+//     // let pair = self.pair.take().unwrap();
+//     // match pair.as_rule() {
+//     //     Rule::null => visitor.visit_none(),
+//     //     _ => visitor.visit_some(&mut Deserializer::from_pair(pair)),
+//     // }
+// }
+
+// fn deserialize_newtype_struct<V>(self, _name: &str, visitor: V) -> Result<V::Value>
+// where
+//     V: de::Visitor<'de>,
+// {
+//     visitor.visit_newtype_struct(self)
+// }
+
+// forward_to_deserialize_any! {
+//     bool char str string bytes byte_buf unit unit_struct seq
+//     tuple tuple_struct map struct identifier ignored_any
 // }
