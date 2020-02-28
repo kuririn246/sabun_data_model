@@ -3,6 +3,7 @@ use std::collections::BTreeMap;
 use crate::jval::JVal;
 use crate::de::{deserialize_any, Seq, Map};
 use pest::Span;
+use crate::de::Rule;
 
 pub fn get_unit(span : Span) -> JVal { JVal::Null(s(span)) }
 
@@ -31,8 +32,14 @@ pub fn get_map(m: Map, span : Span) -> Result<JVal> {
         if op.is_none(){ break; }
         let p = op.unwrap();
         let ident = match p.as_rule(){
-            crate::de::Rule::identifier =>{ p.as_str().to_string() }
-            _ =>{ unreachable!() }
+            Rule::identifier =>{ p.as_str().to_string() },
+            Rule::string =>{ p.as_str().to_string() },
+            _ =>{
+                //println!("{:?}",p.as_rule());
+                //println!("{:?}",p.as_str());
+
+                unreachable!()
+            }
         };
         let p   = pairs.next().unwrap();
         let val = deserialize_any(p)?;

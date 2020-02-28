@@ -12,9 +12,7 @@ use std::char;
 #[grammar = "json5.pest"]
 pub struct Parser;
 
-/// Deserialize an instance of type `T` from a string of JSON5 text. Can fail if the input is
-/// invalid JSON5, or doesn&rsquo;t match the structure of the target type.
-pub fn from_str<'a>(s: &'a str) -> Result<JVal>
+pub fn from_str(s: &str) -> Result<JVal>
 {
     let pair = Parser::parse(Rule::text, s)?.next().unwrap();
     return deserialize_any(pair);

@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+#[derive(Clone, Debug, PartialEq)]
 pub enum JVal{
     Null(Span),
     Bool(bool, Span),
@@ -10,6 +11,7 @@ pub enum JVal{
     Map(BTreeMap<String, JVal>, Span)
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct Span{
     pub start : usize,
     pub end : usize,

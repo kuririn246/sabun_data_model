@@ -3,7 +3,6 @@ use pest;
 use crate::de::Rule;
 //use std::error::Error;
 
-/// Alias for a `Result` with error type `json5::Error`
 pub type Result<T> = std::result::Result<T, MyError>;
 
 #[derive(Clone, Debug, PartialEq)]

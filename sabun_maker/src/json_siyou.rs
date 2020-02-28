@@ -1,9 +1,12 @@
-use serde_json::{Result, Value};
-use json5;
+
+use json5_parser::JVal;
+use crate::error::Result;
 
 #[allow(dead_code)]
-pub fn untyped_example() -> Result<Value> {
+pub fn untyped_example() -> Result<JVal> {
     // Some JSON input data as a &str. Maybe this comes from the user.
+
+
     let data = r#"
 {
   hogeNumber : 10,
@@ -147,7 +150,7 @@ pub fn untyped_example() -> Result<Value> {
         hoge : "hogehoge", //RefListIDと、RefIDをセットで記述していく。
         //nullableは入力しなければデフォルトでnull
         hegoNew : "hegohego",
-      }
+      },
       "memOverride?" : ["String"],
     }
   ],
@@ -171,7 +174,7 @@ pub fn untyped_example() -> Result<Value> {
 "#;
 
     // Parse the string of data into serde_json::Value.
-    match json5::from_str(data){
+    match json5_parser::from_str(data){
         Ok(v) =>{
             //println!("{}", serde_json::to_string_pretty(&v).unwrap());
             Ok(v)
