@@ -1,48 +1,9 @@
-
-use crate::rust_struct::{RustObject};
-use crate::json_name::{json_name, NameType, SystemNames};
-use crate::json_item_to_rust::json_item_to_rust;
-//use crate::get_ref_ids::get_ref_ids;
-//use crate::get_rename::get_rename;
-use std::collections::BTreeMap;
-
 use json5_parser::JVal;
+use std::collections::BTreeMap;
+use crate::json_to_rust::names::Names;
+use crate::rust_struct::RustObject;
 
-pub fn json_obj_to_rust(v : &JVal) -> Result<RustObject,String> {
-    let v = v.as_object().ok_or("v is not an object".to_string())?;
-    return Ok(json_obj_to_rust2(v, &Names::new("")).unwrap());
-}
-
-pub struct Names<'a>{
-    pub name : &'a str,
-    pub next : Option<&'a Names<'a>>,
-}
-
-impl<'a> Names<'a>{
-    pub fn to_string(&self) -> String{
-        let mut vec : Vec<String> = vec![];
-        let mut cur = self;
-        loop{
-            vec.push(cur.name.to_string());
-            if cur.next.is_none(){
-                break;
-            }
-            cur = cur.next.unwrap();
-        }
-        vec.reverse();
-        vec.join(".")
-    }
-
-    pub fn append(&'a self, name : &'a str) -> Self{
-        Names::<'a>{ name, next : Some(self)}
-    }
-
-    pub fn new(name : &'a str) -> Self{
-        Names::<'a>{ name, next : None }
-    }
-}
-
-pub fn json_obj_to_rust2(v : &Map<String, Value>, names : &Names) -> Result<RustObject, String>{
+pub fn json_obj_to_rust2(v : &BTreeMap<String, JVal>, names : &Names) -> Result<RustObject, String>{
     let mut r : RustObject = RustObject::new();
     for (k,v) in v{
         let name = json_name(k).ok_or(format!("{} is not a valid name {}", k, names.to_string()))?;

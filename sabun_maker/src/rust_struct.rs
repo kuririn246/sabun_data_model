@@ -117,6 +117,7 @@ impl RustObject{
         if self.default.is_none(){
             self.default = Some(BTreeMap::new());
         }
-        self.default.unwrap().insert(key, value)
+        let def = self.default.as_mut().unwrap();
+        return def.insert(key, value);
     }
 }

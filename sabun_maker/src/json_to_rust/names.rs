@@ -1,0 +1,28 @@
+pub struct Names<'a>{
+    pub name : &'a str,
+    pub next : Option<&'a Names<'a>>,
+}
+
+impl<'a> Names<'a>{
+    pub fn to_string(&self) -> String{
+        let mut vec : Vec<String> = vec![];
+        let mut cur = self;
+        loop{
+            vec.push(cur.name.to_string());
+            if cur.next.is_none(){
+                break;
+            }
+            cur = cur.next.unwrap();
+        }
+        vec.reverse();
+        vec.join(".")
+    }
+
+    pub fn append(&'a self, name : &'a str) -> Self{
+        Names::<'a>{ name, next : Some(self)}
+    }
+
+    pub fn new(name : &'a str) -> Self{
+        Names::<'a>{ name, next : None }
+    }
+}

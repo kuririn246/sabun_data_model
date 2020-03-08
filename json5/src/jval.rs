@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::rc::Rc;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum JVal{
@@ -15,4 +16,14 @@ pub enum JVal{
 pub struct Span{
     pub start : usize,
     pub end : usize,
+    pub text : Rc<String>,
+}
+
+impl JVal{
+    pub fn as_object(&self) -> Option<&BTreeMap<String, JVal>>{
+        return match self {
+            JVal::Map(map, _span) => { Some(map) }
+            _ => { None }
+        }
+    }
 }
