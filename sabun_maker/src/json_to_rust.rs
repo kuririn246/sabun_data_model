@@ -1,12 +1,14 @@
-use serde_json::{Value, Map };
+
 use crate::rust_struct::{RustObject};
 use crate::json_name::{json_name, NameType, SystemNames};
 use crate::json_item_to_rust::json_item_to_rust;
-use crate::get_ref_ids::get_ref_ids;
-use crate::get_rename::get_rename;
+//use crate::get_ref_ids::get_ref_ids;
+//use crate::get_rename::get_rename;
 use std::collections::BTreeMap;
 
-pub fn json_obj_to_rust(v : &Value) -> Result<RustObject,String> {
+use json5_parser::JVal;
+
+pub fn json_obj_to_rust(v : &JVal) -> Result<RustObject,String> {
     let v = v.as_object().ok_or("v is not an object".to_string())?;
     return Ok(json_obj_to_rust2(v, &Names::new("")).unwrap());
 }

@@ -28,13 +28,41 @@ pub enum RustValue{
 }
 
 #[derive(Debug)]
+pub struct Decim{
+    val : i128,
+    comma : u64,
+}
+
+impl Decim{
+    pub fn new(val : i128, comma : u64) -> Decim{
+        Decim{ val, comma }
+    }
+
+    pub fn val(&self) -> i128{ self.val }
+    pub fn comma(&self) -> u64{ self.comma }
+    pub fn to_f64(&self) -> f64{
+        let val = self.val as f64;
+        let comma = self.comma as f64;
+        return val / 10f64.powf(comma);
+    }
+}
+
+#[derive(Debug)]
 pub enum Qv<T>{ Val(T), Incompatible, Null }
 
 #[derive(Debug)]
 pub struct RustArray{
-    pub vec : Vec<RustValue>,
+    pub vec : Vec<RustArrayItem>,
     pub array_type : ArrayType,
 }
+
+#[derive(Debug)]
+pub enum RustArrayItem{
+    Num(f64),
+    Str(String),
+    NumArray(Vec<f64>),
+}
+
 #[derive(Debug)]
 pub struct RefListID{
     pub id : String,
@@ -62,14 +90,11 @@ pub struct RustList{
     pub list_id : Option<String>,
     pub default : RustObject,
     pub list : Vec<RustObject>,
-    //ref_list_idsにより、どのメンバはどのrefを参照するべきか、あるいは曖昧なので参照できないかが決定できる。
-    //参照できない場合None,参照できる場合参照先のRefListIDが入る。
-    pub ref_names : HashMap<String, Option<String>>,
 }
 
 #[derive(Debug)]
 pub struct RustObject{
-    //listの場合、defaultはlist側にあるのでここにはない。
+    //listのobjectの場合、defaultはlist側にあるのでここにはない。
     pub default : Option<BTreeMap<String, RustValue>>,
     //デフォルト値から変更されたものを記録。差分変更時に、defaultと同じになったらここから削除するかもしれない？
     pub sabun : BTreeMap<String, RustValue>,
@@ -78,7 +103,7 @@ pub struct RustObject{
     pub id : Option<String>,
     //単一のref_idしかない時は、キーはRefIDである。
     //RefIDもRefIDsもない場合は空
-    pub ref_ids : Option<BTreeMap<String, String>>,
+    pub ref_ids : Option<BTreeMap<String, Option<String>>>,
     pub rename : HashMap<String, String>,
 }
 

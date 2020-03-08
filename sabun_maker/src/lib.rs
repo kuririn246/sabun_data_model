@@ -1,5 +1,11 @@
-mod json_siyou;
-mod error;
+pub mod json_siyou;
+pub mod error;
+pub mod json_to_rust;
+pub mod rust_struct;
+pub mod json_name;
+pub mod json_item_to_rust;
+pub mod json_array_to_rust;
+pub mod json_list_to_rust;
 
 #[cfg(test)]
 mod tests {
