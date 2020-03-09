@@ -6,6 +6,7 @@ use crate::deserialize_item::{get_unit, get_bool, get_string, get_i64, get_f64, 
 use crate::jval::JVal;
 use std::f64;
 use std::char;
+use std::rc::Rc;
 
 
 #[derive(Parser)]
@@ -15,30 +16,31 @@ pub struct Parser;
 pub fn from_str(s: &str) -> Result<JVal>
 {
     let pair = Parser::parse(Rule::text, s)?.next().unwrap();
-    return deserialize_any(pair);
+    let rc = Rc::new(s.to_string());
+    return deserialize_any(pair, rc);
 }
 
-pub fn deserialize_any(pair: Pair<'_, Rule>) -> Result<JVal>
+pub fn deserialize_any(pair: Pair<'_, Rule>, rc : Rc<String>) -> Result<JVal>
 {
     let span = pair.as_span();
     match pair.as_rule() {
-        Rule::null => Ok(get_unit(span)),
-        Rule::boolean => Ok(get_bool(parse_bool(&pair), span)),
-        Rule::string | Rule::identifier => Ok(get_string(parse_string(pair)?, span)),
+        Rule::null => Ok(get_unit(span, rc)),
+        Rule::boolean => Ok(get_bool(parse_bool(&pair), span, rc)),
+        Rule::string | Rule::identifier => Ok(get_string(parse_string(pair)?, span, rc)),
         Rule::number => {
             if is_int(pair.as_str()) {
-                Ok(get_i64(parse_integer(&pair)?, span))
+                Ok(get_i64(parse_integer(&pair)?, span, rc))
             } else {
-                Ok(get_f64(parse_number(&pair)?, span))
+                Ok(get_f64(parse_number(&pair)?, span, rc))
             }
         }
         Rule::array => get_seq(Seq {
             pairs: pair.into_inner(),
-        }, span),
+        }, span, rc),
         Rule::object => {
             get_map(Map {
                 pairs: pair.into_inner(),
-            }, span)
+            }, span, rc)
         },
         _ => unreachable!(),
     }

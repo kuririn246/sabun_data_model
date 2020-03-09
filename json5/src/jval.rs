@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 use std::rc::Rc;
+use std::fmt::Display;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum JVal{
@@ -12,13 +13,6 @@ pub enum JVal{
     Map(BTreeMap<String, JVal>, Span)
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct Span{
-    pub start : usize,
-    pub end : usize,
-    pub text : Rc<String>,
-}
-
 impl JVal{
     pub fn as_object(&self) -> Option<&BTreeMap<String, JVal>>{
         return match self {
@@ -26,4 +20,90 @@ impl JVal{
             _ => { None }
         }
     }
+
+    pub fn as_str(&self) -> Option<&str>{
+        return match self {
+            JVal::String(s, span) => { Some(s) }
+            _ => { None }
+        }
+    }
+
+    pub fn span(&self) -> &Span{
+        return match self{
+            JVal::Null(s) => s,
+            JVal::Bool(_,s) => s,
+            JVal::String(_, s) => s,
+            JVal::Int(_, s) => s,
+            JVal::Double(_, s) => s,
+            JVal::Array(_, s) => s,
+            JVal::Map(_, s) => s,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Span{
+    pub start : usize,
+    pub end : usize,
+    pub text : Rc<String>,
+}
+
+impl Span{
+    pub fn line_col(&self) -> (usize, usize) {
+        let input = self.text.as_str();
+        let mut pos = self.start;
+        if pos > input.len() {
+            panic!("position out of bounds");
+        }
+
+        // Position's pos is always a UTF-8 border.
+        let slice = unsafe { std::str::from_utf8_unchecked(&input.as_bytes()[..pos]) };
+        let mut chars = slice.chars().peekable();
+
+        let mut line_col = (1, 1);
+
+        while pos != 0 {
+            match chars.next() {
+                Some('\r') => {
+                    if let Some(&'\n') = chars.peek() {
+                        chars.next();
+
+                        if pos == 1 {
+                            pos -= 1;
+                        } else {
+                            pos -= 2;
+                        }
+
+                        line_col = (line_col.0 + 1, 1);
+                    } else {
+                        pos -= 1;
+                        line_col = (line_col.0, line_col.1 + 1);
+                    }
+                }
+                Some('\n') => {
+                    pos -= 1;
+                    line_col = (line_col.0 + 1, 1);
+                }
+                Some(c) => {
+                    pos -= c.len_utf8();
+                    line_col = (line_col.0, line_col.1 + 1);
+                }
+                None => unreachable!()
+            }
+        }
+
+        line_col
+    }
+
+    pub fn slice(&self) -> &str{
+        &self.text.as_str()[self.start..self.end]
+    }
+}
+
+impl Display for Span{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let (line, col) = self.line_col();
+        write!(f, "({}, {})", line, col)
+    }
+
 }

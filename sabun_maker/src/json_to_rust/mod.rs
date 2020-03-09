@@ -1,5 +1,9 @@
 pub mod names;
 pub mod json_obj_to_rust;
+pub mod json_name;
+pub mod json_item_to_rust;
+pub mod get_ref_ids;
+pub mod get_rename;
 use crate::rust_struct::{RustObject};
 //use json_name::{json_name, NameType, SystemNames};
 //use crate::json_item_to_rust::json_item_to_rust;

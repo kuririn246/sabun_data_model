@@ -1,4 +1,4 @@
-
+use json5_parser::Span;
 pub type Result<T> = std::result::Result<T, SabunError>;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -16,5 +16,11 @@ impl From<json5_parser::MyError> for SabunError {
 impl From<&str> for SabunError {
     fn from(s : &str) -> Self {
         SabunError{ message : s.to_string() }
+    }
+}
+
+impl From<String> for SabunError {
+    fn from(s : String) -> Self {
+        SabunError{ message : s }
     }
 }

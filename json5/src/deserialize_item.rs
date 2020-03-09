@@ -4,27 +4,28 @@ use crate::jval::JVal;
 use crate::de::{deserialize_any, Seq, Map};
 use pest::Span;
 use crate::de::Rule;
+use std::rc::Rc;
 
-pub fn get_unit(span : Span) -> JVal { JVal::Null(s(span)) }
+pub fn get_unit(span : Span, rc : Rc<String>) -> JVal { JVal::Null(s(span, rc)) }
 
-pub fn get_bool(b: bool, span : Span) -> JVal { JVal::Bool(b, s(span)) }
+pub fn get_bool(b: bool, span : Span, rc : Rc<String>) -> JVal { JVal::Bool(b, s(span, rc)) }
 
-pub fn get_string(st: String, span : Span) -> JVal { JVal::String(st, s(span)) }
+pub fn get_string(st: String, span : Span, rc : Rc<String>) -> JVal { JVal::String(st, s(span, rc)) }
 
-pub fn get_i64(i: i64, span : Span) -> JVal { JVal::Int(i, s(span)) }
+pub fn get_i64(i: i64, span : Span, rc : Rc<String>) -> JVal { JVal::Int(i, s(span, rc)) }
 
-pub fn get_f64(f: f64, span : Span) -> JVal { JVal::Double(f, s(span)) }
+pub fn get_f64(f: f64, span : Span, rc : Rc<String>) -> JVal { JVal::Double(f, s(span, rc)) }
 
-pub fn get_seq(seq: Seq, span : Span) -> Result<JVal> {
+pub fn get_seq(seq: Seq, span : Span, rc : Rc<String>) -> Result<JVal> {
     let mut result : Vec<JVal> = vec![];
     let pairs = seq.pairs;
     for pair in pairs{
-        result.push(deserialize_any(pair)?);
+        result.push(deserialize_any(pair, rc.clone())?);
     }
-    return Ok(JVal::Array(result, s(span)));
+    return Ok(JVal::Array(result, s(span, rc)));
 }
 
-pub fn get_map(m: Map, span : Span) -> Result<JVal> {
+pub fn get_map(m: Map, span : Span, rc : Rc<String>) -> Result<JVal> {
     let mut result : BTreeMap<String, JVal> = BTreeMap::new();
     let mut pairs = m.pairs;
     loop{
@@ -42,15 +43,17 @@ pub fn get_map(m: Map, span : Span) -> Result<JVal> {
             }
         };
         let p   = pairs.next().unwrap();
-        let val = deserialize_any(p)?;
+        let val = deserialize_any(p, rc.clone())?;
         result.insert(ident, val);
     }
 
-    Ok(JVal::Map(result, s(span)))
+    Ok(JVal::Map(result, s(span, rc)))
 }
 
-fn s(span : Span) -> crate::jval::Span{
-    crate::jval::Span{ start : span.start(), end : span.end() }
+fn s(span : Span, rc : Rc<String>) -> crate::jval::Span{
+    let hoge = span.start_pos();
+
+    crate::jval::Span{ start : span.start(), end : span.end(), text : rc }
 }
 
 

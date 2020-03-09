@@ -1,12 +1,18 @@
 use json5_parser::JVal;
 use std::collections::BTreeMap;
-use crate::json_to_rust::names::Names;
+use super::names::Names;
 use crate::rust_struct::RustObject;
+use super::json_name::{json_name, NameType, SystemNames};
+use super::json_item_to_rust::json_item_to_rust;
+use crate::json_to_rust::get_ref_ids::get_ref_ids;
+use crate::json_to_rust::get_rename::get_rename;
+use crate::error::Result;
 
-pub fn json_obj_to_rust2(v : &BTreeMap<String, JVal>, names : &Names) -> Result<RustObject, String>{
+
+pub fn json_obj_to_rust(v : &BTreeMap<String, JVal>, names : &Names) -> Result<RustObject>{
     let mut r : RustObject = RustObject::new();
     for (k,v) in v{
-        let name = json_name(k).ok_or(format!("{} is not a valid name {}", k, names.to_string()))?;
+        let name = json_name(k).ok_or(format!("{} {} is not a valid name {}",v.span(), k, names.to_string()))?;
         match name{
             NameType::Normal =>{
                 let v = json_item_to_rust(k,v, names)?;
@@ -22,7 +28,7 @@ pub fn json_obj_to_rust2(v : &BTreeMap<String, JVal>, names : &Names) -> Result<
                 match sn{
                     SystemNames::ID =>{
                         if r.id.is_none() {
-                            r.id = Some(v.as_str().ok_or(format!("ID must be string : {} {}", v, names.to_string()))?.to_string())
+                            r.id = Some(v.as_str().ok_or(format!("{} ID must be string : {} {}", v.span(), v.span().slice(), names.to_string()))?.to_string())
                         } else{
                             return Err(format!("ID is defined multiple times {}", names.to_string()));
                         }
