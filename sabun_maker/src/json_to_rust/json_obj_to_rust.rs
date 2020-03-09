@@ -14,16 +14,10 @@ pub fn json_obj_to_rust(v : &BTreeMap<String, JVal>, names : &Names) -> Result<R
     for (k,v) in v{
         let name = json_name(k).ok_or_else(|| format!("{} {} is not a valid name {}",v.line_col(), k, names))?;
         match name{
-            NameType::Normal =>{
-                let v = json_item_to_rust(k,v, names)?;
+            NameType::Name(name, vt) =>{
+                let v = json_item_to_rust(&name, vt,v, names)?;
                 r.insert_default(k.to_string(), v);
             },
-
-            NameType::Nullable(ref s) =>{
-                let v = json_item_to_rust(s,v, names)?;
-                r.insert_default(s.to_string(), v);
-            }
-
             NameType::SystemName(sn) =>{
                 match sn{
                     SystemNames::ID =>{
