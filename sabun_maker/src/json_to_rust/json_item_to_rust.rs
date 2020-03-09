@@ -1,19 +1,21 @@
 use crate::rust_struct::{RustValue, Qv};
 use super::Names;
 use json5_parser::JVal;
+use crate::error::Result;
+
 //use serde_json::Value;
 //use crate::json_array_to_rust::json_array_to_rust;
 //use crate::json_to_rust::{Names, json_obj_to_rust2};
 
-fn is_nullable(s : &str, names : &Names) -> Result<bool, String>{
+fn is_nullable(s : &str, names : &Names) -> Result<bool>{
     if let Some((b,_)) = super::json_name::is_possible_name(s){
         Ok(b)
     } else{
-        Err(format!("{} is not a valid name {}", s, names.to_string()))
+        Err(format!("{} is not a valid name {}", s, names.to_string()))?
     }
 }
 
-pub fn json_item_to_rust(k : &str, v : &JVal, names : &Names) -> Result<RustValue, String> {
+pub fn json_item_to_rust(k : &str, v : &JVal, names : &Names) -> Result<RustValue> {
     todo!();
 //    match v {
 //        Value::Bool(b) => {

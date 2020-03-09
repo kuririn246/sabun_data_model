@@ -12,7 +12,7 @@ use crate::error::Result;
 pub fn json_obj_to_rust(v : &BTreeMap<String, JVal>, names : &Names) -> Result<RustObject>{
     let mut r : RustObject = RustObject::new();
     for (k,v) in v{
-        let name = json_name(k).ok_or(format!("{} {} is not a valid name {}",v.span(), k, names.to_string()))?;
+        let name = json_name(k).ok_or_else(|| format!("{} {} is not a valid name {}",v.line_col(), k, names))?;
         match name{
             NameType::Normal =>{
                 let v = json_item_to_rust(k,v, names)?;
@@ -28,9 +28,9 @@ pub fn json_obj_to_rust(v : &BTreeMap<String, JVal>, names : &Names) -> Result<R
                 match sn{
                     SystemNames::ID =>{
                         if r.id.is_none() {
-                            r.id = Some(v.as_str().ok_or(format!("{} ID must be string : {} {}", v.span(), v.span().slice(), names.to_string()))?.to_string())
+                            r.id = Some(v.as_str().ok_or_else(|| format!("{} ID must be string : {} {}", v.line_col(), v.original(), names))?.to_string())
                         } else{
-                            return Err(format!("ID is defined multiple times {}", names.to_string()));
+                            Err(format!("{} ID is defined multiple times {}", v.line_col(), names.to_string()))?;
                         }
                     },
                     SystemNames::Include=>{
@@ -38,27 +38,27 @@ pub fn json_obj_to_rust(v : &BTreeMap<String, JVal>, names : &Names) -> Result<R
                     },
                     SystemNames::RefID =>{
                         if r.ref_ids.is_none(){
-                            let id = v.as_str().ok_or(format!("RefID must be string : {} {}", v, names.to_string()))?.to_string();
-                            let mut map : BTreeMap<String,String> = BTreeMap::new();
-                            map.insert("RefID".to_string(), id);
+                            let id = v.as_str().ok_or_else(|| format!("{} RefID must be string : {} {}", v.line_col(), v.original(), names))?.to_string();
+                            let mut map : BTreeMap<String, Option<String>> = BTreeMap::new();
+                            map.insert("RefID".to_string(), Some(id));
                             r.ref_ids = Some(map);
                         } else {
-                            return Err(format!("RefID is defined multiple times {}", names.to_string()));
+                            Err(format!("{} RefID is defined multiple times {}", v.line_col(), names))?;
                         }
                     },
                     SystemNames::RefIDs =>{
                         if r.ref_ids.is_none(){
                             r.ref_ids = Some(get_ref_ids(v, names)?);
                         } else {
-                            return Err(format!("RefID is defined multiple times {}", names.to_string()));
+                            Err(format!("{} RefIDs is defined multiple times {}", v.line_col(), names))?;
                         }
                     },
                     SystemNames::Rename =>{
                         if r.rename.len() == 0{
                             r.rename = get_rename(v, names)?;
                         } else{
-                            //そもそも複数回の定義はjsonパーサーによって弾かれるはずだが、いずれjsonパーサーを自作した時にこの処理が必要になるはず。
-                            return Err(format!("Rename is defined multiple times {}", names.to_string()));
+                            //そもそも複数回の定義はjsonパーサーによって弾かれるはずだが・・・
+                            Err(format!("{} Rename is defined multiple times {}", v.line_col(), names))?;
                         }
                     }
                 }

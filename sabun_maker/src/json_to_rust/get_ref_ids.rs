@@ -1,8 +1,9 @@
 use json5_parser::JVal;
 use crate::json_to_rust::names::Names;
 use std::collections::BTreeMap;
+use crate::error::Result;
 
-pub fn get_ref_ids(v : &JVal, names : &Names) -> Result<BTreeMap<String,String>, String> {
+pub fn get_ref_ids(v : &JVal, names : &Names) -> Result<BTreeMap<String,Option<String>>> {
     todo!();
 //    let v = v.as_object().ok_or(format!("RefIDs must be an object. {}", names.to_string()))?;
 //    let mut m : BTreeMap<String, String> = BTreeMap::new();

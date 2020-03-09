@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 pub struct Names<'a>{
     pub name : &'a str,
     pub next : Option<&'a Names<'a>>,
@@ -25,4 +27,12 @@ impl<'a> Names<'a>{
     pub fn new(name : &'a str) -> Self{
         Names::<'a>{ name, next : None }
     }
+}
+
+impl<'a> Display for Names<'a>{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+
+        write!(f, "{}", self.to_string())
+    }
+
 }

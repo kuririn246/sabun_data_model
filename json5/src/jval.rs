@@ -39,6 +39,16 @@ impl JVal{
             JVal::Map(_, s) => s,
         }
     }
+
+    pub fn original(&self) -> &str{
+        self.span().slice()
+    }
+
+    ///くっそ重いので正常系で実行しないように注意
+    pub fn line_col(&self) -> String{
+        let (line, col) = self.span().line_col();
+        format!("({}, {})", line, col)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -100,10 +110,10 @@ impl Span{
     }
 }
 
-impl Display for Span{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let (line, col) = self.line_col();
-        write!(f, "({}, {})", line, col)
-    }
-
-}
+//impl Display for Span{
+//    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+//        let (line, col) = self.line_col();
+//        write!(f, "({}, {})", line, col)
+//    }
+//
+//}
