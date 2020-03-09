@@ -8,12 +8,21 @@ pub enum ArrayType{
     Num2, //two dimensional num array
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum ValueType{
     Normal,
     Nullable,
     Incompatible,
     IncompatNullable,
+}
+
+impl ValueType{
+    pub fn is_nullable(&self) -> bool{
+        match self{
+            ValueType::Nullable | ValueType::IncompatNullable => true,
+            _ => false,
+        }
+    }
 }
 
 
@@ -28,40 +37,14 @@ pub enum RustValue{
 }
 
 #[derive(Debug)]
-pub struct Decim{
-    val : i128,
-    comma : u64,
-}
-
-impl Decim{
-    pub fn new(val : i128, comma : u64) -> Decim{
-        Decim{ val, comma }
-    }
-
-    pub fn val(&self) -> i128{ self.val }
-    pub fn comma(&self) -> u64{ self.comma }
-    pub fn to_f64(&self) -> f64{
-        let val = self.val as f64;
-        let comma = self.comma as f64;
-        return val / 10f64.powf(comma);
-    }
-}
-
-#[derive(Debug)]
 pub enum Qv<T>{ Val(T), Incompatible, Null }
 
 #[derive(Debug)]
 pub struct RustArray{
-    pub vec : Vec<RustArrayItem>,
+    pub vec : Vec<RustValue>,
     pub array_type : ArrayType,
 }
 
-#[derive(Debug)]
-pub enum RustArrayItem{
-    Num(f64),
-    Str(String),
-    NumArray(Vec<f64>),
-}
 
 #[derive(Debug)]
 pub struct RefListID{

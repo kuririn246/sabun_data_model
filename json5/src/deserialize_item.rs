@@ -12,7 +12,7 @@ pub fn get_bool(b: bool, span : Span, rc : Rc<String>) -> JVal { JVal::Bool(b, s
 
 pub fn get_string(st: String, span : Span, rc : Rc<String>) -> JVal { JVal::String(st, s(span, rc)) }
 
-pub fn get_i64(i: i64, span : Span, rc : Rc<String>) -> JVal { JVal::Int(i, s(span, rc)) }
+//pub fn get_i64(i: i64, span : Span, rc : Rc<String>) -> JVal { JVal::Double(i as f64, s(span, rc)) }
 
 pub fn get_f64(f: f64, span : Span, rc : Rc<String>) -> JVal { JVal::Double(f, s(span, rc)) }
 

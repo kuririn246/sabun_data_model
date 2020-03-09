@@ -24,7 +24,7 @@ pub fn json_obj_to_rust(v : &BTreeMap<String, JVal>, names : &Names) -> Result<R
                         if r.id.is_none() {
                             r.id = Some(v.as_str().ok_or_else(|| format!("{} ID must be string : {} {}", v.line_col(), v.original(), names))?.to_string())
                         } else{
-                            Err(format!("{} ID is defined multiple times {}", v.line_col(), names.to_string()))?;
+                            Err(format!("{} ID is defined multiple times {}", v.line_col(), names))?;
                         }
                     },
                     SystemNames::Include=>{
