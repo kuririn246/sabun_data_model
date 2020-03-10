@@ -7,3 +7,4 @@ edition = "2018"
 [dependencies]
 sabun_maker = { path = "./sabun_maker"}
 json5_parser = { path = "./json5" }
+general_compaction = { path = "./general_compaction" }

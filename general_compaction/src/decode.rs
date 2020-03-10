@@ -17,7 +17,9 @@ pub fn decode(vec : Vec<u8>) -> Vec<Kihon>{
     let mut result : Vec<Kihon> = vec![];
     for tag in tags{
         let kihon = match tag{
+            KihonFromTag::Null => Kihon::Null,
             KihonFromTag::Bit(b) => Kihon::Bit(b),
+            KihonFromTag::Bool(b) => Kihon::Bool(b),
             KihonFromTag::Byte => Kihon::Byte(data.read() as i8),
             KihonFromTag::Str16(l) =>{
                 Kihon::Str16(data.read_string(l as usize ))
@@ -53,7 +55,8 @@ pub fn decode(vec : Vec<u8>) -> Vec<Kihon>{
                 let len = crate::var_int::decode(v);
                 let s = data.read_string(len as usize);
                 Kihon::BigStr(s)
-            }
+            },
+            KihonFromTag::Undefined(i) => Kihon::Undefined(i),
         };
         result.push(kihon);
     }

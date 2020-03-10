@@ -5,12 +5,17 @@ use crate::decode::decode;
 
 pub fn _test_enc_dec(){
     let vec : Vec<Kihon> = vec![
+        Kihon::Null,
         Kihon::Bit(false),
+        Kihon::Bool(true),
+        Kihon::Byte(0),
         Kihon::Byte(20),
         Kihon::Byte(-128),
         Kihon::Str16("amenbou".to_string()),
         Kihon::Str16("".to_string()),
         Kihon::Str16("012345678901234".to_string()),
+        Kihon::Int(0),
+        Kihon::Int(-50),
         Kihon::Int(200),
         Kihon::Int(-200),
         Kihon::Int(32767),
@@ -20,6 +25,7 @@ pub fn _test_enc_dec(){
         Kihon::Float(0.1f32),
         Kihon::Str256("01234567890123456".to_string()),
         Kihon::Str256("".to_string()),
+        Kihon::Str256("01234".to_string()),
         Kihon::Double(0.1f64),
         Kihon::Decimal(65536*65536*65536, 4),
         Kihon::Decimal(-65536*65536*65536, 4),
@@ -38,6 +44,8 @@ pub fn _test_enc_dec(){
 
         Kihon::BigStr(String::from_utf8(vec!['a' as u8; 256]).unwrap()),
         Kihon::BigStr("".to_string()),
+        Kihon::Undefined(0),
+        Kihon::Undefined(7),
     ];
 
     let encoded = encode(&vec);

@@ -29,7 +29,9 @@ pub fn to_string(k : &Kihon) -> String{
     fn s(t : &str) -> String{ t.to_string() }
 
     return match k{
+        Kihon::Null => s("null"),
         Kihon::Bit(b) => if *b{ s("1") } else{ s("0") }
+        Kihon::Bool(b) => if *b{ s("true")} else{ s("false") }
         Kihon::Byte(b) => b.to_string(),
         Kihon::Str16(s) => s.to_string(),
         Kihon::Int(i) => i.to_string(),
@@ -38,12 +40,15 @@ pub fn to_string(k : &Kihon) -> String{
         Kihon::Double(d) => d.to_string(),
         Kihon::Decimal(num, dot) => decimal_lib::to_string(*num, *dot),
         Kihon::BigStr(s) => s.to_string(),
+        Kihon::Undefined(u) => format!("undefined{}", u),
     }
 }
 
 fn to_enum(s : &str) -> Kihon{
     if s == "0"{ return Kihon::Bit(false) }
     if s == "1"{ return Kihon::Bit(true) }
+    if s == "true"{ return Kihon::Bool(true) }
+    if s == "false"{ return Kihon::Bool(false) }
 
     if let Some(number) = get_number(s){
         if number.number == 0 && number.minus {

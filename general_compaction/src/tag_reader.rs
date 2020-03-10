@@ -26,33 +26,55 @@ impl TagReader{
         return r;
     }
 
-    pub fn read_tag(&mut self) -> KihonFromTag{
+    pub fn read_next_1(&mut self) -> usize{
         let mut count = 0;
         loop{
             let b = self.read_bit();
-            if b{ break; }
+            if b{ return count; }
             count += 1;
         }
+    }
+
+    pub fn read_tag(&mut self) -> KihonFromTag{
+        let count = self.read_next_1();
         match count{
             0 => return KihonFromTag::Bit(self.read_bit()),
-            1 => return KihonFromTag::Byte,
-            2 => return KihonFromTag::Str16(self.read_bits(4) as u8),
+            1 =>{
+                let count = self.read_next_1();
+                match count{
+                    0 => return KihonFromTag::Byte,
+                    1 => return KihonFromTag::Str16(self.read_bits(4) as u8),
+                    2 => return KihonFromTag::Null,
+                    3 => return KihonFromTag::Bool(self.read_bit()),
+                    4 => {
+                        let bytes = self.read_bits(4);
+                        return KihonFromTag::Decimal((bytes + 1) as u8);
+                    },
+                    _ =>{ panic!("undefined tag 0100_000")}
+                }
+            }
+            2 => {
+                let count = self.read_next_1();
+                match count{
+                    0 => {
+                        let bytes = self.read_bits(3);
+                        return KihonFromTag::Int((bytes + 1) as u8);
+                    },
+                    1 => return KihonFromTag::Str256,
+                    2  => return KihonFromTag::Double,
+                    3 => {
+                        let bytes = self.read_bits(3);
+                        return KihonFromTag::BigStr((bytes + 1) as u8);
+                    },
+                    4 => return KihonFromTag::Float,
+                    _ => panic!("undefined tag 0010_0000")
+                }
+            },
             3 =>{
-                let bytes = self.read_bits(3);
-                if bytes == 0{ return KihonFromTag::Float; }
-                else{ return KihonFromTag::Int((bytes + 1) as u8); }
+                let count = self.read_next_1();
+                return KihonFromTag::Undefined(count as u8);
             },
-            4 => return KihonFromTag::Str256,
-            5 => return KihonFromTag::Double,
-            6 =>{
-                let bytes = self.read_bits(4);
-                return KihonFromTag::Decimal((bytes + 1) as u8);
-            },
-            7 =>{
-                let bytes = self.read_bits(3);
-                return KihonFromTag::BigStr((bytes + 1) as u8);
-            },
-            _ =>{ panic!("Tag's zeroes must be within 7") }
+            _ =>{ panic!("Tag's zeroes must be within 3") }
         }
     }
 
