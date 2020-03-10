@@ -1,5 +1,5 @@
 use crate::kihon_enum::Kihon;
-use crate::tag_storage::TagStorage;
+use crate::enc_dec::tag_storage::TagStorage;
 
 
 pub fn encode(vec : &Vec<Kihon>) -> Vec<u8>{
@@ -24,7 +24,7 @@ pub fn encode(vec : &Vec<Kihon>) -> Vec<u8>{
                 data.extend_from_slice(s.as_bytes());
             },
             Kihon::Int(i) => {
-                let ans = crate::var_int::encode(*i);
+                let ans = super::var_int::encode(*i);
                 let size = ans.len();
                 if 8 < size { panic!("Int's size must be 1..=8"); }
                 tag.append(0b0011, 4);
@@ -46,7 +46,7 @@ pub fn encode(vec : &Vec<Kihon>) -> Vec<u8>{
             },
             Kihon::Decimal(i, dot) =>{
                 let i = *i; let dot = *dot;
-                let ans = crate::var_int::encode128(i);
+                let ans = super::var_int::encode128(i);
                 let size = ans.len();
                 if size <= 0 || 17 <= size{ panic!("decimal's size must be 1..=16"); }
 
@@ -57,7 +57,7 @@ pub fn encode(vec : &Vec<Kihon>) -> Vec<u8>{
             }
             Kihon::BigStr(s)=>{
                 tag.append(0b0010_001, 7);
-                let vec = crate::var_int::encode(s.len() as i64);
+                let vec = super::var_int::encode(s.len() as i64);
                 if 8 < vec.len(){ panic!("BigStr is too large"); }
                 tag.append((vec.len() - 1) as u64, 3);
                 data.extend_from_slice(&vec);
@@ -75,7 +75,7 @@ pub fn encode(vec : &Vec<Kihon>) -> Vec<u8>{
     let mut result : Vec<u8> = vec![];
     //最初にアイテム数が入る。
     let len = vec.len() as i64;
-    let bytes = crate::var_int::encode(len);
+    let bytes = super::var_int::encode(len);
     result.push(bytes.len() as u8);
     result.extend_from_slice(&bytes);
     result.append(&mut tag.to_vec());

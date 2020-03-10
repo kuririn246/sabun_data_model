@@ -1,11 +1,11 @@
 use crate::kihon_enum::{Kihon, KihonFromTag};
-use crate::vec_reader::VecReader;
-use crate::tag_reader::TagReader;
+use super::vec_reader::VecReader;
+use super::tag_reader::TagReader;
 
 pub fn decode(vec : Vec<u8>) -> Vec<Kihon>{
     let mut vec = VecReader::new(vec);
     let size = vec.read() as usize;
-    let count = crate::var_int::decode(vec.read_vec(size)) as usize;
+    let count = super::var_int::decode(vec.read_vec(size)) as usize;
     let mut reader = TagReader::new(&vec.vec[vec.index..]);
     let mut tags : Vec<KihonFromTag> = vec![];
     for _ in 0..count{
@@ -27,7 +27,7 @@ pub fn decode(vec : Vec<u8>) -> Vec<Kihon>{
             KihonFromTag::Int(size) => {
                 let size = size as usize;
                 let bytes = data.read_vec(size);
-                Kihon::Int(crate::var_int::decode(bytes))
+                Kihon::Int(super::var_int::decode(bytes))
             },
             KihonFromTag::Float =>{
                 let v = data.read_vec(4);
@@ -46,13 +46,13 @@ pub fn decode(vec : Vec<u8>) -> Vec<Kihon>{
             KihonFromTag::Decimal(size) =>{
                 let size = size as usize;
                 let vec = data.read_vec(size);
-                let v = crate::var_int::decode128(vec);
+                let v = super::var_int::decode128(vec);
                 let dot = data.read();
                 Kihon::Decimal(v, dot)
             },
             KihonFromTag::BigStr(size) =>{
                 let v = data.read_vec(size as usize);
-                let len = crate::var_int::decode(v);
+                let len = super::var_int::decode(v);
                 let s = data.read_string(len as usize);
                 Kihon::BigStr(s)
             },

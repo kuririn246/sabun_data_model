@@ -1,8 +1,8 @@
 use crate::kihon_enum::Kihon;
 use regex::{Regex, Match};
-use crate::encode::encode;
-use crate::decode::decode;
-use crate::decimal_lib;
+use crate::enc_dec::encode::encode;
+use crate::enc_dec::decode::decode;
+use crate::enc_dec::decimal_lib;
 use lazy_static::lazy_static;
 
 pub fn to_kihons(strs : Vec<String>) -> Vec<Kihon>{

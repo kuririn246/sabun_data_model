@@ -50,7 +50,7 @@ pub fn _test_string_compaction(){
     let _vv2 = vv.to_vec();
 
     let kihons = crate::string_compaction::to_kihons(vv);
-    let encoded = crate::encode::encode(&kihons);
+    let encoded = crate::enc_dec::encode::encode(&kihons);
     let url = crate::url_string::get_url_string(&encoded);
     //println!("{}", url);
     //println!("{}", url.len());

@@ -1,6 +1,6 @@
 use crate::kihon_enum::Kihon;
-use crate::encode::encode;
-use crate::decode::decode;
+use crate::enc_dec::encode::encode;
+use crate::enc_dec::decode::decode;
 
 
 pub fn _test_enc_dec(){

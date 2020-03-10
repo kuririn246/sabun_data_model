@@ -1,4 +1,4 @@
-use crate::signed_bytes::{signed_bytes, signed_bytes128};
+use super::signed_bytes::{signed_bytes, signed_bytes128};
 
 pub fn encode(val : i64) -> Vec<u8>{
     let sign;
