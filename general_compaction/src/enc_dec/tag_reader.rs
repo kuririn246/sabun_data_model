@@ -1,5 +1,6 @@
 use bit_vec::BitVec;
-use crate::kihon_enum::KihonFromTag;
+use crate::enc_dec::kihon_from_tag::KihonFromTag;
+
 
 pub struct TagReader{
     pub vec : BitVec,

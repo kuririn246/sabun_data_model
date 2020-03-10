@@ -1,6 +1,7 @@
-use crate::kihon_enum::{Kihon, KihonFromTag};
+use crate::kihon_enum::{Kihon};
 use super::vec_reader::VecReader;
 use super::tag_reader::TagReader;
+use crate::enc_dec::kihon_from_tag::KihonFromTag;
 
 pub fn decode(vec : Vec<u8>) -> Vec<Kihon>{
     let mut vec = VecReader::new(vec);
