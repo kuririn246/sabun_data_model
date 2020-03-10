@@ -75,6 +75,18 @@ pub struct RustList{
     pub list : Vec<RustObject>,
 }
 
+impl RustList{
+    pub fn new() -> RustList{
+        RustList{
+            auto_id : None,
+            ref_list_ids : None,
+            list_id : None,
+            default : RustObject::new(),
+            list : vec![],
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct RustObject{
     //listのobjectの場合、defaultはlist側にあるのでここにはない。

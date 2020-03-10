@@ -32,14 +32,11 @@ pub fn untyped_example() -> Result<JVal> {
     //numArray3 : [ "Num-Array", [0, 3, 10] ], これはできない
 
     emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
-    //emptyNumArray : [ "Num-Array", [] ], //初期値が空配列のnum-array。これは出来たほうがいいような気がするがめんどくさい
     "nullableNumArray?" : [ "Num-Array", null ], //nullable配列の初期値をnullにする場合
     numArray2 : [ "Num-Array2", [2,3], [3,1] ], //二次元のnumarray
-    //numArray2 : [ "Num-Array2", [[2,3], [3,1]] ], //これもめんどうなのでやらない
 
 
 	strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
-	//strArray2 : [ "Str-Array", ["ababa", "ibibi"] ], めんどうなのでカット
 	//そもそも配列なんてこのシステムに必要なんだろうか・・・？　まともに差分生成出来る気もしないしなあ。
 
 	hogeList : [

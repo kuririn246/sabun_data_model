@@ -3,10 +3,12 @@ use crate::rust_struct::{RustValue, ArrayType, RustArray, Qv, ValueType };
 use crate::error::Result;
 use super::names::Names;
 use json5_parser::{JVal, Span};
+use crate::json_to_rust::array_null::array_null;
 
 pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue>{
     use GatResult::*;
-    return match get_array_type(array){
+    let gat = get_array_type(array);
+    return match gat{
         AT(array_type) =>{
             let array = get_array( array,array_type, names)?;
             if let Some(array) = array {
@@ -20,7 +22,8 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
             }
         },
         Num | Str | Bool =>{
-            todo!()
+            //いまのところ["Num", null] のような形での、nullのセットしか認めていない。Arrayを使った記法では、null以外はセットできない。
+            array_null(&array[1..], gat, value_type, &array[0].span(), names)
         },
         None =>{ Err(format!(r#"{} Array must be "...-Array", "List", "Num", "Str" or "Bool" {}"#, span.line_col_str(), names))? },
         List =>{
@@ -30,7 +33,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
     }
 }
 
-enum GatResult{
+pub enum GatResult{
     AT(ArrayType),
     List,
     Num,
@@ -105,26 +108,3 @@ fn get_array(a : &[JVal], array_type : ArrayType, names : &Names) -> Result<Opti
     }
     return Ok(Some(RustArray{ vec, array_type }));
 }
-
-// fn get_str_array(a : &[Value], names : &Names) -> Result<RustArray, String>{
-//     let mut vec : Vec<RustValue> = vec![];
-//     for item in a{
-//         let s = item.as_str().ok_or(format!("{} is not string {}", item, names.to_string()))?;
-//         vec.push(RustValue::String(Qv::Val(s.to_string())));
-//     }
-//     return Ok(RustArray{ vec, array_type : ArrayType::String });
-// }
-//
-// fn get_num_array2(a : &[Value], names : &Names) -> Result<RustArray, String>{
-//     let mut vec : Vec<RustValue> = vec![];
-//     for item in a{
-//         match item{
-//             Value::Array(a) =>{
-//                 let array = get_num_array(a, names)?;
-//                 vec.push(RustValue::Array(Qv::Val(array)));
-//             }
-//             _=>{ return Err(format!("{} is not an array {}", item, names.to_string())); }
-//         }
-//     }
-//     return Ok(RustArray{ vec, array_type : ArrayType::Num2 })
-// }
