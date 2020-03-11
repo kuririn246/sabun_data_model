@@ -65,3 +65,5 @@ fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<ListArra
         _ => Err(format!(r#"{} {} {} {}"#, span.line_col_str(), span.slice(), error_message, names))?,
     }
 }
+
+fn get_ref_list_ids
