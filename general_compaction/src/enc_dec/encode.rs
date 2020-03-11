@@ -44,8 +44,8 @@ pub fn encode(vec : &Vec<Kihon>) -> Vec<u8>{
                 tag.append(0b0010_01, 6);
                 data.extend_from_slice(&d.to_be_bytes());
             },
-            Kihon::Decimal(i, dot) =>{
-                let i = *i; let dot = *dot;
+            Kihon::Decimal(d) =>{
+                let i = d.int; let dot = d.dot;
                 let ans = super::var_int::encode128(i);
                 let size = ans.len();
                 if size <= 0 || 17 <= size{ panic!("decimal's size must be 1..=16"); }

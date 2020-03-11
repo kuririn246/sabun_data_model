@@ -1,4 +1,4 @@
-use crate::kihon_enum::Kihon;
+use crate::kihon_enum::{Kihon, Decimal};
 use regex::{Regex, Match};
 use crate::enc_dec::encode::encode;
 use crate::enc_dec::decode::decode;
@@ -38,7 +38,7 @@ pub fn to_string(k : &Kihon) -> String{
         Kihon::Float(f) => f.to_string(),
         Kihon::Str256(s) => s.to_string(),
         Kihon::Double(d) => d.to_string(),
-        Kihon::Decimal(num, dot) => decimal_lib::to_string(*num, *dot),
+        Kihon::Decimal(d) => d.to_string(),
         Kihon::BigStr(s) => s.to_string(),
         Kihon::Undefined(u) => format!("undefined{}", u),
     }
@@ -55,7 +55,7 @@ fn to_enum(s : &str) -> Kihon{
             //-0はこの仕組では表現できない
             return get_str(s);
         } else if let Some(dot) = number.dot{
-            return Kihon::Decimal(number.number, dot);
+            return Kihon::Decimal(Decimal::new(number.number, dot));
         } else{
             if number.number == number.number as i64 as i128{
                 //i64で損失なく表現可能である
@@ -67,7 +67,7 @@ fn to_enum(s : &str) -> Kihon{
                     return Kihon::Int(number as i64);
                 }
             } else{
-                return Kihon::Decimal(number.number, 0);
+                return Kihon::Decimal(Decimal::new(number.number, 0));
             }
         }
     } else { return get_str(s); }

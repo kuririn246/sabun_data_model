@@ -49,7 +49,7 @@ pub fn decode(vec : Vec<u8>) -> Vec<Kihon>{
                 let vec = data.read_vec(size);
                 let v = super::var_int::decode128(vec);
                 let dot = data.read();
-                Kihon::Decimal(v, dot)
+                Kihon::Decimal(crate::kihon_enum::Decimal::new(v, dot))
             },
             KihonFromTag::BigStr(size) =>{
                 let v = data.read_vec(size as usize);

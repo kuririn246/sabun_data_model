@@ -9,12 +9,12 @@ pub enum Kihon{
     Float(f32),
     Str256(String),
     Double(f64),
-    ///u8はドットの位置を表す。0はドットがないことを表す。
-    Decimal(i128, u8),
+    Decimal(Decimal),
     BigStr(String),
     Undefined(u8),
 }
 
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Decimal{
     pub int : i128,
     pub dot : u8,
@@ -24,6 +24,14 @@ impl Decimal{
     pub fn to_f64(&self) -> f64 {
         crate::enc_dec::decimal_lib::to_f64(self.int, self.dot)
     }
+
+    pub fn to_string(&self) -> String{
+        crate::enc_dec::decimal_lib::to_string(self.int, self.dot)
+    }
+
+    pub fn new(int : i128, dot : u8) -> Decimal{
+        Decimal{ int, dot }
+    }
 }
 
 impl Kihon{
@@ -31,12 +39,11 @@ impl Kihon{
     pub fn as_f64(&self) -> Option<f64>{
         use Kihon::*;
         match self{
-            Bit(b) => Some(*b as f64),
+            Bit(b) => Some(*b as isize as f64),
             Byte(b) => Some(*b as f64),
             Int(i) => Some(*i as f64),
             Float(f) => Some(*f as f64),
             Double(f) => Some(*f),
-
             _ => None,
         }
     }
@@ -84,14 +91,12 @@ impl Kihon{
         }
     }
 
-    pub fn as_decimal(&self) -> Option<(i128, u8)>{
+    pub fn as_decimal(&self) -> Option<Decimal>{
         match self{
-            Kihon::Decimal(i, u) => Some((*i, *u)),
+            Kihon::Decimal(d) => Some(*d),
             _ => None,
         }
     }
-
-
 
     pub fn to_string(&self) -> String{
         crate::string_compaction::to_string(self)

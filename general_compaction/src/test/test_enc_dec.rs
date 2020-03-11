@@ -1,9 +1,13 @@
-use crate::kihon_enum::Kihon;
+use crate::kihon_enum::{Kihon, Decimal};
 use crate::enc_dec::encode::encode;
 use crate::enc_dec::decode::decode;
 
 
 pub fn _test_enc_dec(){
+
+    fn decimal(int : i128, dot : u8) -> Kihon{
+        Kihon::Decimal(Decimal::new(int, dot))
+    }
     let vec : Vec<Kihon> = vec![
         Kihon::Null,
         Kihon::Bit(false),
@@ -27,20 +31,20 @@ pub fn _test_enc_dec(){
         Kihon::Str256("".to_string()),
         Kihon::Str256("01234".to_string()),
         Kihon::Double(0.1f64),
-        Kihon::Decimal(65536*65536*65536, 4),
-        Kihon::Decimal(-65536*65536*65536, 4),
-        Kihon::Decimal(65536*65536*65536*65536, 0),
-        Kihon::Decimal(-65536*65536*65536*65536, 0),
-        Kihon::Decimal(65536*65536*65536*65536 / 2, 0),
-        Kihon::Decimal(-65536*65536*65536*65536 / 2, 0),
-        Kihon::Decimal(65536*65536*65536*65536 / 4, 0),
-        Kihon::Decimal(-65536*65536*65536*65536 / 4, 0),
-        Kihon::Decimal(65536*65536*65536*65536*65536, 0),
-        Kihon::Decimal(-65536*65536*65536*65536*65536, 0),
-        Kihon::Decimal(65536*65536*65536*65536*65536 / 2, 0),
-        Kihon::Decimal(-65536*65536*65536*65536*65536 / 2, 0),
-        Kihon::Decimal(65536*65536*65536*65536*65536 / 4, 0),
-        Kihon::Decimal(-65536*65536*65536*65536*65536 / 4, 0),
+        decimal(65536*65536*65536, 4),
+        decimal(-65536*65536*65536, 4),
+        decimal(65536*65536*65536*65536, 0),
+        decimal(-65536*65536*65536*65536, 0),
+        decimal(65536*65536*65536*65536 / 2, 0),
+        decimal(-65536*65536*65536*65536 / 2, 0),
+        decimal(65536*65536*65536*65536 / 4, 0),
+        decimal(-65536*65536*65536*65536 / 4, 0),
+        decimal(-65536*65536*65536*65536*65536, 0),
+        decimal(65536*65536*65536*65536*65536 / 2, 0),
+        decimal(-65536*65536*65536*65536*65536 / 2, 0),
+        decimal(65536*65536*65536*65536*65536 / 4, 0),
+        decimal(-65536*65536*65536*65536*65536 / 4, 0),
+        decimal(65536*65536*65536*65536*65536, 0),
 
         Kihon::BigStr(String::from_utf8(vec!['a' as u8; 256]).unwrap()),
         Kihon::BigStr("".to_string()),
