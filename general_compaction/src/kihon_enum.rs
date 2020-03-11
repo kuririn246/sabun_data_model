@@ -14,6 +14,9 @@ pub enum Kihon{
     Undefined(u8),
 }
 
+///128bit数　およそ40桁まで。dotは0で小数点なし、1で10.1のように左に一つずらして、2だと10.00みたいな感じで、255桁までの小数点を表現。
+/// String Compactionで誤差のない小数値の文字列表現を作ることが主な目的。
+/// f64をDecimalに変換する良い方法は見つかっていない
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Decimal{
     pub int : i128,
