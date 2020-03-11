@@ -4,7 +4,7 @@ use crate::error::Result;
 
 #[allow(dead_code)]
 pub fn untyped_example() -> Result<JVal> {
-    // Some JSON input data as a &str. Maybe this comes from the user.
+
 
 
     let data = r#"
@@ -57,9 +57,10 @@ pub fn untyped_example() -> Result<JVal> {
 		}
 	],
 
-	"Rename" : [ "prevName->currentName",
+	RenamedMember : [ "prevName->currentName",
 	             "prevName2->currentName2" ], //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
 
+    Include : { memberName : "hoge.json5" } //メンバの中身を別ファイルに書くことが出来る。
 	hogeList2 : [
 	  "List",
 	  ["Default", "second" ], //デフォルトのIDを指定。Defaultを指定しない場合最初のものがデフォルトになる。
@@ -90,6 +91,7 @@ pub fn untyped_example() -> Result<JVal> {
   weapons : [
     "List",
     ["ListID", "weapon"],
+    ["RenamedID", "oldID->currentID", "oldID2->currentID2" ]
     {
       ID : "katana",
       atk : 5
@@ -105,7 +107,7 @@ pub fn untyped_example() -> Result<JVal> {
     ["AutoID"],
     ["RefListID", "weapon"],
     {
-      RefID : "doutanuki", //どうたぬきを参照。参照すると継承される。
+      RefID : { weapon : "doutanuki" }, //どうたぬきを参照。
       atk : 8 //overrideしてみる
     }
   ],
@@ -139,22 +141,22 @@ pub fn untyped_example() -> Result<JVal> {
   itemList3 : [
     "List",
     ["AutoID"],
-    ["RefListIDs",  //複数の参照が必要な場合、RefListIDsを設定する
-      "hoge", "huga?", //nullableにも出来る
-      //{hegoNew : "hego"} //名前を変更する機能を作るかは未定。idである以上いらなくないか？
+    ["RefListID",  //複数の参照が必要な場合、RefListIDに複数設定する
+      "hoge", "huga?", "hego!"
     ],
     {
-      RefIDs : { //RefListIDsが設定されている場合、RefIDsが必要。必要なメンバを設定する。
+      RefID : { //RefListIDが設定されている場合、RefIDが必要。必要なメンバを設定する。
         hoge : "hogehoge", //RefListIDと、RefIDをセットで記述していく。
-        //nullableは入力しなければデフォルトでnull
-        hegoNew : "hegohego",
+        //nullableだと入力しなければデフォルトでnull
+        hego : "hegohego",
       },
-      "memOverride?" : ["String"],
+      "memOverride?" : ["Str", null],
     }
   ],
-  "nullableObj?" : {
-    member1 : 31,
-  }
+  //"nullableObj?" : { //nullableObjっていうのは、objにデフォルト値を設定したあとにnullを入れ直すということなので、そんなユースケースないと思う。同様にnullable listもないと思う
+//    member1 : 31, //undefinedも、
+  //},
+  RenamedListID : [ "oldListID->currentListID" ] //ListIDの変更もトラッキング可能である
 }
 
 //使用側 概念コード
@@ -168,6 +170,9 @@ pub fn untyped_example() -> Result<JVal> {
 //nullableなメンバを上書きして、実質overrideのようにした方が良かろうと思う。
 ////item.memOverride = "c" //nullableなメンバを書き換える
 //if(item.memOverride != null){ return item.memOverride } else{ return item.mem }
+
+
+
 
 
 
