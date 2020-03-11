@@ -28,3 +28,7 @@ pub fn to_string(num : i128, dot : u8) -> String{
 
     return result;
 }
+
+pub fn to_f64(num : i128, dot : u8) -> f64{
+    (num as f64) / 10f64.powi(dot as i32)
+}
