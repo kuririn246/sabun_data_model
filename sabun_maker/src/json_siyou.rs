@@ -12,70 +12,53 @@ pub fn untyped_example() -> Result<JVal> {
   hogeNumber : 10,
   hogeString : "hoge",
   hogeBool : true,
-  hogeObj : {
-    hugaNumber : 30,
-    "@HugaNumber" : 30, //先頭が大文字のメンバ名はすべてシステムが予約しているので認められない。しかしメンバ名をどうしても大文字で始めたい場合、
-                        //jsonでは戦闘に@をつけ、プログラム側では@なしでもアクセス可能にするという技も使えなくはなかろうと思う。
+  "@HugaNumber" : 30, //先頭が大文字のメンバ名はすべてシステムが予約しているので認められない。しかしメンバ名をどうしても大文字で始めたい場合、
+                      //jsonでは戦闘に@をつけ、プログラム側では@なしでもアクセス可能にするという技も使えなくはなかろうと思う。
 
-    //名前が?で終わるメンバはnull値を含むことが出来る。
-    //プログラム側のメンバ名にはこの?は反映されず、型が変わるだけ(もし俺以外の実装が現れたらわからないが・・・）
-    //初期値にnullを入れるには、特殊な記法を使う必要がある
-    "hegoNumber?" : ["Num", null], //型を指定し、null値を入れる。これでnullになる。
+  //名前が?で終わるメンバはnull値を含むことが出来る。
+  //プログラム側のメンバ名にはこの?は反映されず、型が変わるだけ(もし俺以外の実装が現れたらわからないが・・・）
+  //初期値にnullを入れるには、特殊な記法を使う必要がある
+  "hegoNumber?" : ["Num", null], //型を指定し、null値を入れる。これでnullになる。
 
-    //!で終わる場合、バージョン違いでこのメンバを持っていなかった場合、デフォルト値でなくundefinedが入る。
-    //undefinedを代入する手段はない。
-    "pugyaNumber!" : 10,
-    "pugyaNumber2!?" : ["Num", null], //!?も出来る。?!でも良い。
+  //!で終わる場合、バージョン違いでこのメンバを持っていなかった場合、デフォルト値でなくundefinedが入る。
+  //undefinedを代入する手段はない。
+  "pugyaNumber!" : 10,
+  "pugyaNumber2!?" : ["Num", null], //!?も出来る。?!でも良い。
 
-    //配列はいまのところnumber配列、string配列、number配列の配列の4通り。
-    numArray2 : [ "Num-Array", 0, 3, 10 ],
-    //numArray3 : [ "Num-Array", [0, 3, 10] ], これはできない
+  //配列はいまのところnumber配列、string配列、number配列の配列の4通り。
+  numArray2 : [ "Num-Array", 0, 3, 10 ],
 
-    emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
-    "nullableNumArray?" : [ "Num-Array", null ], //nullable配列の初期値をnullにする場合
-    numArray2 : [ "Num-Array2", [2,3], [3,1] ], //二次元のnumarray
+  emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
+  "nullableNumArray?" : [ "Num-Array", null ], //nullable配列の初期値をnullにする場合
+  numArray2 : [ "Num-Array2", [2,3], [3,1] ], //二次元のnumarray
 
 
-	strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
-	//そもそも配列なんてこのシステムに必要なんだろうか・・・？　まともに差分生成出来る気もしないしなあ。
+  strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
+  //そもそも配列なんてこのシステムに必要なんだろうか・・・？　まともに差分生成出来る気もしないしなあ。
 
-	hogeList : [
-		"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
-		["ListID", "hogehoge"], //任意でListIDを与えることが出来る。ListIDは全データの中で一意である必要がある。
-		["Default", {
-			hogeNumber : 0,
-			hogeString : "hoge"
-		}], //デフォルト値を設定。実際のリストには加わらない。
-		{
-			ID : "first",
-			hogeNumber : 12,
-			hogeString : "huga"
-		},
-		{
-			ID : "second",
-			//リストでは、デフォルト値から変更がない場合は書かなくても良いんじゃないかと思う
-		}
-	],
+  hogeList : [
+	"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
+	["ListID", "hogehoge"], //任意でListIDを与えることが出来る。ListIDは全データの中で一意である必要がある。
+	["Default", {
+		hogeNumber : 0,
+		hogeString : "hoge"
+	}], //デフォルト値を設定
+	{
+		ID : "first",
+		hogeNumber : 12,
+		hogeString : "huga"
+	},
+	{
+		ID : "second",
+		//デフォルト値から変更がない場合は書かなくても良い
+	}],
 
-	RenamedMember : [ "prevName->currentName",
-	             "prevName2->currentName2" ], //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
+  RenamedMember : [ "prevName->currentName",
+                    "prevName2->currentName2" ], //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
 
-    Include : { memberName : "hoge.json5" } //メンバの中身を別ファイルに書くことが出来る。
-	hogeList2 : [
-	  "List",
-	  ["Default", "second" ], //デフォルトのIDを指定。Defaultを指定しない場合最初のものがデフォルトになる。
-	  {
-	    ID : "first",
-	    member1 : "hoge"
-	  },
-	  {
-	    ID : "second",
-	    member2 : "this_is_default", //これがデフォルト値となり、差分が取られる。
-	  }
-	],
-  },
+  Include : { someList : "someList.json5" } //メンバの中身を別ファイルに書くことが出来る。
 
-  usables : [
+  usable : [
     "List",
     ["ListID", "usable"],
     {
@@ -92,6 +75,7 @@ pub fn untyped_example() -> Result<JVal> {
     "List",
     ["ListID", "weapon"],
     ["RenamedID", "oldID->currentID", "oldID2->currentID2" ]
+    ["Default", "katana"],
     {
       ID : "katana",
       atk : 5
@@ -135,6 +119,10 @@ pub fn untyped_example() -> Result<JVal> {
     {
       ID : "hegohego",
       mem : "b",
+    },
+    {
+      ID : "nantoka",
+      Obsolete : true //被参照リストでは要らなくなっても削除は危険なのでObsoleteするのが良いと思われる。
     }
   ],
 
@@ -153,9 +141,7 @@ pub fn untyped_example() -> Result<JVal> {
       "memOverride?" : ["Str", null],
     }
   ],
-  //"nullableObj?" : { //nullableObjっていうのは、objにデフォルト値を設定したあとにnullを入れ直すということなので、そんなユースケースないと思う。同様にnullable listもないと思う
-//    member1 : 31, //undefinedも、
-  //},
+
   RenamedListID : [ "oldListID->currentListID" ] //ListIDの変更もトラッキング可能である
 }
 
