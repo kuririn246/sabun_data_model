@@ -30,7 +30,6 @@ pub fn untyped_example() -> Result<JVal> {
   "nullableNumArray?" : [ "Num-Array", null ], //nullable配列の初期値をnullにする場合
   numArray2 : [ "Num-Array2", [2,3], [3,1] ], //二次元のnumarray
 
-
   strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
   //そもそも配列なんてこのシステムに必要なんだろうか・・・？　まともに差分生成出来る気もしないしなあ。
 
@@ -86,7 +85,7 @@ pub fn untyped_example() -> Result<JVal> {
 
   itemList : [
     "List",
-    ["AutoID"],
+    ["AutoID"], //RefferedとAutoIDは同時には使えない
     ["RefList", "weapons"],
     {
       RefID : { weapons : "doutanuki" }, //どうたぬきを参照。
