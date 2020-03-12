@@ -120,6 +120,7 @@ pub fn untyped_example() -> Result<JVal> {
     {
       ID : "hegohego",
       mem : "b",
+      Renamed: ["memOld->mem"]//DefaultメンバではRenamedの設定が可能
     },
     {
       ID : "nantoka",
@@ -130,6 +131,7 @@ pub fn untyped_example() -> Result<JVal> {
   itemList3 : [
     "List",
     ["AutoID"],
+    ["Default",{ memOverride? : ["Str", null ] }],
     ["RefList",  //複数の参照が必要な場合、RefListIDに複数設定する
       "hogeList", "hugaList?", "hegoList!"
     ],
@@ -139,7 +141,6 @@ pub fn untyped_example() -> Result<JVal> {
         //nullableだと入力しなければデフォルトでnull
         hegoList : "hegohego",
       },
-      "memOverride?" : ["Str", null],
     }
   ],
 
