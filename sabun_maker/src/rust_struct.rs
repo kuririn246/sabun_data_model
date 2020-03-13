@@ -46,43 +46,29 @@ pub struct RustArray{
 }
 
 
-#[derive(Debug)]
-pub struct RefListID{
-    pub id : String,
-    pub is_nullable : bool,
-}
-
-impl Eq for RefListID{}
-
-impl PartialEq for RefListID{
-    fn eq(&self, other: &Self) -> bool {
-        self.id.eq(&other.id)
-    }
-}
-
-impl Hash for RefListID {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
-}
 
 #[derive(Debug)]
 pub struct RustList{
     pub auto_id : Option<u64>,
-    pub ref_list_ids : Option<BTreeSet<RefListID>>,
-    pub list_id : Option<String>,
+    pub refs: Vec<RefName>,
     pub default : RustObject,
     pub list : Vec<RustObject>,
+    pub reffered : bool,
+}
+
+pub struct RefName{
+    pub value_type : ValueType,
+    pub name : String,
 }
 
 impl RustList{
     pub fn new() -> RustList{
         RustList{
             auto_id : None,
-            ref_list_ids : None,
-            list_id : None,
+            refs: vec![],
             default : RustObject::new(),
             list : vec![],
+            reffered : false,
         }
     }
 }
@@ -96,16 +82,15 @@ pub struct RustObject{
     //listの場合idがなければならず、list内で一意である必要もある。
     //listのオブジェクトでない場合はNone
     pub id : Option<String>,
-    //単一のref_idしかない時は、キーはRefIDである。
-    //RefIDもRefIDsもない場合は空
-    pub ref_ids : Option<BTreeMap<String, Option<String>>>,
-    pub rename : HashMap<String, String>,
+    pub refs: Option<BTreeMap<String, Option<String>>>,
+    pub renamed: HashMap<String, String>,
+    pub obsolete : bool,
 }
 
 impl RustObject{
     pub fn new() -> RustObject{
-        RustObject{ default : None, sabun : BTreeMap::new(),id : None, ref_ids : None,
-            rename : HashMap::new() }
+        RustObject{ default : None, sabun : BTreeMap::new(),id : None, refs: None,
+            renamed: HashMap::new(), obsolete : false }
     }
 
     pub fn insert_default(&mut self, key : String, value : RustValue) -> Option<RustValue>{

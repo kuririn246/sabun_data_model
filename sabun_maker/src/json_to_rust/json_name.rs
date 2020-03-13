@@ -5,10 +5,10 @@ use crate::rust_struct::ValueType;
 
 pub enum SystemNames{
     Include,
-    Rename,
+    Renamed,
     ID,
-    RefID,
-    RefIDs
+    Ref,
+    Obsolete,
 }
 
 pub enum NameType{
@@ -24,10 +24,10 @@ pub fn json_name(s : &str) -> Option<NameType>{
 
     match s {
         "Include" => return some(Include),
-        "Rename" => return some(Rename),
+        "Renamed" => return some(Renamed),
         "ID" => return some(ID),
-        "RefID" => return some(RefID),
-        "RefIDs" => return some(RefIDs),
+        "Ref" => return some(Ref),
+        "Obsolete" => return some(Obsolete),
         _ => {},
     }
 

@@ -3,12 +3,39 @@ use crate::rust_struct::{ValueType, RustValue, RustList, Qv, RustObject};
 use crate::json_to_rust::names::Names;
 use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use crate::error::Result;
+use crate::json_to_rust::list::list_attribute::ListAttribute;
 
 pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue> {
     let mut result = RustList::new();
     for item in array {
         let val = match item {
-            JVal::Array(a2, _) => {
+            JVal::Array(a2, span) => {
+                match list_attribute(a2, span, names)?{
+                    ListAttribute::Reffered =>{
+                        if result.reffered == false{
+                            result.reffered = true;
+                        } else{
+                            Err(format!(r#"{} ["Reffered"] is defined multiple times {}"#, span.line_col_str(), names))?
+                        }
+                    },
+                    ListAttribute::Ref(vec) =>{
+                        if result.refs.len() == 0{
+                            result.refs = vec;
+                        } else{
+                            Err(format!(r#"{} "Ref" is defined multiple times {}"#, span.line_col_str(), names))?
+                        }
+                    },
+                    ListAttribute::AutoID =>{
+                        if result.auto_id.is_none(){
+                            result.auto_id = Some(0);
+                        } else{
+                            Err(format!(r#"{} "AutoID" is defined multiple times {}"#, span.line_col_str(), names))?
+                        }
+                    },
+                    ListAttribute::Renamed(map) =>{
+
+                    }
+                }
             },
             //JVal::Map(_, _) => unreachable!(),
             //JVal::Bool(_, _) => unreachable!(),
@@ -18,17 +45,10 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
     return Ok(RustValue::List(Qv::Val(result), value_type));
 }
 
-enum ListArrayItem{
-    DefaultID(String),
-    DefaultObj(RustObject),
-    ListID(String),
-    AutoID,
-    RefListID(String),
-    RefListIDs(RustObject),
-}
 
-fn list_item_array(array : &Vec<JVal>, span : &Span, names : &Names) -> Result<ListArrayItem>{
-    let error_message = "List's array must be AutoID, RefListID, RefListIDs, Default or ListID";
+
+fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Result<ListAttribute>{
+    let error_message = "List's array must be AutoID, Ref, Reffered, Renamed or Default";
 
     if array.len() == 0{
         Err(format!("{} {} {} {}", span.line_col_str(), span.slice(), error_message, names))?
@@ -38,8 +58,11 @@ fn list_item_array(array : &Vec<JVal>, span : &Span, names : &Names) -> Result<L
             match s.as_str(){
                 "AutoID" =>{ Ok(ListArrayItem::AutoID) },
                 "Default" =>{ get_default(&array[1..], span, names) },
-                "RefListIDs" =>{ todo!() },
-                "RefListID" =>{ todo!() },
+                "Ref" =>{ todo!() },
+                "Reffered" =>{
+                    if array.len() == 1 { Ok(ListAttribute::Reffered) }
+                    else{ }
+                },
                 "ListID" =>{ todo!() },
                 _ =>{
                     Err(format!("{} {} {} {}", span.line_col_str(), span.slice(), error_message, names))?
@@ -66,4 +89,3 @@ fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<ListArra
     }
 }
 
-fn get_ref_list_ids

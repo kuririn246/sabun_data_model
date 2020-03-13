@@ -33,6 +33,12 @@ pub fn untyped_example() -> Result<JVal> {
   strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
   //そもそも配列なんてこのシステムに必要なんだろうか・・・？　まともに差分生成出来る気もしないしなあ。
 
+  Renamed : [ "prevName->currentName",
+              "prevName2->currentName2" ], //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
+              //参照可能なListの名前が変わった場合参照先も追跡できる
+
+  Include : { someList : "someList.json5" } //メンバの中身を別ファイルに書くことが出来る。
+
   hogeList : [
 	"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
 	["Reffered"], //参照可能になる
@@ -50,15 +56,12 @@ pub fn untyped_example() -> Result<JVal> {
 		//デフォルト値から変更がない場合は書かなくても良い
 	}],
 
-  Renamed : [ "prevName->currentName",
-              "prevName2->currentName2" ], //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
-              //参照可能なListの名前が変わった場合参照先も追跡できる
 
-  Include : { someList : "someList.json5" } //メンバの中身を別ファイルに書くことが出来る。
 
   usable : [
     "List",
     ["Reffered"],
+    ["Default",{ num : 0 }],
     {
       ID : "yakusou",
       num : 3
@@ -69,10 +72,11 @@ pub fn untyped_example() -> Result<JVal> {
     }
   ],
 
-  weapons : [
+  weapon : [
     "List",
     ["Renamed", "oldID->currentID", "oldID2->currentID2" ]
     ["Default", { atk : 0 }],
+    ["Reffered"],
     {
       ID : "katana",
       atk : 5
@@ -86,10 +90,11 @@ pub fn untyped_example() -> Result<JVal> {
   itemList : [
     "List",
     ["AutoID"], //RefferedとAutoIDは同時には使えない
-    ["RefList", "weapons"],
+    ["Ref", "weapons"],
+    ["Default",{ atk? : ["Num", null] } ]
     {
-      RefID : { weapons : "doutanuki" }, //どうたぬきを参照。
-      atk : 8 //overrideしてみる
+      Ref : { weapons : "doutanuki" }, //どうたぬきを参照。
+      atk : 8 //override的ななにか
     }
   ],
 
@@ -131,11 +136,11 @@ pub fn untyped_example() -> Result<JVal> {
     "List",
     ["AutoID"],
     ["Default",{ memOverride? : ["Str", null ] }],
-    ["RefList",  //複数の参照が必要な場合、RefListIDに複数設定する
+    ["Ref",  //複数の参照が必要な場合、RefListIDに複数設定する
       "hogeList", "hugaList?", "hegoList!"
     ],
     {
-      RefID : { //RefListIDが設定されている場合、RefIDが必要。必要なメンバを設定する。
+      Ref : { //RefListIDが設定されている場合、RefIDが必要。必要なメンバを設定する。
         hogeList : "hogehoge", //RefListIDと、RefIDをセットで記述していく。
         //nullableだと入力しなければデフォルトでnull
         hegoList : "hegohego",

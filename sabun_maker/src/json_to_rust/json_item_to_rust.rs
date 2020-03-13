@@ -23,8 +23,7 @@ pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names :
             Ok(json_array_to_rust(a, value_type, v.span(), names)?)
         },
         JVal::Map(map, _) => {
-            let obj = json_obj_to_rust(map, names)?;
-            Ok(RustValue::Object(Qv::Val(obj), value_type))
+            Err(format!("An object can't have an object"))?;
         },
         JVal::Null(_) =>{
              Err(format!(r#"{} null must be ["type", null] {}"#, v.line_col(), names))?

@@ -4,6 +4,7 @@ use crate::error::Result;
 use super::names::Names;
 use json5_parser::{JVal, Span};
 use crate::json_to_rust::array_null::array_null;
+use crate::json_to_rust::json_list_to_rust::json_list_to_rust;
 
 pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue>{
     use GatResult::*;
@@ -23,12 +24,11 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
         },
         Num | Str | Bool =>{
             //いまのところ["Num", null] のような形での、nullのセットしか認めていない。Arrayを使った記法では、null以外はセットできない。
-            array_null(&array[1..], gat, value_type, &array[0].span(), names)
+            array_null(&array[1..], gat, value_type, span, names)
         },
         None =>{ Err(format!(r#"{} Array must be "...-Array", "List", "Num", "Str" or "Bool" {}"#, span.line_col_str(), names))? },
         List =>{
-            todo!()
-            //return Ok(json_list_to_rust(array, is_nullable, names)?);
+            json_list_to_rust(&array[1..], value_type, span, names)
         },
     }
 }
