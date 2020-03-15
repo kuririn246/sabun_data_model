@@ -56,6 +56,7 @@ pub struct RustList{
     pub reffered : bool,
 }
 
+#[derive(Debug)]
 pub struct RefName{
     pub value_type : ValueType,
     pub name : String,

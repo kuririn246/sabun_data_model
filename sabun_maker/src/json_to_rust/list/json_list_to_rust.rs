@@ -3,7 +3,7 @@ use crate::rust_struct::{ValueType, RustValue, RustList, Qv, RustObject};
 use crate::json_to_rust::names::Names;
 use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use crate::error::Result;
-use crate::json_to_rust::list::list_attribute::ListAttribute;
+use crate::json_to_rust::list::list_attribute::{ListAttribute, list_attribute};
 
 pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue> {
     let mut result = RustList::new();
@@ -34,7 +34,8 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
                     },
                     ListAttribute::Renamed(map) =>{
 
-                    }
+                    },
+                    _ =>{ todo!() }
                 }
             },
             //JVal::Map(_, _) => unreachable!(),
