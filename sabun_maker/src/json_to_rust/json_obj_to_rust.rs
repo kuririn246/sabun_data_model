@@ -46,7 +46,15 @@ pub fn json_obj_to_rust(v : &BTreeMap<String, JVal>, names : &Names) -> Result<R
                         }
                     }
                     SystemNames::Obsolete =>{
-
+                        if let Some(b) = v.as_bool(){
+                            if b == false{
+                                Err(format!("{} Obsolete must be \"true\" {}", v.line_col(), names))?;
+                            }
+                            if r.obsolete == true {
+                                Err(format!("{} Obsolete is defined multiple times {}", v.line_col(), names))?;
+                            }
+                            r.obsolete = true;
+                        }
                     }
                 }
             }

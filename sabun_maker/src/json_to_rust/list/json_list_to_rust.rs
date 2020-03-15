@@ -47,45 +47,6 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
 
 
 
-fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Result<ListAttribute>{
-    let error_message = "List's array must be AutoID, Ref, Reffered, Renamed or Default";
 
-    if array.len() == 0{
-        Err(format!("{} {} {} {}", span.line_col_str(), span.slice(), error_message, names))?
-    }
-    return match &array[0]{
-        JVal::String(s, _) =>{
-            match s.as_str(){
-                "AutoID" =>{ Ok(ListArrayItem::AutoID) },
-                "Default" =>{ get_default(&array[1..], span, names) },
-                "Ref" =>{ todo!() },
-                "Reffered" =>{
-                    if array.len() == 1 { Ok(ListAttribute::Reffered) }
-                    else{ }
-                },
-                "ListID" =>{ todo!() },
-                _ =>{
-                    Err(format!("{} {} {} {}", span.line_col_str(), span.slice(), error_message, names))?
-                }
-            }
-        },
-        _ =>{
-            Err(format!("{} {} {} {}", span.line_col_str(), span.slice(), error_message, names))?
-        }
-    };
-}
 
-fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<ListArrayItem>{
-    let error_message = r#"["Default", "id"] or ["Default", \{ default_obj \}] is valid"#;
-    if array.len() != 1{
-        Err(format!(r#"{} {} {} {}"#, span.line_col_str(), span.slice(), error_message, names))?
-    }
-    return match &array[0]{
-        JVal::String(id, _) => Ok(ListArrayItem::DefaultID(id.to_string())),
-        JVal::Map(map, _) =>{
-            Ok(ListArrayItem::DefaultObj(json_obj_to_rust(map, names)?))
-        },
-        _ => Err(format!(r#"{} {} {} {}"#, span.line_col_str(), span.slice(), error_message, names))?,
-    }
-}
 
