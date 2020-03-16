@@ -2,7 +2,7 @@ use json5_parser::{JVal, Span};
 use crate::json_to_rust::names::Names;
 use std::collections::{BTreeMap, HashMap};
 use crate::error::Result;
-use crate::json_to_rust::list::rename_map::{rename_map, RenameMapError};
+use crate::json_to_rust::rename_map::{rename_map, RenameMapError};
 
 pub fn get_renamed(array : &[JVal], span : &Span, names : &Names) -> Result<HashMap<String,String>>{
     let mut vec : Vec<(String, String)> = vec![];

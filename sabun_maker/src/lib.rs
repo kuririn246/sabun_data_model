@@ -1,6 +1,6 @@
 pub mod json_siyou;
 pub mod error;
-pub mod json_to_rust;
+mod json_to_rust;
 pub mod rust_struct;
 
 #[cfg(test)]

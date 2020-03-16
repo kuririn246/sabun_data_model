@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use std::rc::Rc;
 use std::fmt::Display;
+use indexmap::IndexMap;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum JVal{
@@ -10,14 +11,21 @@ pub enum JVal{
     //Int(i64, Span),
     Double(f64, Span),
     Array(Vec<JVal>, Span),
-    Map(BTreeMap<String, JVal>, Span)
+    Map(IndexMap<String, JVal>, Span)
 }
 
 impl JVal{
-    pub fn as_object(&self) -> Option<&BTreeMap<String, JVal>>{
+    pub fn as_object(&self) -> Option<&IndexMap<String, JVal>>{
         return match self {
             JVal::Map(map, _span) => { Some(map) }
             _ => { None }
+        }
+    }
+
+    pub fn as_array(&self) -> Option<&Vec<JVal>>{
+        return match self{
+            JVal::Array(a, _) => { Some(a) },
+            _ =>{ None }
         }
     }
 

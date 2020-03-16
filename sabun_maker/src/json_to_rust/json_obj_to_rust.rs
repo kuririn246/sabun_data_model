@@ -1,13 +1,16 @@
 use json5_parser::JVal;
+use indexmap::IndexMap;
 use std::collections::BTreeMap;
 use super::names::Names;
 use crate::rust_struct::RustObject;
 use super::json_name::{json_name, NameType, SystemNames};
 use super::json_item_to_rust::json_item_to_rust;
 use crate::error::Result;
+use crate::json_to_rust::get_refs::get_refs;
+use crate::json_to_rust::get_renamed::get_renamed;
 
 
-pub fn json_obj_to_rust(v : &BTreeMap<String, JVal>, names : &Names) -> Result<RustObject>{
+pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, names : &Names) -> Result<RustObject>{
     let mut r : RustObject = RustObject::new();
     for (k,v) in v{
         let name = json_name(k).ok_or_else(|| format!("{} {} is not a valid name {}",v.line_col(), k, names))?;
@@ -30,14 +33,25 @@ pub fn json_obj_to_rust(v : &BTreeMap<String, JVal>, names : &Names) -> Result<R
                     },
                     SystemNames::Ref =>{
                         if r.refs.is_none(){
-                            r.refs = Some(get_refs(v, names)?);
+                            match &v {
+                                JVal::Map(map, span) =>{
+                                    r.refs = Some(get_refs(map, span,names)?);
+                                }
+
+                            }
                         } else {
                             Err(format!("{} RefIDs is defined multiple times {}", v.line_col(), names))?;
                         }
                     },
                     SystemNames::Renamed =>{
                         if r.renamed.len() == 0{
-                            r.renamed = get_rename(v, names)?;
+                            match &v{
+                                JVal::Array(a, span) =>{
+                                    r.renamed = get_renamed(a, span, names)?;
+                                },
+                                _ =>{ Err(format!("{}  {}", v.line_col(), names))?; }
+                            }
+
                         } else{
                             //そもそも複数回の定義はjsonパーサーによって弾かれるはずだが・・・
                             Err(format!("{} Rename is defined multiple times {}", v.line_col(), names))?;

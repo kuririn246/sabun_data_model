@@ -27,7 +27,7 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
                 },
                 "Default" =>{
                     let def = get_default(&array[1..], span, names)?;
-                    ListAttribute::Default(def)
+                    Ok(ListAttribute::Default(def))
                 },
                 "Reffered" =>{
                     if array.len() == 1 { Ok(ListAttribute::Reffered) }

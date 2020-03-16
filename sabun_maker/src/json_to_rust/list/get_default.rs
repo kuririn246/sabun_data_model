@@ -5,6 +5,7 @@ use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use crate::rust_struct::RustObject;
 use crate::error::Result;
 use crate::json_to_rust::list::list_attribute::ListAttribute;
+use indexmap::IndexMap;
 
 pub fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<RustObject>{
     let error_message = r#"["Default", \{ default_obj \}] is valid"#;
@@ -19,7 +20,7 @@ pub fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<Rust
     }
 }
 
-fn get_default_obj(map : &BTreeMap<String, JVal>, span : &Span, names : &Names) -> Result<RustObject>{
+fn get_default_obj(map : &IndexMap<String, JVal>, span : &Span, names : &Names) -> Result<RustObject>{
     let names = &names.append("default");
     let obj = json_obj_to_rust(map, names)?;
     if (&obj).id.is_none() == false{

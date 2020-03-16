@@ -4,7 +4,6 @@ use crate::json_to_rust::names::Names;
 use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use crate::error::Result;
 use crate::json_to_rust::list::list_attribute::{ListAttribute, list_attribute};
-use crate::json_to_rust::list::get_renamed::get_renamed;
 
 pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue> {
     let mut result = RustList::new();
@@ -20,13 +19,6 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
                             _ =>{
                                 Err(format!(r#"{} "Reffered" can't coexist with "AutoID" {}"#, span.line_col_str(), names))?
                             }
-                        }
-                    },
-                    ListAttribute::Ref(vec) =>{
-                        if result.refs.len() == 0{
-                            result.refs = vec;
-                        } else{
-                            Err(format!(r#"{} "Ref" is defined multiple times {}"#, span.line_col_str(), names))?
                         }
                     },
                     ListAttribute::AutoID =>{
