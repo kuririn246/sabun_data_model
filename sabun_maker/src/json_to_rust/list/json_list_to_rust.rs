@@ -1,9 +1,10 @@
 use json5_parser::{JVal, Span};
-use crate::rust_struct::{ValueType, RustValue, RustList, Qv, RustObject};
+use crate::rust_struct::{ValueType, RustValue, RustList, Qv, RustObject, ListType};
 use crate::json_to_rust::names::Names;
 use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use crate::error::Result;
 use crate::json_to_rust::list::list_attribute::{ListAttribute, list_attribute};
+use crate::json_to_rust::list::get_renamed::get_renamed;
 
 pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue> {
     let mut result = RustList::new();
@@ -12,10 +13,13 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
             JVal::Array(a2, span) => {
                 match list_attribute(a2, span, names)?{
                     ListAttribute::Reffered =>{
-                        if result.reffered == false{
-                            result.reffered = true;
-                        } else{
-                            Err(format!(r#"{} ["Reffered"] is defined multiple times {}"#, span.line_col_str(), names))?
+                        match result.list_type{
+                            ListType::Normal =>{
+                                result.list_type = ListType::Reffered;
+                            },
+                            _ =>{
+                                Err(format!(r#"{} "Reffered" can't coexist with "AutoID" {}"#, span.line_col_str(), names))?
+                            }
                         }
                     },
                     ListAttribute::Ref(vec) =>{
@@ -26,14 +30,14 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
                         }
                     },
                     ListAttribute::AutoID =>{
-                        if result.auto_id.is_none(){
-                            result.auto_id = Some(0);
-                        } else{
-                            Err(format!(r#"{} "AutoID" is defined multiple times {}"#, span.line_col_str(), names))?
+                        match result.list_type{
+                            ListType::Normal =>{
+                                result.list_type = ListType::AutoID;
+                            },
+                            _ =>{
+                                Err(format!(r#"{} "AutoID" can't coexist with "Reffered" {}"#, span.line_col_str(), names))?
+                            }
                         }
-                    },
-                    ListAttribute::Renamed(map) =>{
-
                     },
                     _ =>{ todo!() }
                 }

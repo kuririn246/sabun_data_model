@@ -2,8 +2,6 @@ pub mod names;
 pub mod json_obj_to_rust;
 pub mod json_name;
 pub mod json_item_to_rust;
-pub mod get_refs;
-pub mod get_rename;
 pub mod json_array_to_rust;
 pub mod array_null;
 pub mod list;

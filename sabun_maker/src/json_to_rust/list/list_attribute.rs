@@ -8,14 +8,12 @@ use crate::error::Result;
 pub enum ListAttribute{
     Default(RustObject),
     AutoID,
-    Ref(Vec<RefName>),
-    Renamed(BTreeMap<String, String>),
     Reffered,
 }
 
 
 pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Result<ListAttribute>{
-    let error_message = "List's array must be AutoID, Ref, Reffered, Renamed or Default";
+    let error_message = "List's array must be AutoID, Reffered or Default";
 
     if array.len() == 0{
         Err(format!("{} {} {} {}", span.line_col_str(), span.slice(), error_message, names))?
@@ -23,17 +21,19 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
     return match &array[0]{
         JVal::String(s, _) =>{
             match s.as_str(){
-                "AutoID" =>{ Ok(ListAttribute::AutoID) },
-                "Default" =>{ get_default(&array[1..], span, names); todo!() },
-                "Ref" =>{ todo!() },
+                "AutoID" =>{
+                    if array.len() == 1 { Ok(ListAttribute::AutoID) }
+                    else{ Err(format!("{} {} <- [\"AutoID\"] is valid {}", span.line_col_str(), span.slice(), names))? }
+                },
+                "Default" =>{
+                    let def = get_default(&array[1..], span, names)?;
+                    ListAttribute::Default(def)
+                },
                 "Reffered" =>{
                     if array.len() == 1 { Ok(ListAttribute::Reffered) }
                     else{ Err(format!("{} {} [\"Reffered\"] is valid {}", span.line_col_str(), span.slice(), names))? }
                 },
-                "Renamed" =>{
-                    todo!()
-                },
-                "Default" =>{ todo!(); },
+
                 _ =>{
                     Err(format!("{} {} {} {}", span.line_col_str(), span.slice(), error_message, names))?
                 }

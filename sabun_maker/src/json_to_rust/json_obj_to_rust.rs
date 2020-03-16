@@ -4,8 +4,6 @@ use super::names::Names;
 use crate::rust_struct::RustObject;
 use super::json_name::{json_name, NameType, SystemNames};
 use super::json_item_to_rust::json_item_to_rust;
-use crate::json_to_rust::get_refs::get_refs;
-use crate::json_to_rust::get_rename::get_rename;
 use crate::error::Result;
 
 

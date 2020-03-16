@@ -49,11 +49,17 @@ pub struct RustArray{
 
 #[derive(Debug)]
 pub struct RustList{
-    pub auto_id : Option<u64>,
-    pub refs: Vec<RefName>,
+    pub list_type : ListType,
     pub default : RustObject,
     pub list : Vec<RustObject>,
     pub reffered : bool,
+}
+
+#[derive(Debug)]
+pub enum ListType{
+    AutoID,
+    Reffered,
+    Normal
 }
 
 #[derive(Debug)]
@@ -65,8 +71,7 @@ pub struct RefName{
 impl RustList{
     pub fn new() -> RustList{
         RustList{
-            auto_id : None,
-            refs: vec![],
+            list_type : ListType,
             default : RustObject::new(),
             list : vec![],
             reffered : false,

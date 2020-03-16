@@ -25,12 +25,8 @@ fn get_default_obj(map : &BTreeMap<String, JVal>, span : &Span, names : &Names) 
     if (&obj).id.is_none() == false{
         Err(format!("{} ID is not valid for default objects {}", span.line_col_str(), names))?
     }
-    if obj.obsolete == true{
-        Err(format!("{} Obsolete is not valid for default objects {}", span.line_col_str(), names))?
-    }
-    if obj.refs.is_none() == false{
-        Err(format!("{}  Refs is not valid for default objects {}", span.line_col_str(), names))?
-    }
+
+
     if obj.default.is_none() == false{
         unreachable!();
     }
