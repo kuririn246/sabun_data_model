@@ -68,7 +68,7 @@ impl RustList{
 
 #[derive(Debug)]
 pub enum ListType{
-    AutoID(u64),
+    AutoID(Option<u64>),
     Reffered,
     Normal
 }
