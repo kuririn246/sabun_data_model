@@ -10,7 +10,6 @@ pub fn untyped_example() -> Result<JVal> {
 
     let data = r#"
 {
-"hegoNumber?" : ["Num", null], //型を指定し、null値を入れる。これでnullになる。
   hogeNumber : 10,
   hogeString : "hoge",
   hogeBool : true,
@@ -28,7 +27,7 @@ pub fn untyped_example() -> Result<JVal> {
   "pugyaNumber2!?" : ["Num", null], //!?も出来る。?!ではダメ
 
   //配列はいまのところnumber配列、string配列、number配列の配列の4通り。
-  numArray2 : [ "Num-Array", 0, 3, 10 ],
+  numArray : [ "Num-Array", 0, 3, 10 ],
 
   emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
   "nullableNumArray?" : [ "Num-Array", null ], //nullable配列の初期値をnullにする場合
@@ -43,7 +42,7 @@ pub fn untyped_example() -> Result<JVal> {
 
   Include : { someList : "someList.json5" }, //メンバの中身を別ファイルに書くことが出来る。
 
-  hogeList : [
+  unkoList : [
 	"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
 	["Reffered"], //参照可能になる
 	["Default", {

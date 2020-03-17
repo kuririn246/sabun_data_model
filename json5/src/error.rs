@@ -13,6 +13,12 @@ pub struct MyError{
     pub end : Option<usize>,
 }
 
+impl MyError{
+    pub fn new(s : String, start : usize) -> MyError{
+        MyError{ message : s.to_string(), source : s, start : Some(start), end : None }
+    }
+}
+
 
 impl From<pest::error::Error<Rule>> for MyError {
     fn from(err: pest::error::Error<Rule>) -> Self {

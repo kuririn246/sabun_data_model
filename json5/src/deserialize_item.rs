@@ -5,6 +5,7 @@ use pest::Span;
 use crate::de::Rule;
 use std::rc::Rc;
 use indexmap::IndexMap;
+use crate::MyError;
 
 pub fn get_unit(span : Span, rc : Rc<String>) -> JVal { JVal::Null(s(span, rc)) }
 
@@ -36,7 +37,7 @@ pub fn get_map(m: Map, span : Span, rc : Rc<String>) -> Result<JVal> {
             Rule::identifier =>{ p.as_str().to_string() },
             Rule::string =>{
                 let s = p.as_str();
-                (&s[1..s.len()-2]).to_string()
+                (&s[1..s.len()-1]).to_string()
             },
             _ =>{
                 //println!("{:?}",p.as_rule());
@@ -46,8 +47,16 @@ pub fn get_map(m: Map, span : Span, rc : Rc<String>) -> Result<JVal> {
             }
         };
         let p   = pairs.next().unwrap();
+        let span = p.as_span();
         let val = deserialize_any(p, rc.clone())?;
-        result.insert(ident, val);
+        match result.insert(ident.to_string(), val){
+            Some(_) =>{
+                let start = span.start();
+                let (line,_col) = span.start_pos().line_col();
+                return Err(MyError::new(format!("{} {} is duplicated", line, ident), start));
+            },
+            _ =>{}
+        }
     }
 
     Ok(JVal::Map(result, s(span, rc)))

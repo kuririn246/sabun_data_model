@@ -11,7 +11,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
     let gat = get_array_type(array);
     return match gat{
         AT(array_type) =>{
-            let array = get_array( array,array_type, names)?;
+            let array = get_array( &array[1..],array_type, names)?;
             if let Some(array) = array {
                 Ok(RustValue::Array(Qv::Val(array), value_type))
             } else{

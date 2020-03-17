@@ -18,6 +18,7 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, names : &Names) -> Result<R
         match name{
             NameType::Name(name, vt) =>{
                 let v = json_item_to_rust(&name, vt,v, names)?;
+
                 r.insert_default(k.to_string(), v);
             },
             NameType::SystemName(sn) =>{
