@@ -7,7 +7,6 @@ use crate::json_to_rust::list::get_list_items::get_list_items;
 
 pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue> {
     let mut result = RustList::new();
-    let mut auto_id_null = false;
     for ind in 0..array.len() {
         let item = &array[ind];
         match item {
@@ -26,10 +25,7 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
                     ListAttribute::AutoID(id) =>{
                         match result.list_type{
                             ListType::Normal =>{
-                                result.list_type = ListType::AutoID(id.unwrap_or(0));
-                                if id.is_none(){
-                                    auto_id_null = true;
-                                }
+                                result.list_type = ListType::AutoID(id);
                             },
                             _ =>{
                                 Err(format!(r#"{} "AutoID" can't coexist with "Reffered" {}"#, span.line_str(), names))?
@@ -42,9 +38,11 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
                 }
             },
             JVal::Map(_, span) =>{
-                result.list = get_list_items(&array[ind..], result.list_type.is_auto_id(), span, names)?;
-                if auto_id_null{
-                    result.list_type = ListType::AutoID(result.list.len() as u64);
+                let null_id = result.is_null_auto_id();
+                //auto_idがnullの場合、idはいらない
+                result.list = get_list_items(&array[ind..], !null_id, span, names)?;
+                if null_id{
+                    result.set_auto_id(result.list.len() as u64);
                 }
                 break;
             },

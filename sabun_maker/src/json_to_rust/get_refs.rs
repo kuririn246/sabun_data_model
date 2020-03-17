@@ -6,7 +6,7 @@ use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use crate::rust_struct::{RefMap, RustValue};
 
 pub fn get_refs(v : &IndexMap<String, JVal>, span : &Span, names : &Names) -> Result<RefMap> {
-    let obj = json_obj_to_rust(v, names)?;
+    let obj = json_obj_to_rust(v, true, names)?;
     if obj.refs.is_some(){
         Err(format!(r#"{} Ref can't be declared in a Ref object {}"#, span.line_str(), names))?
     }

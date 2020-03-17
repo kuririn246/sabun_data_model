@@ -92,8 +92,10 @@ pub fn untyped_example() -> Result<JVal> {
   itemList : [
     "List",
     ["AutoID"], //RefferedとAutoIDは同時には使えない
-    ["Ref", "weapons"],
-    ["Default",{ "atk?" : ["Num", null] } ],
+    ["Default",{
+      "atk?" : ["Num", null],
+      "Ref": { weapons : "" },
+    }],
     {
       Ref : { weapons : "doutanuki" }, //どうたぬきを参照。
       atk : 8 //override的ななにか
@@ -139,10 +141,10 @@ pub fn untyped_example() -> Result<JVal> {
   itemList3 : [
     "List",
     ["AutoID"],
-    ["Default",{ "memOverride?" : ["Str", null] }],
-    ["Ref",  //複数の参照が必要な場合、RefListIDに複数設定する
-      "hogeList", "hugaList?", "hegoList!"
-    ],
+    ["Default",{
+      "memOverride?" : ["Str", null],
+      "Ref" : { hogeList : "", "hugaList?" : null, hegoList : "" },
+    }],
     {
       Ref : { //RefListIDが設定されている場合、RefIDが必要。必要なメンバを設定する。
         hogeList : "hogehoge", //RefListIDと、RefIDをセットで記述していく。

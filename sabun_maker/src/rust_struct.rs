@@ -45,8 +45,6 @@ pub struct RustArray{
     pub array_type : ArrayType,
 }
 
-
-
 #[derive(Debug)]
 pub struct RustList{
     pub list_type : ListType,
@@ -55,10 +53,26 @@ pub struct RustList{
 }
 
 impl RustList{
+    pub fn is_auto_id(&self) -> bool{
+        match self.list_type{
+            ListType::AutoID(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_null_auto_id(&self) -> bool{
+        match self.list_type{
+            ListType::AutoID(val) =>{
+                val.is_none()
+            },
+            _ =>{ false }
+        }
+    }
+
     pub fn set_auto_id(&mut self, id : u64) -> Result<(), ()>{
         match self.list_type{
             ListType::AutoID(_) =>{
-                self.list_type = ListType::AutoID(id);
+                self.list_type = ListType::AutoID(Some(id));
                 Ok(())
             },
             _=>{ Err(()) }
@@ -71,17 +85,6 @@ pub enum ListType{
     AutoID(Option<u64>),
     Reffered,
     Normal
-}
-
-impl ListType{
-    pub fn is_auto_id(&self) -> bool{
-        match self{
-            ListType::AutoID(_) => true,
-            _ => false,
-        }
-    }
-
-
 }
 
 #[derive(Debug)]
@@ -118,7 +121,7 @@ pub type RefMap = IndexMap<String, (Qv<String>, ValueType)>;
 
 impl RustObject{
     pub fn new() -> RustObject{
-        RustObject{ default : None, sabun : IndexMap::new(),id : None, refs: None,
+        RustObject{ default : Some(IndexMap::new()), sabun : IndexMap::new(),id : None, refs: None,
             renamed: HashMap::new(), obsolete : false }
     }
 

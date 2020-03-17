@@ -22,10 +22,13 @@ pub fn get_list_items(array : &[JVal], need_id : bool,  span : &Span, names : &N
 }
 
 pub fn get_list_item(map : &IndexMap<String, JVal>, need_id : bool, index : usize, span : &Span, names : &Names) -> Result<RustObject>{
-    let mut obj = json_obj_to_rust(map, names)?;
+    let mut obj = json_obj_to_rust(map, false, names)?;
+    //println!("is none {}", obj.default.is_none());
     let map = obj.default.take();
     obj.default = None;
-    obj.sabun = map.unwrap();
+    if map.is_some() {
+        obj.sabun = map.unwrap();
+    }
 
     if need_id{
         if obj.id.is_none(){

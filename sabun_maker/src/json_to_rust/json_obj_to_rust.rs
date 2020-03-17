@@ -7,9 +7,10 @@ use super::json_item_to_rust::json_item_to_rust;
 use crate::error::Result;
 use crate::json_to_rust::get_refs::get_refs;
 use crate::json_to_rust::get_renamed::get_renamed;
+use crate::json_to_rust::json_item_to_rust::json_item_to_rust_ref;
 
 
-pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, names : &Names) -> Result<RustObject>{
+pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : &Names) -> Result<RustObject>{
     let mut r : RustObject = RustObject::new();
     for (k,v) in v{
         let k : &String = k;
@@ -17,7 +18,12 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, names : &Names) -> Result<R
         let name = json_name(k).ok_or_else(|| format!("{} {} is not a valid name {}",v.line_str(), k, names))?;
         match name{
             NameType::Name(name, vt) =>{
-                let v = json_item_to_rust(&name, vt,v, names)?;
+                let v = if is_ref_obj {
+                    json_item_to_rust_ref(&name, vt,v, names)?
+                }
+                else{
+                    json_item_to_rust(&name, vt,v, names)?
+                };
 
                 r.insert_default(k.to_string(), v);
             },

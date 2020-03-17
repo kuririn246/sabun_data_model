@@ -21,13 +21,37 @@ pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names :
         JVal::Array(a, _) => {
             Ok(json_array_to_rust(a, value_type, v.span(), names)?)
         },
-        JVal::Map(_map, _) => {
-            Err(format!("An object can't have an object"))?
+        JVal::Map(_map, span) => {
+            Err(format!("{} An object can't have an object {}", span.line_str(), names))?
         },
-        JVal::Null(_) =>{
-             Err(format!(r#"{} null must be ["type", null] {}"#, v.line_str(), names))?
+        JVal::Null(span) =>{
+             Err(format!(r#"{} null must be ["type", null] {}"#, span.line_str(), names))?
         },
     }
 }
 
+pub fn json_item_to_rust_ref(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {
+    let names = &names.append(name);
+    match v {
+        JVal::Bool(_, span) => {
+            Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
+        },
+        JVal::Double(_, span)=>{
+            Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
+        }
+        JVal::String(s, _) => {
+            let s = s.to_string();
+            Ok(RustValue::String(Qv::Val(s), value_type))
+        },
+        JVal::Array(_, span) => {
+            Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
+        },
+        JVal::Map(_, span) => {
+            Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
+        },
+        JVal::Null(_) =>{
+            Ok(RustValue::String(Qv::Null, value_type))
+        },
+    }
+}
 

@@ -20,13 +20,12 @@ pub fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<Rust
 
 fn get_default_obj(map : &IndexMap<String, JVal>, span : &Span, names : &Names) -> Result<RustObject>{
     let names = &names.append("default");
-    let obj = json_obj_to_rust(map, names)?;
+    let obj = json_obj_to_rust(map, false, names)?;
     if (&obj).id.is_none() == false{
         Err(format!("{} ID is not valid for default objects {}", span.line_str(), names))?
     }
 
-
-    if obj.default.is_none() == false{
+    if obj.default.is_none(){
         Err(format!("{} no default obj {}", span.line_str(), names))?
     }
     for (name, val) in obj.default.as_ref().unwrap(){
