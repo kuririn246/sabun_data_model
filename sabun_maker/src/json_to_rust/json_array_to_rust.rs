@@ -4,7 +4,7 @@ use crate::error::Result;
 use super::names::Names;
 use json5_parser::{JVal, Span};
 use crate::json_to_rust::array_null::array_null;
-use crate::json_to_rust::json_list_to_rust::json_list_to_rust;
+use crate::json_to_rust::list::json_list_to_rust::json_list_to_rust;
 
 pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue>{
     use GatResult::*;

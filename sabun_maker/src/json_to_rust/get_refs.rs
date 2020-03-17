@@ -1,20 +1,42 @@
-use json5_parser::JVal;
+use json5_parser::{JVal, Span};
+use indexmap::IndexMap;
 use crate::json_to_rust::names::Names;
-use std::collections::BTreeMap;
 use crate::error::Result;
+use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
+use crate::rust_struct::{Qv, RefName, RefMap, RustValue};
 
-pub fn get_refs(v : &JVal, names : &Names) -> Result<BTreeMap<String,Option<String>>> {
-    todo!();
-//    let v = v.as_object().ok_or(format!("RefIDs must be an object. {}", names.to_string()))?;
-//    let mut m : BTreeMap<String, String> = BTreeMap::new();
-//    for (k,v) in v{
-//        if is_valid_name(k) == false{
-//            return Err(format!("{} is not a valid name for RefIDs {}", k, names.to_string()));
-//        }
-//        let v = v.as_str().ok_or(format!("{} is not string {}", v, names.to_string()))?;
-//        m.insert(k.to_string(), v.to_string());
-//    }
-//    Ok(m)
+pub fn get_refs(v : &IndexMap<String, JVal>, span : &Span, names : &Names) -> Result<RefMap> {
+    let obj = json_obj_to_rust(v, names)?;
+    if obj.refs.is_some(){
+        Err(format!(r#"{} Ref can't be declared in a Ref object {}"#, span.line_col_str(), names))?
+    }
+    if obj.id.is_some(){
+        Err(format!(r#"{} ID can't be declared in a Ref object {}"#, span.line_col_str(), names))?
+    }
+    if obj.renamed.len() != 0{
+        Err(format!(r#"{} Renamed can't be declared in a Ref object {}"#, span.line_col_str(), names))?
+    }
+    if obj.obsolete{
+        Err(format!(r#"{} Obsolete can't be declared in a Ref object {}"#, span.line_col_str(), names))?
+    }
+    if let Some(def) = obj.default.as_ref(){
+        let mut map : RefMap = IndexMap::new();
+        for (_k,_v) in def{
+            let k : &String = _k;
+            let v : &RustValue = _v;
+            match v{
+                RustValue::String(v, vt) =>{
+                    map.insert(k.to_string(), (*v.clone(), vt.clone()))
+                },
+                _ =>{
+                    Err(format!(r#"{} {} Ref's value must be string or null {}"#, span.line_col_str(), k, names))?
+                }
+            }
+        }
+        return Ok(map);
+    } else{
+        unreachable!();
+    }
 }
 
 //fn get_name(name : &str) -> Option<String>{
