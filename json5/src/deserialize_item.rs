@@ -34,7 +34,10 @@ pub fn get_map(m: Map, span : Span, rc : Rc<String>) -> Result<JVal> {
         let p = op.unwrap();
         let ident = match p.as_rule(){
             Rule::identifier =>{ p.as_str().to_string() },
-            Rule::string =>{ p.as_str().to_string() },
+            Rule::string =>{
+                let s = p.as_str();
+                (&s[1..s.len()-2]).to_string()
+            },
             _ =>{
                 //println!("{:?}",p.as_rule());
                 //println!("{:?}",p.as_str());

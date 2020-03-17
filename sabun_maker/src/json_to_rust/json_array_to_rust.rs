@@ -18,7 +18,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
                 if value_type.is_nullable() {
                     Ok(RustValue::Array(Qv::Null, value_type))
                 } else{
-                    Err(format!(r#"{} Nullable parameters must have "?" in the end of their name {}"#, span.line_col_str(), names))?
+                    Err(format!(r#"{} Nullable parameters must have "?" in the end of their name {}"#, span.line_str(), names))?
                 }
             }
         },
@@ -26,7 +26,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
             //いまのところ["Num", null] のような形での、nullのセットしか認めていない。Arrayを使った記法では、null以外はセットできない。
             array_null(&array[1..], gat, value_type, span, names)
         },
-        None =>{ Err(format!(r#"{} Array must be "...-Array", "List", "Num", "Str" or "Bool" {}"#, span.line_col_str(), names))? },
+        None =>{ Err(format!(r#"{} Array must be "...-Array", "List", "Num", "Str" or "Bool" {}"#, span.line_str(), names))? },
         List =>{
             json_list_to_rust(&array[1..], value_type, span, names)
         },
@@ -68,20 +68,20 @@ fn get_array(a : &[JVal], array_type : ArrayType, names : &Names) -> Result<Opti
             JVal::Double(f, _) => {
                 match array_type {
                     ArrayType::Num => RustValue::Number(Qv::Val(*f), ValueType::Normal),
-                    _ => Err(format!(r#"{} {} num is not valid in this array {}"#, item.line_col(), item.original(), names))?,
+                    _ => Err(format!(r#"{} {} num is not valid in this array {}"#, item.line_str(), item.slice(), names))?,
                 }
             },
             JVal::String(s, _) =>{
                 match array_type {
                     ArrayType::String => RustValue::String(Qv::Val(s.to_string()), ValueType::Normal),
-                    _ => Err(format!(r#"{} {} string is not valid in this array {}"#, item.line_col(), item.original(), names))?,
+                    _ => Err(format!(r#"{} {} string is not valid in this array {}"#, item.line_str(), item.slice(), names))?,
                 }
             },
             JVal::Null(_) =>{
                 if vec.len() == 0 && a.len() == 1{
                     return Ok(None);
                 } else{
-                    Err(format!(r#"{} null must be ["type", null] {}"#, item.line_col(), names))?
+                    Err(format!(r#"{} null must be ["type", null] {}"#, item.line_str(), names))?
                 }
             },
             JVal::Array(a2, _) =>{
@@ -94,11 +94,11 @@ fn get_array(a : &[JVal], array_type : ArrayType, names : &Names) -> Result<Opti
                             if vec.len() == 0 && a.len() == 1{
                                 return Ok(None);
                             } else{
-                                Err(format!(r#"{} null must be ["type", null] {}"#, item.line_col(), names))?
+                                Err(format!(r#"{} null must be ["type", null] {}"#, item.line_str(), names))?
                             }
                         }
                     },
-                    _ => Err(format!(r#"{} two-dimensional array must be "Num-Array2" {}"#, item.line_col(), names))?,
+                    _ => Err(format!(r#"{} two-dimensional array must be "Num-Array2" {}"#, item.line_str(), names))?,
                 }
             },
             JVal::Map(_,_) => unreachable!(),

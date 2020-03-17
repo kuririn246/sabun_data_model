@@ -19,7 +19,7 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
                                 result.list_type = ListType::Reffered;
                             },
                             _ =>{
-                                Err(format!(r#"{} "Reffered" can't coexist with "AutoID" {}"#, span.line_col_str(), names))?
+                                Err(format!(r#"{} "Reffered" can't coexist with "AutoID" {}"#, span.line_str(), names))?
                             }
                         }
                     },
@@ -32,7 +32,7 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
                                 }
                             },
                             _ =>{
-                                Err(format!(r#"{} "AutoID" can't coexist with "Reffered" {}"#, span.line_col_str(), names))?
+                                Err(format!(r#"{} "AutoID" can't coexist with "Reffered" {}"#, span.line_str(), names))?
                             }
                         }
                     },
@@ -48,7 +48,7 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
                 }
                 break;
             },
-        _ =>{ Err(format!(r#"{} {} List must consist of objects and arrays {}"#, item.span().line_col_str(), item.span().slice(), names))? }
+        _ =>{ Err(format!(r#"{} {} List must consist of objects and arrays {}"#, item.span().line_str(), item.span().slice(), names))? }
         };
     }
     return Ok(RustValue::List(Qv::Val(result), value_type));

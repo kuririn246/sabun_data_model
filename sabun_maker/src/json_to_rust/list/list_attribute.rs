@@ -15,7 +15,7 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
     let error_message = "List's array must be AutoID, Reffered or Default";
 
     if array.len() == 0{
-        Err(format!("{} {} {} {}", span.line_col_str(), span.slice(), error_message, names))?
+        Err(format!("{} {} {} {}", span.line_str(), span.slice(), error_message, names))?
     }
     return match &array[0]{
         JVal::String(s, _) =>{
@@ -28,15 +28,15 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
                                 if *d as u64 as f64 == *d{
                                     Ok(ListAttribute::AutoID(Some(*d as u64)))
                                 } else{
-                                    Err(format!("{} {} AutoID's ID must be an integer {}", span.line_col_str(), span.slice(), names))?
+                                    Err(format!("{} {} AutoID's ID must be an integer {}", span.line_str(), span.slice(), names))?
                                 }
                             },
                             _ =>{
-                                Err(format!("{} {} AutoID's ID must be an integer {}", span.line_col_str(), span.slice(), names))?
+                                Err(format!("{} {} AutoID's ID must be an integer {}", span.line_str(), span.slice(), names))?
                             }
                         }
                     } else {
-                        Err(format!("{} {} <- [\"AutoID\"] is valid {}", span.line_col_str(), span.slice(), names))?
+                        Err(format!("{} {} <- [\"AutoID\"] is valid {}", span.line_str(), span.slice(), names))?
                     }
                 },
                 "Default" =>{
@@ -45,16 +45,16 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
                 },
                 "Reffered" =>{
                     if array.len() == 1 { Ok(ListAttribute::Reffered) }
-                    else{ Err(format!("{} {} [\"Reffered\"] is valid {}", span.line_col_str(), span.slice(), names))? }
+                    else{ Err(format!("{} {} [\"Reffered\"] is valid {}", span.line_str(), span.slice(), names))? }
                 },
 
                 _ =>{
-                    Err(format!("{} {} {} {}", span.line_col_str(), span.slice(), error_message, names))?
+                    Err(format!("{} {} {} {}", span.line_str(), span.slice(), error_message, names))?
                 }
             }
         },
         _ =>{
-            Err(format!("{} {} {} {}", span.line_col_str(), span.slice(), error_message, names))?
+            Err(format!("{} {} {} {}", span.line_str(), span.slice(), error_message, names))?
         }
     };
 }

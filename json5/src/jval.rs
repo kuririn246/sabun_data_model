@@ -68,13 +68,13 @@ impl JVal{
         }
     }
 
-    pub fn original(&self) -> &str{
+    pub fn slice(&self) -> &str{
         self.span().slice()
     }
 
     ///くっそ重いので正常系で実行しないように注意
-    pub fn line_col(&self) -> String{
-        self.span().line_col_str()
+    pub fn line_str(&self) -> String{
+        self.span().line_str()
     }
 }
 
@@ -86,7 +86,7 @@ pub struct Span{
 }
 
 impl Span{
-    pub fn line_col(&self) -> (usize, usize) {
+    pub fn line_num(&self) -> usize {
         let input = self.text.as_str();
         let mut pos = self.start;
         if pos > input.len() {
@@ -129,13 +129,12 @@ impl Span{
             }
         }
 
-        line_col
+        line_col.0
     }
 
     ///くっそ重いので正常系で実行しないように注意
-    pub fn line_col_str(&self) -> String{
-        let (line, col) = self.line_col();
-        format!("({}, {})", line, col)
+    pub fn line_str(&self) -> String{
+        self.line_num().to_string()
     }
 
     pub fn slice(&self) -> &str{

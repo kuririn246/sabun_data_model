@@ -8,16 +8,16 @@ use crate::rust_struct::{RefMap, RustValue};
 pub fn get_refs(v : &IndexMap<String, JVal>, span : &Span, names : &Names) -> Result<RefMap> {
     let obj = json_obj_to_rust(v, names)?;
     if obj.refs.is_some(){
-        Err(format!(r#"{} Ref can't be declared in a Ref object {}"#, span.line_col_str(), names))?
+        Err(format!(r#"{} Ref can't be declared in a Ref object {}"#, span.line_str(), names))?
     }
     if obj.id.is_some(){
-        Err(format!(r#"{} ID can't be declared in a Ref object {}"#, span.line_col_str(), names))?
+        Err(format!(r#"{} ID can't be declared in a Ref object {}"#, span.line_str(), names))?
     }
     if obj.renamed.len() != 0{
-        Err(format!(r#"{} Renamed can't be declared in a Ref object {}"#, span.line_col_str(), names))?
+        Err(format!(r#"{} Renamed can't be declared in a Ref object {}"#, span.line_str(), names))?
     }
     if obj.obsolete{
-        Err(format!(r#"{} Obsolete can't be declared in a Ref object {}"#, span.line_col_str(), names))?
+        Err(format!(r#"{} Obsolete can't be declared in a Ref object {}"#, span.line_str(), names))?
     }
     if let Some(def) = obj.default.as_ref(){
         let mut map : RefMap = IndexMap::new();
@@ -29,7 +29,7 @@ pub fn get_refs(v : &IndexMap<String, JVal>, span : &Span, names : &Names) -> Re
                     map.insert(k.to_string(), (v.clone(), vt.clone()));
                 },
                 _ =>{
-                    Err(format!(r#"{} {} Ref's value must be string or null {}"#, span.line_col_str(), k, names))?
+                    Err(format!(r#"{} {} Ref's value must be string or null {}"#, span.line_str(), k, names))?
                 }
             }
         }

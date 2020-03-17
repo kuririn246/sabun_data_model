@@ -12,13 +12,13 @@ pub fn get_renamed(array : &[JVal], span : &Span, names : &Names) -> Result<Hash
             JVal::String(s, span) =>{
                 let split : Vec<&str> = s.split("->").collect();
                 if split.len() != 2{
-                    Err(format!(r#"{} {} "oldName->currentName" is valid {}"#, span.line_col_str(), span.slice(), names))?
+                    Err(format!(r#"{} {} "oldName->currentName" is valid {}"#, span.line_str(), span.slice(), names))?
                 }
                 vec.push((split[0].to_string(), split[1].to_string()));
             },
             _ =>{
                 let span = item.span();
-                Err(format!(r#"{} {} "oldName->currentName" is valid {}"#, span.line_col_str(), span.slice(), names))?
+                Err(format!(r#"{} {} "oldName->currentName" is valid {}"#, span.line_str(), span.slice(), names))?
             }
         }
     }
@@ -27,10 +27,10 @@ pub fn get_renamed(array : &[JVal], span : &Span, names : &Names) -> Result<Hash
         Err(e) =>{
             match e{
                 RenameMapError::DuplicatedOld(old) =>{
-                    Err(format!(r#"{} {} is duplicated {}"#, span.line_col_str(), old, names))?
+                    Err(format!(r#"{} {} is duplicated {}"#, span.line_str(), old, names))?
                 },
                 RenameMapError::CircularReference(s) =>{
-                    Err(format!(r#"{} {} is circulated {}"#, span.line_col_str(), s, names))?
+                    Err(format!(r#"{} {} is circulated {}"#, span.line_str(), s, names))?
                 }
             }
         }

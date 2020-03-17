@@ -5,8 +5,12 @@ use crate::error::Result;
 #[allow(dead_code)]
 pub fn untyped_example() -> Result<JVal> {
 
+
+
+
     let data = r#"
 {
+"hegoNumber?" : ["Num", null], //型を指定し、null値を入れる。これでnullになる。
   hogeNumber : 10,
   hogeString : "hoge",
   hogeBool : true,
@@ -37,7 +41,7 @@ pub fn untyped_example() -> Result<JVal> {
               "prevName2->currentName2" ], //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
               //参照可能なListの名前が変わった場合参照先も追跡できる
 
-  Include : { someList : "someList.json5" } //メンバの中身を別ファイルに書くことが出来る。
+  Include : { someList : "someList.json5" }, //メンバの中身を別ファイルに書くことが出来る。
 
   hogeList : [
 	"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
@@ -74,7 +78,6 @@ pub fn untyped_example() -> Result<JVal> {
 
   weapon : [
     "List",
-    ["Renamed", "oldID->currentID", "oldID2->currentID2" ]
     ["Default", { atk : 0 }],
     ["Reffered"],
     {
@@ -91,7 +94,7 @@ pub fn untyped_example() -> Result<JVal> {
     "List",
     ["AutoID"], //RefferedとAutoIDは同時には使えない
     ["Ref", "weapons"],
-    ["Default",{ atk? : ["Num", null] } ]
+    ["Default",{ "atk?" : ["Num", null] } ],
     {
       Ref : { weapons : "doutanuki" }, //どうたぬきを参照。
       atk : 8 //override的ななにか
@@ -110,7 +113,7 @@ pub fn untyped_example() -> Result<JVal> {
 
   hugaList: [
     "List",
-    ["Reffered"]
+    ["Reffered"],
     ["Default",{}],
     {
       ID : "hugahuga"
@@ -120,11 +123,13 @@ pub fn untyped_example() -> Result<JVal> {
   hegoList: [
     "List",
     ["Reffered"],
-    ["Default", { mem : "" }],
+    ["Default", {
+        mem : "",
+        Renamed: ["memOld->mem"] //DefaultメンバではRenamedの設定が可能
+    }],
     {
       ID : "hegohego",
       mem : "b",
-      Renamed: ["memOld->mem"]//DefaultメンバではRenamedの設定が可能
     },
     {
       ID : "nantoka",
@@ -135,7 +140,7 @@ pub fn untyped_example() -> Result<JVal> {
   itemList3 : [
     "List",
     ["AutoID"],
-    ["Default",{ memOverride? : ["Str", null ] }],
+    ["Default",{ "memOverride?" : ["Str", null] }],
     ["Ref",  //複数の参照が必要な場合、RefListIDに複数設定する
       "hogeList", "hugaList?", "hegoList!"
     ],

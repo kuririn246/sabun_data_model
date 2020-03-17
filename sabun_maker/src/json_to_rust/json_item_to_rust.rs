@@ -25,7 +25,7 @@ pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names :
             Err(format!("An object can't have an object"))?
         },
         JVal::Null(_) =>{
-             Err(format!(r#"{} null must be ["type", null] {}"#, v.line_col(), names))?
+             Err(format!(r#"{} null must be ["type", null] {}"#, v.line_str(), names))?
         },
     }
 }

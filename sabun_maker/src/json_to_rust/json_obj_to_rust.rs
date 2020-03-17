@@ -12,7 +12,9 @@ use crate::json_to_rust::get_renamed::get_renamed;
 pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, names : &Names) -> Result<RustObject>{
     let mut r : RustObject = RustObject::new();
     for (k,v) in v{
-        let name = json_name(k).ok_or_else(|| format!("{} {} is not a valid name {}",v.line_col(), k, names))?;
+        let k : &String = k;
+        let v : &JVal = v;
+        let name = json_name(k).ok_or_else(|| format!("{} {} is not a valid name {}",v.line_str(), k, names))?;
         match name{
             NameType::Name(name, vt) =>{
                 let v = json_item_to_rust(&name, vt,v, names)?;
@@ -22,9 +24,9 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, names : &Names) -> Result<R
                 match sn{
                     SystemNames::ID =>{
                         if r.id.is_none() {
-                            r.id = Some(v.as_str().ok_or_else(|| format!("{} ID must be string : {} {}", v.line_col(), v.original(), names))?.to_string())
+                            r.id = Some(v.as_str().ok_or_else(|| format!("{} ID must be string : {} {}", v.line_str(), v.slice(), names))?.to_string())
                         } else{
-                            Err(format!("{} ID is defined multiple times {}", v.line_col(), names))?;
+                            Err(format!("{} ID is defined multiple times {}", v.line_str(), names))?;
                         }
                     },
                     SystemNames::Include=>{
@@ -36,11 +38,11 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, names : &Names) -> Result<R
                                 JVal::Map(map, span) =>{
                                     r.refs = Some(get_refs(map, span,names)?);
                                 },
-                                _ =>{ Err(format!("{} Ref must be an object {}", v.line_col(), names))?;}
+                                _ =>{ Err(format!("{} Ref must be an object {}", v.line_str(), names))?;}
 
                             }
                         } else {
-                            Err(format!("{} RefIDs is defined multiple times {}", v.line_col(), names))?;
+                            Err(format!("{} RefIDs is defined multiple times {}", v.line_str(), names))?;
                         }
                     },
                     SystemNames::Renamed =>{
@@ -49,21 +51,21 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, names : &Names) -> Result<R
                                 JVal::Array(a, span) =>{
                                     r.renamed = get_renamed(a, span, names)?;
                                 },
-                                _ =>{ Err(format!("{}  {}", v.line_col(), names))?; }
+                                _ =>{ Err(format!("{}  {}", v.line_str(), names))?; }
                             }
 
                         } else{
                             //そもそも複数回の定義はjsonパーサーによって弾かれるはずだが・・・
-                            Err(format!("{} Rename is defined multiple times {}", v.line_col(), names))?;
+                            Err(format!("{} Rename is defined multiple times {}", v.line_str(), names))?;
                         }
                     }
                     SystemNames::Obsolete =>{
                         if let Some(b) = v.as_bool(){
                             if b == false{
-                                Err(format!("{} Obsolete must be \"true\" {}", v.line_col(), names))?;
+                                Err(format!("{} Obsolete must be \"true\" {}", v.line_str(), names))?;
                             }
                             if r.obsolete == true {
-                                Err(format!("{} Obsolete is defined multiple times {}", v.line_col(), names))?;
+                                Err(format!("{} Obsolete is defined multiple times {}", v.line_str(), names))?;
                             }
                             r.obsolete = true;
                         }

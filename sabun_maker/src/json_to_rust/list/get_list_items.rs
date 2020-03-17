@@ -14,7 +14,7 @@ pub fn get_list_items(array : &[JVal], auto_id : bool,  span : &Span, names : &N
                 result.push(get_list_item(map, auto_id, index, span, names)?)
             },
             _ =>{
-                Err(format!(r#"{} List's object sequence must not be interrupted {}"#, item.span().line_col_str(), names))?
+                Err(format!(r#"{} List's object sequence must not be interrupted {}"#, item.span().line_str(), names))?
             }
         }
     }
@@ -30,18 +30,18 @@ pub fn get_list_item(map : &IndexMap<String, JVal>, need_id : bool, index : usiz
 
     if need_id{
         if obj.id.is_none(){
-            Err(format!(r#"{} ID is missing {}"#, span.line_col_str(), names))?
+            Err(format!(r#"{} ID is missing {}"#, span.line_str(), names))?
         }
     } else{
         if obj.id.is_none(){
             obj.id = Some(index.to_string());
         } else{
-            Err(format!(r#"{} ID is invalid for AutoID lists {}"#, span.line_col_str(), names))?
+            Err(format!(r#"{} ID is invalid for AutoID lists {}"#, span.line_str(), names))?
         }
 
     }
     if obj.renamed.is_empty() == false{
-        Err(format!(r#"{} Renamed is not valid for list objects {}"#, span.line_col_str(), names))?
+        Err(format!(r#"{} Renamed is not valid for list objects {}"#, span.line_str(), names))?
     }
     return Ok(obj)
 }
