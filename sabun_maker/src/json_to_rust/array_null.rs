@@ -1,6 +1,6 @@
 use json5_parser::{JVal, Span};
 use crate::json_to_rust::names::Names;
-use crate::rust_struct::{RustValue, ArrayType, Qv, ValueType};
+use crate::rust_struct::{RustValue, Qv, ValueType};
 use crate::error::Result;
 use crate::json_to_rust::json_array_to_rust::GatResult;
 

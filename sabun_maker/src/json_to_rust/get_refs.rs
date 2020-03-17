@@ -3,7 +3,7 @@ use indexmap::IndexMap;
 use crate::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
-use crate::rust_struct::{Qv, RefName, RefMap, RustValue};
+use crate::rust_struct::{RefMap, RustValue};
 
 pub fn get_refs(v : &IndexMap<String, JVal>, span : &Span, names : &Names) -> Result<RefMap> {
     let obj = json_obj_to_rust(v, names)?;
@@ -26,7 +26,7 @@ pub fn get_refs(v : &IndexMap<String, JVal>, span : &Span, names : &Names) -> Re
             let v : &RustValue = _v;
             match v{
                 RustValue::String(v, vt) =>{
-                    map.insert(k.to_string(), (*v.clone(), vt.clone()))
+                    map.insert(k.to_string(), (v.clone(), vt.clone()));
                 },
                 _ =>{
                     Err(format!(r#"{} {} Ref's value must be string or null {}"#, span.line_col_str(), k, names))?

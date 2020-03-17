@@ -2,7 +2,6 @@ use crate::kihon_enum::{Kihon, Decimal};
 use regex::{Regex, Match};
 use crate::enc_dec::encode::encode;
 use crate::enc_dec::decode::decode;
-use crate::enc_dec::decimal_lib;
 use lazy_static::lazy_static;
 
 pub fn to_kihons(strs : Vec<String>) -> Vec<Kihon>{

@@ -1,10 +1,8 @@
 use json5_parser::{JVal, Span};
 use crate::json_to_rust::names::Names;
-use std::collections::BTreeMap;
 use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use crate::rust_struct::RustObject;
 use crate::error::Result;
-use crate::json_to_rust::list::list_attribute::ListAttribute;
 use indexmap::IndexMap;
 
 pub fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<RustObject>{

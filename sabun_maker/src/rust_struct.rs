@@ -1,5 +1,4 @@
-use std::collections::{BTreeMap, HashMap, BTreeSet};
-use std::hash::{Hash, Hasher};
+use std::collections::{HashMap};
 use indexmap::IndexMap;
 
 #[derive(Debug)]
@@ -37,7 +36,7 @@ pub enum RustValue{
     Object(Qv<RustObject>, ValueType),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Qv<T>{ Val(T), Incompatible, Null }
 
 #[derive(Debug)]
@@ -55,11 +54,34 @@ pub struct RustList{
     pub list : Vec<RustObject>,
 }
 
+impl RustList{
+    pub fn set_auto_id(&mut self, id : u64) -> Result<(), ()>{
+        match self.list_type{
+            ListType::AutoID(_) =>{
+                self.list_type = ListType::AutoID(id);
+                Ok(())
+            },
+            _=>{ Err(()) }
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum ListType{
-    AutoID,
+    AutoID(u64),
     Reffered,
     Normal
+}
+
+impl ListType{
+    pub fn is_auto_id(&self) -> bool{
+        match self{
+            ListType::AutoID(_) => true,
+            _ => false,
+        }
+    }
+
+
 }
 
 #[derive(Debug)]
@@ -83,7 +105,7 @@ pub struct RustObject{
     //listのobjectの場合、defaultはlist側にあるのでここにはない。
     pub default : Option<IndexMap<String, RustValue>>,
     //デフォルト値から変更されたものを記録。差分変更時に、defaultと同じになったらここから削除するかもしれない？
-    pub sabun : HashMap<String, RustValue>,
+    pub sabun : IndexMap<String, RustValue>,
     //listの場合idがなければならず、list内で一意である必要もある。
     //listのオブジェクトでない場合はNone
     pub id : Option<String>,

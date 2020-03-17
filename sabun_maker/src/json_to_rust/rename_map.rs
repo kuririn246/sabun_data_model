@@ -21,14 +21,17 @@ pub fn rename_map(input : Vec<(String, String)>) -> Result<HashMap<String, Strin
     let mut new_map: HashMap<String, String> = HashMap::new();
 
     for (old, new) in &map {
-        let mut new = new;
-        if let Some(new2) = map.get(new) {
-            if new2 == old {
-                return Err(RenameMapError::CircularReference(new2.to_string()))
+        loop {
+            let mut new = new;
+            if let Some(new2) = map.get(new) {
+                if new2 == old {
+                    return Err(RenameMapError::CircularReference(new2.to_string()))
+                }
+                new = new2;
+            } else {
+                new_map.insert(old.to_string(), new.to_string());
+                break;
             }
-            new = new2;
-        } else {
-            new_map.insert(old.to_string(), new.to_string());
         }
     }
 

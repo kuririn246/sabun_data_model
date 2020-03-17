@@ -1,5 +1,4 @@
 use crate::error::Result;
-use std::collections::BTreeMap;
 use crate::jval::JVal;
 use crate::de::{deserialize_any, Seq, Map};
 use pest::Span;
@@ -52,8 +51,6 @@ pub fn get_map(m: Map, span : Span, rc : Rc<String>) -> Result<JVal> {
 }
 
 fn s(span : Span, rc : Rc<String>) -> crate::jval::Span{
-    let hoge = span.start_pos();
-
     crate::jval::Span{ start : span.start(), end : span.end(), text : rc }
 }
 

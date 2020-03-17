@@ -2,7 +2,6 @@ use crate::rust_struct::{RustValue, Qv, ValueType};
 use super::Names;
 use json5_parser::JVal;
 use crate::error::Result;
-use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use crate::json_to_rust::json_array_to_rust::json_array_to_rust;
 
 
@@ -22,7 +21,7 @@ pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names :
         JVal::Array(a, _) => {
             Ok(json_array_to_rust(a, value_type, v.span(), names)?)
         },
-        JVal::Map(map, _) => {
+        JVal::Map(_map, _) => {
             Err(format!("An object can't have an object"))?
         },
         JVal::Null(_) =>{

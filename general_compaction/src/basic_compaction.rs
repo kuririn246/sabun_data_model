@@ -1,5 +1,4 @@
 use crate::kihon_enum::Kihon;
-use crate::enc_dec::var_int;
 use std::f64;
 
 ///f64が整数で表せるなら整数で、bitやbyteに出来るならそこまで削って表す。f32にしても情報が失われない場合f32にする。

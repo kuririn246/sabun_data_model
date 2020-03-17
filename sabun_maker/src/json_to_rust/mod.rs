@@ -10,19 +10,20 @@ pub mod get_refs;
 pub mod rename_map;
 
 use crate::rust_struct::{RustObject};
-//use json_name::{json_name, NameType, SystemNames};
-//use crate::json_item_to_rust::json_item_to_rust;
-//use crate::get_ref_ids::get_ref_ids;
-//use crate::get_rename::get_rename;
-use std::collections::BTreeMap;
 
 use json5_parser::JVal;
 use names::Names;
+use crate::error::Result;
 
-pub fn json_to_rust(v : &JVal) -> Result<RustObject,String> {
-    let v = v.as_object().ok_or("v is not an object")?;
-    todo!();
-    //return Ok(json_obj_to_rust2(v, &Names::new("")).unwrap());
+pub fn json_to_rust(v : &JVal) -> Result<RustObject> {
+    return match v{
+        JVal::Map(map, _) =>{
+            json_obj_to_rust::json_obj_to_rust(map, &Names::new(""))
+        },
+        _ =>{
+            Err(format!(r#"root object is not found"#))?
+        }
+    };
 }
 
 //

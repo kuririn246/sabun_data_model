@@ -1,6 +1,6 @@
 use json5_parser::{JVal, Span};
 use crate::json_to_rust::names::Names;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{HashMap};
 use crate::error::Result;
 use crate::json_to_rust::rename_map::{rename_map, RenameMapError};
 

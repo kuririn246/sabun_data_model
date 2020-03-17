@@ -1,6 +1,5 @@
 use json5_parser::JVal;
 use indexmap::IndexMap;
-use std::collections::BTreeMap;
 use super::names::Names;
 use crate::rust_struct::RustObject;
 use super::json_name::{json_name, NameType, SystemNames};
@@ -36,7 +35,8 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, names : &Names) -> Result<R
                             match &v {
                                 JVal::Map(map, span) =>{
                                     r.refs = Some(get_refs(map, span,names)?);
-                                }
+                                },
+                                _ =>{ Err(format!("{} Ref must be an object {}", v.line_col(), names))?;}
 
                             }
                         } else {

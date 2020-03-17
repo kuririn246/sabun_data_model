@@ -1,6 +1,4 @@
-use std::collections::BTreeMap;
 use std::rc::Rc;
-use std::fmt::Display;
 use indexmap::IndexMap;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -31,7 +29,7 @@ impl JVal{
 
     pub fn as_str(&self) -> Option<&str>{
         return match self {
-            JVal::String(s, span) => { Some(s) }
+            JVal::String(s, _span) => { Some(s) }
             _ => { None }
         }
     }
