@@ -34,7 +34,7 @@ fn get_default_obj(map : &BTreeMap<String, JVal>, span : &Span, names : &Names) 
         unreachable!();
     }
     for (name, val) in &obj.default.unwrap(){
-        
+
     }
     return Ok(obj);
 }
