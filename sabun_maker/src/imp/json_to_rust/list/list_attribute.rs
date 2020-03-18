@@ -1,7 +1,7 @@
 use crate::rust_struct::{RustObject};
 use json5_parser::{JVal, Span};
-use crate::json_to_rust::names::Names;
-use crate::json_to_rust::list::get_default::get_default;
+use super::super::names::Names;
+use super::get_default::get_default;
 use crate::error::Result;
 
 pub enum ListAttribute{

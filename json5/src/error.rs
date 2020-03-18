@@ -33,26 +33,26 @@ impl From<pest::error::Error<Rule>> for MyError {
     }
 }
 //
-// impl ser::Error for Error {
+// imp ser::Error for Error {
 //     fn custom<T: Display>(msg: T) -> Self {
 //         Error::Message(msg.to_string(), None)
 //     }
 // }
 //
-// impl de::Error for Error {
+// imp de::Error for Error {
 //     fn custom<T: Display>(msg: T) -> Self {
 //         Error::Message(msg.to_string(), None)
 //     }
 // }
 //
-// impl Display for Error {
+// imp Display for Error {
 //     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
 //         formatter.write_str(self.description());
 //         //formatter.write_str(std::error::Error::description(self))
 //     }
 // }
 //
-// impl std::error::Error for Error {
+// imp std::error::Error for Error {
 //     fn description(&self) -> &str {
 //         match *self {
 //             Error::Message(ref msg, _) => msg,

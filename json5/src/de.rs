@@ -146,7 +146,7 @@ pub struct Map<'de> {
     pub pairs: Pairs<'de, Rule>,
 }
 
-// impl<'de> de::SeqAccess<'de> for Seq<'de> {
+// imp<'de> de::SeqAccess<'de> for Seq<'de> {
 //     type Error = Error;
 //
 //     fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>>
@@ -162,7 +162,7 @@ pub struct Map<'de> {
 //     }
 // }
 
-// impl<'de> de::MapAccess<'de> for Map<'de> {
+// imp<'de> de::MapAccess<'de> for Map<'de> {
 //     type Error = Error;
 //
 //     fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>>
@@ -189,7 +189,7 @@ pub struct Map<'de> {
 //     pair: Pair<'de, Rule>,
 // }
 //
-// impl<'de> de::EnumAccess<'de> for Enum<'de> {
+// imp<'de> de::EnumAccess<'de> for Enum<'de> {
 //     type Error = Error;
 //     type Variant = Variant<'de>;
 //
@@ -221,7 +221,7 @@ pub struct Map<'de> {
 //     pair: Option<Pair<'de, Rule>>,
 // }
 //
-// impl<'de, 'a> de::VariantAccess<'de> for Variant<'de> {
+// imp<'de, 'a> de::VariantAccess<'de> for Variant<'de> {
 //     type Error = Error;
 //
 //     fn unit_variant(self) -> Result<()> {

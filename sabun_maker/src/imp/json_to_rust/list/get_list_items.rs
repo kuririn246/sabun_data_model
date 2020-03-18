@@ -1,8 +1,8 @@
 use json5_parser::{JVal, Span};
-use crate::json_to_rust::names::Names;
+use crate::imp::json_to_rust::names::Names;
 use crate::rust_struct::RustObject;
 use crate::error::Result;
-use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
+use crate::imp::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use indexmap::IndexMap;
 
 pub fn get_list_items(array : &[JVal], need_id : bool,  _span : &Span, names : &Names) -> Result<Vec<RustObject>>{

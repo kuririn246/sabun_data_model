@@ -19,7 +19,7 @@
 //     output: String,
 // }
 //
-// impl Serializer {
+// imp Serializer {
 //     fn call_to_string<T>(&mut self, v: &T) -> Result<()>
 //     where
 //         T: ToString,
@@ -29,7 +29,7 @@
 //     }
 // }
 //
-// impl<'a> ser::Serializer for &'a mut Serializer {
+// imp<'a> ser::Serializer for &'a mut Serializer {
 //     type Ok = ();
 //     type Error = Error;
 //
@@ -223,7 +223,7 @@
 //     }
 // }
 //
-// impl<'a> ser::SerializeSeq for &'a mut Serializer {
+// imp<'a> ser::SerializeSeq for &'a mut Serializer {
 //     type Ok = ();
 //     type Error = Error;
 //
@@ -243,7 +243,7 @@
 //     }
 // }
 //
-// impl<'a> ser::SerializeTuple for &'a mut Serializer {
+// imp<'a> ser::SerializeTuple for &'a mut Serializer {
 //     type Ok = ();
 //     type Error = Error;
 //
@@ -259,7 +259,7 @@
 //     }
 // }
 //
-// impl<'a> ser::SerializeTupleStruct for &'a mut Serializer {
+// imp<'a> ser::SerializeTupleStruct for &'a mut Serializer {
 //     type Ok = ();
 //     type Error = Error;
 //
@@ -275,7 +275,7 @@
 //     }
 // }
 //
-// impl<'a> ser::SerializeTupleVariant for &'a mut Serializer {
+// imp<'a> ser::SerializeTupleVariant for &'a mut Serializer {
 //     type Ok = ();
 //     type Error = Error;
 //
@@ -292,7 +292,7 @@
 //     }
 // }
 //
-// impl<'a> ser::SerializeMap for &'a mut Serializer {
+// imp<'a> ser::SerializeMap for &'a mut Serializer {
 //     type Ok = ();
 //     type Error = Error;
 //
@@ -320,7 +320,7 @@
 //     }
 // }
 //
-// impl<'a> ser::SerializeStruct for &'a mut Serializer {
+// imp<'a> ser::SerializeStruct for &'a mut Serializer {
 //     type Ok = ();
 //     type Error = Error;
 //
@@ -337,7 +337,7 @@
 //     }
 // }
 //
-// impl<'a> ser::SerializeStructVariant for &'a mut Serializer {
+// imp<'a> ser::SerializeStructVariant for &'a mut Serializer {
 //     type Ok = ();
 //     type Error = Error;
 //

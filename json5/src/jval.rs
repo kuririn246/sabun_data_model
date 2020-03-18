@@ -142,7 +142,7 @@ impl Span{
     }
 }
 
-//impl Display for Span{
+//imp Display for Span{
 //    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 //        let (line, col) = self.line_col();
 //        write!(f, "({}, {})", line, col)

@@ -12,16 +12,26 @@ pub enum ArrayType{
 pub enum ValueType{
     Normal,
     Nullable,
-    Incompatible,
-    IncompatNullable,
+    Compatible,
+    CompatNullable,
 }
 
 impl ValueType{
     pub fn is_nullable(&self) -> bool{
         match self{
-            ValueType::Nullable | ValueType::IncompatNullable => true,
+            ValueType::Nullable | ValueType::CompatNullable => true,
             _ => false,
         }
+    }
+
+    pub fn to_suffix(&self) -> String{
+        let s = match self{
+            ValueType::Normal => "",
+            ValueType::Nullable => "?",
+            ValueType::Compatible => "!",
+            ValueType::CompatNullable => "!?",
+        };
+        s.to_string()
     }
 }
 

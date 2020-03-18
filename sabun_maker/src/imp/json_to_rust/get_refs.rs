@@ -1,8 +1,8 @@
 use json5_parser::{JVal, Span};
 use indexmap::IndexMap;
-use crate::json_to_rust::names::Names;
+use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
-use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
+use crate::imp::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use crate::rust_struct::{RefMap, RustValue};
 
 pub fn get_refs(v : &IndexMap<String, JVal>, span : &Span, names : &Names) -> Result<RefMap> {

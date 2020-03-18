@@ -5,9 +5,9 @@ use crate::rust_struct::RustObject;
 use super::json_name::{json_name, NameType, SystemNames};
 use super::json_item_to_rust::json_item_to_rust;
 use crate::error::Result;
-use crate::json_to_rust::get_refs::get_refs;
-use crate::json_to_rust::get_renamed::get_renamed;
-use crate::json_to_rust::json_item_to_rust::json_item_to_rust_ref;
+use super::get_refs::get_refs;
+use super::get_renamed::get_renamed;
+use super::json_item_to_rust::json_item_to_rust_ref;
 
 
 pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : &Names) -> Result<RustObject>{

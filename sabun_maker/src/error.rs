@@ -12,7 +12,7 @@ impl From<json5_parser::MyError> for SabunError {
     }
 }
 
-//impl From<&str> for SabunError {
+//imp From<&str> for SabunError {
 //    fn from(s : &str) -> Self {
 //        SabunError{ message : s.to_string() }
 //    }

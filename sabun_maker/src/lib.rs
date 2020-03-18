@@ -1,14 +1,13 @@
-pub mod json_siyou;
+mod json_siyou;
 pub mod error;
-mod json_to_rust;
+mod imp;
 pub mod rust_struct;
-mod rust_to_json;
 
-pub use json_to_rust::json_to_rust;
+pub use imp::json_to_rust::json_to_rust as json_to_rust;
+pub use imp::rust_to_json::rust_to_json::rust_to_json_new_default as rust_to_json_new_default;
 
 #[cfg(test)]
 mod tests {
-    use crate::json_to_rust::json_to_rust;
 
     #[test]
     fn it_works() {
