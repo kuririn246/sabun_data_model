@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap};
 
 
 
@@ -8,8 +8,8 @@ pub enum RenameMapError{
 }
 
 
-pub fn rename_map(input : Vec<(String, String)>) -> Result<HashMap<String, String>, RenameMapError> {
-    let mut map: HashMap<String, String> = HashMap::new();
+pub fn rename_map(input : Vec<(String, String)>) -> Result<BTreeMap<String, String>, RenameMapError> {
+    let mut map: BTreeMap<String, String> = BTreeMap::new();
 
     for (old, new) in input {
         if map.contains_key(&old) {
@@ -18,11 +18,11 @@ pub fn rename_map(input : Vec<(String, String)>) -> Result<HashMap<String, Strin
         map.insert(old, new);
     }
 
-    let mut new_map: HashMap<String, String> = HashMap::new();
+    let mut new_map: BTreeMap<String, String> = BTreeMap::new();
 
     for (old, new) in &map {
+        let mut new = new;
         loop {
-            let mut new = new;
             if let Some(new2) = map.get(new) {
                 if new2 == old {
                     return Err(RenameMapError::CircularReference(new2.to_string()))

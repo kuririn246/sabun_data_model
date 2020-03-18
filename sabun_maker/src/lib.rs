@@ -2,6 +2,9 @@ pub mod json_siyou;
 pub mod error;
 mod json_to_rust;
 pub mod rust_struct;
+mod rust_to_json;
+
+pub use json_to_rust::json_to_rust;
 
 #[cfg(test)]
 mod tests {

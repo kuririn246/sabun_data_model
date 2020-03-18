@@ -36,13 +36,13 @@ pub fn json_name(s : &str) -> Option<NameType>{
 }
 
 
-///[@a-z_][a-zA-Z0-9_]*
-pub fn is_valid_name(s : &str) -> bool{
-    lazy_static! {
-        static ref RE : Regex = Regex::new(r"^[@a-z_][a-zA-Z0-9_]*$").unwrap();
-    }
-    RE.is_match(s)
-}
+// ///[@a-z_][a-zA-Z0-9_]*
+// pub fn is_valid_name(s : &str) -> bool{
+//     lazy_static! {
+//         static ref RE : Regex = Regex::new(r"^[@a-z_][a-zA-Z0-9_]*$").unwrap();
+//     }
+//     RE.is_match(s)
+// }
 
 
 ///[@a-z_][a-zA-Z0-9_]*

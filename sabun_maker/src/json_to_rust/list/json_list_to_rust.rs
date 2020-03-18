@@ -5,7 +5,7 @@ use crate::error::Result;
 use crate::json_to_rust::list::list_attribute::{ListAttribute, list_attribute};
 use crate::json_to_rust::list::get_list_items::get_list_items;
 
-pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue> {
+pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, _span : &Span, names : &Names) -> Result<RustValue> {
     let mut result = RustList::new();
     for ind in 0..array.len() {
         let item = &array[ind];
@@ -42,7 +42,7 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, span : &Span, 
                 //auto_idがnullの場合、idはいらない
                 result.list = get_list_items(&array[ind..], !null_id, span, names)?;
                 if null_id{
-                    result.set_auto_id(result.list.len() as u64);
+                    result.set_auto_id(result.list.len() as u64).ok();
                 }
                 break;
             },

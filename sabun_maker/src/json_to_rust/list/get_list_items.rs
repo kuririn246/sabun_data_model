@@ -5,7 +5,7 @@ use crate::error::Result;
 use crate::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use indexmap::IndexMap;
 
-pub fn get_list_items(array : &[JVal], need_id : bool,  span : &Span, names : &Names) -> Result<Vec<RustObject>>{
+pub fn get_list_items(array : &[JVal], need_id : bool,  _span : &Span, names : &Names) -> Result<Vec<RustObject>>{
     let mut result : Vec<RustObject> = vec![];
     for index in 0..array.len(){
         let item = &array[index];

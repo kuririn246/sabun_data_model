@@ -1,4 +1,4 @@
-use std::collections::{HashMap};
+use std::collections::{BTreeMap};
 use indexmap::IndexMap;
 
 #[derive(Debug)]
@@ -113,7 +113,7 @@ pub struct RustObject{
     //listのオブジェクトでない場合はNone
     pub id : Option<String>,
     pub refs: Option<RefMap>,
-    pub renamed: HashMap<String, String>,
+    pub renamed: BTreeMap<String, String>,
     pub obsolete : bool,
 }
 
@@ -122,7 +122,7 @@ pub type RefMap = IndexMap<String, (Qv<String>, ValueType)>;
 impl RustObject{
     pub fn new() -> RustObject{
         RustObject{ default : Some(IndexMap::new()), sabun : IndexMap::new(),id : None, refs: None,
-            renamed: HashMap::new(), obsolete : false }
+            renamed: BTreeMap::new(), obsolete : false }
     }
 
     pub fn insert_default(&mut self, key : String, value : RustValue) -> Option<RustValue>{

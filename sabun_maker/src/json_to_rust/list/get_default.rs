@@ -28,8 +28,6 @@ fn get_default_obj(map : &IndexMap<String, JVal>, span : &Span, names : &Names) 
     if obj.default.is_none(){
         Err(format!("{} no default obj {}", span.line_str(), names))?
     }
-    for (name, val) in obj.default.as_ref().unwrap(){
-        
-    }
+
     return Ok(obj);
 }
