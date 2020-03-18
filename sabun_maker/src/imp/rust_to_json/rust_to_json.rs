@@ -2,6 +2,7 @@ use crate::rust_struct::{RustObject, RustValue};
 use serde_json::{Value, Map};
 use crate::imp::rust_to_json::get_renamed::get_renamed;
 use indexmap::IndexMap;
+use crate::imp::rust_to_json::get_ref_map::get_ref_map;
 
 ///本来デフォルト値と差分が保存されているのだが、見やすくするためにまとめてデフォルト値にしてしまう。
 ///デフォルト値も差分も全部Json化したいユースケースもあるとは思うのだけど・・・
@@ -20,8 +21,11 @@ pub fn rust_to_json_new_default(obj : &RustObject, def : Option<IndexMap<String,
         insert(map, "Obsolete", Value::Bool(true));
     }
     if let Some(refs) = &obj.refs{
-
+        let rm = get_ref_map(refs);
+        insert(map, "Ref", Value::Map(rm));
     }
+
+    let def = obj.default.unwrap_or(def.unwrap());
 
     todo!()
 }
