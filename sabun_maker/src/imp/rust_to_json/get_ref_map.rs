@@ -1,8 +1,9 @@
 use crate::rust_struct::{RefMap, Qv, ValueType};
-use serde_json::{Map, Value};
+use crate::my_json::{Value};
+use indexmap::IndexMap;
 
-pub fn get_ref_map(r : &RefMap) -> Map<String, Value>{
-    let mut map = Map::new();
+pub fn get_ref_map(r : &RefMap) -> IndexMap<String, Value>{
+    let mut map = IndexMap::new();
 
     for (k, (qv, vt)) in r{
         let k : &String = k;
@@ -12,7 +13,7 @@ pub fn get_ref_map(r : &RefMap) -> Map<String, Value>{
         let qv_str = match qv{
             Qv::Val(v) => v,
             Qv::Null => "null",
-            Qv::Incompatible => "undefined",
+            Qv::Undefined => "undefined",
         };
         map.insert(name, Value::String(qv_str.to_string()));
     }

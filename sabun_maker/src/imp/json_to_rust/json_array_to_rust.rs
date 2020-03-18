@@ -12,14 +12,24 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
     return match gat{
         AT(array_type) =>{
             let array = get_array( &array[1..],array_type, names)?;
-            if let Some(array) = array {
-                Ok(RustValue::Array(Qv::Val(array), value_type))
-            } else{
-                if value_type.is_nullable() {
-                    Ok(RustValue::Array(Qv::Null, value_type))
-                } else{
-                    Err(format!(r#"{} Nullable parameters must have "?" in the end of their name {}"#, span.line_str(), names))?
-                }
+            match array{
+                Qv::Val(array) =>{
+                    Ok(RustValue::Array(Qv::Val(array), value_type))
+                },
+                Qv::Null => {
+                    if value_type.is_nullable() {
+                        Ok(RustValue::Array(Qv::Null, value_type))
+                    } else{
+                        Err(format!(r#"{} Nullable parameters must have "?" in the end of their name {}"#, span.line_str(), names))?
+                    }
+                },
+                Qv::Undefined => {
+                    if value_type.is_nullable() {
+                        Ok(RustValue::Array(Qv::Null, value_type))
+                    } else{
+                        Err(format!(r#"{} Nullable parameters must have "?" in the end of their name {}"#, span.line_str(), names))?
+                    }
+                },
             }
         },
         Num | Str | Bool =>{
@@ -61,7 +71,7 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
     None
 }
 
-fn get_array(a : &[JVal], array_type : ArrayType, names : &Names) -> Result<Option<RustArray>>{
+fn get_array(a : &[JVal], array_type : ArrayType, names : &Names) -> Result<Qv<RustArray>>{
     let mut vec : Vec<RustValue> = vec![];
     for item in a{
         let val = match item{
@@ -79,32 +89,41 @@ fn get_array(a : &[JVal], array_type : ArrayType, names : &Names) -> Result<Opti
             },
             JVal::Null(_) =>{
                 if vec.len() == 0 && a.len() == 1{
-                    return Ok(None);
+                    return Ok(Qv::Null);
                 } else{
                     Err(format!(r#"{} null must be ["type", null] {}"#, item.line_str(), names))?
+                }
+            },
+            JVal::Undefined(_) =>{
+                if vec.len() == 0 && a.len() == 1{
+                    return Ok(Qv::Undefined);
+                } else{
+                    Err(format!(r#"{} undefined must be ["type", undefined] {}"#, item.line_str(), names))?
                 }
             },
             JVal::Array(a2, _) =>{
                 match array_type{
                     ArrayType::Num2 => {
                         let array = get_array(a2, ArrayType::Num, names)?;
-                        if let Some(array) = array {
-                            RustValue::Array(Qv::Val(array), ValueType::Normal)
-                        } else{
-                            if vec.len() == 0 && a.len() == 1{
-                                return Ok(None);
-                            } else{
-                                Err(format!(r#"{} null must be ["type", null] {}"#, item.line_str(), names))?
-                            }
+                        match array{
+                            Qv::Val(array) =>{
+                                RustValue::Array(Qv::Val(array), ValueType::Normal)
+                            },
+                            Qv::Null =>{
+                                Err(format!(r#"{} null is not a num array {}"#, item.line_str(), names))?
+                            },
+                            Qv::Undefined =>{
+                                Err(format!(r#"{} undefined is not a num array {}"#, item.line_str(), names))?
+                            },
                         }
                     },
                     _ => Err(format!(r#"{} two-dimensional array must be "Num-Array2" {}"#, item.line_str(), names))?,
                 }
             },
-            JVal::Map(_,_) => unreachable!(),
-            JVal::Bool(_, _) => unreachable!(),
+            JVal::Map(_,_) => Err(format!(r#"{} object is not valid for an array item {}"#, item.line_str(), names))?,
+            JVal::Bool(_, _) => Err(format!(r#"{} bool is not valid for an array item {}"#, item.line_str(), names))?,
         };
         vec.push(val);
     }
-    return Ok(Some(RustArray{ vec, array_type }));
+    return Ok(Qv::Val(RustArray{ vec, array_type }));
 }

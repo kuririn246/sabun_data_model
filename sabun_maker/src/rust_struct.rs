@@ -24,6 +24,13 @@ impl ValueType{
         }
     }
 
+    pub fn is_undefiable(&self) -> bool{
+        match self{
+            ValueType::Undefiable | ValueType::UndefNullable => true,
+            _ => false,
+        }
+    }
+
     pub fn to_suffix(&self) -> String{
         let s = match self{
             ValueType::Normal => "",
@@ -47,7 +54,7 @@ pub enum RustValue{
 }
 
 #[derive(Debug, Clone)]
-pub enum Qv<T>{ Val(T), Incompatible, Null }
+pub enum Qv<T>{ Val(T), Undefined, Null }
 
 #[derive(Debug)]
 pub struct RustArray{

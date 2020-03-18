@@ -25,8 +25,11 @@ pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names :
             Err(format!("{} An object can't have an object {}", span.line_str(), names))?
         },
         JVal::Null(span) =>{
-             Err(format!(r#"{} null must be ["type", null] {}"#, span.line_str(), names))?
+            Err(format!(r#"{} null must be ["type", null] {}"#, span.line_str(), names))?
         },
+        JVal::Undefined(span) =>{
+            Err(format!(r#"{} undefined must be ["type", undefined] {}"#, span.line_str(), names))?
+        }
     }
 }
 
@@ -52,6 +55,9 @@ pub fn json_item_to_rust_ref(name : &str, value_type : ValueType, v : &JVal, nam
         JVal::Null(_) =>{
             Ok(RustValue::String(Qv::Null, value_type))
         },
+        JVal::Undefined(_)=>{
+            Ok(RustValue::String(Qv::Undefined, value_type))
+        }
     }
 }
 
