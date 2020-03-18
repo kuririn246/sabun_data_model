@@ -9,6 +9,8 @@ use crate::MyError;
 
 pub fn get_unit(span : Span, rc : Rc<String>) -> JVal { JVal::Null(s(span, rc)) }
 
+pub fn get_undefined(span : Span, rc : Rc<String>) -> JVal{ JVal::Undefined(s(span, rc)) }
+
 pub fn get_bool(b: bool, span : Span, rc : Rc<String>) -> JVal { JVal::Bool(b, s(span, rc)) }
 
 pub fn get_string(st: String, span : Span, rc : Rc<String>) -> JVal { JVal::String(st, s(span, rc)) }

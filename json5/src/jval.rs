@@ -4,6 +4,7 @@ use indexmap::IndexMap;
 #[derive(Clone, Debug, PartialEq)]
 pub enum JVal{
     Null(Span),
+    Undefined(Span),
     Bool(bool, Span),
     String(String, Span),
     //Int(i64, Span),
@@ -56,12 +57,19 @@ impl JVal{
         }
     }
 
+    pub fn is_undefined(&self) -> bool{
+        return match self{
+            JVal::Undefined(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn span(&self) -> &Span{
         return match self{
             JVal::Null(s) => s,
+            JVal::Undefined(s) => s,
             JVal::Bool(_,s) => s,
             JVal::String(_, s) => s,
-            //JVal::Int(_, s) => s,
             JVal::Double(_, s) => s,
             JVal::Array(_, s) => s,
             JVal::Map(_, s) => s,

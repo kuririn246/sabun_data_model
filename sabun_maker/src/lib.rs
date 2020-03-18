@@ -2,6 +2,7 @@ mod json_siyou;
 pub mod error;
 mod imp;
 pub mod rust_struct;
+pub mod my_json;
 
 pub use imp::json_to_rust::json_to_rust as json_to_rust;
 pub use imp::rust_to_json::rust_to_json::rust_to_json_new_default as rust_to_json_new_default;

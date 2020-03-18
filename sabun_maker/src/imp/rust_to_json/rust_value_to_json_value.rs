@@ -1,8 +1,8 @@
-use serde_json::Value;
-use crate::rust_struct::RustValue;
+use crate::my_json::Value;
+use crate::rust_struct::{RustValue, ValueType};
 
-pub fn rust_value_to_json_value(v : &RustValue) -> (Value, String){
+pub fn rust_value_to_json_value(v : &RustValue) -> (Value, ValueType){
     match v{
-        RustValue::Bool()
+        RustValue::Bool(b, vt) =>
     }
 }

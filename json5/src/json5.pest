@@ -84,6 +84,8 @@ nul_escape_sequence = @{ "0" }
 
 null = @{ "null" }
 
+undefined = @{ "undefined" }
+
 number = @{ ("+" | "-")? ~ numeric_literal }
 
 numeric_literal = _{
@@ -120,4 +122,4 @@ unicode_letter = _{
   LETTER_NUMBER
 }
 
-value = _{ null | boolean | string | number | object | array }
+value = _{ null | undefined | boolean | string | number | object | array }

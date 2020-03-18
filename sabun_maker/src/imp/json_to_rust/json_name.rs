@@ -58,9 +58,9 @@ pub fn value_type_and_name(s : &str) -> Option<(ValueType, String)>{
         let name = cap[1].to_string();
         let suffix = cap[2].to_string();
         let value_type = if suffix == "!?" || suffix == "?!"{
-            ValueType::CompatNullable
+            ValueType::UndefNullable
         } else if suffix == "!"{
-            ValueType::Compatible
+            ValueType::Undefiable
         } else if suffix == "?"{
             ValueType::Nullable
         } else if suffix == ""{

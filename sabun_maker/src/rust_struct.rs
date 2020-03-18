@@ -12,14 +12,14 @@ pub enum ArrayType{
 pub enum ValueType{
     Normal,
     Nullable,
-    Compatible,
-    CompatNullable,
+    Undefiable,
+    UndefNullable,
 }
 
 impl ValueType{
     pub fn is_nullable(&self) -> bool{
         match self{
-            ValueType::Nullable | ValueType::CompatNullable => true,
+            ValueType::Nullable | ValueType::UndefNullable => true,
             _ => false,
         }
     }
@@ -28,8 +28,8 @@ impl ValueType{
         let s = match self{
             ValueType::Normal => "",
             ValueType::Nullable => "?",
-            ValueType::Compatible => "!",
-            ValueType::CompatNullable => "!?",
+            ValueType::Undefiable => "!",
+            ValueType::UndefNullable => "!?",
         };
         s.to_string()
     }
@@ -92,6 +92,7 @@ impl RustList{
 
 #[derive(Debug)]
 pub enum ListType{
+    ///稼働中のシステムでは、次に割り振るべきIDが入っている。IDを割り振った後インクリメントしていく。
     AutoID(Option<u64>),
     Reffered,
     Normal

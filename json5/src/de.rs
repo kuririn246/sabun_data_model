@@ -2,7 +2,7 @@ use pest::iterators::{Pair, Pairs};
 use pest::Parser as P;
 use pest_derive::Parser;
 use crate::error::{Result, MyError};
-use crate::deserialize_item::{get_unit, get_bool, get_string,  get_f64, get_seq, get_map};
+use crate::deserialize_item::{get_unit, get_bool, get_string, get_f64, get_seq, get_map, get_undefined};
 use crate::jval::JVal;
 use std::f64;
 use std::char;
@@ -25,6 +25,7 @@ pub fn deserialize_any(pair: Pair<'_, Rule>, rc : Rc<String>) -> Result<JVal>
     let span = pair.as_span();
     match pair.as_rule() {
         Rule::null => Ok(get_unit(span, rc)),
+        Rule::undefined => Ok(get_undefined(span, rc)),
         Rule::boolean => Ok(get_bool(parse_bool(&pair), span, rc)),
         Rule::string | Rule::identifier => Ok(get_string(parse_string(pair)?, span, rc)),
         Rule::number => {
