@@ -11,21 +11,21 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
     let gat = get_array_type(array);
     return match gat{
         AT(array_type) =>{
-            let array = get_array( &array[1..],array_type, names)?;
+            let array = get_array( &array[1..], &array_type, names)?;
             match array{
                 Qv::Val(array) =>{
-                    Ok(RustValue::Array(Qv::Val(array), value_type))
+                    Ok(RustValue::Array(Qv::Val(array), array_type, value_type))
                 },
                 Qv::Null => {
                     if value_type.is_nullable() {
-                        Ok(RustValue::Array(Qv::Null, value_type))
+                        Ok(RustValue::Array(Qv::Null, array_type, value_type))
                     } else{
                         Err(format!(r#"{} Nullable parameters must have "?" in the end of their name {}"#, span.line_str(), names))?
                     }
                 },
                 Qv::Undefined => {
                     if value_type.is_nullable() {
-                        Ok(RustValue::Array(Qv::Null, value_type))
+                        Ok(RustValue::Array(Qv::Null, array_type, value_type))
                     } else{
                         Err(format!(r#"{} Nullable parameters must have "?" in the end of their name {}"#, span.line_str(), names))?
                     }
@@ -71,7 +71,7 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
     None
 }
 
-fn get_array(a : &[JVal], array_type : ArrayType, names : &Names) -> Result<Qv<RustArray>>{
+fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result<Qv<RustArray>>{
     let mut vec : Vec<RustValue> = vec![];
     for item in a{
         let val = match item{
@@ -104,10 +104,10 @@ fn get_array(a : &[JVal], array_type : ArrayType, names : &Names) -> Result<Qv<R
             JVal::Array(a2, _) =>{
                 match array_type{
                     ArrayType::Num2 => {
-                        let array = get_array(a2, ArrayType::Num, names)?;
+                        let array = get_array(a2, &ArrayType::Num, names)?;
                         match array{
                             Qv::Val(array) =>{
-                                RustValue::Array(Qv::Val(array), ValueType::Normal)
+                                RustValue::Array(Qv::Val(array), array_type.clone(), ValueType::Normal)
                             },
                             Qv::Null =>{
                                 Err(format!(r#"{} null is not a num array {}"#, item.line_str(), names))?
@@ -125,5 +125,5 @@ fn get_array(a : &[JVal], array_type : ArrayType, names : &Names) -> Result<Qv<R
         };
         vec.push(val);
     }
-    return Ok(Qv::Val(RustArray{ vec, array_type }));
+    return Ok(Qv::Val(RustArray{ vec }));
 }

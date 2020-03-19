@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap};
 use indexmap::IndexMap;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ArrayType{
     Num,
     String,
@@ -48,7 +48,7 @@ pub enum RustValue{
     Bool(Qv<bool>, ValueType),
     Number(Qv<f64>, ValueType),
     String(Qv<String>, ValueType),
-    Array(Qv<RustArray>, ValueType),
+    Array(Qv<RustArray>, ArrayType, ValueType),
     List(Qv<RustList>, ValueType),
     Object(Qv<RustObject>, ValueType),
 }
@@ -59,7 +59,7 @@ pub enum Qv<T>{ Val(T), Undefined, Null }
 #[derive(Debug)]
 pub struct RustArray{
     pub vec : Vec<RustValue>,
-    pub array_type : ArrayType,
+
 }
 
 #[derive(Debug)]
