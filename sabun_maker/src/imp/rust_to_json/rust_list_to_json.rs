@@ -5,7 +5,7 @@ use crate::error::Result;
 
 pub fn rust_list_to_json(qv : &Qv<RustList>, at : &ArrayType) -> Value{
     let mut result : Vec<Value> = vec![];
-    
+
     match qv{
         Qv::Val(v) => {
             for item in &v.vec{
