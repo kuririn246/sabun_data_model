@@ -22,7 +22,7 @@ pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names :
             Ok(json_array_to_rust(a, value_type, v.span(), names)?)
         },
         JVal::Map(_map, span) => {
-            Err(format!("{} An object can't have an object {}", span.line_str(), names))?
+            Err(format!("{} Objects can't have objects {}", span.line_str(), names))?
         },
         JVal::Null(span) =>{
             Err(format!(r#"{} null must be ["type", null] {}"#, span.line_str(), names))?
