@@ -67,6 +67,7 @@ pub struct RustList{
     pub list_type : ListType,
     pub default : RustObject,
     pub list : Vec<RustObject>,
+    pub redef : BTreeMap<String, String>,
 }
 
 impl RustList{
@@ -117,6 +118,7 @@ impl RustList{
             list_type : ListType::Normal,
             default : RustObject::new(),
             list : vec![],
+            redef : BTreeMap::new(),
         }
     }
 }
@@ -139,7 +141,9 @@ pub type RefMap = IndexMap<String, (Qv<String>, ValueType)>;
 
 impl RustObject{
     pub fn new() -> RustObject{
-        RustObject{ default : Some(IndexMap::new()), sabun : IndexMap::new(),id : None, refs: None,
+        RustObject{
+            default : Some(IndexMap::new()), sabun : IndexMap::new(),
+            id : None, refs: None,
             renamed: BTreeMap::new(), obsolete : false }
     }
 

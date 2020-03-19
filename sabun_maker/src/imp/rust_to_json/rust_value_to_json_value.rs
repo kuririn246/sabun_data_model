@@ -2,7 +2,7 @@ use crate::my_json::Value;
 use crate::rust_struct::{RustValue, ValueType, Qv};
 use crate::imp::rust_to_json::rust_array_to_json::rust_array_to_json;
 use crate::error::Result;
-use crate::imp::rust_to_json::rust_list_to_json::rust_list_to_json;
+use crate::imp::rust_to_json::list::rust_list_to_json::rust_list_to_json;
 
 pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> Result<(Value, ValueType)>{
     let r = match v{
@@ -13,16 +13,16 @@ pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> Result<(Value, V
         RustValue::List(l, vt)=>{
             match l{
                 Qv::Val(l) =>{
-                    (rust_list_to_json(l)?, vt)
+                    (rust_list_to_json(l, name)?, vt.clone())
                 },
                 _ =>{
-                    Err(format!("{} Lists must not be null or undefined", name))?;
+                    Err(format!("{} Lists must not be null or undefined", name))?
                 }
             }
         },
         RustValue::Object(_o, _vt) =>{
             //仕様上unreachable。むりやり書こうとしても[obj,null]の記法がないからかけないな・・・
-            Err(format!("{} objects must not have objects", name))?;
+            Err(format!("{} objects must not have objects", name))?
         },
     };
     return Ok(r);

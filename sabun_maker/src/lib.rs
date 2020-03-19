@@ -9,13 +9,22 @@ pub use imp::rust_to_json::rust_to_json::rust_to_json_new_default as rust_to_jso
 
 #[cfg(test)]
 mod tests {
+    use crate::{json_to_rust, rust_to_json_new_default};
 
     #[test]
     fn it_works() {
 
         let v = crate::json_siyou::untyped_example().unwrap();
         match json_to_rust(&v){
-            Ok(obj) => println!("{:?}", obj),
+            Ok(obj) =>{
+                match rust_to_json_new_default(&obj){
+                    Ok(val) =>{
+                        let pretty = val.to_string_pretty();
+                        println!("{}", pretty);
+                    },
+                    Err(e) =>{ println!("{:?}", e) }
+                }
+            },
             Err(e) => println!("{:?}", e)
         }
         //let r = json_obj_to_rust(&v);

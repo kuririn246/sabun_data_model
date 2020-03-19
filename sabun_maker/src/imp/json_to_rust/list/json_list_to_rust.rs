@@ -34,6 +34,9 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, _span : &Span,
                     },
                     ListAttribute::Default(obj) =>{
                         result.default = obj;
+                    },
+                    ListAttribute::Redef(redef) =>{
+                        result.redef = redef;
                     }
                 }
             },

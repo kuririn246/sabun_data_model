@@ -3,11 +3,14 @@ use json5_parser::{JVal, Span};
 use super::super::names::Names;
 use super::get_default::get_default;
 use crate::error::Result;
+use std::collections::BTreeMap;
+use crate::imp::json_to_rust::list::get_redef::get_redef;
 
 pub enum ListAttribute{
     Default(RustObject),
     AutoID(Option<u64>),
     Reffered,
+    Redef(BTreeMap<String, String>),
 }
 
 
@@ -47,7 +50,10 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
                     if array.len() == 1 { Ok(ListAttribute::Reffered) }
                     else{ Err(format!("{} {} [\"Reffered\"] is valid {}", span.line_str(), span.slice(), names))? }
                 },
-
+                "Redef" =>{
+                    let redef = get_redef(&array[1..], span, names)?;
+                    Ok(ListAttribute::Redef(redef))
+                },
                 _ =>{
                     Err(format!("{} {} {} {}", span.line_str(), span.slice(), error_message, names))?
                 }

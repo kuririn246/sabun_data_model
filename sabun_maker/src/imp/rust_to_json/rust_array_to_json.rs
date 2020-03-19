@@ -1,4 +1,4 @@
-use crate::rust_struct::{Qv, RustArray, RustValue, ArrayType, ValueType};
+use crate::rust_struct::{Qv, RustArray, ArrayType};
 use crate::my_json::Value;
 use crate::imp::rust_to_json::rust_value_to_json_value::rust_value_to_json_value;
 use crate::error::Result;
@@ -13,7 +13,7 @@ pub fn rust_array_to_json(qv : &Qv<RustArray>, at : &ArrayType, name : &str) -> 
     match qv{
         Qv::Val(v) => {
             for item in &v.vec{
-                let (v, _) = rust_value_to_json_value(item, name);
+                let (v, _) = rust_value_to_json_value(item, name)?;
                 result.push(v);
             }
         },

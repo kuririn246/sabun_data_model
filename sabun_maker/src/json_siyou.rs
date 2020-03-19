@@ -124,6 +124,7 @@ pub fn untyped_example() -> Result<JVal> {
   hegoList: [
     "List",
     ["Reffered"],
+    ["Redef", "hugahuga->hegohego"],
     ["Default", {
         mem : "",
         Renamed: ["memOld->mem"] //DefaultメンバではRenamedの設定が可能

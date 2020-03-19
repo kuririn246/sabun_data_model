@@ -8,13 +8,15 @@ use crate::error::Result;
 
 ///本来デフォルト値と差分が保存されているのだが、見やすくするためにまとめてデフォルト値にしてしまう。
 ///デフォルト値も差分も全部Json化したいユースケースもあるとは思うのだけど・・・
-pub fn rust_to_json_new_default(obj : &RustObject, def : Option<IndexMap<String, RustValue>>) -> Result<Value>{
+pub fn rust_to_json_new_default(obj : &RustObject) -> Result<Value>{
 
     let mut map_item = IndexMap::new();
     let map = &mut map_item;
 
     let renamed = get_renamed(&obj.renamed);
-    insert(map,"Renamed", Value::Array(renamed));
+    if renamed.len() != 0 {
+        insert(map, "Renamed", Value::Array(renamed));
+    }
 
     if let Some(id) = &obj.id{
         insert(map,"ID", Value::String(id.to_string()));
@@ -23,14 +25,18 @@ pub fn rust_to_json_new_default(obj : &RustObject, def : Option<IndexMap<String,
         insert(map, "Obsolete", Value::Bool(true));
     }
     if let Some(refs) = &obj.refs{
-        let rm = get_ref_map(refs);
-        insert(map, "Ref", Value::Map(rm));
+        if refs.len() != 0 {
+            let rm = get_ref_map(refs);
+            insert(map, "Ref", Value::Map(rm));
+        }
     }
 
-    let def = obj.default.as_ref().unwrap_or(def.as_ref().unwrap());
-
-    let new = get_new_default(def, &obj.sabun)?;
-
+    let new;
+    if let Some(def) = obj.default.as_ref(){
+        new = get_new_default(Some(def), &obj.sabun)?;
+    } else{
+        new = get_new_default(None, &obj.sabun)?;
+    }
     for (k,v) in new{
         map.insert(k, v);
     }
