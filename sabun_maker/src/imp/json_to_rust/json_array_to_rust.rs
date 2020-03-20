@@ -87,7 +87,7 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
                     _=>{ GatResult::None }
                 }
             },
-            JVal::Double(num, _) => NoTagNum,
+            JVal::Double(_num, _) => NoTagNum,
             _ => None,
         }
     }
@@ -129,7 +129,7 @@ fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result<Qv<
                     ArrayType::Num2 => {
                         let rv = json_array_to_rust(a2, ValueType::Normal, span, names)?;
                         match rv{
-                            RustValue::Array(array, at, vt) =>{
+                            RustValue::Array(array, _at, _vt) =>{
                                 match array {
                                     Qv::Val(array) => {
                                         RustValue::Array(Qv::Val(array), ArrayType::Num, ValueType::Normal)

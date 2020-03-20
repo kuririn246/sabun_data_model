@@ -10,7 +10,6 @@ pub use imp::rust_to_json::rust_to_json::rust_to_json_new_default as rust_to_jso
 #[cfg(test)]
 mod tests {
     use crate::{json_to_rust, rust_to_json_new_default};
-    use std::convert::TryInto;
 
     #[test]
     fn it_works() {
