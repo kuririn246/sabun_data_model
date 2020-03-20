@@ -25,7 +25,7 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : 
                     json_item_to_rust(&name, vt,v, names)?
                 };
 
-                r.insert_default(k.to_string(), v);
+                r.insert_default(name.to_string(), v);
             },
             NameType::SystemName(sn) =>{
                 match sn{

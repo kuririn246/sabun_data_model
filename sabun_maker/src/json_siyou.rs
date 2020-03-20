@@ -29,9 +29,11 @@ pub fn untyped_example() -> Result<JVal> {
   //配列はいまのところnumber配列、string配列、number配列の配列の4通り。
   numArray : [ "Num-Array", 0, 3, 10 ],
 
+  //numArrayはタグなしでも書ける特殊記法がある
+  numArrayNoTag : [ 5.8, 8, 10 ],
   emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
   "nullableNumArray?" : [ "Num-Array", null ], //nullable配列の初期値をnullにする場合
-  numArray2 : [ "Num-Array2", [2,3], [3,1] ], //二次元のnumarray
+  num2Array : [ "Num2-Array", [2,3], [3,1] ], //二次元のnumarray
 
   strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
   //そもそも配列なんてこのシステムに必要なんだろうか・・・？　まともに差分生成出来る気もしないしなあ。
@@ -94,10 +96,10 @@ pub fn untyped_example() -> Result<JVal> {
     ["AutoID"], //RefferedとAutoIDは同時には使えない
     ["Default",{
       "atk?" : ["Num", null],
-      "Ref": { weapons : "" },
+      "Ref": { weapon : "" }, //Refの基本の形、なにか入れないとエラーになる。
     }],
     {
-      Ref : { weapons : "doutanuki" }, //どうたぬきを参照。
+      Ref : { weapon : "doutanuki" }, //どうたぬきを参照。
       atk : 8 //override的ななにか
     }
   ],

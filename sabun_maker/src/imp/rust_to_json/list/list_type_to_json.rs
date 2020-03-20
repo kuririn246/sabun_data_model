@@ -11,7 +11,7 @@ pub fn list_type_to_json(l : &ListType, name : &str) -> Result<Value>{
         ListType::AutoID(val) =>{
             result.push(val_str("AutoID"));
             match val{
-                Some(i) => result.push(Value::String(i.to_string())),
+                Some(i) => result.push(Value::Number(*i as f64)),
                 None =>{
                     //常識的に考えるとエラーだが文法上はなくてもいい。次のIDが既に使われていた場合、その都度新しく有効なIDを探せば良い
                 }

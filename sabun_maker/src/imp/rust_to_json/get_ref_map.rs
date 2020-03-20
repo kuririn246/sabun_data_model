@@ -10,12 +10,12 @@ pub fn get_ref_map(r : &RefMap) -> IndexMap<String, Value>{
         let qv : &Qv<String> = qv;
         let vt : &ValueType = vt;
         let name = format!("{}{}", k, vt.to_suffix());
-        let qv_str = match qv{
-            Qv::Val(v) => v,
-            Qv::Null => "null",
-            Qv::Undefined => "undefined",
+        match qv{
+            Qv::Val(v) => map.insert(name, Value::String(v.to_string())),
+            Qv::Null => map.insert(name, Value::Null),
+            Qv::Undefined => map.insert(name, Value::Undefined),
         };
-        map.insert(name, Value::String(qv_str.to_string()));
+        //map.insert(name, Value::String(qv_str.to_string()));
     }
 
     map

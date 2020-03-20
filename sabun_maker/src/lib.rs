@@ -10,6 +10,7 @@ pub use imp::rust_to_json::rust_to_json::rust_to_json_new_default as rust_to_jso
 #[cfg(test)]
 mod tests {
     use crate::{json_to_rust, rust_to_json_new_default};
+    use std::convert::TryInto;
 
     #[test]
     fn it_works() {
@@ -21,6 +22,23 @@ mod tests {
                     Ok(val) =>{
                         let pretty = val.to_string_pretty();
                         println!("{}", pretty);
+                        match json5_parser::from_str(&pretty){
+                            Ok(v) =>{
+                                match json_to_rust(&v){
+                                    Ok(obj) =>{
+                                        match rust_to_json_new_default(&obj){
+                                            Ok(val) =>{
+                                                let pretty2 = val.to_string_pretty();
+                                                assert_eq!(pretty, pretty2);
+                                            },
+                                            Err(e) =>{ println!("{:?}", e); }
+                                        }
+                                    },
+                                    Err(e) =>{ println!("{:?}", e); }
+                                }
+                            }
+                            Err(e) =>{ println!("{:?}", e); }
+                        }
                     },
                     Err(e) =>{ println!("{:?}", e) }
                 }

@@ -26,17 +26,7 @@ fn write(value : &Value, s : &mut String, indent_level : usize){
         Value::Undefined => s.push_str("undefined"),
         Value::Number(f) => s.push_str(&f.to_string()),
         Value::Array(v) => write_array(v, s, indent_level + 1),
-        Value::Map(obj) =>{
-            s.push_str("{\n");
-            for (k,v) in obj{
-                s.push_str(&indent_str(indent_level + 1));
-                s.push_str(&format!("\"{}\" : ", k));
-                write(v, s, indent_level + 1);
-                s.push_str(",\n");
-            }
-            s.push_str(&indent_str(indent_level));
-            s.push_str("}");
-        }
+        Value::Map(obj) => write_map(obj, s, indent_level + 1),
     }
 }
 
@@ -45,9 +35,15 @@ fn write_array(array : &Vec<Value>, s : &mut String, indent_level : usize){
         s.push_str("[]");
     } else if array.len() == 1 {
         s.push_str("[ ");
-        write(&array[0], s, 0);
+        write(&array[0], s, indent_level);
         s.push_str(" ]");
-    } else {
+    } else if array.len() == 2 {
+        s.push_str("[ ");
+        write(&array[0], s, indent_level);
+        s.push_str(", ");
+        write(&array[1], s, indent_level);
+        s.push_str(" ]");
+    } else{
         s.push_str("[\n");
         s.push_str(&indent_str(indent_level));
         write(&array[0], s, indent_level);
@@ -69,4 +65,29 @@ fn write_array(array : &Vec<Value>, s : &mut String, indent_level : usize){
 
 fn indent_str(indent_level : usize) -> String{
     "  ".repeat(indent_level)
+}
+
+fn write_map(map : &IndexMap<String, Value>, s : &mut String, indent_level : usize) {
+    if map.len() == 0{
+        s.push_str("{}");
+    } else if map.len() == 1 {
+        for (k,v) in map{
+            s.push_str(&format!("{} \"{}\" : ","{", k));
+            write(v, s, indent_level);
+            s.push_str(" }");
+        }
+    } else{
+        s.push_str("{\n");
+        for (k,v) in map{
+            s.push_str(&indent_str(indent_level));
+            s.push_str(&format!("\"{}\" : ", k));
+            write(v, s, indent_level);
+            s.push_str(",\n");
+        }
+        if indent_level != 0 {
+            s.push_str(&indent_str(indent_level - 1));
+        }
+        s.push_str("}");
+
+    }
 }

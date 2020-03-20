@@ -32,6 +32,16 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
                 },
             }
         },
+        NoTagNum =>{
+            let array = get_array(&array, &ArrayType::Num, names)?;
+            match array{
+                Qv::Val(array) =>{
+                    Ok(RustValue::Array(Qv::Val(array), ArrayType::Num, value_type))
+                },
+                Qv::Null =>{ unreachable!() },
+                Qv::Undefined => { unreachable!() },
+            }
+        }
         Num | Str | Bool =>{
             //いまのところ["Num", null] のような形での、nullのセットしか認めていない。Arrayを使った記法では、null以外はセットできない。
             array_null(&array[1..], gat, value_type, span, names)
@@ -55,6 +65,7 @@ pub enum GatResult{
     AT(ArrayType),
     List,
     Num,
+    NoTagNum,
     Str,
     Bool,
     None
@@ -63,17 +74,21 @@ pub enum GatResult{
 fn get_array_type(a : &Vec<JVal>) -> GatResult{
     use GatResult::*;
     if let Some(v) = a.get(0){
-        if let Some(s) = v.as_str(){
-            return match s{
-                "Num-Array" =>{ AT(ArrayType::Num) },
-                "Str-Array" =>{ AT(ArrayType::String) },
-                "Num-Array2" =>{ AT(ArrayType::Num2) }
-                "Num" =>{ Num },
-                "Str" =>{ Str },
-                "Bool" =>{ Bool },
-                "List" => { GatResult::List }
-                _=>{ return GatResult::None; }
-            }
+        return match v{
+            JVal::String(s, _)=>{
+                return match s.as_str(){
+                    "Num-Array" =>{ AT(ArrayType::Num) },
+                    "Str-Array" =>{ AT(ArrayType::String) },
+                    "Num2-Array" =>{ AT(ArrayType::Num2) }
+                    "Num" =>{ Num },
+                    "Str" =>{ Str },
+                    "Bool" =>{ Bool },
+                    "List" => { GatResult::List }
+                    _=>{ GatResult::None }
+                }
+            },
+            JVal::Double(num, _) => NoTagNum,
+            _ => None,
         }
     }
     None
@@ -109,20 +124,25 @@ fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result<Qv<
                     Err(format!(r#"{} undefined must be ["type", undefined] {}"#, item.line_str(), names))?
                 }
             },
-            JVal::Array(a2, _) =>{
+            JVal::Array(a2, span) =>{
                 match array_type{
                     ArrayType::Num2 => {
-                        let array = get_array(a2, &ArrayType::Num, names)?;
-                        match array{
-                            Qv::Val(array) =>{
-                                RustValue::Array(Qv::Val(array), array_type.clone(), ValueType::Normal)
+                        let rv = json_array_to_rust(a2, ValueType::Normal, span, names)?;
+                        match rv{
+                            RustValue::Array(array, at, vt) =>{
+                                match array {
+                                    Qv::Val(array) => {
+                                        RustValue::Array(Qv::Val(array), ArrayType::Num, ValueType::Normal)
+                                    },
+                                    Qv::Null => {
+                                        Err(format!(r#"{} null is not a num array {}"#, item.line_str(), names))?
+                                    },
+                                    Qv::Undefined => {
+                                        Err(format!(r#"{} undefined is not a num array {}"#, item.line_str(), names))?
+                                    },
+                                }
                             },
-                            Qv::Null =>{
-                                Err(format!(r#"{} null is not a num array {}"#, item.line_str(), names))?
-                            },
-                            Qv::Undefined =>{
-                                Err(format!(r#"{} undefined is not a num array {}"#, item.line_str(), names))?
-                            },
+                            _ =>{ Err(format!(r#"{} {} is not a num array {}"#, span.line_str(), span.slice(), names))? }
                         }
                     },
                     _ => Err(format!(r#"{} two-dimensional array must be "Num-Array2" {}"#, item.line_str(), names))?,
