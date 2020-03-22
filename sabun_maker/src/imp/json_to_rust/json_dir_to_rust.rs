@@ -49,17 +49,25 @@ pub fn json_dir_to_rust(dir_path : &str) -> Result<RustObject>{
 
 pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>) -> Result<RustObject>{
     let mut map : HashMap<String, RustValue> = HashMap::new();
+    let mut root= None;
 
     for file in ite{
         let name = &file.file_name_without_ext;
         if name == "root"{
-            let val = json_root_to_rust(&file.json)?;
-            map.insert("root".to_string(), RustValue::Object(Qv::Val(val), ValueType::Normal));
+            if root.is_none() {
+                root = Some(json_root_to_rust(&file.json)?);
+            } else{
+                Err("There's two 'root.json5' in the directory")?
+            }
         } else{
             let val = json_item_str_to_rust(name, &file.json)?;
             map.insert(name.to_string(), val);
         }
     }
 
-    return validate_and_final_touch(map);
+    if root.is_none(){
+        Err("root.json5 is needed")?
+    }
+
+    return validate_and_final_touch(root.unwrap(), map);
 }

@@ -4,7 +4,7 @@ use lazy_static::lazy_static;
 use crate::rust_struct::ValueType;
 
 pub enum SystemNames{
-    Include,
+    //Include,
     Renamed,
     ID,
     Ref,
@@ -23,7 +23,7 @@ pub fn json_name(s : &str) -> Option<NameType>{
     use SystemNames::*;
 
     match s {
-        "Include" => return some(Include),
+        //"Include" => return some(Include),
         "Renamed" => return some(Renamed),
         "ID" => return some(ID),
         "Ref" => return some(Ref),
@@ -60,7 +60,7 @@ pub fn value_type_and_name(s : &str) -> Option<(ValueType, String)>{
         let value_type = if suffix == "!?" || suffix == "?!"{
             ValueType::UndefNullable
         } else if suffix == "!"{
-            ValueType::Undefiable
+            ValueType::Undefinable
         } else if suffix == "?"{
             ValueType::Nullable
         } else if suffix == ""{

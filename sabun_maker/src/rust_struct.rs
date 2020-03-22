@@ -8,11 +8,21 @@ pub enum ArrayType{
     Num2, //two dimensional num array
 }
 
+impl ArrayType{
+    pub(crate) fn type_num(&self) -> usize{
+        match self{
+            ArrayType::Num => 0,
+            ArrayType::String => 1,
+            ArrayType::Num2 => 2,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum ValueType{
     Normal,
     Nullable,
-    Undefiable,
+    Undefinable,
     UndefNullable,
 }
 
@@ -26,7 +36,7 @@ impl ValueType{
 
     pub fn is_undefiable(&self) -> bool{
         match self{
-            ValueType::Undefiable | ValueType::UndefNullable => true,
+            ValueType::Undefinable | ValueType::UndefNullable => true,
             _ => false,
         }
     }
@@ -35,10 +45,19 @@ impl ValueType{
         let s = match self{
             ValueType::Normal => "",
             ValueType::Nullable => "?",
-            ValueType::Undefiable => "!",
+            ValueType::Undefinable => "!",
             ValueType::UndefNullable => "!?",
         };
         s.to_string()
+    }
+
+    pub(crate) fn type_num(&self) -> usize{
+        match self{
+            ValueType::Normal => 0,
+            ValueType::Nullable => 1,
+            ValueType::Undefinable => 2,
+            ValueType::UndefNullable => 3,
+        }
     }
 }
 
@@ -51,6 +70,31 @@ pub enum RustValue{
     Array(Qv<RustArray>, ArrayType, ValueType),
     List(Qv<RustList>, ValueType),
     Object(Qv<RustObject>, ValueType),
+}
+
+impl RustValue{
+    pub fn value_type(&self) -> ValueType {
+        let vt = match self{
+            RustValue::Bool(_,vt) => vt,
+            RustValue::Number(_, vt) => vt,
+            RustValue::String(_, vt) => vt,
+            RustValue::Array(_, at, vt) => vt,
+            RustValue::List(_, vt) => vt,
+            RustValue::Object(_, vt) => vt,
+        };
+        vt.clone()
+    }
+
+    pub(crate) fn type_num(&self) -> usize{
+        match self{
+            RustValue::Bool(_, _) => 0,
+            RustValue::Number(_, _) => 1,
+            RustValue::String(_, _) => 2,
+            RustValue::Array(_, _, _) => 3,
+            RustValue::List(_, _) => 4,
+            RustValue::Object(_, _) => 5,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -125,8 +169,9 @@ impl RustList{
 
 #[derive(Debug)]
 pub struct RustObject{
+    //別ファイルにあったことを記録しておくためのもの。どう使うかは後で考える。
     pub include : Vec<String>,
-    //listのobjectの場合、defaultはlist側にあるのでここにはない。
+    //listのobjectの場合、defaultはlist側にあるのでここにはない。それ以外は絶対ある
     pub default : Option<IndexMap<String, RustValue>>,
     //デフォルト値から変更されたものを記録。差分変更時に、defaultと同じになったらここから削除するかもしれない？
     pub sabun : IndexMap<String, RustValue>,
