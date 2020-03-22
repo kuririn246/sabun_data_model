@@ -1,0 +1,149 @@
+{
+  hogeNumber : 10,
+  hogeString : "hoge",
+  hogeBool : true,
+  "@HugaNumber" : 30, //先頭が大文字のメンバ名はすべてシステムが予約しているので認められない。しかしメンバ名をどうしても大文字で始めたい場合、
+                      //jsonでは戦闘に@をつけ、プログラム側では@なしでもアクセス可能にするという技も使えなくはなかろうと思う。
+
+  //名前が?で終わるメンバはnull値を含むことが出来る。
+  //プログラム側のメンバ名にはこの?は反映されず、型が変わるだけ(もし俺以外の実装が現れたらわからないが・・・）
+  //初期値にnullを入れるには、特殊な記法を使う必要がある
+  "hegoNumber?" : ["Num", null], //型を指定し、null値を入れる。これでnullになる。
+
+  //!で終わる場合、バージョン違いでこのメンバを持っていなかった場合、デフォルト値でなくundefinedが入る。
+  //undefinedを代入する手段はない。
+  "pugyaNumber!" : 10,
+  "pugyaNumber2!?" : ["Num", null], //!?も出来る。?!ではダメ
+
+  //配列はいまのところnumber配列、string配列、number配列の配列の4通り。
+  numArray : [ "Num-Array", 0, 3, 10 ],
+
+  //numArrayはタグなしでも書ける特殊記法がある
+  numArrayNoTag : [ 5.8, 8, 10 ],
+  emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
+  "nullableNumArray?" : [ "Num-Array", null ], //nullable配列の初期値をnullにする場合
+  num2Array : [ "Num2-Array", [2,3], [3,1] ], //二次元のnumarray
+
+  strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
+  //そもそも配列なんてこのシステムに必要なんだろうか・・・？　まともに差分生成出来る気もしないしなあ。
+
+  Renamed : [ "prevName->currentName",
+              "prevName2->currentName2" ], //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
+              //参照可能なListの名前が変わった場合参照先も追跡できる
+
+  Include : { "some_list", "some_str" }, //メンバを別ファイルに書くことが出来る。
+
+  unkoList : [
+	"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
+	["Reffered"], //参照可能になる
+	["Default", {
+		hogeNumber : 0,
+		hogeString : "hoge"
+	}], //デフォルト値を設定
+	{
+		ID : "first",
+		hogeNumber : 12,
+		hogeString : "huga"
+	},
+	{
+		ID : "second",
+		//デフォルト値から変更がない場合は書かなくても良い
+	}],
+
+
+
+  usable : [
+    "List",
+    ["Reffered"],
+    ["Default",{ num : 0 }],
+    {
+      ID : "yakusou",
+      num : 3
+    },
+    {
+      ID : "dokukesisou",
+      num : 31
+    }
+  ],
+
+  weapon : [
+    "List",
+    ["Default", { atk : 0 }],
+    ["Reffered"],
+    {
+      ID : "katana",
+      atk : 5
+    },
+    {
+      ID : "doutanuki",
+      atk : 7
+    }
+  ],
+
+  itemList : [
+    "List",
+    ["AutoID"], //RefferedとAutoIDは同時には使えない
+    ["Default",{
+      "atk?" : ["Num", null],
+      "Ref": { weapon : "" }, //Refの基本の形、なにか入れないとエラーになる。
+    }],
+    {
+      Ref : { weapon : "doutanuki" }, //どうたぬきを参照。
+      atk : 8 //override的ななにか
+    }
+  ],
+
+  hogeList : [
+    "List",
+    ["Reffered"],
+    ["Default",{ mem : "" }],
+    {
+      ID : "hogehoge",
+      mem : "a",
+    }
+  ],
+
+  hugaList: [
+    "List",
+    ["Reffered"],
+    ["Default",{}],
+    {
+      ID : "hugahuga"
+    }
+  ],
+
+  hegoList: [
+    "List",
+    ["Reffered"],
+    ["Redef", "hugahuga->hegohego"],
+    ["Default", {
+        mem : "",
+        Renamed: ["memOld->mem"] //DefaultメンバではRenamedの設定が可能
+    }],
+    {
+      ID : "hegohego",
+      mem : "b",
+    },
+    {
+      ID : "nantoka",
+      Obsolete : true //被参照リストでは要らなくなっても削除は危険なのでObsoleteするのが良いと思われる。
+    }
+  ],
+
+  itemList3 : [
+    "List",
+    ["AutoID"],
+    ["Default",{
+      "memOverride?" : ["Str", null],
+      "Ref" : { hogeList : "", "hugaList?" : null, hegoList : "" },
+    }],
+    {
+      Ref : { //参照先を記述
+        hogeList : "hogehoge",
+        //入力しなければデフォルトになる。この場合null
+        hegoList : "hegohego",
+      },
+    }
+  ],
+
+}

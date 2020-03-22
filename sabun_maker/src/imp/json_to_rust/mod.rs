@@ -8,6 +8,7 @@ pub mod list;
 pub mod get_renamed;
 pub mod get_refs;
 pub mod rename_map;
+pub mod json_dir_to_rust;
 
 use crate::rust_struct::{RustObject};
 
