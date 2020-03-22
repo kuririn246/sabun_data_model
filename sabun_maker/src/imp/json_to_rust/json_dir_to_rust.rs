@@ -1,14 +1,15 @@
 
-use std::error::Error;
 use std::fs::File;
 
 use std::io::prelude::*;
-use std::path::Path;
 use crate::error::Result;
-use crate::rust_struct::JsonFile;
-use std::ffi::{OsString, OsStr};
+use crate::rust_struct::{JsonFile, RustValue, Qv, ValueType, RustObject};
+use std::ffi::{OsStr};
+use crate::imp::json_to_rust::{json_root_to_rust, json_item_str_to_rust};
+use std::collections::HashMap;
+use crate::imp::json_to_rust::validate_and_final_touch::validate_and_final_touch;
 
-pub fn json_dir_to_rust(dir_path : &str) -> Result<()>{
+pub fn json_dir_to_rust(dir_path : &str) -> Result<RustObject>{
     let dirs = std::fs::read_dir(dir_path)?;
 
     let mut vec : Vec<JsonFile> = vec![];
@@ -39,17 +40,26 @@ pub fn json_dir_to_rust(dir_path : &str) -> Result<()>{
         }
     }
 
-    for item in vec {
-        println!("{}", item.file_name_without_ext);
-    }
-    Ok(())
+
+    json_files_to_rust(vec.into_iter())
 
 
     // `file` goes out of scope, and the "hello.txt" file gets closed
 }
 
-pub fn hoge(ite : impl Iterator<Item = u32>){
-    for hoge in ite{
-        println!("{}", hoge);
+pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>) -> Result<RustObject>{
+    let mut map : HashMap<String, RustValue> = HashMap::new();
+
+    for file in ite{
+        let name = &file.file_name_without_ext;
+        if name == "root"{
+            let val = json_root_to_rust(&file.json)?;
+            map.insert("root".to_string(), RustValue::Object(Qv::Val(val), ValueType::Normal));
+        } else{
+            let val = json_item_str_to_rust(name, &file.json)?;
+            map.insert(name.to_string(), val);
+        }
     }
+
+    return validate_and_final_touch(map);
 }

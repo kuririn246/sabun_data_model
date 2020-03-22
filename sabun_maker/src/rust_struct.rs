@@ -125,6 +125,7 @@ impl RustList{
 
 #[derive(Debug)]
 pub struct RustObject{
+    pub include : Vec<String>,
     //listのobjectの場合、defaultはlist側にあるのでここにはない。
     pub default : Option<IndexMap<String, RustValue>>,
     //デフォルト値から変更されたものを記録。差分変更時に、defaultと同じになったらここから削除するかもしれない？
@@ -142,6 +143,7 @@ pub type RefMap = IndexMap<String, (Qv<String>, ValueType)>;
 impl RustObject{
     pub fn new() -> RustObject{
         RustObject{
+            include : vec![],
             default : Some(IndexMap::new()), sabun : IndexMap::new(),
             id : None, refs: None,
             renamed: BTreeMap::new(), obsolete : false }

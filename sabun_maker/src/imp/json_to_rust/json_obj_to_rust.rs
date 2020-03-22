@@ -1,13 +1,14 @@
 use json5_parser::JVal;
 use indexmap::IndexMap;
 use super::names::Names;
-use crate::rust_struct::RustObject;
+use crate::rust_struct::{RustObject};
 use super::json_name::{json_name, NameType, SystemNames};
 use super::json_item_to_rust::json_item_to_rust;
 use crate::error::Result;
 use super::get_refs::get_refs;
 use super::get_renamed::get_renamed;
 use super::json_item_to_rust::json_item_to_rust_ref;
+use crate::imp::json_to_rust::get_include::get_include;
 
 
 pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : &Names) -> Result<RustObject>{
@@ -37,7 +38,12 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : 
                         }
                     },
                     SystemNames::Include=>{
-                        //TODO: implement "Include"
+                       let mut incl = get_include(v, names)?;
+                        if r.include.len() == 0 {
+                            r.include.append(&mut incl);
+                        } else{
+                            Err(format!("{} Include is defined multiple times {}", v.line_str(), names))?; //パーサーのほうでエラーになるからありえない・・・
+                        }
                     },
                     SystemNames::Ref =>{
                         if r.refs.is_none(){

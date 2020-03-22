@@ -94,7 +94,7 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
     None
 }
 
-fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result<Qv<RustArray>>{
+pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result<Qv<RustArray>>{
     let mut vec : Vec<RustValue> = vec![];
     for item in a{
         let val = match item{
