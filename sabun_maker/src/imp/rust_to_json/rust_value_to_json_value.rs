@@ -10,17 +10,10 @@ pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> Result<(Value, V
         RustValue::String(s, vt) => to(s, vt, "Str", |s| Value::String(s.to_string())),
         RustValue::Number(n, vt) => to(n, vt, "Num", |n| Value::Number(*n)),
         RustValue::Array(a, at, vt) => (rust_array_to_json(a, at, name)?, vt.clone()),
-        RustValue::List(l, vt)=>{
-            match l{
-                Qv::Val(l) =>{
-                    (rust_list_to_json(l, name)?, vt.clone())
-                },
-                _ =>{
-                    Err(format!("{} Lists must not be null or undefined", name))?
-                }
-            }
+        RustValue::List(l)=> {
+            (rust_list_to_json(l, name)?, ValueType::Normal)
         },
-        RustValue::Object(_o, _vt) =>{
+        RustValue::Object(_o) =>{
             //仕様上unreachable。むりやり書こうとしても[obj,null]の記法がないからかけないな・・・
             Err(format!("{} objects must not have objects", name))?
         },

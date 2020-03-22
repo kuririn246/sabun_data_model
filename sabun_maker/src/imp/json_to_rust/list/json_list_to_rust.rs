@@ -52,7 +52,7 @@ pub fn json_list_to_rust(array : &[JVal], value_type : ValueType, _span : &Span,
         _ =>{ Err(format!(r#"{} {} List must consist of objects and arrays {}"#, item.span().line_str(), item.span().slice(), names))? }
         };
     }
-    return Ok(RustValue::List(Qv::Val(result), value_type));
+    return Ok(RustValue::List(result));
 }
 
 

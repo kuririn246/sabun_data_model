@@ -68,8 +68,10 @@ pub enum RustValue{
     Number(Qv<f64>, ValueType),
     String(Qv<String>, ValueType),
     Array(Qv<RustArray>, ArrayType, ValueType),
-    List(Qv<RustList>, ValueType),
-    Object(Qv<RustObject>, ValueType),
+    ///Listは定義上nullやundefinedにならないので多分後で直す
+    List(RustList),
+    ///Objectも定義上nullやundefinedにならないはず。多分後で直す。
+    Object(RustObject),
 }
 
 impl RustValue{
@@ -79,8 +81,8 @@ impl RustValue{
             RustValue::Number(_, vt) => vt,
             RustValue::String(_, vt) => vt,
             RustValue::Array(_, at, vt) => vt,
-            RustValue::List(_, vt) => vt,
-            RustValue::Object(_, vt) => vt,
+            RustValue::List(_) => &ValueType::Normal,
+            RustValue::Object(_) => &ValueType::Normal,
         };
         vt.clone()
     }
@@ -91,8 +93,8 @@ impl RustValue{
             RustValue::Number(_, _) => 1,
             RustValue::String(_, _) => 2,
             RustValue::Array(_, _, _) => 3,
-            RustValue::List(_, _) => 4,
-            RustValue::Object(_, _) => 5,
+            RustValue::List(_) => 4,
+            RustValue::Object(_) => 5,
         }
     }
 }
