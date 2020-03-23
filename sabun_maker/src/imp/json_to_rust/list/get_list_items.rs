@@ -31,7 +31,7 @@ pub fn get_list_item(map : &IndexMap<String, JVal>, need_id : bool, index : usiz
     if map.is_some() {
         obj.sabun = map.unwrap();
     }
-    
+
     if need_id{
         if obj.id.is_none(){
             Err(format!(r#"{} ID is missing {}"#, span.line_str(), names))?
