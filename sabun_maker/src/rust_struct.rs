@@ -1,5 +1,6 @@
 use std::collections::{BTreeMap};
 use indexmap::IndexMap;
+use linked_hash_map::LinkedHashMap;
 
 #[derive(Debug, Clone)]
 pub enum ArrayType{
@@ -112,7 +113,7 @@ pub struct RustArray{
 pub struct RustList{
     pub list_type : ListType,
     pub default : RustObject,
-    pub list : Vec<RustObject>,
+    pub list : LinkedHashMap<String, RustObject>,
     pub redef : BTreeMap<String, String>,
 }
 

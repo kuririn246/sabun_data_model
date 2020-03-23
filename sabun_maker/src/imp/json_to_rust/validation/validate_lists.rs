@@ -14,9 +14,9 @@ pub fn validate_lists(root : &RustObject) -> Result<()>{
         if let RustValue::List(l) = value {
             let list_def = &l.default;
             //unwrapは絶対に成功するはずだが、データ型はそう言ってないのでデータ型に従ってコーディングする。
-            validate_list_sabuns(name, list_def.default.as_ref().ok_or_else(|| format!("list {} doesn't have default obj", name))?, &l.list);
+            validate_list_sabuns(name, list_def.default.as_ref().ok_or_else(|| format!("list {} doesn't have default obj", name))?, &l.list, &l.default.renamed);
             if let Some(refs) = &list_def.refs {
-                validate_ref_names(name, &l.list, refs);
+                validate_ref_names(name, &l.list, refs, &root.renamed);
                 //validate_refs()
             } else{
                 if let Some(id) = check_if_items_have_ref(&l.list){

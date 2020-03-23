@@ -4,9 +4,10 @@ use crate::rust_struct::RustObject;
 use crate::error::Result;
 use crate::imp::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use indexmap::IndexMap;
+use linked_hash_map::LinkedHashMap;
 
-pub fn get_list_items(array : &[JVal], need_id : bool,  _span : &Span, names : &Names) -> Result<Vec<RustObject>>{
-    let mut result : Vec<RustObject> = vec![];
+pub fn get_list_items(array : &[JVal], need_id : bool,  _span : &Span, names : &Names) -> Result<LinkedHashMap<String, RustObject>>{
+    let mut result : LinkedHashMap<String, RustObject> = LinkedHashMap::new();
     for index in 0..array.len(){
         let item = &array[index];
         match item{
@@ -21,7 +22,7 @@ pub fn get_list_items(array : &[JVal], need_id : bool,  _span : &Span, names : &
     return Ok(result);
 }
 
-pub fn get_list_item(map : &IndexMap<String, JVal>, need_id : bool, index : usize, span : &Span, names : &Names) -> Result<RustObject>{
+pub fn get_list_item(map : &IndexMap<String, JVal>, need_id : bool, index : usize, span : &Span, names : &Names) -> Result<(String, RustObject)>{
     let mut obj = json_obj_to_rust(map, false, names)?;
     //println!("is none {}", obj.default.is_none());
     let map = obj.default.take();

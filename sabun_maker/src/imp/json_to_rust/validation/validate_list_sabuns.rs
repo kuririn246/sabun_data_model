@@ -1,21 +1,19 @@
 use crate::rust_struct::{RustValue, RustObject};
 use indexmap::IndexMap;
 use crate::error::Result;
+use std::collections::{BTreeMap};
 
-pub fn validate_list_sabuns(list_name : &str, list_def : &IndexMap<String, RustValue>, list_items : &[RustObject]) -> Result<()>{
+pub fn validate_list_sabuns(list_name : &str, list_def : &IndexMap<String, RustValue>, list_items : &[RustObject], rename : &BTreeMap<String, String>) -> Result<()>{
     for item in list_items{
-        for (name, val) in &item.sabun{
-            let name : &str = name;
-            let sabun_val : &RustValue = val;
+        for (name, val) in &item.sabun {
+            let name: &str = name;
+            let sabun_val: &RustValue = val;
 
-            if item.obsolete == false {
-                let def_val = list_def.get(name).ok_or_else(|| format!("{}'s default obj doesn't have {} .{}", list_name, name, get_id(item)))?;
+            let name = rename.get(name).map(|n| n.as_str()).unwrap_or(name);
+            let def_val = list_def.get(name).ok_or_else(|| format!("{}'s default obj doesn't have {} .{}", list_name, name, get_id(item)))?;
 
-                if val_type_check(sabun_val, def_val) == false {
-                    Err(format!("list {}'s default value's type doesn't correspond to {}'s {}", list_name, get_id(item), name))?
-                }
-            } else{
-
+            if val_type_check(sabun_val, def_val) == false {
+                Err(format!("list {}'s default value's type doesn't correspond to {}'s {}", list_name, get_id(item), name))?
             }
         }
     }
@@ -43,4 +41,3 @@ fn val_type_check(l : &RustValue, r : &RustValue) ->bool{
     }
     return true;
 }
-
