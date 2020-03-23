@@ -1,16 +1,17 @@
 use crate::rust_struct::{RustValue, RustObject};
 use indexmap::IndexMap;
+use linked_hash_map::LinkedHashMap;
 use crate::error::Result;
 use std::collections::{BTreeMap};
 
-pub fn validate_list_sabuns(list_name : &str, list_def : &IndexMap<String, RustValue>, list_items : &[RustObject], rename : &BTreeMap<String, String>) -> Result<()>{
-    for item in list_items{
+pub fn validate_list_sabuns(list_name : &str, list_def : &IndexMap<String, RustValue>, list_items : &LinkedHashMap<String, RustObject>, rename : &BTreeMap<String, String>) -> Result<()>{
+    for (id, item) in list_items{
         for (name, val) in &item.sabun {
             let name: &str = name;
             let sabun_val: &RustValue = val;
 
             let name = rename.get(name).map(|n| n.as_str()).unwrap_or(name);
-            let def_val = list_def.get(name).ok_or_else(|| format!("{}'s default obj doesn't have {} .{}", list_name, name, get_id(item)))?;
+            let def_val = list_def.get(name).ok_or_else(|| format!("{}'s default obj doesn't have {} .{}", list_name, name, id))?;
 
             if val_type_check(sabun_val, def_val) == false {
                 Err(format!("list {}'s default value's type doesn't correspond to {}'s {}", list_name, get_id(item), name))?

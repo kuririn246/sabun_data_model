@@ -164,7 +164,7 @@ impl RustList{
         RustList{
             list_type : ListType::Normal,
             default : RustObject::new(),
-            list : vec![],
+            list : LinkedHashMap::new(),
             redef : BTreeMap::new(),
         }
     }

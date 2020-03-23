@@ -17,7 +17,7 @@ fn validate_ref(list_name : &str,
                 if let Some(l) = get_root_list(name, root_def, rename){
 
                 } else{
-                    Err(format!("There's no list named {}, list {} id {}", name, list_name, get_id(item)))
+                    Err(format!("There's no list named {}, list {} id {}", name, list_name, get_id(item)))?
                 }
             }
         } else{
@@ -29,7 +29,7 @@ fn validate_ref(list_name : &str,
 
 fn check_if_list_have_id(list : &RustList, id : &str) -> bool{
     let id = list.redef.get(id).map(|n| n.as_str()).unwrap_or(id);
-    list.list
+    list.list.contains_key(id)
 }
 
 fn get_root_list<'a>(

@@ -12,7 +12,8 @@ pub fn get_list_items(array : &[JVal], need_id : bool,  _span : &Span, names : &
         let item = &array[index];
         match item{
             JVal::Map(map, span) =>{
-                result.push(get_list_item(map, need_id, index, span, names)?)
+                let (id,item) = get_list_item(map, need_id, index, span, names)?;
+                result.insert(id, item);
             },
             _ =>{
                 Err(format!(r#"{} List's object sequence must not be interrupted {}"#, item.span().line_str(), names))?
@@ -30,7 +31,7 @@ pub fn get_list_item(map : &IndexMap<String, JVal>, need_id : bool, index : usiz
     if map.is_some() {
         obj.sabun = map.unwrap();
     }
-
+    
     if need_id{
         if obj.id.is_none(){
             Err(format!(r#"{} ID is missing {}"#, span.line_str(), names))?
@@ -46,5 +47,5 @@ pub fn get_list_item(map : &IndexMap<String, JVal>, need_id : bool, index : usiz
     if obj.renamed.is_empty() == false{
         Err(format!(r#"{} Renamed is not valid for list objects {}"#, span.line_str(), names))?
     }
-    return Ok(obj)
+    return Ok((obj.id.as_ref().unwrap().to_string(), obj))
 }

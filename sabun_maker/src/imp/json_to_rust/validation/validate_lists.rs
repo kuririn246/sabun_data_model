@@ -2,6 +2,7 @@ use crate::rust_struct::{RustObject, RustValue};
 use crate::error::Result;
 use crate::imp::json_to_rust::validation::validate_list_sabuns::validate_list_sabuns;
 use crate::imp::json_to_rust::validation::validate_ref_names::validate_ref_names;
+use linked_hash_map::LinkedHashMap;
 
 pub fn validate_lists(root : &RustObject) -> Result<()>{
     if root.default.is_none(){ return Ok(()); }
@@ -29,10 +30,10 @@ pub fn validate_lists(root : &RustObject) -> Result<()>{
     return Ok(());
 }
 
-fn check_if_items_have_ref(list_items : &[RustObject]) -> Option<&str>{
-    for item in list_items{
+fn check_if_items_have_ref(list_items : &LinkedHashMap<String, RustObject>) -> Option<&str>{
+    for (id, item) in list_items{
         if item.refs.is_some(){
-            return Some(item.id.as_ref().unwrap());
+            return Some(id);
         }
     }
     return None;
