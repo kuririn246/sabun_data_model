@@ -1,0 +1,46 @@
+use crate::rust_struct::{RustValue, RustObject};
+use indexmap::IndexMap;
+use crate::error::Result;
+
+pub fn validate_list_sabuns(list_name : &str, list_def : &IndexMap<String, RustValue>, list_items : &[RustObject]) -> Result<()>{
+    for item in list_items{
+        for (name, val) in &item.sabun{
+            let name : &str = name;
+            let sabun_val : &RustValue = val;
+
+            if item.obsolete == false {
+                let def_val = list_def.get(name).ok_or_else(|| format!("{}'s default obj doesn't have {} .{}", list_name, name, get_id(item)))?;
+
+                if val_type_check(sabun_val, def_val) == false {
+                    Err(format!("list {}'s default value's type doesn't correspond to {}'s {}", list_name, get_id(item), name))?
+                }
+            } else{
+
+            }
+        }
+    }
+    return Ok(());
+}
+
+fn get_id(obj : &RustObject) -> String{
+    obj.id.as_ref().map(|s| s.as_str()).unwrap_or_else(|| "no id").to_string()
+}
+
+fn val_type_check(l : &RustValue, r : &RustValue) ->bool{
+    if l.type_num() != r.type_num(){
+        return false
+    }
+    if l.value_type().type_num() != r.value_type().type_num(){
+        return false
+    }
+
+    if let RustValue::Array(_, l_at, _) = l {
+        if let RustValue::Array(_, r_at, _) = r {
+            if l_at.type_num() != r_at.type_num() {
+                return false
+            }
+        }
+    }
+    return true;
+}
+

@@ -10,7 +10,7 @@ pub mod get_refs;
 pub mod rename_map;
 pub mod json_dir_to_rust;
 pub mod get_include;
-pub mod validate_and_final_touch;
+pub mod validation;
 
 use crate::rust_struct::{RustObject, RustValue, ValueType};
 

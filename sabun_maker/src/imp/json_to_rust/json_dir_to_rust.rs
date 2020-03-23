@@ -7,7 +7,7 @@ use crate::rust_struct::{JsonFile, RustValue, Qv, ValueType, RustObject};
 use std::ffi::{OsStr};
 use crate::imp::json_to_rust::{json_root_to_rust, json_item_str_to_rust};
 use std::collections::HashMap;
-use crate::imp::json_to_rust::validate_and_final_touch::validate_and_final_touch;
+use crate::imp::json_to_rust::validation::construct_root::construct_root;
 
 pub fn json_dir_to_rust(dir_path : &str) -> Result<RustObject>{
     let dirs = std::fs::read_dir(dir_path)?;
@@ -57,7 +57,7 @@ pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>) -> Result<RustOb
             if root.is_none() {
                 root = Some(json_root_to_rust(&file.json)?);
             } else{
-                Err("There's two 'root.json5' in the directory")?
+                Err("There's two 'root.json5's in the directory")? //unreachableだけど一応
             }
         } else{
             let val = json_item_str_to_rust(name, &file.json)?;
@@ -69,5 +69,5 @@ pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>) -> Result<RustOb
         Err("root.json5 is needed")?
     }
 
-    return validate_and_final_touch(root.unwrap(), map);
+    return construct_root(root.unwrap(), map);
 }
