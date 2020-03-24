@@ -37,14 +37,9 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : 
                             Err(format!("{} ID is defined multiple times {}", v.line_str(), names))?;
                         }
                     },
-                    // SystemNames::Include=>{
-                    //    let mut incl = get_include(v, names)?;
-                    //     if r.include.len() == 0 {
-                    //         r.include.append(&mut incl);
-                    //     } else{
-                    //         Err(format!("{} Include is defined multiple times {}", v.line_str(), names))?; //パーサーのほうでエラーになるからありえない・・・
-                    //     }
-                    // },
+                    SystemNames::Include=>{
+                        //Rust to Jsonで別ファイルに書かれたメンバ名が、Includeに記録されるが、これはファイル読み出しとかで使うのでここでは何もしない
+                    },
                     SystemNames::Ref =>{
                         if r.refs.is_none(){
                             match &v {

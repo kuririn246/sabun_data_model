@@ -1,5 +1,6 @@
 use indexmap::IndexMap;
 
+#[derive(Debug)]
 pub enum Value{
     Bool(bool),
     String(String),

@@ -5,13 +5,20 @@ use crate::imp::rust_to_json::get_ref_map::get_ref_map;
 use crate::imp::rust_to_json::get_new_default::get_new_default;
 use crate::error::Result;
 use crate::structs::rust_object::RustObject;
+use crate::imp::rust_to_json::get_include::get_include;
 
 ///本来デフォルト値と差分が保存されているのだが、見やすくするためにまとめてデフォルト値にしてしまう。
 ///デフォルト値も差分も全部Json化したいユースケースもあるとは思うのだけど・・・
+
 pub fn rust_to_json_new_default(obj : &RustObject) -> Result<Value>{
 
     let mut map_item = IndexMap::new();
     let map = &mut map_item;
+
+    if obj.include.len() != 0 {
+        let include = get_include(&obj.include);
+        insert(map, "Include", Value::Array(include));
+    }
 
     let renamed = get_renamed(&obj.renamed);
     if renamed.len() != 0 {
