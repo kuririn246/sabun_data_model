@@ -1,4 +1,4 @@
-use crate::rust_struct::{RustValue, RustObject};
+use crate::rust_struct::{RustValue, RustObject };
 use indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
 use crate::error::Result;
@@ -13,7 +13,7 @@ pub fn validate_list_sabuns(list_name : &str, list_def : &IndexMap<String, RustV
             let name = rename.get(name).map(|n| n.as_str()).unwrap_or(name);
             let def_val = list_def.get(name).ok_or_else(|| format!("{}'s default obj doesn't have {} .{}", list_name, name, id))?;
 
-            if val_type_check(sabun_val, def_val) == false {
+            if val_type_check(def_val, sabun_val) == false {
                 Err(format!("list {}'s default value's type doesn't correspond to {}'s {}", list_name, get_id(item), name))?
             }
         }
@@ -26,15 +26,18 @@ fn get_id(obj : &RustObject) -> String{
 }
 
 fn val_type_check(l : &RustValue, r : &RustValue) ->bool{
+
     if l.type_num() != r.type_num(){
         return false
     }
-    if l.value_type().type_num() != r.value_type().type_num(){
-        return false
+    if l.value_type().acceptable(&r.qv_type()) == false{
+        return false;
     }
+
 
     if let RustValue::Array(_, l_at, _) = l {
         if let RustValue::Array(_, r_at, _) = r {
+
             if l_at.type_num() != r_at.type_num() {
                 return false
             }

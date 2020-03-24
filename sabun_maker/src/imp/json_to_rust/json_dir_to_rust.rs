@@ -60,8 +60,10 @@ pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>, validation : boo
                 Err("There's two 'root.json5's in the directory")? //unreachableだけど一応
             }
         } else{
-            let val = json_item_str_to_rust(name, &file.json)?;
-            map.insert(name.to_string(), val);
+            match json_item_str_to_rust(name, &file.json){
+                Ok(val) =>{ map.insert(name.to_string(), val); }
+                Err(e) =>{ Err(format!("filename {}, {}", name, e.message))? }
+            }
         }
     }
 

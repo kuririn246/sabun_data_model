@@ -60,6 +60,30 @@ impl ValueType{
             ValueType::UndefNullable => 3,
         }
     }
+
+    pub fn acceptable(&self, t : &QvType) -> bool {
+        match self{
+            ValueType::Normal => {
+                match t {
+                    QvType::Val => true,
+                    _ => false,
+                }
+            },
+            ValueType::Nullable => {
+                match t {
+                    QvType::Val | QvType::Null => true,
+                    _ => false,
+                }
+            },
+            ValueType::Undefinable => {
+                match t {
+                    QvType::Val | QvType::Undefined => true,
+                    _ => false,
+                }
+            },
+            ValueType::UndefNullable => true,
+        }
+    }
 }
 
 
@@ -98,10 +122,33 @@ impl RustValue{
             RustValue::Object(_) => 5,
         }
     }
+
+    pub fn qv_type(&self) -> QvType{
+        match self{
+            RustValue::Bool(b, _) => qv(b),
+            RustValue::Number(n, _) => qv(n),
+            RustValue::String(s, _) => qv(s),
+            RustValue::Array(a, _, _) => qv(a),
+            RustValue::List(_) => QvType::Val,
+            RustValue::Object(_) => QvType::Val,
+        }
+    }
+}
+
+fn qv<T>(q : &Qv<T>) -> QvType{
+    match q{
+        Qv::Val(_) => QvType::Val,
+        Qv::Null => QvType::Null,
+        Qv::Undefined => QvType::Undefined,
+    }
 }
 
 #[derive(Debug, Clone)]
 pub enum Qv<T>{ Val(T), Undefined, Null }
+
+pub enum QvType{
+    Val, Undefined, Null
+}
 
 #[derive(Debug)]
 pub struct RustArray{

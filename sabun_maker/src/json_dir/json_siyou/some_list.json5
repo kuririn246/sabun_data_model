@@ -6,8 +6,11 @@
 		Ref : { unkoList : "first" },
 	},
 	{
-		ID : "2ban",
-		s : "hugahuga",
-		n : 30.08,
-		Ref: { unkoList : "second" }
+		ID: "2ban",
+		s: "hugahuga",
+		n: 30.08,
+		Ref: {
+			unkoList: "second"
+		},
+	}
 ]

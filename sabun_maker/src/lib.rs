@@ -13,8 +13,8 @@ mod tests {
 
     #[test]
     fn it_works() {
-        match json_dir_to_rust("src/json_dir/json_siyou"){
-            Ok(_) =>{}
+        match json_dir_to_rust("src/json_dir/json_siyou", true){
+            Ok(a) =>{ println!("{:?}", a)}
             Err(e) => println!("{}", e.message),
         }
     }
