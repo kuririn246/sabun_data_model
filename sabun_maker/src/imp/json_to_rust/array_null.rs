@@ -1,8 +1,10 @@
 use json5_parser::{JVal, Span};
 use super::names::Names;
-use crate::rust_struct::{RustValue, Qv, ValueType};
 use crate::error::Result;
 use super::json_array_to_rust::GatResult;
+use crate::structs::value_type::ValueType;
+use crate::structs::rust_value::RustValue;
+use crate::structs::qv::Qv;
 
 pub fn array_null(a : &[JVal], gat : GatResult, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue> {
     if a.len() != 1 {

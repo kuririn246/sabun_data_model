@@ -1,8 +1,10 @@
-use crate::rust_struct::{RustValue, Qv, ValueType};
 use super::Names;
 use json5_parser::JVal;
 use crate::error::Result;
 use super::json_array_to_rust::json_array_to_rust;
+use crate::structs::value_type::ValueType;
+use crate::structs::rust_value::RustValue;
+use crate::structs::qv::Qv;
 
 
 pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {

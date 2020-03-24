@@ -1,7 +1,9 @@
-use crate::rust_struct::{Qv, RustArray, ArrayType};
 use crate::my_json::Value;
 use crate::imp::rust_to_json::rust_value_to_json_value::rust_value_to_json_value;
 use crate::error::Result;
+use crate::structs::qv::Qv;
+use crate::structs::array_type::ArrayType;
+use crate::structs::rust_value::RustArray;
 
 pub fn rust_array_to_json(qv : &Qv<RustArray>, at : &ArrayType, name : &str) -> Result<Value>{
     let mut result : Vec<Value> = vec![];

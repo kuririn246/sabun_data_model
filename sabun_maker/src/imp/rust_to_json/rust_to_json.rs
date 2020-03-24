@@ -1,10 +1,10 @@
-use crate::rust_struct::{RustObject};
 use crate::my_json::{Value};
 use crate::imp::rust_to_json::get_renamed::get_renamed;
 use indexmap::IndexMap;
 use crate::imp::rust_to_json::get_ref_map::get_ref_map;
 use crate::imp::rust_to_json::get_new_default::get_new_default;
 use crate::error::Result;
+use crate::structs::rust_object::RustObject;
 
 ///本来デフォルト値と差分が保存されているのだが、見やすくするためにまとめてデフォルト値にしてしまう。
 ///デフォルト値も差分も全部Json化したいユースケースもあるとは思うのだけど・・・

@@ -1,8 +1,9 @@
-use crate::rust_struct::{RustValue, RustObject };
 use indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
 use crate::error::Result;
 use std::collections::{BTreeMap};
+use crate::structs::rust_value::RustValue;
+use crate::structs::rust_object::RustObject;
 
 pub fn validate_list_sabuns(list_name : &str, list_def : &IndexMap<String, RustValue>, list_items : &LinkedHashMap<String, RustObject>, rename : &BTreeMap<String, String>) -> Result<()>{
     for (id, item) in list_items{

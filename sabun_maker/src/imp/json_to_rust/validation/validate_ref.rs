@@ -1,8 +1,11 @@
 use std::collections::{BTreeMap};
-use crate::rust_struct::{RustValue, RustObject, Qv, RustList};
 use crate::error::Result;
 use indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
+use crate::structs::rust_object::RustObject;
+use crate::structs::rust_value::RustValue;
+use crate::structs::qv::Qv;
+use crate::structs::rust_list::RustList;
 
 ///参照先が存在し、Obsoleteされてないか調べる。自分自身がObsoleteである場合、参照先がObsoleteでも良い。
 pub fn validate_ref(list_name : &str,
@@ -12,8 +15,8 @@ pub fn validate_ref(list_name : &str,
                 rename : &BTreeMap<String, String>) -> Result<()> {
     for (id, item) in list_items{
         if let Some(sabun_refs) = &item.refs {
-            for (ref_list_name, (qv, _vt)) in sabun_refs {
-                if let Some(reference) = get_reference(qv) {
+            for (ref_list_name, rv) in sabun_refs {
+                if let Some(reference) = get_reference(&rv.value) {
                     if let Some(l) = get_root_list(ref_list_name, root_def, rename) {
                         match check_if_list_have_id_and_obsolete(l, reference, item.obsolete){
                             Cilhiao::NotFound =>  Err(format!("list {} doesn't have id {}, list {} id {}", ref_list_name, reference, list_name, id))?,

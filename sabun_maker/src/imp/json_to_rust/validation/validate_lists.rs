@@ -1,10 +1,11 @@
-use crate::rust_struct::{RustObject, RustValue};
 use crate::error::Result;
 use crate::imp::json_to_rust::validation::validate_list_sabuns::validate_list_sabuns;
 use crate::imp::json_to_rust::validation::validate_ref_names::validate_ref_names;
 use linked_hash_map::LinkedHashMap;
 use crate::imp::json_to_rust::validation::validate_ref::validate_ref;
 use crate::imp::json_to_rust::validation::validate_list_def_ref::validate_list_def_ref;
+use crate::structs::rust_object::RustObject;
+use crate::structs::rust_value::RustValue;
 
 pub fn validate_lists(root : &RustObject) -> Result<()>{
     if root.default.is_none(){ return Ok(()); }

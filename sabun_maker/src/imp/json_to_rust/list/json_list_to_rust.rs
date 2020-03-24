@@ -1,9 +1,11 @@
 use json5_parser::{JVal};
-use crate::rust_struct::{RustValue, RustList, ListType};
 use super::super::names::Names;
 use crate::error::Result;
 use super::list_attribute::{ListAttribute, list_attribute};
 use super::get_list_items::get_list_items;
+use crate::structs::rust_value::RustValue;
+use crate::structs::rust_list::RustList;
+use crate::structs::list_type::ListType;
 
 pub fn json_list_to_rust(array : &[JVal],  names : &Names) -> Result<RustValue> {
     let mut result = RustList::new();

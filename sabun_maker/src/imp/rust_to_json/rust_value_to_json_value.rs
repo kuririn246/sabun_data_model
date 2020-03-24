@@ -1,8 +1,10 @@
 use crate::my_json::Value;
-use crate::rust_struct::{RustValue, ValueType, Qv};
 use crate::imp::rust_to_json::rust_array_to_json::rust_array_to_json;
 use crate::error::Result;
 use crate::imp::rust_to_json::list::rust_list_to_json::rust_list_to_json;
+use crate::structs::rust_value::RustValue;
+use crate::structs::value_type::ValueType;
+use crate::structs::qv::Qv;
 
 pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> Result<(Value, ValueType)>{
     let r = match v{

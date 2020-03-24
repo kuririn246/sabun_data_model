@@ -1,7 +1,7 @@
 use regex::Regex;
 use regex::Captures;
 use lazy_static::lazy_static;
-use crate::rust_struct::ValueType;
+use crate::structs::value_type::ValueType;
 
 pub enum SystemNames{
     //Include,

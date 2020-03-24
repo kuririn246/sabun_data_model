@@ -12,11 +12,13 @@ pub mod json_dir_to_rust;
 pub mod get_include;
 pub mod validation;
 
-use crate::rust_struct::{RustObject, RustValue, ValueType};
 
 use json5_parser::JVal;
 use names::Names;
 use crate::error::Result;
+use crate::structs::rust_object::RustObject;
+use crate::structs::rust_value::RustValue;
+use crate::structs::value_type::ValueType;
 
 pub fn json_root_to_rust(json : &str) -> Result<RustObject>{
     let jval = json5_parser::from_str(json)?;

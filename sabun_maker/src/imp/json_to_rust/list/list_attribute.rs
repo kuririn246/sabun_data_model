@@ -1,10 +1,10 @@
-use crate::rust_struct::{RustObject};
 use json5_parser::{JVal, Span};
 use super::super::names::Names;
 use super::get_default::get_default;
 use crate::error::Result;
 use std::collections::BTreeMap;
 use crate::imp::json_to_rust::list::get_redef::get_redef;
+use crate::structs::rust_object::RustObject;
 
 pub enum ListAttribute{
     Default(RustObject),

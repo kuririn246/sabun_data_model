@@ -1,9 +1,9 @@
 use json5_parser::{JVal, Span};
 use super::super::names::Names;
 use super::super::json_obj_to_rust::json_obj_to_rust;
-use crate::rust_struct::RustObject;
 use crate::error::Result;
 use indexmap::IndexMap;
+use crate::structs::rust_object::RustObject;
 
 pub fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<RustObject>{
     let error_message = r#"["Default", \{ default_obj \}] is valid"#;

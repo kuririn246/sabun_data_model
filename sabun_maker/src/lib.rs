@@ -1,7 +1,7 @@
 mod old;
 pub mod error;
 mod imp;
-pub mod rust_struct;
+pub mod structs;
 pub mod my_json;
 mod test;
 

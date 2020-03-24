@@ -1,11 +1,12 @@
-use crate::rust_struct::{RustValue, Qv, ValueType};
 use std::collections::BTreeMap;
 use crate::error::Result;
 use indexmap::IndexMap;
+use crate::structs::rust_value::RustValue;
+use crate::structs::ref_value::RefValue;
 
 pub fn validate_list_def_ref(
     list_name : &str,
-    list_def_ref : &IndexMap<String, (Qv<String>, ValueType)>,
+    list_def_ref : &IndexMap<String, RefValue>,
     root_def : &IndexMap<String, RustValue>,
     root_rename : &BTreeMap<String, String>) -> Result<()>{
 

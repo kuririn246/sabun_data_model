@@ -1,10 +1,10 @@
 use json5_parser::{JVal, Span};
 use crate::imp::json_to_rust::names::Names;
-use crate::rust_struct::RustObject;
 use crate::error::Result;
 use crate::imp::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
+use crate::structs::rust_object::RustObject;
 
 pub fn get_list_items(array : &[JVal], need_id : bool,  _span : &Span, names : &Names) -> Result<LinkedHashMap<String, RustObject>>{
     let mut result : LinkedHashMap<String, RustObject> = LinkedHashMap::new();

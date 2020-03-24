@@ -3,11 +3,13 @@ use std::fs::File;
 
 use std::io::prelude::*;
 use crate::error::Result;
-use crate::rust_struct::{JsonFile, RustValue, RustObject};
 use std::ffi::{OsStr};
 use crate::imp::json_to_rust::{json_root_to_rust, json_item_str_to_rust};
 use std::collections::HashMap;
 use crate::imp::json_to_rust::validation::construct_root::construct_root;
+use crate::structs::rust_object::RustObject;
+use crate::structs::json_file::JsonFile;
+use crate::structs::rust_value::RustValue;
 
 pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RustObject>{
     let dirs = std::fs::read_dir(dir_path)?;

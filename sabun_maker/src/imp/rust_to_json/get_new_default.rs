@@ -1,8 +1,8 @@
 use indexmap::IndexMap;
-use crate::rust_struct::RustValue;
 use crate::my_json::Value;
 use crate::imp::rust_to_json::rust_value_to_json_value::rust_value_to_json_value;
 use crate::error::Result;
+use crate::structs::rust_value::RustValue;
 
 pub fn get_new_default(def : Option<&IndexMap<String, RustValue>>, sabun : &IndexMap<String, RustValue>) -> Result<IndexMap<String, Value>>{
     let mut result = IndexMap::new();

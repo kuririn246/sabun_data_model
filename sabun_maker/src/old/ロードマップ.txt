@@ -1,5 +1,6 @@
 /Includeを処理する
 /refのバリデーション
+rust to jsonのincludeを処理する
 バージョンのアジャスタを作る
 jsonからRustのアクセサ生成
 

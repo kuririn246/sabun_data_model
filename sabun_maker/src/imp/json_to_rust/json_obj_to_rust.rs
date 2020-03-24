@@ -1,13 +1,13 @@
 use json5_parser::JVal;
 use indexmap::IndexMap;
 use super::names::Names;
-use crate::rust_struct::{RustObject};
 use super::json_name::{json_name, NameType, SystemNames};
 use super::json_item_to_rust::json_item_to_rust;
 use crate::error::Result;
 use super::get_refs::get_refs;
 use super::get_renamed::get_renamed;
 use super::json_item_to_rust::json_item_to_rust_ref;
+use crate::structs::rust_object::RustObject;
 //use crate::imp::json_to_rust::get_include::get_include;
 
 

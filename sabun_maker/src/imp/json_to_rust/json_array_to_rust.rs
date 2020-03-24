@@ -1,10 +1,13 @@
-use crate::rust_struct::{RustValue, ArrayType, RustArray, Qv, ValueType };
 //use super::json_list_to_rust::json_list_to_rust;
 use crate::error::Result;
 use super::names::Names;
 use json5_parser::{JVal, Span};
 use super::array_null::array_null;
 use super::list::json_list_to_rust::json_list_to_rust;
+use crate::structs::value_type::ValueType;
+use crate::structs::rust_value::{RustValue, RustArray};
+use crate::structs::qv::Qv;
+use crate::structs::array_type::ArrayType;
 
 pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue>{
     use GatResult::*;
