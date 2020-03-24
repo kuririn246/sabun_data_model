@@ -12,7 +12,7 @@ pub fn validate_ref_names(list_name : &str, list_items : &LinkedHashMap<String, 
             for (name, (_qv, def_vt)) in sabun_ref {
                 //renameされていれば直す
                 let name = root_renamed.get(name).map(|n| n.as_str()).unwrap_or(name);
-                if let Some((sab, sab_vt)) = list_def_ref.get(name) {
+                if let Some((_sab, sab_vt)) = list_def_ref.get(name) {
                     if def_vt.type_num() != sab_vt.type_num() {
                         Err(format!("{}'s ref member {}'s type doesn't correspond to list {}'s default object", id, name, list_name))?
                     }
@@ -24,8 +24,4 @@ pub fn validate_ref_names(list_name : &str, list_items : &LinkedHashMap<String, 
         }
     }
     return Ok(());
-}
-
-fn get_id(obj : &RustObject) -> String{
-    obj.id.as_ref().map(|s| s.as_str()).unwrap_or_else(|| "no id").to_string()
 }

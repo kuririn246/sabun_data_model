@@ -2,8 +2,9 @@ use crate::rust_struct::{RustObject, RustValue, ValueType};
 use crate::imp::json_to_rust::json_name::{json_name, NameType};
 use std::collections::HashMap;
 use crate::error::Result;
+use crate::imp::json_to_rust::validation::validate_lists::validate_lists;
 
-pub fn construct_root(root : RustObject, map : HashMap<String, RustValue>) -> Result<RustObject>{
+pub fn construct_root(root : RustObject, map : HashMap<String, RustValue>, validation : bool) -> Result<RustObject>{
     let mut root = root;
     for (key, value) in map{
         let name = json_name(&key).ok_or_else(|| format!("{} is not a valid name", &key))?;
@@ -14,6 +15,9 @@ pub fn construct_root(root : RustObject, map : HashMap<String, RustValue>) -> Re
             },
             _=>{ Err(format!("{} is not a valid name", &key))?; }
         }
+    }
+    if validation{
+        validate_lists(&root)?;
     }
 
     return Ok(root);

@@ -81,7 +81,7 @@ impl RustValue{
             RustValue::Bool(_,vt) => vt,
             RustValue::Number(_, vt) => vt,
             RustValue::String(_, vt) => vt,
-            RustValue::Array(_, at, vt) => vt,
+            RustValue::Array(_, _at, vt) => vt,
             RustValue::List(_) => &ValueType::Normal,
             RustValue::Object(_) => &ValueType::Normal,
         };

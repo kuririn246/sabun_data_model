@@ -1,7 +1,6 @@
-use std::collections::{HashMap, BTreeMap};
-use crate::rust_struct::{RustValue, RustObject, ValueType, Qv, ArrayType, RustList};
+use std::collections::{BTreeMap};
+use crate::rust_struct::{RustValue, RustObject, Qv, RustList};
 use crate::error::Result;
-use crate::imp::json_to_rust::json_name::{json_name, NameType};
 use indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
 
@@ -13,15 +12,16 @@ pub fn validate_ref(list_name : &str,
                 rename : &BTreeMap<String, String>) -> Result<()> {
     for (id, item) in list_items{
         if let Some(sabun_refs) = &item.refs {
-            for (name, (qv, vt)) in sabun_refs {
-                if let Some(reference) = get_reference(qv, vt) {
-                    let name = rename.get(name).map(|n| n.as_str()).unwrap_or(name);
-                    if let Some(l) = get_root_list(name, root_def, rename) {
-                        if check_if_list_have_id(l, reference) == false {
-                            Err(format!("list {} doesn't have id {}, list {} id {}", name, reference, list_name, id))?
+            for (ref_list_name, (qv, _vt)) in sabun_refs {
+                if let Some(reference) = get_reference(qv) {
+                    if let Some(l) = get_root_list(ref_list_name, root_def, rename) {
+                        match check_if_list_have_id_and_obsolete(l, reference, item.obsolete){
+                            Cilhiao::NotFound =>  Err(format!("list {} doesn't have id {}, list {} id {}", ref_list_name, reference, list_name, id))?,
+                            Cilhiao::Obsolete => Err(format!("list {}'s {} is obsolete, list {} id {}", ref_list_name, reference, list_name, id))?,
+                            Cilhiao::Ok =>{},
                         }
                     } else {
-                        Err(format!("There's no list named {}, list {} id {}", name, list_name, id))?
+                        Err(format!("There's no list named {}, list {} id {}", ref_list_name, list_name, id))?
                     }
                 } else{
                     //referenceがない場合チェックすることもない
@@ -31,11 +31,11 @@ pub fn validate_ref(list_name : &str,
             //refがないのでチェックするようなことはない
         }
     }
-    todo!()
+    return Ok(());
 }
 
 ///nullやundefinedの場合None
-fn get_reference<'a>(qv : &'a Qv<String>, vt : &'a ValueType) -> Option<&'a str>{
+fn get_reference<'a>(qv : &'a Qv<String>) -> Option<&'a str>{
     match qv{
         Qv::Val(s) => Some(s.as_str()),
         Qv::Null => None,
@@ -43,17 +43,36 @@ fn get_reference<'a>(qv : &'a Qv<String>, vt : &'a ValueType) -> Option<&'a str>
     }
 }
 
-fn check_if_list_have_id(list : &RustList, id : &str) -> bool{
+enum Cilhiao{
+    Ok,
+    Obsolete,
+    NotFound
+}
+fn check_if_list_have_id_and_obsolete(list : &RustList, id : &str, obsolete : bool) -> Cilhiao{
     let id = list.redef.get(id).map(|n| n.as_str()).unwrap_or(id);
-    list.list.contains_key(id)
+    if let Some(item) = list.list.get(id){
+        if item.obsolete{
+            //相手がobsoleteでも、自分もobsoleteなら見逃す
+            if obsolete{
+                return Cilhiao::Ok;
+            } else{
+                return Cilhiao::Obsolete;
+            }
+        } else{
+            return Cilhiao::Ok;
+        }
+    } else{
+        return Cilhiao::NotFound;
+    }
 }
 
 fn get_root_list<'a>(
     name : &'a str,
     root_def : &'a IndexMap<String, RustValue>,
-    rename : &'a BTreeMap<String, String>) -> Option<&'a RustList>{
-
+    rename : &BTreeMap<String, String>) -> Option<&'a RustList>
+{
     let name = rename.get(name).map(|n| n.as_str()).unwrap_or(name);
+
     if let Some(value) = root_def.get(name){
         match value{
             RustValue::List(l) =>{
@@ -63,8 +82,4 @@ fn get_root_list<'a>(
         }
     }
     return None;
-}
-
-fn get_id(obj : &RustObject) -> String{
-    obj.id.as_ref().map(|s| s.as_str()).unwrap_or_else(|| "no id").to_string()
 }

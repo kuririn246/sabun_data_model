@@ -50,7 +50,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
         List =>{
             match value_type{
                 ValueType::Normal =>{
-                    json_list_to_rust(&array[1..], value_type, span, names)
+                    json_list_to_rust(&array[1..], names)
                 },
                 _ =>{
                     Err(format!(r#"{} Lists can't be undefined or null {}"#, span.line_str(), names))?
