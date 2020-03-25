@@ -8,6 +8,7 @@ use super::get_refs::get_refs;
 use super::get_renamed::get_renamed;
 use super::json_item_to_rust::json_item_to_rust_ref;
 use crate::structs::rust_object::RustObject;
+use crate::imp::json_to_rust::get_include::get_include;
 //use crate::imp::json_to_rust::get_include::get_include;
 
 
@@ -38,7 +39,11 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : 
                         }
                     },
                     SystemNames::Include=>{
-                        //Rust to Jsonで別ファイルに書かれたメンバ名が、Includeに記録されるが、これはファイル読み出しとかで使うのでここでは何もしない
+                        if r.include.len() == 0{
+                            r.include.append(&mut get_include(v, &names.append("Include"))?)
+                        } else{
+                            Err(format!("{} Include is defined multiple times {}", v.line_str(), names))?;
+                        }
                     },
                     SystemNames::Ref =>{
                         if r.refs.is_none(){
