@@ -1,0 +1,33 @@
+{
+	currentNum : 10,
+
+	curStr : "a",
+
+	Rename : [
+		"oldNum->currentNum",
+		"oldoldStr->oldStr",
+		"oldStr->curStr",
+		"oldList->newList",
+	],
+
+	newList: [
+		"List",
+		["Reffered"],
+		["Default",{
+			Mem1 : 5,
+			mem2 : 9,
+			Rename : ["oldMem1->oldMem2"]
+		}],
+		["Redef", "first->obsolete1" ],
+		{
+			ID : "second",
+		},
+
+		{
+			ID : "obsolete1",
+			oldMem1 : 10,
+			mem2 : 20,
+			Obsolete : true,
+		}
+	]
+}

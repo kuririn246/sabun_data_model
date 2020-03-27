@@ -1,0 +1,36 @@
+{
+	oldNum : -2,
+	oldoldStr : "old",
+
+	oldList: [
+		"List",
+		["Reffered"],
+		["Default",{
+			oldMem1 : 5,
+			mem2 : 9,
+		}],
+		{
+			ID : "first",
+			oldMem1 : 10,
+			mem2 : 20,
+		},
+		{
+			ID : "second",
+		}
+	],
+
+	refList: [
+		"List",
+		["Default",{
+			Ref : { oldList : "" }
+		}],
+		{
+			ID : "1",
+			Ref : { oldList : "first" }
+		},
+		{
+			ID : "2",
+			Ref : { oldList :  "second" }
+		}
+	]
+}
