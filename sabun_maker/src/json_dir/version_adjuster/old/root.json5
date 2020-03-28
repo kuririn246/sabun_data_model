@@ -19,10 +19,11 @@
 		}
 	],
 
-	refList: [
+	oldRefList: [
 		"List",
 		["Default",{
-			Ref : { oldList : "" }
+			Ref : { oldList : "" },
+			mem : 0,
 		}],
 		{
 			ID : "1",
@@ -30,7 +31,19 @@
 		},
 		{
 			ID : "2",
-			Ref : { oldList :  "second" }
+			Ref : { oldList :  "second" },
+			mem : 2001,
+		}
+	],
+
+	oldAutoIdList : [
+		"List",
+		["Default",{ mem : 1 }],
+		{
+			mem : 2,
+		},
+		{
+			mem : 3,
 		}
 	]
 }

@@ -8,6 +8,7 @@
 		"oldoldStr->oldStr",
 		"oldStr->curStr",
 		"oldList->newList",
+		"oldAutoIDList->newAutoIDList",
 	],
 
 	newList: [
@@ -22,12 +23,59 @@
 		{
 			ID : "second",
 		},
-
+		{
+			ID : "newItem",
+			mem1 : 100,
+		},
 		{
 			ID : "obsolete1",
 			oldMem1 : 10,
 			mem2 : 20,
 			Obsolete : true,
+		}
+	],
+
+	newRefList: [
+		"List",
+		["Default",{
+			Ref : { oldList : "" },
+			mem : 3000,
+			tuikaMem : 20,
+		}],
+
+		{
+			ID : "2",
+			Ref : { oldList :  "second" },
+
+			//上書きされている。これはどうするべきだろうか。
+			//「oldがdefaultから変化がないなら新defaultにして、それ以外は書き換えられた値を維持」というような玉虫色の解決を考えていたが・・・
+			mem : 4000,
+			tuikaMem : 30,
+		},
+		{
+			ID : "3",
+			Ref : { oldList : "newItem" },
+			mem : 5000,
+		},
+
+		{
+			ID : "1",
+			Ref : { oldList : "first" },
+			Obsolete : true, //Obsoleteを参照するものはObsoleteでないと弾かれる。
+		}
+	],
+
+	//AutoIDの場合、Listに初期値が入っているのはそもそもおかしいと考えている。プログラムで追加、削除もされるのがAutoIDのリスト。
+	//別バージョンのデータが有ったとして今のバージョンのアイテムとどっちを優先するか、IDが同じだったら、IDが違ったら？　どれも答えが出ない。
+	//私が思うに、単にAutoIDの場合は初期値を入れることは推奨しない、別バージョンがある場合、そのリストをすべて優先、初期値にあるアイテムは全部削除されるのが良いと思う。
+	//たとえばRPGのアイテムリストだったら、ある程度ゲームが進んだときに別のリストから追加する、初期値としては与えず、「リストの初期値を定義するためのリスト」にデータを用意しておいて
+	//時期が来たらプログラムで加えれば良いと思う。
+	newAutoIDList : [
+		"List",
+		"AutoID",
+		["Default",{ mem : 10 }],
+		{
+			mem : 100,
 		}
 	]
 }
