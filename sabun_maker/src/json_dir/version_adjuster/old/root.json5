@@ -24,6 +24,7 @@
 		["Default",{
 			Ref : { oldList : "" },
 			mem : 0,
+			hoge : 20,
 		}],
 		{
 			ID : "1",
@@ -33,6 +34,7 @@
 			ID : "2",
 			Ref : { oldList :  "second" },
 			mem : 2001,
+			hoge : 30,
 		}
 	],
 
