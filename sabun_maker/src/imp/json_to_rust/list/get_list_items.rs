@@ -25,12 +25,6 @@ pub fn get_list_items(array : &[JVal], need_id : bool,  _span : &Span, names : &
 
 pub fn get_list_item(map : &IndexMap<String, JVal>, need_id : bool, index : usize, span : &Span, names : &Names) -> Result<(String, RustObject)>{
     let mut obj = json_obj_to_rust(map, false, names)?;
-    //println!("is none {}", obj.default.is_none());
-    let map = obj.default.take();
-    obj.default = None;
-    if map.is_some() {
-        obj.sabun = map.unwrap();
-    }
 
     if need_id{
         if obj.id.is_none(){
@@ -42,7 +36,6 @@ pub fn get_list_item(map : &IndexMap<String, JVal>, need_id : bool, index : usiz
         } else{
             Err(format!(r#"{} ID is invalid for AutoID lists {}"#, span.line_str(), names))?
         }
-
     }
     if obj.renamed.is_empty() == false{
         Err(format!(r#"{} Renamed is not valid for list objects {}"#, span.line_str(), names))?

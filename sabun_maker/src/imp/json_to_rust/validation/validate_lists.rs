@@ -10,9 +10,7 @@ use crate::imp::json_to_rust::validation::validate_renamed::validate_renamed;
 use crate::imp::json_to_rust::names::Names;
 
 pub fn validate_lists(root : &RustObject) -> Result<()>{
-    if root.default.is_none(){ return Ok(()); }
-
-    let root_def = root.default.as_ref().unwrap();
+    let root_def = &root.default;
     for (name, value) in root_def{
         let name : &str = name;
         let value : &RustValue = value;
@@ -23,7 +21,7 @@ pub fn validate_lists(root : &RustObject) -> Result<()>{
             validate_renamed(list_def, &names.append("Default"));
 
             //unwrapは絶対に成功するはずだが、データ型はそう言ってないのでデータ型に従ってコーディングする。
-            let list_defs_def = list_def.default.as_ref().ok_or_else(|| format!("list {} doesn't have default obj", name))?;
+            let list_defs_def = &list_def.default;
 
             validate_list_sabuns(name, list_defs_def, &l.list, &l.default.renamed)?;
 

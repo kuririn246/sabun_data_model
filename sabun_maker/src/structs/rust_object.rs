@@ -7,9 +7,9 @@ use crate::structs::ref_value::RefValue;
 pub struct RustObject{
     //別ファイルにあったことを記録しておくためのもの。どう使うかは後で考える。
     pub include : Vec<String>,
-    //listのobjectの場合、defaultはlist側にあるのでここにはない。それ以外は絶対ある
-    pub default : Option<IndexMap<String, RustValue>>,
-    //デフォルト値から変更されたものを記録。差分変更時に、defaultと同じになったらここから削除するかもしれない？
+    //listのobjectの場合、defaultはlist側にあるが、ここには初期値が入る。
+    pub default : IndexMap<String, RustValue>,
+    //変更されたものを記録。差分変更時に、defaultと同じになったらここから削除する
     pub sabun : IndexMap<String, RustValue>,
     //listの場合idがなければならず、list内で一意である必要もある。
     //listのオブジェクトでない場合はNone

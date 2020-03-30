@@ -25,9 +25,9 @@ fn get_default_obj(map : &IndexMap<String, JVal>, span : &Span, names : &Names) 
         Err(format!("{} ID is not valid for default objects {}", span.line_str(), names))?
     }
 
-    if obj.default.is_none(){
-        Err(format!("{} no default obj {}", span.line_str(), names))?
-    }
+    // if obj.default.is_none(){
+    //     Err(format!("{} no default obj {}", span.line_str(), names))?
+    // }
 
     return Ok(obj);
 }
