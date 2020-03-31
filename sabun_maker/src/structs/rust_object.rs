@@ -24,16 +24,12 @@ impl RustObject{
     pub fn new() -> RustObject{
         RustObject{
             include : vec![],
-            default : Some(IndexMap::new()), sabun : IndexMap::new(),
+            default : IndexMap::new(), sabun : IndexMap::new(),
             id : None, refs: None,
             renamed: BTreeMap::new(), obsolete : false }
     }
 
     pub fn insert_default(&mut self, key : String, value : RustValue) -> Option<RustValue>{
-        if self.default.is_none(){
-            self.default = Some(IndexMap::new());
-        }
-        let def = self.default.as_mut().unwrap();
-        return def.insert(key, value);
+        return self.default.insert(key, value);
     }
 }

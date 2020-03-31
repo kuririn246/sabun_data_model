@@ -21,7 +21,7 @@ pub fn rust_list_to_json(l : &RustList, name : &str) -> Result<Value>{
 
    result.push(default_to_json(&l.default)?);
    for (_id, obj) in &l.list{
-      result.push(rust_to_json_new_default(obj)?);
+      result.push(rust_to_json_new_default(obj, Some(&l.default.default))?);
    }
 
    return Ok(Value::Array(result));
