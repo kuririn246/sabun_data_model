@@ -1,6 +1,6 @@
 
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Qv<T>{ Val(T), Undefined, Null }
 
 impl<T> Qv<T>{

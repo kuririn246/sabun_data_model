@@ -3,7 +3,7 @@ use crate::structs::rust_object::RustObject;
 use std::collections::BTreeMap;
 use linked_hash_map::LinkedHashMap;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct RustList{
     pub list_type : ListType,
     pub default : RustObject,

@@ -1,6 +1,6 @@
 use crate::structs::qv::QvType;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ValueType{
     Normal,
     Nullable,

@@ -4,7 +4,7 @@ use crate::structs::rust_object::RustObject;
 use crate::structs::rust_list::RustList;
 use crate::structs::array_type::ArrayType;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum RustValue{
     Bool(Qv<bool>, ValueType),
     Number(Qv<f64>, ValueType),
@@ -54,7 +54,7 @@ impl RustValue{
 
 
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct RustArray{
     pub vec : Vec<RustValue>,
 

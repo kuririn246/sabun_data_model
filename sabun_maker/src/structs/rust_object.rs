@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use indexmap::IndexMap;
 use crate::structs::ref_value::RefValue;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct RustObject{
     //別ファイルにあったことを記録しておくためのもの。どう使うかは後で考える。
     pub include : Vec<String>,

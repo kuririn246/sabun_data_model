@@ -31,6 +31,9 @@
               "prevName2->currentName2" ], //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
               //参照可能なListの名前が変わった場合参照先も追跡できる
 
+  currentName : 0,
+  currentName2 : 0,
+
   unkoList : [
 	"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
 	["Reffered"], //参照可能になる
@@ -144,4 +147,37 @@
     }
   ],
 
+  dim2List : [
+    "List",
+    ["AutoID"],
+    ["Default",{
+      innerList : [
+        "List",
+        ["AutoID"], //AutoIDのListの中にはAutoIDなListが作れる
+        ["Default",{
+          Ref : { hegoList :  "" },
+          val : 3,
+        }],
+        //AutoIDのListには本来初期値を用意するべきではない。
+      ],
+
+      val2 : 4,
+    }],
+    {
+      //AutoIDのListには本来初期値を用意するべきではないが、仕様を示すために出しとく。
+      innerList : [
+        "List",
+        ["AutoID"],
+        ["Default",{
+          Ref : { hegoList :  "" },
+          val : 3,
+        }], //本来Defaultの定義は上にあるので書く必要のないものだが、手書きされることが想定されておらず、機械的に生成されるとこれは出てくる。
+        {
+          val : 10,
+          Ref : { hegoList : "hegohego" }
+        },
+      ],
+      val2 : 30,
+    }
+  ]
 }

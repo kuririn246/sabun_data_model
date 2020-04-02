@@ -1,7 +1,7 @@
 use crate::structs::value_type::ValueType;
 use crate::structs::qv::Qv;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct RefValue{
     pub value_type : ValueType,
     pub value : Qv<String>,
