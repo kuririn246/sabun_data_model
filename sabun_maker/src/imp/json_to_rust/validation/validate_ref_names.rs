@@ -15,7 +15,7 @@ pub fn validate_ref_names(list_name : &str, list_items : &LinkedHashMap<String, 
                 let name = root_renamed.get(name).map(|n| n.as_str()).unwrap_or(name);
                 if let Some(rv) = list_def_ref.get(name) {
                     let rv : &RefValue = rv;
-                    if rv.value_type.acceptable(&sab_rv.value.qv_type()) == false{
+                    if rv.value_type.acceptable(&sab_rv.get_value().qv_type()) == false{
                         Err(format!("{}'s ref member {}'s type doesn't correspond to list {}'s default object", id, name, list_name))?
                     }
                 } else {

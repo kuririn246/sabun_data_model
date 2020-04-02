@@ -10,7 +10,7 @@ pub fn get_ref_map(r : &IndexMap<String, RefValue>) -> IndexMap<String, Value>{
     for (k, rv) in r{
         let rv : &RefValue = rv;
         let k : &String = k;
-        let qv : &Qv<String> = &rv.value;
+        let qv : &Qv<String> = rv.get_value();
         let vt : &ValueType = &rv.value_type;
         let name = format!("{}{}", k, vt.to_suffix());
         match qv{
