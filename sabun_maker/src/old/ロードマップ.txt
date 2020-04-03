@@ -1,5 +1,5 @@
-/Refもデフォルト値と差分を用意し、アジャスト時に差分がある場合差分を優先するように
-/AutoIDのListのDefaultでAutoIDのListを定義できるように。AutoIDのリストに初期値は与えるべきではないので、アイテムは定義できない。
+
+/adjust_list_item_valuesとadjust_root_objを書いて、adjust_listを書けばOKではないかと思う
 
 バージョンのアジャスタを作る
 jsonからRustのアクセサ生成
