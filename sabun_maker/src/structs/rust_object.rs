@@ -1,6 +1,6 @@
 use crate::structs::rust_value::RustValue;
 use std::collections::BTreeMap;
-use indexmap::IndexMap;
+use crate::indexmap::IndexMap;
 use crate::structs::ref_value::RefValue;
 
 #[derive(Debug, PartialEq)]

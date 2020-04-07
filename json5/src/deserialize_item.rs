@@ -4,7 +4,7 @@ use crate::de::{deserialize_any, Seq, Map};
 use pest::Span;
 use crate::de::Rule;
 use std::rc::Rc;
-use indexmap::IndexMap;
+use crate::jval::IndexMap;
 use crate::MyError;
 
 pub fn get_unit(span : Span, rc : Rc<String>) -> JVal { JVal::Null(s(span, rc)) }

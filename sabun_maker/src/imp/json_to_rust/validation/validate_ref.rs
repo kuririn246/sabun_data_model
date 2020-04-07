@@ -1,12 +1,10 @@
 use std::collections::{BTreeMap};
 use crate::error::Result;
-use indexmap::IndexMap;
+use crate::indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
 use crate::structs::rust_object::RustObject;
 use crate::structs::rust_value::RustValue;
-use crate::structs::qv::Qv;
 use crate::structs::rust_list::RustList;
-use crate::structs::ref_value::RefValue;
 
 ///参照先が存在し、Obsoleteされてないか調べる。自分自身がObsoleteである場合、参照先がObsoleteでも良い。
 pub fn validate_ref(list_name : &str,

@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use crate::error::Result;
-use indexmap::IndexMap;
+use crate::indexmap::IndexMap;
 use crate::structs::rust_value::RustValue;
 use crate::structs::ref_value::RefValue;
 

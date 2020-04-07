@@ -1,5 +1,5 @@
 use json5_parser::JVal;
-use indexmap::IndexMap;
+use crate::indexmap::IndexMap;
 use super::names::Names;
 use super::json_name::{json_name, NameType, SystemNames};
 use super::json_item_to_rust::json_item_to_rust;

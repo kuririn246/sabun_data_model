@@ -7,6 +7,6 @@ pub fn adjust(new_def : &RustObject, new : RustObject, old_def : RustObject, old
     if let Some(refs) = &new_def.refs {
         new.refs = adjust_ref(&new.renamed, refs, new.refs, &old_def.refs, old.refs)?;
     }
-    new.
+    //new.
     return Ok(());
 }

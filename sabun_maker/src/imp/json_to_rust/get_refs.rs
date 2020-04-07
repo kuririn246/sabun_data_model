@@ -1,5 +1,5 @@
 use json5_parser::{JVal, Span};
-use indexmap::IndexMap;
+use crate::indexmap::IndexMap;
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::imp::json_to_rust::json_obj_to_rust::json_obj_to_rust;

@@ -1,5 +1,6 @@
 pub type Result<T> = std::result::Result<T, SabunError>;
 
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct SabunError{
     pub message : String,

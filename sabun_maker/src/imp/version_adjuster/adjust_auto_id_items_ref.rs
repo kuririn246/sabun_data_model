@@ -4,8 +4,8 @@ use crate::structs::qv::Qv;
 use crate::error::Result;
 use crate::indexmap::IndexMap;
 
-pub fn adjust_ref(renamed : &BTreeMap<String, String>,
-                  new_def : &IndexMap<String, RefValue>, new : Option<IndexMap<String, RefValue>>,
+pub fn adjust_auto_id_items_ref(renamed : &BTreeMap<String, String>,
+                  new_def : &IndexMap<String, RefValue>, 
                   old_def : &Option<IndexMap<String, RefValue>>, old : Option<IndexMap<String, RefValue>>) -> Result<Option<IndexMap<String, RefValue>>> {
     let mut new = new.unwrap_or_else(|| IndexMap::new());
 

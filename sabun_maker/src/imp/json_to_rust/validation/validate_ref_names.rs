@@ -1,5 +1,5 @@
 use crate::error::Result;
-use indexmap::IndexMap;
+use crate::indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
 use std::collections::BTreeMap;
 use crate::structs::rust_object::RustObject;
