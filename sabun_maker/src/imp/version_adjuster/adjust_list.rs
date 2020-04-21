@@ -7,6 +7,7 @@ pub fn adjust_list(new : RustList, old : RustList, validation : bool) -> Result<
     // for (key, value) in old.list{
     //     construct_new_sabun(&new_default.renamed
     // }
+    
 todo!()
 
 }
