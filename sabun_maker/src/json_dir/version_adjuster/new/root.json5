@@ -77,9 +77,13 @@
 	newAutoIDList : [
 		"List",
 		"AutoID",
-		["Default",{ mem : 10 }],
+		["Default",{
+			mem : 10,
+			Ref : { newList : "" }
+		}],
 		{
 			mem : 100,
+			Ref : { newList :  "second" },
 		}
 	]
 }

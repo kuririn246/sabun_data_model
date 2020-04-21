@@ -1,5 +1,5 @@
 use json5_parser::JVal;
-use indexmap::IndexMap;
+use crate::indexmap::IndexMap;
 use super::names::Names;
 use super::json_name::{json_name, NameType, SystemNames};
 use super::json_item_to_rust::json_item_to_rust;
@@ -46,10 +46,10 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : 
                         }
                     },
                     SystemNames::Ref =>{
-                        if r.refs.is_none(){
+                        if r.refs.len() == 0{
                             match &v {
                                 JVal::Map(map, span) =>{
-                                    r.refs = Some(get_refs(map, span,names)?);
+                                    r.refs = get_refs(map, span,names)?;
                                 },
                                 _ =>{ Err(format!("{} Ref must be an object {}", v.line_str(), names))?;}
 

@@ -24,7 +24,8 @@ pub fn validate_lists(root : &RustObject) -> Result<()>{
             let list_defs_def = &list_def.default;
             validate_list_defaults(&names, list_defs_def, &l.list, &l.default.renamed)?;
 
-            if let Some(refs) = &list_def.refs {
+            if list_def.refs.len() != 0 {
+                let refs = &list_def.refs;
                 validate_ref_names(name, &l.list, refs, &root.renamed)?;
                 validate_ref(name, &l.list, root_def, &root.renamed)?;
                 validate_list_def_ref(name, refs, root_def, &root.renamed)?;
@@ -41,7 +42,7 @@ pub fn validate_lists(root : &RustObject) -> Result<()>{
 
 fn check_if_items_have_ref(list_items : &LinkedHashMap<String, RustObject>) -> Option<&str>{
     for (id, item) in list_items{
-        if item.refs.is_some(){
+        if item.refs.len() != 0{
             return Some(id);
         }
     }

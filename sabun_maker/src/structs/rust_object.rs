@@ -1,6 +1,6 @@
 use crate::structs::rust_value::RustValue;
 use std::collections::BTreeMap;
-use indexmap::IndexMap;
+use crate::indexmap::IndexMap;
 use crate::structs::ref_value::RefValue;
 
 #[derive(Debug, PartialEq)]
@@ -14,7 +14,7 @@ pub struct RustObject{
     //listの場合idがなければならず、list内で一意である必要もある。
     //listのオブジェクトでない場合はNone
     pub id : Option<String>,
-    pub refs: Option<IndexMap<String, RefValue>>,
+    pub refs: IndexMap<String, RefValue>,
     pub renamed: BTreeMap<String, String>,
     pub obsolete : bool,
 }

@@ -3,6 +3,7 @@ pub mod error;
 mod imp;
 pub mod structs;
 pub mod my_json;
+mod indexmap;
 mod test;
 
 pub use imp::rust_to_json::rust_to_json::rust_to_json_new_default as rust_to_json_new_default;

@@ -40,12 +40,17 @@
 
 	oldAutoIdList : [
 		"List",
-		["Default",{ mem : 1 }],
+		["Default",{
+			mem : 1,
+			Ref: { oldList : "" },
+		}],
 		{
 			mem : 2,
+			Ref: { oldList : "first" },
 		},
 		{
 			mem : 3,
+			Ref : { oldList :  "second" },
 		}
 	]
 }

@@ -1,5 +1,6 @@
 use std::rc::Rc;
-use indexmap::IndexMap;
+//use indexmap::IndexMap;
+pub type IndexMap<Key, Value> = linked_hash_map::LinkedHashMap<Key, Value>;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum JVal{

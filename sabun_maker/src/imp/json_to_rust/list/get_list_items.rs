@@ -2,7 +2,7 @@ use json5_parser::{JVal, Span};
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::imp::json_to_rust::json_obj_to_rust::json_obj_to_rust;
-use indexmap::IndexMap;
+use crate::indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
 use crate::structs::rust_object::RustObject;
 
