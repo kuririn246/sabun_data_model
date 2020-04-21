@@ -14,7 +14,7 @@ pub struct RustObject{
     //listの場合idがなければならず、list内で一意である必要もある。
     //listのオブジェクトでない場合はNone
     pub id : Option<String>,
-    pub refs: Option<IndexMap<String, RefValue>>,
+    pub refs: IndexMap<String, RefValue>,
     pub renamed: BTreeMap<String, String>,
     pub obsolete : bool,
 }

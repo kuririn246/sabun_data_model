@@ -5,16 +5,19 @@ use crate::structs::rust_object::RustObject;
 use crate::imp::version_adjuster::rename_old::rename_old;
 use crate::imp::version_adjuster::adjust_ref::adjust_ref;
 
+///auto_idの場合はnewの方は消えるので、oldのitemをアジャストしてnew_listに突っ込む
 pub fn adjust_auto_id_item(
     renamed : &BTreeMap<String, String>,
     new_list_def : &RustObject,
-    old : &mut RustObject){
+    old_list_def : &RustObject,
+    old : RustObject){
+    let mut old = old;
 
 
-    rename_old(renamed, &mut old.default)
+    rename_old(renamed, &mut old.default);
     rename_old(renamed, &mut old.sabun);
 
-    if new_list_def.refs.is_some() {
-        adjust_ref(renamed, new_list_def.refs.as_ref().unwrap(), None, )
+    if new_list_def.refs.len() != 0 {
+        adjust_ref( &new_list_def.refs, None, &old_list_def.refs, Some(old.refs))
     }
 }

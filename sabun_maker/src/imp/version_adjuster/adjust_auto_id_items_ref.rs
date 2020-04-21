@@ -5,13 +5,13 @@ use crate::error::Result;
 use crate::indexmap::IndexMap;
 
 pub fn adjust_auto_id_items_ref(renamed : &BTreeMap<String, String>,
-                  new_def : &IndexMap<String, RefValue>, 
+                  new_def : &IndexMap<String, RefValue>,
                   old_def : &Option<IndexMap<String, RefValue>>, old : Option<IndexMap<String, RefValue>>) -> Result<Option<IndexMap<String, RefValue>>> {
-    let mut new = new.unwrap_or_else(|| IndexMap::new());
+    let mut new = new_def.unwrap_or_else(|| IndexMap::new());
 
-    //undefiableである場合、oldで定義されていないものであればundefinedにする
+    //undefableである場合、oldで定義されていないものであればundefinedにする
     for (key, value) in new_def {
-        if value.value_type.is_undefiable() {
+        if value.value_type.is_undefable() {
             if old_def.is_none() || old_def.as_ref().unwrap().get(key).is_none() {
                 if let Some(val) = new.get_mut(key) {
                     val.sabun_value = Some(Qv::Undefined);

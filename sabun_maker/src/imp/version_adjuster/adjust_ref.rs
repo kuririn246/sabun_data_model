@@ -4,15 +4,14 @@ use crate::structs::qv::Qv;
 use crate::error::Result;
 use crate::indexmap::IndexMap;
 
-pub fn adjust_ref(renamed : &BTreeMap<String, String>,
-                  new_def : &IndexMap<String, RefValue>, new : Option<IndexMap<String, RefValue>>,
-                  old_def : &Option<IndexMap<String, RefValue>>, old : Option<IndexMap<String, RefValue>>) -> Result<Option<IndexMap<String, RefValue>>> {
+pub fn adjust_ref(new_def : &IndexMap<String, RefValue>, new : Option<IndexMap<String, RefValue>>,
+                  old_def : &IndexMap<String, RefValue>, old : Option<IndexMap<String, RefValue>>) -> Result<Option<IndexMap<String, RefValue>>> {
     let mut new = new.unwrap_or_else(|| IndexMap::new());
 
-    //undefiableである場合、oldで定義されていないものであればundefinedにする
+    //undefableである場合、oldで定義されていないものであればundefinedにする
     for (key, value) in new_def {
-        if value.value_type.is_undefiable() {
-            if old_def.is_none() || old_def.as_ref().unwrap().get(key).is_none() {
+        if value.value_type.is_undefable() {
+            if old_def.get(key).is_none() {
                 if let Some(val) = new.get_mut(key) {
                     val.sabun_value = Some(Qv::Undefined);
                 } else {
@@ -33,15 +32,14 @@ pub fn adjust_ref(renamed : &BTreeMap<String, String>,
         for (key, value) in old {
             //oldで元々のjson値から書き換えられているデータは、newの対応するメンバの値も書き換える。
             if let Some(sabun) = value.sabun_value {
-                let key = renamed.get(&key).unwrap_or(&key);
 
-                if let Some(val) = new.get_mut(key) {
+                if let Some(val) = new.get_mut(&key) {
                     val.sabun_value = Some(sabun);
                 } else {
-                    if let Some(new_def_val) = new_def.get(key) {
+                    if let Some(new_def_val) = new_def.get(&key) {
                         let mut val = RefValue::new(Qv::Undefined, new_def_val.value_type.clone());
                         val.sabun_value = Some(sabun);
-                        new.insert(key.to_string(), val);
+                        new.insert(key, val);
                     }
                 }
             }
@@ -55,3 +53,4 @@ pub fn adjust_ref(renamed : &BTreeMap<String, String>,
         return Ok(Some(new));
     }
 }
+

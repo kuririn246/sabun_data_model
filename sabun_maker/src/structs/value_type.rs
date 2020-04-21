@@ -16,7 +16,7 @@ impl ValueType{
         }
     }
 
-    pub fn is_undefiable(&self) -> bool{
+    pub fn is_undefable(&self) -> bool{
         match self{
             ValueType::Undefinable | ValueType::UndefNullable => true,
             _ => false,

@@ -9,8 +9,6 @@ use crate::imp::json_to_rust::names::Names;
 pub fn validate_list_defaults(list_name : &Names, list_def : &IndexMap<String, RustValue>, list_items : &LinkedHashMap<String, RustObject>, rename : &BTreeMap<String, String>) -> Result<()>{
     for (id, item) in list_items{
         for (name, val) in &item.default {
-
-
             let name: &str = name;
             let sabun_val: &RustValue = val;
             let name = rename.get(name).map(|n| n.as_str()).unwrap_or(name);

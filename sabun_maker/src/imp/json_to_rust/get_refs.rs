@@ -8,7 +8,7 @@ use crate::structs::ref_value::RefValue;
 
 pub fn get_refs(v : &IndexMap<String, JVal>, span : &Span, names : &Names) -> Result<IndexMap<String, RefValue>> {
     let obj = json_obj_to_rust(v, true, names)?;
-    if obj.refs.is_some() {
+    if obj.refs.len() != 0 {
         Err(format!(r#"{} Ref can't be declared in a Ref object {}"#, span.line_str(), names))?
     }
     if obj.id.is_some() {
