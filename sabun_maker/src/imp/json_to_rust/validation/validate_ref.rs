@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap};
+//use std::collections::{BTreeMap};
 use crate::error::Result;
 use crate::indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
@@ -11,12 +11,13 @@ pub fn validate_ref(list_name : &str,
                 list_items : &LinkedHashMap<String, RustObject>,
                 root_def : &IndexMap<String, RustValue>,
                 //list_def_ref : &HashMap<String, (Qv<String>, ValueType)>,
-                rename : &BTreeMap<String, String>) -> Result<()> {
+                //rename : &BTreeMap<String, String>
+                    ) -> Result<()> {
     for (id, item) in list_items {
         let sabun_refs = &item.refs;
         for (ref_list_name, rv) in sabun_refs {
             if let Some(reference) = rv.get_reference() {
-                if let Some(l) = get_root_list(ref_list_name, root_def, rename) {
+                if let Some(l) = get_root_list(ref_list_name, root_def) {
                     match check_if_list_have_id_and_obsolete(l, reference, item.obsolete) {
                         Cilhiao::NotFound => Err(format!("list {} doesn't have id {}, list {} id {}", ref_list_name, reference, list_name, id))?,
                         Cilhiao::Obsolete => Err(format!("list {}'s {} is obsolete, list {} id {}", ref_list_name, reference, list_name, id))?,
@@ -40,6 +41,7 @@ enum Cilhiao{
     NotFound
 }
 fn check_if_list_have_id_and_obsolete(list : &RustList, id : &str, obsolete : bool) -> Cilhiao{
+    //redefは認めるべき？　よくわからない・・・
     let id = list.redef.get(id).map(|n| n.as_str()).unwrap_or(id);
     if let Some(item) = list.list.get(id){
         if item.obsolete{
@@ -60,9 +62,10 @@ fn check_if_list_have_id_and_obsolete(list : &RustList, id : &str, obsolete : bo
 fn get_root_list<'a>(
     name : &'a str,
     root_def : &'a IndexMap<String, RustValue>,
-    rename : &BTreeMap<String, String>) -> Option<&'a RustList>
+    //rename : &BTreeMap<String, String>
+) -> Option<&'a RustList>
 {
-    let name = rename.get(name).map(|n| n.as_str()).unwrap_or(name);
+    //let name = rename.get(name).map(|n| n.as_str()).unwrap_or(name);
 
     if let Some(value) = root_def.get(name){
         match value{

@@ -1,11 +1,11 @@
 use crate::structs::ref_value::RefValue;
-use std::collections::{BTreeMap, HashSet};
+//use std::collections::{BTreeMap, HashSet};
 use crate::structs::qv::Qv;
 use crate::error::Result;
 use crate::indexmap::IndexMap;
 
 pub fn adjust_ref(new_def : &IndexMap<String, RefValue>, new : Option<IndexMap<String, RefValue>>,
-                  old_def : &IndexMap<String, RefValue>, old : Option<IndexMap<String, RefValue>>) -> Result<Option<IndexMap<String, RefValue>>> {
+                  old_def : &IndexMap<String, RefValue>, old : Option<IndexMap<String, RefValue>>) -> Option<IndexMap<String, RefValue>> {
     let mut new = new.unwrap_or_else(|| IndexMap::new());
 
     //undefableである場合、oldで定義されていないものであればundefinedにする
@@ -48,9 +48,9 @@ pub fn adjust_ref(new_def : &IndexMap<String, RefValue>, new : Option<IndexMap<S
 
     //len == 0 のときは allocateされないらしいので助かる
     if new.len() == 0 {
-        return Ok(None);
+        return None;
     } else {
-        return Ok(Some(new));
+        return Some(new);
     }
 }
 

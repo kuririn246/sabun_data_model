@@ -8,10 +8,11 @@ use crate::imp::json_to_rust::names::Names;
 
 pub fn validate_list_defaults(list_name : &Names, list_def : &IndexMap<String, RustValue>, list_items : &LinkedHashMap<String, RustObject>, rename : &BTreeMap<String, String>) -> Result<()>{
     for (id, item) in list_items{
+        //sabunはjsonからの変換時にはないので調べない・・・
         for (name, val) in &item.default {
             let name: &str = name;
             let sabun_val: &RustValue = val;
-            let name = rename.get(name).map(|n| n.as_str()).unwrap_or(name);
+            //let name = rename.get(name).map(|n| n.as_str()).unwrap_or(name); json時点でrenameに頼るのは認めないことにする
             let def_val = list_def.get(name).ok_or_else(|| format!("{}'s default obj doesn't have {} .{}", list_name, name, id))?;
 
             if val_type_check(def_val, sabun_val, &list_name.append(name))? == false {

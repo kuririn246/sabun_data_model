@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
-use crate::indexmap::IndexMap;
-use crate::structs::rust_value::RustValue;
+//use crate::indexmap::IndexMap;
+//use crate::structs::rust_value::RustValue;
 use crate::structs::rust_object::RustObject;
 use crate::imp::version_adjuster::rename_old::rename_old;
 use crate::imp::version_adjuster::adjust_ref::adjust_ref;
@@ -14,10 +14,9 @@ pub fn adjust_auto_id_item(
     let mut old = old;
 
 
-    rename_old(renamed, &mut old.default);
-    rename_old(renamed, &mut old.sabun);
 
-    if new_list_def.refs.len() != 0 {
-        adjust_ref( &new_list_def.refs, None, &old_list_def.refs, Some(old.refs))
-    }
+
+    // if new_list_def.refs.len() != 0 {
+    //     adjust_ref( &new_list_def.refs, None, &old_list_def.refs, Some(old.refs))
+    // }
 }

@@ -20,15 +20,13 @@ pub fn validate_lists(root : &RustObject) -> Result<()>{
             let list_def = &l.default;
             validate_renamed(list_def, &names.append("Default"))?;
 
-            //unwrapは絶対に成功するはずだが、データ型はそう言ってないのでデータ型に従ってコーディングする。
-            let list_defs_def = &list_def.default;
-            validate_list_defaults(&names, list_defs_def, &l.list, &l.default.renamed)?;
+            validate_list_defaults(&names, &list_def.default, &l.list, &l.default.renamed)?;
 
             if list_def.refs.len() != 0 {
                 let refs = &list_def.refs;
-                validate_ref_names(name, &l.list, refs, &root.renamed)?;
-                validate_ref(name, &l.list, root_def, &root.renamed)?;
-                validate_list_def_ref(name, refs, root_def, &root.renamed)?;
+                validate_ref_names(name, &l.list, refs)?;
+                validate_ref(name, &l.list, root_def)?;
+                validate_list_def_ref(name, refs, root_def)?;
             } else{
                 if let Some(id) = check_if_items_have_ref(&l.list){
                     Err(format!("{}'s {} has Ref", name, id))?

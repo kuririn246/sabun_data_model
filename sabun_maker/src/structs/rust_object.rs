@@ -25,7 +25,7 @@ impl RustObject{
         RustObject{
             include : vec![],
             default : IndexMap::new(), sabun : IndexMap::new(),
-            id : None, refs: None,
+            id : None, refs: IndexMap::new(),
             renamed: BTreeMap::new(), obsolete : false }
     }
 

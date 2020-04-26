@@ -1,57 +1,39 @@
 use crate::structs::ref_value::RefValue;
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap};
 use crate::structs::qv::Qv;
 use crate::error::Result;
 use crate::indexmap::IndexMap;
 
+///old_defとはrenameされている必要アリ oldは必要なし
+/// auto_idとはいえdefaultは透過でいいと思うんだよねえ
 pub fn adjust_auto_id_items_ref(renamed : &BTreeMap<String, String>,
                   new_def : &IndexMap<String, RefValue>,
-                  old_def : &Option<IndexMap<String, RefValue>>, old : Option<IndexMap<String, RefValue>>) -> Result<Option<IndexMap<String, RefValue>>> {
-    let mut new = new_def.unwrap_or_else(|| IndexMap::new());
+                  old_def : &IndexMap<String, RefValue>, old : &IndexMap<String, RefValue>) -> IndexMap<String, RefValue> {
+    let mut new: IndexMap<String, RefValue> = IndexMap::new();
 
     //undefableである場合、oldで定義されていないものであればundefinedにする
     for (key, value) in new_def {
         if value.value_type.is_undefable() {
-            if old_def.is_none() || old_def.as_ref().unwrap().get(key).is_none() {
-                if let Some(val) = new.get_mut(key) {
-                    val.sabun_value = Some(Qv::Undefined);
-                } else {
-                    //List Itemの方では書かれていないRefのメンバ、つまりデフォルトのままになっているものはデータもないのだが、
-                    //Undefinedを入れるためにはRefValueをnewする必要がある。その場合のdefault_valueはやはりundefinedということになるだろう。
-                    //ここにundefinedが入っていることで、これはもともとのjsonでは定義されていなかったんだな、と分かるというメリットは有る
-                    //jsonになかったundefinedと、jsonにあったundefinedで内部表現にだいぶ違いがあるというのは、
-                    //直感的にわかりにくいかもしれない・・・？
-                    let val = RefValue::new(Qv::Undefined, value.value_type);
-                    //defaultがundefinedなのでsabunは定義しなくて良い
-                    new.insert(key.to_string(), val);
-                }
+            if old_def.get(key).is_none() {
+                let val = RefValue::new(Qv::Undefined, value.value_type);
+                //defaultがundefinedなのでsabunは定義しなくて良い
+                new.insert(key.to_string(), val);
             }
         }
     }
 
-    if let Some(old) = old {
-        for (key, value) in old {
-            //oldで元々のjson値から書き換えられているデータは、newの対応するメンバの値も書き換える。
-            if let Some(sabun) = value.sabun_value {
-                let key = renamed.get(&key).unwrap_or(&key);
+    for (key, value) in old {
+        let key = renamed.get(key).unwrap_or(key);
+        let default_value = &value.default_value;
 
-                if let Some(val) = new.get_mut(key) {
-                    val.sabun_value = Some(sabun);
-                } else {
-                    if let Some(new_def_val) = new_def.get(key) {
-                        let mut val = RefValue::new(Qv::Undefined, new_def_val.value_type.clone());
-                        val.sabun_value = Some(sabun);
-                        new.insert(key.to_string(), val);
-                    }
-                }
+        if let Some(new_def_val) = new_def.get(key) {
+            let mut val = RefValue::new(default_value.clone(), new_def_val.value_type.clone());
+            if let Some(sabun) = &value.sabun_value {
+                val.sabun_value = Some(sabun.clone());
             }
+            new.insert(key.to_string(), val);
         }
     }
 
-    //len == 0 のときは allocateされないらしいので助かる
-    if new.len() == 0 {
-        return Ok(None);
-    } else {
-        return Ok(Some(new));
-    }
+    return new;
 }
