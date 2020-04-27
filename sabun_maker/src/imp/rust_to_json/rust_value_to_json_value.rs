@@ -15,10 +15,10 @@ pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> Result<(Value, V
         RustValue::List(l)=> {
             (rust_list_to_json(l, name)?, ValueType::Normal)
         },
-        RustValue::Object(_o) =>{
-            //仕様上unreachable。むりやり書こうとしても[obj,null]の記法がないからかけないな・・・
-            Err(format!("{} objects must not have objects", name))?
-        },
+        // RustValue::Object(_o) =>{
+        //     //仕様上unreachable。むりやり書こうとしても[obj,null]の記法がないからかけないな・・・
+        //     Err(format!("{} objects must not have objects", name))?
+        // },
     };
     return Ok(r);
 }

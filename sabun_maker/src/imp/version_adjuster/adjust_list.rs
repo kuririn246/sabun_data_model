@@ -5,7 +5,7 @@ use crate::imp::version_adjuster::rename_old::rename_old;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::version_adjuster::adjust_list_item_values::adjust_list_item_values;
 
-pub fn adjust_list(new : &mut RustList, old : RustList, validation : bool, names : &Names) -> Result<()>{
+pub fn adjust_list(new : &RustList, old : RustList, validation : bool, names : &Names) -> Result<RustList>{
     let mut old = old;
 
     rename_old(&new.default.renamed, &mut old.default.default);
@@ -26,5 +26,6 @@ pub fn adjust_list(new : &mut RustList, old : RustList, validation : bool, names
             new_list.insert(name.to_string(), item);
         }
     }
-    return Ok(());
+    todo!()
+    //return Ok(());
 }
