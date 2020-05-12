@@ -6,9 +6,16 @@ use linked_hash_map::LinkedHashMap;
 #[derive(Debug, PartialEq)]
 pub struct RustList{
     pub list_type : ListType,
-    pub default : RustObject,
+    pub default : ListDef,
     pub list : LinkedHashMap<String, RustObject>,
     pub redef : BTreeMap<String, String>,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum ListDef{
+    Def(RustObject),
+    Rent(String),
+    InnerList,
 }
 
 impl RustList{

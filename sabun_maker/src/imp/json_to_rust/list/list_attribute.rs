@@ -11,6 +11,7 @@ pub enum ListAttribute{
     AutoID(Option<u64>),
     Reffered,
     Redef(BTreeMap<String, String>),
+    Rent(String),
 }
 
 
@@ -53,6 +54,17 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
                 "Redef" =>{
                     let redef = get_redef(&array[1..], span, names)?;
                     Ok(ListAttribute::Redef(redef))
+                },
+                "Rent" =>{
+                    if array.len() == 1{
+                        match &array[1]{
+                            JVal::String(s, _) =>{
+                                return Ok(ListAttribute::Rent(s.to_string()))
+                            },
+                            _=>{},
+                        }
+                    }
+                    Err(format!("{} {} [\"Rent\", list_name] is valid {}", span.line_str(), span.slice(), error_message, names))?,
                 },
                 _ =>{
                     Err(format!("{} {} {} {}", span.line_str(), span.slice(), error_message, names))?

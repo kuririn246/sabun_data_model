@@ -1,7 +1,6 @@
 use crate::structs::ref_value::RefValue;
 //use std::collections::{BTreeMap, HashSet};
 use crate::structs::qv::Qv;
-use crate::error::Result;
 use crate::indexmap::IndexMap;
 
 pub fn adjust_ref(new_def : &IndexMap<String, RefValue>, new : Option<IndexMap<String, RefValue>>,

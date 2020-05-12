@@ -1,7 +1,6 @@
 use crate::structs::ref_value::RefValue;
 use std::collections::{BTreeMap};
 use crate::structs::qv::Qv;
-use crate::error::Result;
 use crate::indexmap::IndexMap;
 
 ///old_defとはrenameされている必要アリ oldは必要なし

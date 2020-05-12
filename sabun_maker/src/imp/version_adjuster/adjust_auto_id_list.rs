@@ -1,6 +1,5 @@
 use crate::structs::rust_list::RustList;
 use crate::imp::json_to_rust::names::Names;
-use crate::imp::version_adjuster::rename_old::rename_old;
 use std::collections::BTreeMap;
 use crate::error::Result;
 use crate::imp::version_adjuster::rename_ref::rename_ref;

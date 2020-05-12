@@ -4,7 +4,7 @@ use crate::error::Result;
 use super::list_attribute::{ListAttribute, list_attribute};
 use super::get_list_items::get_list_items;
 use crate::structs::rust_value::RustValue;
-use crate::structs::rust_list::RustList;
+use crate::structs::rust_list::{RustList, ListDef};
 use crate::structs::list_type::ListType;
 
 pub fn json_list_to_rust(array : &[JVal],  names : &Names) -> Result<RustValue> {
@@ -35,7 +35,7 @@ pub fn json_list_to_rust(array : &[JVal],  names : &Names) -> Result<RustValue> 
                         }
                     },
                     ListAttribute::Default(obj) =>{
-                        result.default = obj;
+                        result.default = ListDef::Def(obj);
                     },
                     ListAttribute::Redef(redef) =>{
                         result.redef = redef;
