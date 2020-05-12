@@ -5,7 +5,7 @@ use crate::imp::rust_to_json::list::list_type_to_json::list_type_to_json;
 use crate::imp::rust_to_json::list::redef_to_json::redef_to_json;
 use crate::imp::rust_to_json::list::default_to_json::default_to_json;
 use crate::rust_to_json_new_default;
-use crate::structs::rust_list::RustList;
+use crate::structs::rust_list::{RustList, ListDef};
 use crate::structs::list_type::ListType;
 
 pub fn rust_list_to_json(l : &RustList, name : &str) -> Result<Value>{
@@ -19,7 +19,11 @@ pub fn rust_list_to_json(l : &RustList, name : &str) -> Result<Value>{
       result.push(redef_to_json(&l.redef));
    }
 
-   result.push(default_to_json(&l.default)?);
+   match &l.default {
+      ListDef::Def(def) => result.push(default_to_json(def)?),
+      ListDef::Rent(s) => result.push(Value::Array(vec![val_str("Rent"), val_str(s)])),
+      ListDef::InnerList =>{},
+   }
    for (_id, obj) in &l.list{
       result.push(rust_to_json_new_default(obj, Some(&l.default.default))?);
    }

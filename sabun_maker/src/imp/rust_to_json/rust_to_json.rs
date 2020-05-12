@@ -11,7 +11,7 @@ use crate::structs::rust_value::RustValue;
 ///本来デフォルト値と差分が保存されているのだが、見やすくするためにまとめてデフォルト値にしてしまう。
 ///デフォルト値も差分も全部Json化したいユースケースもあるとは思うのだけど・・・
 
-pub fn rust_to_json_new_default(obj : &RustObject, list_def : Option<&IndexMap<String, RustValue>>) -> Result<Value> {
+pub fn rust_to_json_new_default(obj : &RustObject,list_def : Option<&IndexMap<String, RustValue>>) -> Result<Value> {
     let mut map_item = IndexMap::new();
     let map = &mut map_item;
 

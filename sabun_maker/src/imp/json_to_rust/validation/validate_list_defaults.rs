@@ -5,6 +5,7 @@ use std::collections::{BTreeMap};
 use crate::structs::rust_value::RustValue;
 use crate::structs::rust_object::RustObject;
 use crate::imp::json_to_rust::names::Names;
+use crate::structs::rust_list::ListDef;
 
 pub fn validate_list_defaults(list_name : &Names, list_def : &IndexMap<String, RustValue>, list_items : &LinkedHashMap<String, RustObject>, rename : &BTreeMap<String, String>) -> Result<()>{
     for (id, item) in list_items{
@@ -50,10 +51,16 @@ fn val_type_check(l : &RustValue, r : &RustValue, names : &Names) -> Result<bool
             if l.list.len() != 0{
                 Err(format!("{} inner list's default obj must not have any items", names))?
             }
-            if &l.default.default != &r.default.default{
-                Err(format!("{} inner list's default objects must be the same", names))?
+            if let ListDef::InnerList = r.default{}
+            else{
+                Err(format!("{} inner list's default objects must be undefined", names))?
             }
-            validate_list_defaults(names, &r.default.default, &r.list, &l.default.renamed)?
+            if let ListDef::Def(def) = &l.default {
+                validate_list_defaults(names, &def.default, &r.list, &def.renamed);
+            }
+            else{
+                Err(format!("{} default object's list's default object must be defined", names))?
+            }
         }
     }
     return Ok(true);

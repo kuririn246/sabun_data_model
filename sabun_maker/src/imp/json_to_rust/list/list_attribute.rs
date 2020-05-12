@@ -64,7 +64,7 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
                             _=>{},
                         }
                     }
-                    Err(format!("{} {} [\"Rent\", list_name] is valid {}", span.line_str(), span.slice(), error_message, names))?,
+                    Err(format!("{} {} [\"Rent\", list_name] is valid {}", span.line_str(), span.slice(), names))?
                 },
                 _ =>{
                     Err(format!("{} {} {} {}", span.line_str(), span.slice(), error_message, names))?
