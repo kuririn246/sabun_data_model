@@ -22,16 +22,16 @@ pub fn rust_list_to_json(l : &RustList, root : &RustObject, name : &str) -> Resu
 
    match &l.default {
       ListDef::Def(def) =>{
-         result.push(default_to_json(def)?);
+         result.push(default_to_json(def, root)?);
          for (_id, obj) in &l.list{
-            result.push(rust_to_json_new_default(obj, Some(&def.default))?);
+            result.push(rust_to_json_new_default(obj, Some(&def.default), root)?);
          }
       },
       ListDef::Rent(s) => {
          result.push(Value::Array(vec![val_str("Rent"), val_str(s)]));
          if let Some(ListDef::Def(def)) = root.get_list(s).map(|list| &list.default){
             for (_id, obj) in &l.list{
-               result.push(rust_to_json_new_default(obj, Some(&def.default))?);
+               result.push(rust_to_json_new_default(obj, Some(&def.default), root)?);
             }
          } else{
             //ありえないはず
@@ -48,7 +48,7 @@ pub fn rust_list_to_json(l : &RustList, root : &RustObject, name : &str) -> Resu
          };
          if let Some(def) = def {
             for (_id, obj) in &l.list {
-               result.push(rust_to_json_new_default(obj, Some(&def.default))?);
+               result.push(rust_to_json_new_default(obj, Some(&def.default), root)?);
             }
          }
 
