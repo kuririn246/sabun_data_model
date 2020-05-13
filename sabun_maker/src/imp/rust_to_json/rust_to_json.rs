@@ -2,7 +2,7 @@ use crate::my_json::{Value};
 use crate::imp::rust_to_json::get_renamed::get_renamed;
 use crate::indexmap::IndexMap;
 use crate::imp::rust_to_json::get_ref_map::get_ref_map;
-use crate::imp::rust_to_json::get_new_default::get_new_default;
+use crate::imp::rust_to_json::get_new_default::{get_new_default, get_new_default_listitem};
 use crate::error::Result;
 use crate::structs::rust_object::RustObject;
 use crate::imp::rust_to_json::get_include::get_include;
@@ -11,7 +11,7 @@ use crate::structs::rust_value::RustValue;
 ///本来デフォルト値と差分が保存されているのだが、見やすくするためにまとめてデフォルト値にしてしまう。
 ///デフォルト値も差分も全部Json化したいユースケースもあるとは思うのだけど・・・
 
-pub fn rust_to_json_new_default(obj : &RustObject,list_def : Option<&IndexMap<String, RustValue>>) -> Result<Value> {
+pub fn rust_to_json_new_default(obj : &RustObject, list_def : Option<&IndexMap<String, RustValue>>, root : &RustObject) -> Result<Value> {
     let mut map_item = IndexMap::new();
     let map = &mut map_item;
 
@@ -37,7 +37,10 @@ pub fn rust_to_json_new_default(obj : &RustObject,list_def : Option<&IndexMap<St
     }
 
 
-    let new = get_new_default(list_def, &obj.default, &obj.sabun)?;
+    let new = match list_def {
+        Some(def) => get_new_default_listitem(def, &obj.default, &obj.sabun, root)?,
+        None => get_new_default(&obj.default, &obj.sabun, root)?
+    };
     for (k, v) in new {
         map.insert(k, v);
     }

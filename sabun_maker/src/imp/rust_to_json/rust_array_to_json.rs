@@ -4,8 +4,9 @@ use crate::error::Result;
 use crate::structs::qv::Qv;
 use crate::structs::array_type::ArrayType;
 use crate::structs::rust_value::RustArray;
+use crate::structs::rust_object::RustObject;
 
-pub fn rust_array_to_json(qv : &Qv<RustArray>, at : &ArrayType, name : &str) -> Result<Value>{
+pub fn rust_array_to_json(qv : &Qv<RustArray>, at : &ArrayType, root : &RustObject, name : &str) -> Result<Value>{
     let mut result : Vec<Value> = vec![];
     match at{
         ArrayType::String =>{ result.push(Value::String("Str-Array".to_string())) },
@@ -15,7 +16,7 @@ pub fn rust_array_to_json(qv : &Qv<RustArray>, at : &ArrayType, name : &str) -> 
     match qv{
         Qv::Val(v) => {
             for item in &v.vec{
-                let (v, _) = rust_value_to_json_value(item, name)?;
+                let (v, _) = rust_value_to_json_value(item, root, name)?;
                 result.push(v);
             }
         },

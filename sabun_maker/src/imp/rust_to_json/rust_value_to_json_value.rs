@@ -5,15 +5,16 @@ use crate::imp::rust_to_json::list::rust_list_to_json::rust_list_to_json;
 use crate::structs::rust_value::RustValue;
 use crate::structs::value_type::ValueType;
 use crate::structs::qv::Qv;
+use crate::structs::rust_object::RustObject;
 
-pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> Result<(Value, ValueType)>{
+pub fn rust_value_to_json_value(v : &RustValue, root : &RustObject, name : &str) -> Result<(Value, ValueType)>{
     let r = match v{
         RustValue::Bool(b, vt) => to(b, vt, "Bool",|b| Value::Bool(*b)),
         RustValue::String(s, vt) => to(s, vt, "Str", |s| Value::String(s.to_string())),
         RustValue::Number(n, vt) => to(n, vt, "Num", |n| Value::Number(*n)),
         RustValue::Array(a, at, vt) => (rust_array_to_json(a, at, name)?, vt.clone()),
         RustValue::List(l)=> {
-            (rust_list_to_json(l, name)?, ValueType::Normal)
+            (rust_list_to_json(l, root, name)?, ValueType::Normal)
         },
         // RustValue::Object(_o) =>{
         //     //仕様上unreachable。むりやり書こうとしても[obj,null]の記法がないからかけないな・・・

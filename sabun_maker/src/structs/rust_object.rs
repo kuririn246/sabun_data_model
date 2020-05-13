@@ -2,6 +2,7 @@ use crate::structs::rust_value::RustValue;
 use std::collections::BTreeMap;
 use crate::indexmap::IndexMap;
 use crate::structs::ref_value::RefValue;
+use crate::structs::rust_list::RustList;
 
 #[derive(Debug, PartialEq)]
 pub struct RustObject{
@@ -10,6 +11,7 @@ pub struct RustObject{
     //listのobjectの場合、defaultはlist側にあるが、ここには初期値が入る。
     pub default : IndexMap<String, RustValue>,
     //変更されたものを記録。差分変更時に、defaultと同じになったらここから削除する
+    //listの変更はRustListが直接上書きされるので、sabunには入らない
     pub sabun : IndexMap<String, RustValue>,
     //listの場合idがなければならず、list内で一意である必要もある。
     //listのオブジェクトでない場合はNone
@@ -31,5 +33,14 @@ impl RustObject{
 
     pub fn insert_default(&mut self, key : String, value : RustValue) -> Option<RustValue>{
         return self.default.insert(key, value);
+    }
+
+    pub fn get_list(&self, name : &str) -> Option<&RustList>{
+        match self.default.get(name){
+            Some(RustValue::List(l)) =>{
+                Some(l)
+            },
+            _ => None,
+        }
     }
 }
