@@ -48,7 +48,7 @@ impl RustList{
     pub fn new() -> RustList{
         RustList{
             list_type : ListType::Normal,
-            default : RustObject::new(),
+            default : ListDef::Def(RustObject::new()),
             list : LinkedHashMap::new(),
             redef : BTreeMap::new(),
         }
