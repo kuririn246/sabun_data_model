@@ -4,7 +4,7 @@ use crate::imp::json_to_rust::validation::validate_ref_names::validate_ref_names
 use linked_hash_map::LinkedHashMap;
 use crate::imp::json_to_rust::validation::validate_ref::validate_ref;
 use crate::imp::json_to_rust::validation::validate_list_def_ref::validate_list_def_ref;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 use crate::structs::rust_value::RustValue;
 use crate::imp::json_to_rust::validation::validate_renamed::validate_renamed;
 use crate::imp::json_to_rust::names::Names;

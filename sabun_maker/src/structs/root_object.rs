@@ -5,7 +5,7 @@ use crate::structs::ref_value::RefValue;
 use crate::structs::rust_list::RustList;
 
 #[derive(Debug, PartialEq)]
-pub struct RustObject{
+pub struct RootObject{
     //別ファイルにあったことを記録しておくためのもの。どう使うかは後で考える。
     pub include : Vec<String>,
     //listのobjectの場合、defaultはlist側にあるが、ここには初期値が入る。

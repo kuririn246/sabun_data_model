@@ -4,7 +4,7 @@ use super::get_default::get_default;
 use crate::error::Result;
 use std::collections::BTreeMap;
 use crate::imp::json_to_rust::list::get_redef::get_redef;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 
 pub enum ListAttribute{
     Default(RustObject),

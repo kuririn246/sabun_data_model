@@ -16,7 +16,7 @@ pub mod validation;
 use json5_parser::JVal;
 use names::Names;
 use crate::error::Result;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 use crate::structs::rust_value::RustValue;
 use crate::structs::value_type::ValueType;
 

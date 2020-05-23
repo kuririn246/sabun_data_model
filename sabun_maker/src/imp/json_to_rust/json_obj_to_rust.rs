@@ -7,7 +7,7 @@ use crate::error::Result;
 use super::get_refs::get_refs;
 use super::get_renamed::get_renamed;
 use super::json_item_to_rust::json_item_to_rust_ref;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 use crate::imp::json_to_rust::get_include::get_include;
 //use crate::imp::json_to_rust::get_include::get_include;
 

@@ -3,7 +3,7 @@ use crate::my_json::Value;
 use crate::imp::rust_to_json::rust_value_to_json_value::rust_value_to_json_value;
 use crate::error::Result;
 use crate::structs::rust_value::RustValue;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 
 ///差分まで含めて全部デフォルトにしてしまう。
 /// listの場合はlist_defが必ずあるものと想定。Noneの場合はdefがしっかりあって、sabunはdefで定義された名前のものしかないと想定。

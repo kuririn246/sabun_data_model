@@ -7,7 +7,7 @@ use crate::imp::rust_to_json::list::default_to_json::default_to_json;
 use crate::rust_to_json_new_default;
 use crate::structs::rust_list::{RustList, ListDef};
 use crate::structs::list_type::ListType;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 
 pub fn rust_list_to_json(l : &RustList, root : &RustObject, name : &str) -> Result<Value>{
    let mut result : Vec<Value> = vec![val_str("List")];

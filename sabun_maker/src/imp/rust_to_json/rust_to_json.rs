@@ -4,7 +4,7 @@ use crate::indexmap::IndexMap;
 use crate::imp::rust_to_json::get_ref_map::get_ref_map;
 use crate::imp::rust_to_json::get_new_default::{get_new_default, get_new_default_listitem};
 use crate::error::Result;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 use crate::imp::rust_to_json::get_include::get_include;
 use crate::structs::rust_value::RustValue;
 

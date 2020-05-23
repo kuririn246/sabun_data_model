@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
 //use std::collections::BTreeMap;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 use crate::structs::ref_value::RefValue;
 
 ///list_itemsのRefの名前と型がDefault objectのRefと一致してるか調べる

@@ -3,7 +3,7 @@ use linked_hash_map::LinkedHashMap;
 use crate::error::Result;
 use std::collections::{BTreeMap};
 use crate::structs::rust_value::RustValue;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 use crate::imp::json_to_rust::names::Names;
 use crate::structs::rust_list::ListDef;
 

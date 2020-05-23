@@ -1,5 +1,5 @@
 use crate::structs::list_type::ListType;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 use std::collections::BTreeMap;
 use linked_hash_map::LinkedHashMap;
 
@@ -14,8 +14,7 @@ pub struct RustList{
 #[derive(Debug, PartialEq)]
 pub enum ListDef{
     Def(RustObject),
-    Rent(String),
-    InnerList,
+    InnerListDef(Rc<RustObject>),
 }
 
 impl RustList{

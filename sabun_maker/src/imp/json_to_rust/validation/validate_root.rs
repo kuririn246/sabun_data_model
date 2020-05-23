@@ -1,4 +1,4 @@
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 use crate::error::Result;
 use crate::imp::json_to_rust::validation::validate_lists::validate_lists;
 use crate::imp::json_to_rust::validation::validate_renamed::validate_renamed;

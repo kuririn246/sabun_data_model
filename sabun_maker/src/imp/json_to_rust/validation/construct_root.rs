@@ -1,7 +1,7 @@
 use crate::imp::json_to_rust::json_name::{json_name, NameType};
 use std::collections::HashMap;
 use crate::error::Result;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 use crate::structs::rust_value::RustValue;
 use crate::structs::value_type::ValueType;
 use crate::imp::json_to_rust::validation::validate_root::validate_root;

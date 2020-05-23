@@ -2,7 +2,7 @@
 use crate::error::Result;
 use crate::indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
-use crate::structs::rust_object::RustObject;
+use crate::structs::root_object::RustObject;
 use crate::structs::rust_value::RustValue;
 use crate::structs::rust_list::RustList;
 
