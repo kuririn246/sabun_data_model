@@ -1,4 +1,4 @@
-use crate::structs::rust_value::RustValue;
+use crate::structs::rust_value::{RustValue, RustParam};
 use std::collections::BTreeMap;
 use crate::indexmap::IndexMap;
 use crate::structs::ref_value::RefValue;
@@ -12,35 +12,35 @@ pub struct RootObject{
     pub default : IndexMap<String, RustValue>,
     //変更されたものを記録。差分変更時に、defaultと同じになったらここから削除する
     //listの変更はRustListが直接上書きされるので、sabunには入らない
-    pub sabun : IndexMap<String, RustValue>,
-    //listの場合idがなければならず、list内で一意である必要もある。
-    //listのオブジェクトでない場合はNone
-    pub id : Option<String>,
+    pub sabun : IndexMap<String, RustParam>,
+}
+
+pub struct ListDefObj{
+    pub default : IndexMap<String, RustValue>,
     pub refs: IndexMap<String, RefValue>,
-    pub renamed: BTreeMap<String, String>,
-    pub obsolete : bool,
 }
 
-
-impl RustObject{
-    pub fn new() -> RustObject{
-        RustObject{
-            include : vec![],
-            default : IndexMap::new(), sabun : IndexMap::new(),
-            id : None, refs: IndexMap::new(),
-            renamed: BTreeMap::new(), obsolete : false }
-    }
-
-    pub fn insert_default(&mut self, key : String, value : RustValue) -> Option<RustValue>{
-        return self.default.insert(key, value);
-    }
-
-    pub fn get_list(&self, name : &str) -> Option<&RustList>{
-        match self.default.get(name){
-            Some(RustValue::List(l)) =>{
-                Some(l)
-            },
-            _ => None,
-        }
-    }
-}
+//
+//
+// impl RustObject{
+//     pub fn new() -> RustObject{
+//         RustObject{
+//             include : vec![],
+//             default : IndexMap::new(), sabun : IndexMap::new(),
+//             id : None, refs: IndexMap::new(),
+//             renamed: BTreeMap::new(), obsolete : false }
+//     }
+//
+//     pub fn insert_default(&mut self, key : String, value : RustValue) -> Option<RustValue>{
+//         return self.default.insert(key, value);
+//     }
+//
+//     pub fn get_list(&self, name : &str) -> Option<&RustList>{
+//         match self.default.get(name){
+//             Some(RustValue::List(l)) =>{
+//                 Some(l)
+//             },
+//             _ => None,
+//         }
+//     }
+// }

@@ -9,10 +9,7 @@ pub enum RustParam{
     Number(Qv<f64>, ValueType),
     String(Qv<String>, ValueType),
     Array(Qv<RustArray>, ArrayType, ValueType),
-    //Listは定義上nullやundefinedにならない
-    //List(RustList),
-    //Objectは定義上nullやundefinedにならない
-    //Object(RustObject),
+
 }
 
 impl RustParam{
