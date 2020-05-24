@@ -5,7 +5,6 @@ use super::list_attribute::{ListAttribute, list_attribute};
 use super::get_list_items::get_list_items;
 use crate::structs::rust_value::RustValue;
 use crate::structs::rust_list::{RustList, ListDef};
-use crate::structs::list_type::ListType;
 
 pub fn json_list_to_rust(array : &[JVal],  names : &Names) -> Result<RustValue> {
     let mut result = RustList::new();

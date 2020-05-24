@@ -1,4 +1,4 @@
-use crate::structs::list_type::ListType;
+
 use crate::structs::root_object::{RustObject, ListDefObj};
 use std::collections::BTreeMap;
 use linked_hash_map::LinkedHashMap;
@@ -11,16 +11,22 @@ use crate::structs::ref_value::RefValue;
 pub struct ConstList{
     pub default : ListDef,
     pub list : IndexMap<String, ListItem>,
+    pub compatible : Option<String>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct MutList{
     pub default : ListDef,
-    pub list : Vec<ListItem>
+    pub list : Vec<ListItem>,
+    ///MutListは初期値を持てないのでConstListに初期値を書いておくことになるだろう。
+    /// その場合、compatibleを設定しdefaultが同一であることを保証することで、そのままListItemをコピーすることが可能になる
+    pub compatible : Option<String>,
 }
 
 pub struct ListItem{
+    ///ListItemの値は常にDefaultからの差分である
     pub values : IndexMap<String, RustValue>,
+    ///ListItemの値はRefでも常にDefaultからの差分である
     pub refs : IndexMap<String, RefValue>,
 }
 
