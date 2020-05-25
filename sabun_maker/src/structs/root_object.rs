@@ -15,7 +15,7 @@ pub struct RootObject{
     pub sabun : HashSet<String, RustParam>,
 
     ///oldに設定されたメンバは、_Oldを付けなければプログラムから使用できず、
-    ///dataである場合、jsonで Refできない
+    ///ConstDataである場合、jsonで Refできない
     pub old : HashSet<String>,
 }
 
