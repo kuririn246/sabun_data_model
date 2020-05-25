@@ -1,7 +1,8 @@
 use crate::structs::value_type::ValueType;
 use crate::structs::qv::{QvType, Qv};
-use crate::structs::rust_list::{RustList, ConstData, ConstList, MutList};
+use crate::structs::rust_list::{ConstData, ConstList, InitialList, MutList, MutData, ListDef};
 use crate::structs::array_type::ArrayType;
+use crate::structs::root_object::ListDefObj;
 
 #[derive(Debug, PartialEq)]
 pub enum RustParam{
@@ -14,9 +15,16 @@ pub enum RustParam{
 #[derive(Debug, PartialEq)]
 pub enum RustValue{
     Param(RustParam, ValueType),
-    Data(ConstData),
-    List(ConstList),
-    Mut(MutList),
+    ConstData(ConstData),
+    ConstList(ConstList),
+    IniList(InitialList),
+    MutList(MutList),
+    MutData(MutData),
+    InnerConstListDef(ListDefObj),
+    InnerConstDataDef(ListDefObj),
+    InnerIniListDef(ListDefObj),
+    InnerMutListDef(ListDefObj),
+    InnerMutDataDef(ListDefObj),
 }
 
 #[derive(Debug, PartialEq)]
