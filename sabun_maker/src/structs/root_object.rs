@@ -1,8 +1,7 @@
 use crate::structs::rust_value::{RustValue, RustParam};
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{HashSet, HashMap};
 use crate::indexmap::IndexMap;
 use crate::structs::ref_value::RefValue;
-use crate::structs::rust_list::RustList;
 
 #[derive(Debug, PartialEq)]
 pub struct RootObject{
@@ -12,7 +11,7 @@ pub struct RootObject{
     pub default : IndexMap<String, RustValue>,
     //変更されたものを記録。差分変更時に、defaultと同じになったらここから削除する
     //listの変更はRustListが直接上書きされるので、sabunには入らない
-    pub sabun : HashSet<String, RustParam>,
+    pub sabun : HashMap<String, RustParam>,
 
     ///oldに設定されたメンバは、_Oldを付けなければプログラムから使用できず、
     ///ConstDataである場合、jsonで Refできない

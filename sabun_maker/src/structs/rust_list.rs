@@ -1,8 +1,8 @@
 
-use crate::structs::root_object::{RustObject, ListDefObj};
-use std::collections::{BTreeMap, HashSet, HashMap};
+use crate::structs::root_object::{ListDefObj};
+use std::collections::{ HashSet, HashMap};
 use linked_hash_map::LinkedHashMap;
-use std::rc::{Rc, Weak};
+use std::rc::{Rc};
 use crate::indexmap::IndexMap;
 use crate::structs::rust_value::RustValue;
 use crate::structs::ref_value::RefValue;
@@ -50,12 +50,12 @@ pub struct MutList{
 ///追加、削除等できるマップ。必要性はよくわからないが・・・マップもあったほうが良いかという気がするので作っておく。
 ///MutのItemに対するRefは、削除されうるので本質的に危険であり、避けたほうがいいように思うが、
 /// たとえばMutで増減するランダムキャラクター同士が好感度をもつような時、キャラクターAに対する好感度をMap(key=A)に入れると効率的に処理できる、といった可能性が考えられる。
+///
+/// MutDataに対して初期値を入れるときは、InitialListのItemからどれをIDにするか、多分nameとか小文字のidとかを設定して、入れることになるだろう。
 #[derive(Debug, PartialEq)]
 pub struct MutData{
     pub default : ListDef,
     pub list : LinkedHashMap<String, ListItem>,
-    ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
-    pub next_id : u64,
 }
 
 #[derive(Debug, PartialEq)]
@@ -80,8 +80,8 @@ pub struct MutListItem{
 #[derive(Debug, PartialEq)]
 pub enum ListDef{
     Def(ListDefObj),
-    ///ListItem内のInnerListは、InnerDefのDefaultを参照する形になる。別にRcでもいいが見た目に分かりやすいのでWeakにしておく
-    InnerItem(Weak<ListDefObj>),
+    ///ListItem内のInnerListは、InnerDefのDefaultを参照する形になる
+    InnerItem(Rc<ListDefObj>),
 }
 //
 // impl RustList{
