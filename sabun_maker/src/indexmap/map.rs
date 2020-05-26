@@ -3,12 +3,12 @@ use std::hash::{Hash, Hasher};
 use std::fmt::Debug;
 
 
-///順番を保持するハッシュマップ
+///順番を保持するハッシュマップ。Remove(未実装)はO(n)になるが、実データがVecなのでiterationが早い。
 #[derive(Debug, PartialEq)]
 pub struct IndexMap<K : Eq + Hash, V>{
     ///Vecは領域が繰り返し作り直されるので、ポインタを永続させるためにBoxが必要
-    contents : Vec<(Box<K>,Box<V>)>,
-    ///BoxのポインタをHashMapで保持。unsafe
+    contents : Vec<Box<(K,V)>>,
+    ///Boxの中のポインタをHashMapで保持。unsafe
     map : HashMap<IndexMapKey<K>, *mut V>
 }
 
@@ -45,9 +45,9 @@ impl<K : Eq + Hash, V> IndexMap<K,V>{
         match self.map.get(&temp_key){
             Some(ptr) => Some(unsafe{ std::mem::replace(&mut **ptr, value) }),
             None=>{
-                self.contents.push((Box::new(key), Box::new(value)));
-                let (key, value) = self.contents.last_mut().unwrap();
-                self.map.insert(IndexMapKey{ key : key.as_ref() }, value.as_mut());
+                self.contents.push(Box::new((key,value)));
+                let (key, value) = self.contents.last_mut().unwrap().as_mut();
+                self.map.insert(IndexMapKey{ key }, value);
                 None
             }
         }
@@ -67,7 +67,6 @@ impl<'a, K : Eq + Hash, V> IntoIterator for &'a IndexMap<K, V> {
     type Item = (&'a K, &'a V);
     type IntoIter = IndexMapIter<'a, K, V>;
 
-    #[inline]
     fn into_iter(self) -> IndexMapIter<'a, K, V> {
         self.iter()
     }
@@ -86,50 +85,50 @@ impl<'a, K : Eq + Hash,V> Iterator for IndexMapIter<'a, K,V> {
             let counter = self.counter;
 
             self.counter += 1;
-            let (k,v) = &self.map.contents[counter];
+            let (k,v) = &self.map.contents[counter].as_ref();
             return Some((k,v));
         } else{
             None
         }
     }
 
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::indexmap::map::{IndexMap, IndexMapKey };
-    use std::collections::HashMap;
-
-    #[test]
-    fn it_works() {
-        let mut im : IndexMap<String, i32> = IndexMap::new();
-        im.insert("hoge".to_string(), 10);
-        im.insert("hoge2".to_string(), 20);
-
-        for (k,v) in &im{
-            println!("{} {}", k, v);
-        }
-
-
-        println!("{:?}", im.insert("hoge".to_string(), 40));
-        for (k,v) in &im{
-            println!("{} {}", k, v);
-        }
-
-    }
-
-    // #[test]
-    // fn it_works() {
-    //     let mut vec : Vec<(usize,usize)> = vec![(10, 10), (20,60)];
-    //     let mut map : HashMap<String, *mut usize> = HashMap::new();
-    //     let (_,hoge) = vec.last_mut().unwrap();
-    //     map.insert("item".to_string(), hoge);
-    //     let hoge2 = map.get_mut(&"item".to_string()).unwrap();
-    //
-    //     let hoge = unsafe{ std::mem::replace(&mut **hoge2, 40) };
-    //     println!("{:?} {}", vec[1], hoge);
-    // }
-
-
-
-}
+// }
+//
+// #[cfg(test)]
+// mod tests {
+//     use crate::indexmap::map::{IndexMap, IndexMapKey };
+//     use std::collections::HashMap;
+//
+//     #[test]
+//     fn it_works() {
+//         let mut im : IndexMap<String, i32> = IndexMap::new();
+//         im.insert("hoge".to_string(), 10);
+//         im.insert("hoge2".to_string(), 20);
+//
+//         for (k,v) in &im{
+//             println!("{} {}", k, v);
+//         }
+//
+//
+//         println!("{:?}", im.insert("hoge".to_string(), 40));
+//         for (k,v) in &im{
+//             println!("{} {}", k, v);
+//         }
+//
+//     }
+//
+//     // #[test]
+//     // fn it_works() {
+//     //     let mut vec : Vec<(usize,usize)> = vec![(10, 10), (20,60)];
+//     //     let mut map : HashMap<String, *mut usize> = HashMap::new();
+//     //     let (_,hoge) = vec.last_mut().unwrap();
+//     //     map.insert("item".to_string(), hoge);
+//     //     let hoge2 = map.get_mut(&"item".to_string()).unwrap();
+//     //
+//     //     let hoge = unsafe{ std::mem::replace(&mut **hoge2, 40) };
+//     //     println!("{:?} {}", vec[1], hoge);
+//     // }
+//
+//
+//
+// }
