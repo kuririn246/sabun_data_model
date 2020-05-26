@@ -3,10 +3,13 @@ use std::hash::{Hash, Hasher};
 use std::fmt::Debug;
 
 
+///順番を保持するハッシュマップ
 #[derive(Debug, PartialEq)]
-pub struct IndexMap<K : Eq + Hash, V : Debug>{
-    contents : Vec<(K,V)>,
-    map : HashMap<IndexMapKey<K>, usize>
+pub struct IndexMap<K : Eq + Hash, V>{
+    ///Vecは領域が繰り返し作り直されるので、ポインタを永続させるためにBoxが必要
+    contents : Vec<(Box<K>,Box<V>)>,
+    ///BoxのポインタをHashMapで保持。unsafe
+    map : HashMap<IndexMapKey<K>, *mut V>
 }
 
 #[derive(Debug)]
@@ -30,7 +33,7 @@ impl<K: Eq + Hash> Hash for IndexMapKey<K> {
     }
 }
 
-impl<K : Eq + Hash, V : Debug> IndexMap<K,V>{
+impl<K : Eq + Hash, V> IndexMap<K,V>{
     pub fn new() -> IndexMap<K,V>{
         IndexMap{ contents : vec![], map : HashMap::new() }
     }
@@ -40,23 +43,13 @@ impl<K : Eq + Hash, V : Debug> IndexMap<K,V>{
     pub fn insert(&mut self, key : K, value : V) -> Option<V>{
         let temp_key = IndexMapKey{ key : &key };
         match self.map.get(&temp_key){
-            Some(ind) => std::mem::replace(&mut self.contents[usize], value),
+            Some(ptr) => Some(unsafe{ std::mem::replace(&mut **ptr, value) }),
             None=>{
-
-                self.contents.push((key, value));
-
+                self.contents.push((Box::new(key), Box::new(value)));
+                let (key, value) = self.contents.last_mut().unwrap();
+                self.map.insert(IndexMapKey{ key : key.as_ref() }, value.as_mut());
+                None
             }
-        }
-        if self.map.contains_key(&temp_key){
-            let val = self.map.get_mut(&temp_key).unwrap();
-            println!("val {:?}", value);
-            unsafe{ println!("moto {:?}", **val); }
-            Some(unsafe{ std::mem::replace(&mut **val, value) })
-        } else{
-
-            let (key, value) = self.contents.last_mut().unwrap();
-            self.map.insert(IndexMapKey { key }, value);
-            return None;
         }
     }
 
@@ -70,7 +63,7 @@ impl<K : Eq + Hash, V : Debug> IndexMap<K,V>{
 }
 
 
-impl<'a, K : Eq + Hash, V : Debug> IntoIterator for &'a IndexMap<K, V> {
+impl<'a, K : Eq + Hash, V> IntoIterator for &'a IndexMap<K, V> {
     type Item = (&'a K, &'a V);
     type IntoIter = IndexMapIter<'a, K, V>;
 
@@ -80,12 +73,12 @@ impl<'a, K : Eq + Hash, V : Debug> IntoIterator for &'a IndexMap<K, V> {
     }
 }
 
-pub struct IndexMapIter<'a, K : Eq + Hash, V : Debug>{
+pub struct IndexMapIter<'a, K : Eq + Hash, V>{
     map : &'a IndexMap<K, V>,
     counter : usize,
 }
 
-impl<'a, K : Eq + Hash,V : Debug> Iterator for IndexMapIter<'a, K,V> {
+impl<'a, K : Eq + Hash,V> Iterator for IndexMapIter<'a, K,V> {
     type Item = (&'a K, &'a V);
 
     fn next(&mut self) -> Option<Self::Item>{
@@ -111,11 +104,11 @@ mod tests {
     fn it_works() {
         let mut im : IndexMap<String, i32> = IndexMap::new();
         im.insert("hoge".to_string(), 10);
-        // im.insert("hoge2".to_string(), 20);
-        //
-        // for (k,v) in &im{
-        //     println!("{} {}", k, v);
-        // }
+        im.insert("hoge2".to_string(), 20);
+
+        for (k,v) in &im{
+            println!("{} {}", k, v);
+        }
 
 
         println!("{:?}", im.insert("hoge".to_string(), 40));
@@ -123,9 +116,6 @@ mod tests {
             println!("{} {}", k, v);
         }
 
-        for (key,val) in &im.contents{
-            println!("{} {}", key, val);
-        }
     }
 
     // #[test]
