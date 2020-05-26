@@ -1,1 +1,0 @@
-pub type IndexMap<Key,Value> = linked_hash_map::LinkedHashMap<Key, Value>;
