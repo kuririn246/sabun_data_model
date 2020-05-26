@@ -92,7 +92,7 @@ impl<'a, K : Eq + Hash,V> Iterator for IndexMapIter<'a, K,V> {
         }
     }
 
-// }
+ }
 //
 // #[cfg(test)]
 // mod tests {
