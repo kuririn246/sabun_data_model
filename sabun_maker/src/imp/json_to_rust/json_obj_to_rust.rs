@@ -5,12 +5,12 @@ use super::json_name::{json_name, NameType, SystemNames};
 use super::json_item_to_rust::json_item_to_rust;
 use crate::error::Result;
 use super::get_refs::get_refs;
-use super::get_renamed::get_renamed;
 use super::json_item_to_rust::json_item_to_rust_ref;
 
 use crate::imp::json_to_rust::get_include::get_include;
 use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
 use crate::imp::json_to_rust::get_old::get_old;
+use crate::imp::json_to_rust::get_id::get_id;
 
 
 pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : &Names) -> Result<TmpObj>{
@@ -32,12 +32,11 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : 
                 match sn{
                     SystemNames::ID =>{
                         if r.id.is_none() {
-                            match v{
-                                JVal::String(s,span) =>{
-
-                                }
+                            if let Some(id) = get_id(v){
+                                r.id = Some(id);
+                            } else {
+                                Err(format!("{} ID must be a string or a num : {} {}", v.line_str(), v.slice(), names))?
                             }
-                            r.id = Some(v.as_str().ok_or_else(|| format!("{} ID must be string : {} {}", v.line_str(), v.slice(), names))?.to_string())
                         } else{
                             Err(format!("{} ID is defined multiple times {}", v.line_str(), names))?;
                         }

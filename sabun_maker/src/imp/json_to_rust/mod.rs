@@ -2,15 +2,16 @@ pub mod names;
 pub mod json_obj_to_rust;
 pub mod json_name;
 pub mod tmp;
-// pub mod json_item_to_rust;
-// pub mod json_array_to_rust;
-// pub mod array_null;
-// pub mod list;
+pub mod json_item_to_rust;
+pub mod json_array_to_rust;
+pub mod array_null;
+pub mod list;
 pub mod get_old;
-// pub mod get_refs;
+pub mod get_id;
+pub mod get_refs;
 // pub mod rename_map;
 // pub mod json_dir_to_rust;
-// pub mod get_include;
+pub mod get_include;
 // pub mod validation;
 //
 //
