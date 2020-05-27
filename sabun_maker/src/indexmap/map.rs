@@ -4,6 +4,12 @@ use std::fmt::Debug;
 
 
 ///順番を保持するハッシュマップ。Remove(未実装)はO(n)になるが、実データがVecなのでiterationが早い。
+/// KeyとValueのポインタ２つをハッシュテーブルに入れているのでコンパクトだしかなり効率はいいはずでござる。
+/// 通常Removeは最後尾とのswapで実装するが、「Removeすると順番が保持されない」とかいうなんだかよくわからない存在に成り下がる。
+/// それならただのハッシュマップでいいような？　しかし効率が良くてボーナスもあるMapとして人気があるらしい。
+/// 順番保持という目的だとLinkedHashMapの方が基本的に優れてるように思う
+///
+/// crates.ioにあるIndexMapはcfg設定が特殊でIntelliJでサジェストできないので試しに自作
 #[derive(Debug, PartialEq)]
 pub struct IndexMap<K : Eq + Hash, V>{
     ///Vecは領域が繰り返し作り直されるので、ポインタを永続させるためにBoxが必要
