@@ -10,6 +10,7 @@ use super::json_item_to_rust::json_item_to_rust_ref;
 
 use crate::imp::json_to_rust::get_include::get_include;
 use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
+use crate::imp::json_to_rust::get_old::get_old;
 
 
 pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : &Names) -> Result<TmpObj>{
@@ -31,6 +32,11 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : 
                 match sn{
                     SystemNames::ID =>{
                         if r.id.is_none() {
+                            match v{
+                                JVal::String(s,span) =>{
+
+                                }
+                            }
                             r.id = Some(v.as_str().ok_or_else(|| format!("{} ID must be string : {} {}", v.line_str(), v.slice(), names))?.to_string())
                         } else{
                             Err(format!("{} ID is defined multiple times {}", v.line_str(), names))?;
@@ -56,29 +62,18 @@ pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : 
                             Err(format!("{} RefIDs is defined multiple times {}", v.line_str(), names))?;
                         }
                     },
-                    SystemNames::Renamed =>{
-                        if r.renamed.len() == 0{
+                    SystemNames::Old =>{
+                        if r.old.len() == 0{
                             match &v{
                                 JVal::Array(a, span) =>{
-                                    r.renamed = get_renamed(a, span, names)?;
+                                    r.old = get_old(a, span, names)?;
                                 },
                                 _ =>{ Err(format!("{}  {}", v.line_str(), names))?; }
                             }
 
                         } else{
                             //そもそも複数回の定義はjsonパーサーによって弾かれるはずだが・・・
-                            Err(format!("{} Rename is defined multiple times {}", v.line_str(), names))?;
-                        }
-                    }
-                    SystemNames::Obsolete =>{
-                        if let Some(b) = v.as_bool(){
-                            if b == false{
-                                Err(format!("{} Obsolete must be \"true\" {}", v.line_str(), names))?;
-                            }
-                            if r.obsolete == true {
-                                Err(format!("{} Obsolete is defined multiple times {}", v.line_str(), names))?;
-                            }
-                            r.obsolete = true;
+                            Err(format!("{} Old is defined multiple times {}", v.line_str(), names))?;
                         }
                     }
                 }

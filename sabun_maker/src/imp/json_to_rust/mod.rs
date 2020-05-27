@@ -6,7 +6,7 @@ pub mod tmp;
 // pub mod json_array_to_rust;
 // pub mod array_null;
 // pub mod list;
-// pub mod get_renamed;
+pub mod get_old;
 // pub mod get_refs;
 // pub mod rename_map;
 // pub mod json_dir_to_rust;

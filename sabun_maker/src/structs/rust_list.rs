@@ -37,13 +37,10 @@ pub struct MutList{
 }
 
 ///Data or Listの内部に作るList。上がMutの場合はMutだし、ConstならConstだが、アクセス制限の違いだけで中身の違いはない。Constの場合idは無視できる。ListDefObjにはDefaultだけ書き、ListItemでは必要ならItemのみを書く。
-///MutListをTableとして、InnerListをSortedListとして運用することで理論上はRelationも表現できる・・・でも実際はConstDataとRefでやるべきだと思う
 #[derive(Debug, PartialEq)]
 pub struct InnerList{
     pub list : Vec<MutListItem>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1秒間に1億生成しても1万年ぐらいかかるはず
-    /// Relationに使うつもりなら、next_idを振る必要はないだろう。その場合、u64::MAX_VALUEをnext_idに入れておくことにしようか
-    /// next_idをインクリメントする時、u64::MAXを超えるときはpanicするようにシステムを組むと、バグが検出できてよろしかろう。
     pub next_id : u64,
 }
 
@@ -57,16 +54,18 @@ pub struct ListItem{
 
 ///たとえばキャラクターAとキャラクターBの間で出来事Cが起こったとする。
 /// キャラクターAのIDをa, BのIDをbとする。
-/// グローバルの出来事リストに出来事Cを記録し、next_idからidを取り、そのidをcとする。その出来事のオブジェクトにはaとbもvaluesに記録されている。
+/// グローバルの出来事リストに出来事Cを記録し、next_idからidを振り、そのidをcとする。その出来事のオブジェクトにはaとbもvaluesに記録されている。
 /// AのインナーリストのID bの項目にアクセスし、なければ作成し、insertする。
 /// Aのbの下にある出来事ID保持用のinner listに出来事ID cを記憶しておく。ID保持用のinner listは、idだけで中身のないオブジェクトを集めたinner listになる。
 /// 同様にキャラクターBのRelationリストaの出来事リストにも、出来事ID cを記録。
 /// これにより、たとえば出来事Cを削除したい場合、Cにあるaとbを読み、AのbにあるID cのものを削除、 Bのaにあるcも削除、さらに出来事リストからCも削除すると、全部消える。
-/// AとBとの間で何があったかの一覧がほしいなら、Aのbにアクセスし、出来事IDリストを取得、出来事リストからSortedListの2分探索を用いてid検索し、出来事を取得、という感じになる。
+/// AとBとの間で何があったかの一覧がほしいなら、Aのbにアクセスし、出来事IDリストを取得、出来事リストからid検索し、出来事を取得、という感じになる。
 /// 出来事リストのIDはnext_id方式により、時系列に積み上がっていくため、何年何月に起きた出来事はID x から y という情報があれば、
 /// その間の出来事を全部調べたり、一定期間が過ぎた出来事データのうち重要じゃないものは消す、といった処理もできる。
-/// キャラクターBを削除したい場合、他のキャラクターのinner listのbの部分を全部消し、Bのインナーリストから取れる出来事IDを全部調べてHashSetに入れて、
-/// 出来事リストを舐めながら全部消す、といった感じで消していくことが可能だ。
+/// キャラクターBを削除したい場合、他のキャラクターのinner listのbの部分を全部消し、Bのインナーリストから取れる出来事IDを全部調べて
+/// 出来事リストから全部消す、といった感じで消していくことが可能だ。
+///
+/// こういったユースケース（あるのか？）のためにRelationを作る
 #[derive(Debug, PartialEq)]
 pub struct MutListItem{
     ///アイテムごとにidが振られ、これによって削除や順番の変更を検出できる
@@ -78,3 +77,8 @@ pub struct MutListItem{
 }
 
 
+///MutListの内部でしか使えない。使い方はMutListItemを参照
+#[derive(Debug, PartialEq)]
+pub struct Relation{
+    pub list : HashMap<u64, MutListItem>,
+}

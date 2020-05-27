@@ -33,6 +33,16 @@ pub fn json_name(s : &str) -> Option<NameType>{
     return Some(NameType::Name(name, vt))
 }
 
+///?とか！がついておらず大文字で始まらない普通の名前
+pub fn json_simple_name(s : &str) -> Option<String> {
+    match json_name(s) {
+        Some(NameType::Name(name, ValueType::Normal)) => {
+            Some(name)
+        },
+        _ => { None }
+    }
+}
+
 
 // ///[@a-z_][a-zA-Z0-9_]*
 // pub fn is_valid_name(s : &str) -> bool{

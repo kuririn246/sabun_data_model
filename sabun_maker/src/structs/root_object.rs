@@ -28,14 +28,16 @@ pub struct ListDefObj{
 
 //
 //
-// impl RustObject{
-//     pub fn new() -> RustObject{
-//         RustObject{
-//             include : vec![],
-//             default : IndexMap::new(), sabun : IndexMap::new(),
-//             id : None, refs: IndexMap::new(),
-//             renamed: BTreeMap::new(), obsolete : false }
-//     }
+impl RootObject {
+    pub fn new() -> RustObject {
+        RustObject {
+            include: vec![],
+            default: IndexMap::new(),
+            sabun: HashMap::new(),
+            obsolete: false
+        }
+    }
+}
 //
 //     pub fn insert_default(&mut self, key : String, value : RustValue) -> Option<RustValue>{
 //         return self.default.insert(key, value);
