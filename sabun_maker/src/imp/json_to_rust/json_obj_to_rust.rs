@@ -9,13 +9,12 @@ use super::get_renamed::get_renamed;
 use super::json_item_to_rust::json_item_to_rust_ref;
 
 use crate::imp::json_to_rust::get_include::get_include;
+use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
 
 
-pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : &Names) -> Result<RustObject>{
-    let mut r : RustObject = RustObject::new();
+pub fn json_obj_to_rust(v : &IndexMap<String, JVal>, is_ref_obj : bool, names : &Names) -> Result<TmpObj>{
+    let mut r  = TmpObj::new();
     for (k,v) in v{
-        let k : &String = k;
-        let v : &JVal = v;
         let name = json_name(k).ok_or_else(|| format!("{} {} is not a valid name {}",v.line_str(), k, names))?;
         match name{
             NameType::Name(name, vt) =>{
