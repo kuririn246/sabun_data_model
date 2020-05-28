@@ -1,12 +1,11 @@
-use json5_parser::{JVal, Span};
+use json5_parser::{JVal};
 use crate::imp::json_to_rust::names::Names;
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{HashSet};
 use crate::error::Result;
-use crate::imp::json_to_rust::rename_map::{rename_map, RenameMapError};
 use crate::imp::json_to_rust::json_name::{json_name, NameType};
 use crate::structs::value_type::ValueType;
 
-pub fn get_old(array : &[JVal], span : &Span, names : &Names) -> Result<HashSet<String>>{
+pub fn get_old(array : &[JVal], names : &Names) -> Result<HashSet<String>>{
     let mut result : HashSet<String> = HashSet::new();
 
     for item in array{
@@ -17,7 +16,7 @@ pub fn get_old(array : &[JVal], span : &Span, names : &Names) -> Result<HashSet<
                         result.insert(name);
                     },
                     _ =>{
-                        Err(format!("{} {} is not a valid simple name {}",v.line_str(), s, names))?;
+                        Err(format!("{} {} is not a valid simple name {}",span.line_str(), s, names))?;
                     }
                 }
             },

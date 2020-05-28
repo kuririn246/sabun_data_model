@@ -5,7 +5,7 @@ use json5_parser::{JVal, Span};
 use super::array_null::array_null;
 use super::list::json_list_to_rust::json_list_to_rust;
 use crate::structs::value_type::ValueType;
-use crate::structs::rust_value::{RustValue, RustArray};
+use crate::structs::rust_value::{RustValue, RustArray, RustParam};
 use crate::structs::qv::Qv;
 use crate::structs::array_type::ArrayType;
 
@@ -17,20 +17,20 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
             let array = get_array( &array[1..], &array_type, names)?;
             match array{
                 Qv::Val(array) =>{
-                    Ok(RustValue::Array(Qv::Val(array), array_type, value_type))
+                    Ok(RustValue::Param(RustParam::Array(Qv::Val(array), array_type), value_type))
                 },
                 Qv::Null => {
                     if value_type.is_nullable() {
-                        Ok(RustValue::Array(Qv::Null, array_type, value_type))
+                        Ok(RustValue::Param(RustParam::Array(Qv::Null, array_type), value_type))
                     } else{
                         Err(format!(r#"{} Nullable parameters must have "?" in the end of their name {}"#, span.line_str(), names))?
                     }
                 },
                 Qv::Undefined => {
-                    if value_type.is_nullable() {
-                        Ok(RustValue::Array(Qv::Null, array_type, value_type))
+                    if value_type.is_undefable() {
+                        Ok(RustValue::Param(RustParam::Array(Qv::Undefined, array_type), value_type))
                     } else{
-                        Err(format!(r#"{} Nullable parameters must have "?" in the end of their name {}"#, span.line_str(), names))?
+                        Err(format!(r#"{} Undefiable parameters must have "!" in the end of their name {}"#, span.line_str(), names))?
                     }
                 },
             }
@@ -39,7 +39,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
             let array = get_array(&array, &ArrayType::Num, names)?;
             match array{
                 Qv::Val(array) =>{
-                    Ok(RustValue::Array(Qv::Val(array), ArrayType::Num, value_type))
+                    Ok(RustValue::Param(RustParam::Array(Qv::Val(array), ArrayType::Num), value_type))
                 },
                 Qv::Null =>{ unreachable!() },
                 Qv::Undefined => { unreachable!() },
@@ -49,11 +49,14 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
             //いまのところ["Num", null] のような形での、nullのセットしか認めていない。Arrayを使った記法では、null以外はセットできない。
             array_null(&array[1..], gat, value_type, span, names)
         },
-        None =>{ Err(format!(r#"{} Array must be "...-Array", "List", "Num", "Str" or "Bool" {}"#, span.line_str(), names))? },
-        List =>{
+        None =>{ Err(format!(r#"{} Array must be "...Array", "List", "Data", "MutList", "InnerList", "Num", "Str" or "Bool" {}"#, span.line_str(), names))? },
+        List | Data | MutList | InnerList =>{
             match value_type{
                 ValueType::Normal =>{
-                    json_list_to_rust(&array[1..], names)
+                    let tmp = json_list_to_rust(&array[1..], names)?;
+                    match gat{
+                        List => RustValue::List()
+                    }
                 },
                 _ =>{
                     Err(format!(r#"{} Lists can't be undefined or null {}"#, span.line_str(), names))?
@@ -67,6 +70,9 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
 pub enum GatResult{
     AT(ArrayType),
     List,
+    Data,
+    MutList,
+    InnerList,
     Num,
     NoTagNum,
     Str,
@@ -80,14 +86,17 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
         return match v{
             JVal::String(s, _)=>{
                 return match s.as_str(){
-                    "Num-Array" =>{ AT(ArrayType::Num) },
-                    "Str-Array" =>{ AT(ArrayType::String) },
-                    "Num2-Array" =>{ AT(ArrayType::Num2) }
+                    "NumArray" =>{ AT(ArrayType::Num) },
+                    "StrArray" =>{ AT(ArrayType::String) },
+                    "Num2Array" =>{ AT(ArrayType::Num2) }
                     "Num" =>{ Num },
                     "Str" =>{ Str },
                     "Bool" =>{ Bool },
-                    "List" => { GatResult::List }
-                    _=>{ GatResult::None }
+                    "List" => { GatResult::List },
+                    "Data" => { GatResult::Data },
+                    "MutList" => { GatResult::MutList }
+                    "InnerList" => { GatResult::InnerList }
+                    _=>{ GatResult::None },
                 }
             },
             JVal::Double(_num, _) => NoTagNum,
@@ -98,18 +107,18 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
 }
 
 pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result<Qv<RustArray>>{
-    let mut vec : Vec<RustValue> = vec![];
+    let mut vec : Vec<RustParam> = vec![];
     for item in a{
         let val = match item{
             JVal::Double(f, _) => {
                 match array_type {
-                    ArrayType::Num => RustValue::Number(Qv::Val(*f), ValueType::Normal),
+                    ArrayType::Num => RustParam::Number(Qv::Val(*f)),
                     _ => Err(format!(r#"{} {} num is not valid in this array {}"#, item.line_str(), item.slice(), names))?,
                 }
             },
             JVal::String(s, _) =>{
                 match array_type {
-                    ArrayType::String => RustValue::String(Qv::Val(s.to_string()), ValueType::Normal),
+                    ArrayType::String => RustParam::String(Qv::Val(s.to_string())),
                     _ => Err(format!(r#"{} {} string is not valid in this array {}"#, item.line_str(), item.slice(), names))?,
                 }
             },
@@ -132,10 +141,13 @@ pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result
                     ArrayType::Num2 => {
                         let rv = json_array_to_rust(a2, ValueType::Normal, span, names)?;
                         match rv{
-                            RustValue::Array(array, _at, _vt) =>{
+                            RustValue::Param(RustParam::Array(array, at), _vt) =>{
                                 match array {
                                     Qv::Val(array) => {
-                                        RustValue::Array(Qv::Val(array), ArrayType::Num, ValueType::Normal)
+                                        match at {
+                                            ArrayType::Num => RustParam::Array(Qv::Val(array), ArrayType::Num),
+                                            _ => { Err(format!(r#"{} {} is not a num array {}"#, span.line_str(), span.slice(), names))? }
+                                        }
                                     },
                                     Qv::Null => {
                                         Err(format!(r#"{} null is not a num array {}"#, item.line_str(), names))?
@@ -156,5 +168,5 @@ pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result
         };
         vec.push(val);
     }
-    return Ok(Qv::Val(RustArray{ vec }));
+    return Ok(Qv::Val(RustArray{ vec : vec }));
 }

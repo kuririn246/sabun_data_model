@@ -2,12 +2,11 @@ use json5_parser::{JVal, Span};
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::imp::json_to_rust::json_obj_to_rust::json_obj_to_rust;
-use crate::indexmap::IndexMap;
 use linked_hash_map::LinkedHashMap;
-use crate::structs::root_object::RustObject;
+use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
 
-pub fn get_list_items(array : &[JVal], need_id : bool,  _span : &Span, names : &Names) -> Result<LinkedHashMap<String, RustObject>>{
-    let mut result : LinkedHashMap<String, RustObject> = LinkedHashMap::new();
+pub fn get_list_items(array : &[JVal], need_id : bool,  _span : &Span, names : &Names) -> Result<Vec<TmpObj>>{
+    let mut result : Vec<TmpObj> = vec![];
     for index in 0..array.len(){
         let item = &array[index];
         match item{
@@ -23,7 +22,7 @@ pub fn get_list_items(array : &[JVal], need_id : bool,  _span : &Span, names : &
     return Ok(result);
 }
 
-pub fn get_list_item(map : &IndexMap<String, JVal>, need_id : bool, index : usize, span : &Span, names : &Names) -> Result<(String, RustObject)>{
+pub fn get_list_item(map : &LinkedHashMap<String, JVal>, need_id : bool, index : usize, span : &Span, names : &Names) -> Result<(String, TmpObj)>{
     let mut obj = json_obj_to_rust(map, false, names)?;
 
     if need_id{

@@ -4,40 +4,20 @@ use crate::error::Result;
 use super::list_attribute::{ListAttribute, list_attribute};
 use super::get_list_items::get_list_items;
 use crate::structs::rust_value::RustValue;
-use crate::structs::rust_list::{RustList, ListDef};
+use crate::imp::json_to_rust::tmp::tmp_list::TmpList;
 
-pub fn json_list_to_rust(array : &[JVal],  names : &Names) -> Result<RustValue> {
-    let mut result = RustList::new();
+pub fn json_list_to_rust(array : &[JVal],  names : &Names) -> Result<TmpList> {
+    let mut result = TmpList::new();
     for ind in 0..array.len() {
         let item = &array[ind];
         match item {
             JVal::Array(a2, span) => {
                 match list_attribute(a2, span, names)?{
-                    ListAttribute::Reffered =>{
-                        match result.list_type{
-                            ListType::Normal =>{
-                                result.list_type = ListType::Reffered;
-                            },
-                            _ =>{
-                                Err(format!(r#"{} "Reffered" can't coexist with "AutoID" {}"#, span.line_str(), names))?
-                            }
-                        }
-                    },
-                    ListAttribute::AutoID(id) =>{
-                        match result.list_type{
-                            ListType::Normal =>{
-                                result.list_type = ListType::AutoID(id);
-                            },
-                            _ =>{
-                                Err(format!(r#"{} "AutoID" can't coexist with "Reffered" {}"#, span.line_str(), names))?
-                            }
-                        }
-                    },
                     ListAttribute::Default(obj) =>{
-                        result.default = ListDef::Def(obj);
+                        result.default = obj;
                     },
-                    ListAttribute::Redef(redef) =>{
-                        result.redef = redef;
+                    ListAttribute::Old(old) =>{
+                        result.old = old;
                     }
                 }
             },

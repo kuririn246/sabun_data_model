@@ -1,6 +1,6 @@
 use std::rc::Rc;
 //use indexmap::IndexMap;
-pub type IndexMap<Key, Value> = linked_hash_map::LinkedHashMap<Key, Value>;
+use linked_hash_map::LinkedHashMap;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum JVal{
@@ -11,11 +11,11 @@ pub enum JVal{
     //Int(i64, Span),
     Double(f64, Span),
     Array(Vec<JVal>, Span),
-    Map(IndexMap<String, JVal>, Span)
+    Map(LinkedHashMap<String, JVal>, Span)
 }
 
 impl JVal{
-    pub fn as_object(&self) -> Option<&IndexMap<String, JVal>>{
+    pub fn as_object(&self) -> Option<&LinkedHashMap<String, JVal>>{
         return match self {
             JVal::Map(map, _span) => { Some(map) }
             _ => { None }

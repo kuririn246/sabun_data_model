@@ -19,23 +19,21 @@ use json5_parser::JVal;
 use names::Names;
 use crate::error::Result;
 use crate::structs::root_object::{RootObject};
-use crate::structs::rust_value::RustValue;
-use crate::structs::value_type::ValueType;
+use std::collections::HashMap;
+
 //
 pub fn json_root_to_rust(json : &str) -> Result<RootObject>{
     let jval = json5_parser::from_str(json)?;
-    return jval_to_rust_obj(&jval);
-}
-//
-// pub fn json_item_str_to_rust(name : &str, json : &str) -> Result<RustValue>{
-//     let jval = json5_parser::from_str(json)?;
-//     return json_item_to_rust::json_item_to_rust(name, ValueType::Normal, &jval, &Names::new("."));
-// }
-//
-pub fn jval_to_rust_obj(v : &JVal) -> Result<RootObject> {
-    return match v{
+
+    return match jval{
         JVal::Map(map, _) =>{
-            json_obj_to_rust::json_obj_to_rust(map, false, &Names::new(""))
+            let tmp = json_obj_to_rust::json_obj_to_rust(&map,  &Names::new(""))?;
+            Ok(RootObject{
+                include : tmp.include,
+                old : tmp.old,
+                default : tmp.default,
+                sabun : HashMap::new(),
+            })
         },
         _ =>{
             Err(format!(r#"root object is not found"#))?

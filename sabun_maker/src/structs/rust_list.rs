@@ -65,20 +65,17 @@ pub struct ListItem{
 /// キャラクターBを削除したい場合、他のキャラクターのinner listのbの部分を全部消し、Bのインナーリストから取れる出来事IDを全部調べて
 /// 出来事リストから全部消す、といった感じで消していくことが可能だ。
 ///
-/// こういったユースケース（あるのか？）のためにRelationを作る
+/// こういったユースケース（あるのか？）のためにHashMap(u64,MutListItem)を使うとRelationを効率的に処理できるだろう。
+/// あるいはBTreeMap(index_key, u64)でindex_keyでソートされたMapを作り、「index_keyがAからBの間にあるアイテム」といった条件で検索が可能になる。
+/// そういったシステムを、C(a,b)オブジェクトを読み出して外部にRelationを構築したり、パラメータをindex-keyとしてBTreeを構築したりすることで
+/// （パラメータは上書きされうるので、その場合(item_id, BTreeのid)のRelationを使って、上書き時にBTreeをアップデートできるようにしておく必要もあり大変だが)
+/// Relationとパラメータ範囲での検索が効率的にできるシステムが作れる。ただそれは外部に作ればいいので、このシステム自体の守備範囲ではない
 #[derive(Debug, PartialEq)]
 pub struct MutListItem{
     ///アイテムごとにidが振られ、これによって削除や順番の変更を検出できる
     pub id : u64,
     ///ListItemの値は常にDefaultからの差分である
-    pub values : IndexMap<String, RustValue>,
+    pub values : HashMap<String, RustValue>,
     ///ListItemの値はRefでも常にDefaultからの差分である
-    pub refs : IndexMap<String, RefValue>,
-}
-
-
-///MutListの内部でしか使えない。使い方はMutListItemを参照
-#[derive(Debug, PartialEq)]
-pub struct Relation{
-    pub list : HashMap<u64, MutListItem>,
+    pub refs : HashMap<String, RefValue>,
 }

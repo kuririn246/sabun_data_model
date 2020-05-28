@@ -26,18 +26,24 @@ pub struct ListDefObj{
     pub old : HashSet<String>,
 }
 
-//
-//
-impl RootObject {
-    pub fn new() -> RustObject {
-        RustObject {
-            include: vec![],
-            default: IndexMap::new(),
-            sabun: HashMap::new(),
-            obsolete: false
-        }
+impl ListDefObj{
+    pub fn new() -> ListDefObj{
+        ListDefObj{ default : IndexMap::new(), refs : IndexMap::new(), old : HashSet::new() }
     }
 }
+
+//
+//
+// impl RootObject {
+//     pub fn new() -> RootObject {
+//         RustObject {
+//             include: vec![],
+//             default: IndexMap::new(),
+//             sabun: HashMap::new(),
+//             obsolete: false
+//         }
+//     }
+// }
 //
 //     pub fn insert_default(&mut self, key : String, value : RustValue) -> Option<RustValue>{
 //         return self.default.insert(key, value);

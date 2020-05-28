@@ -2,10 +2,10 @@ use json5_parser::{JVal, Span};
 use super::super::names::Names;
 use super::super::json_obj_to_rust::json_obj_to_rust;
 use crate::error::Result;
-use crate::indexmap::IndexMap;
-use crate::structs::root_object::RustObject;
+use crate::structs::root_object::ListDefObj;
+use linked_hash_map::LinkedHashMap;
 
-pub fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<RustObject>{
+pub fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<ListDefObj>{
     let error_message = r#"["Default", \{ default_obj \}] is valid"#;
     if array.len() != 1{
         Err(format!(r#"{} {} {} {}"#, span.line_str(), span.slice(), error_message, names))?
@@ -18,16 +18,15 @@ pub fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<Rust
     }
 }
 
-fn get_default_obj(map : &IndexMap<String, JVal>, span : &Span, names : &Names) -> Result<RustObject>{
+fn get_default_obj(map : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<ListDefObj>{
     let names = &names.append("default");
     let obj = json_obj_to_rust(map, false, names)?;
-    if (&obj).id.is_none() == false{
-        Err(format!("{} ID is not valid for default objects {}", span.line_str(), names))?
+     if obj.id.is_some(){
+         Err(format!("{} ID is not valid for Default {}", span.line_str(), names))?
+     }
+    if obj.include.len() != 0{
+        Err(format!("{} Include is not valid for Default {}", span.line_str(), names))?
     }
 
-    // if obj.default.is_none(){
-    //     Err(format!("{} no default obj {}", span.line_str(), names))?
-    // }
-
-    return Ok(obj);
+    return Ok(ListDefObj{ default : obj.default, refs : obj.refs, old : obj.old })
 }

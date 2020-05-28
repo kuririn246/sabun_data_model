@@ -7,6 +7,6 @@ pub fn tmp_to_root(tmp : TmpObj) -> RootObject{
         include: tmp.include,
         default: tmp.default,
         sabun: HashMap::new(),
-        old: tmp.old.iter().collect(),
+        old: tmp.old.into_iter().collect(),
     }
 }

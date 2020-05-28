@@ -4,8 +4,8 @@ use crate::de::{deserialize_any, Seq, Map};
 use pest::Span;
 use crate::de::Rule;
 use std::rc::Rc;
-use crate::jval::IndexMap;
 use crate::MyError;
+use linked_hash_map::LinkedHashMap;
 
 pub fn get_unit(span : Span, rc : Rc<String>) -> JVal { JVal::Null(s(span, rc)) }
 
@@ -29,7 +29,7 @@ pub fn get_seq(seq: Seq, span : Span, rc : Rc<String>) -> Result<JVal> {
 }
 
 pub fn get_map(m: Map, span : Span, rc : Rc<String>) -> Result<JVal> {
-    let mut result : IndexMap<String, JVal> = IndexMap::new();
+    let mut result : LinkedHashMap<String, JVal> = LinkedHashMap::new();
     let mut pairs = m.pairs;
     loop{
         let op = pairs.next();

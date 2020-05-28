@@ -8,6 +8,7 @@ pub enum SystemNames{
     Old,
     ID,
     Ref,
+    Enum,
 }
 
 pub enum NameType{
