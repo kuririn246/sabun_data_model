@@ -10,11 +10,12 @@ pub enum ListAttribute{
     Default(ListDefObj),
     Old(HashSet<String>),
     Compatible(HashSet<String>),
+    NextID(u64),
 }
 
 
 pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Result<ListAttribute>{
-    let error_message = "List's array must be Default or Old";
+    let error_message = "List's array must be Default, Old, Compatible or NextID";
 
     if array.len() == 0{
         Err(format!("{} {} {} {}", span.line_str(), span.slice(), error_message, names))?
@@ -33,6 +34,17 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
                 "Compatible" =>{
                     let compatible = get_old(&array[1..], names)?;
                     Ok(ListAttribute::Compatible(compatible))
+                },
+                "NextID" =>{
+                    if array.len() == 2{
+                        match array[1]{
+                            JVal::Double(n, _) =>{
+                                return Ok(ListAttribute::NextID(n as u64))
+                            }
+                            _ =>{}
+                        }
+                    }
+                    Err(format!(r#"{} {} NextID must be ["NextID", num] {}"#, span.line_str(), span.slice(), names))?
                 }
                 _ =>{
                     Err(format!("{} {} {} {}", span.line_str(), span.slice(), error_message, names))?

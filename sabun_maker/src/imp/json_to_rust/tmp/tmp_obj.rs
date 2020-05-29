@@ -5,6 +5,7 @@ use std::collections::{HashSet, HashMap};
 use crate::structs::rust_list::{ListItem, MutListItem};
 use json5_parser::Span;
 use crate::error::Result;
+use crate::structs::root_object::RefDefObj;
 
 pub struct TmpObj{
     pub default : IndexMap<String, RustValue>,
@@ -24,6 +25,9 @@ pub struct TmpRefs{
 impl TmpRefs{
     pub fn get_hash_map(self) -> HashMap<String, RefValue>{
         self.map.into_iter().collect()
+    }
+    pub fn to_ref_def(self) -> RefDefObj{
+        RefDefObj{ old : self.old, refs : self.map, }
     }
 }
 

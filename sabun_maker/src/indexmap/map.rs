@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::hash::{Hash, Hasher};
 use std::fmt::Debug;
 
@@ -13,8 +13,9 @@ use std::fmt::Debug;
 #[derive(Debug, PartialEq)]
 pub struct IndexMap<K : Eq + Hash, V>{
     ///Vecは領域が繰り返し作り直されるので、ポインタを永続させるためにBoxが必要
-    contents : Vec<Box<(K,V)>>,
-    ///Boxの中のポインタをHashMapで保持。unsafe
+    /// VecだとIntoIterでうまく処理する方法がわからなかったので、VecDequeで妥協
+    contents : VecDeque<Box<(K,V)>>,
+    ///Boxの中のポインタをHashMapで保持。
     map : HashMap<IndexMapKey<K>, *mut V>
 }
 
@@ -41,7 +42,7 @@ impl<K: Eq + Hash> Hash for IndexMapKey<K> {
 
 impl<K : Eq + Hash, V> IndexMap<K,V>{
     pub fn new() -> IndexMap<K,V>{
-        IndexMap{ contents : vec![], map : HashMap::new() }
+        IndexMap{ contents : VecDeque::new(), map : HashMap::new() }
     }
 
     pub fn len(&self) -> usize{ self.contents.len() }
@@ -68,7 +69,7 @@ impl<K : Eq + Hash, V> IndexMap<K,V>{
 
     pub fn iter(&self) -> IndexMapIter<K, V> { IndexMapIter{ map : &self, counter : 0 } }
 
-    pub fn into_iter(self) -> IndexMapIntoIter<K,V>{ IndexMapIntoIter{ vec : self.contents, counter : 0} }
+    pub fn into_iter(self) -> IndexMapIntoIter<K,V>{ IndexMapIntoIter{ vec : self.contents } }
 }
 
 
@@ -103,25 +104,17 @@ impl<'a, K : Eq + Hash,V> Iterator for IndexMapIter<'a, K,V> {
 }
 
 pub struct IndexMapIntoIter<K : Eq + Hash, V>{
-    vec : Vec<Box<(K,V)>>,
-    counter : usize,
+    //VecのBoxを効率的に先頭からRemoveしてく方法が思いつかないのでVecDequeに一回うつす。
+    vec : VecDeque<Box<(K,V)>>,
 }
 
 impl<K : Eq + Hash,V> Iterator for IndexMapIntoIter<K,V> {
     type Item = (K, V);
 
     fn next(&mut self) -> Option<Self::Item>{
-        if self.counter < self.vec.len() {
-            let counter = self.counter;
-
-            self.counter += 1;
-
-            unsafe {
-                let b = self.vec.get_unchecked(counter);
-                return Some(std::ptr::read(b.as_ref()));
-            }
-        } else{
-            None
+        match self.vec.pop_front(){
+            Some(b) => Some(*b),
+            None => None,
         }
     }
 }

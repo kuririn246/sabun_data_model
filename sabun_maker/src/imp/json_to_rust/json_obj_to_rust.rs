@@ -57,7 +57,7 @@ pub fn json_obj_to_rust(v : &LinkedHashMap<String, JVal>, span : &Span, names : 
                     SystemNames::Old =>{
                         if r.old.len() == 0{
                             match &v{
-                                JVal::Array(a, span) =>{
+                                JVal::Array(a, _span) =>{
                                     r.old = get_old(a,  names)?;
                                 },
                                 _ =>{ Err(format!("{}  {}", v.line_str(), names))?; }

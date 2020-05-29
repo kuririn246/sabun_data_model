@@ -21,14 +21,27 @@ pub struct RootObject{
 #[derive(Debug, PartialEq)]
 pub struct ListDefObj{
     pub default : IndexMap<String, RustValue>,
-    pub refs: IndexMap<String, RefValue>,
+    pub refs: RefDefObj,
     ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
     pub old : HashSet<String>,
 }
 
 impl ListDefObj{
+    ///多分いらないんだけど、まああってもいいか・・・？
     pub fn new() -> ListDefObj{
-        ListDefObj{ default : IndexMap::new(), refs : IndexMap::new(), old : HashSet::new() }
+        ListDefObj{ default : IndexMap::new(), refs : RefDefObj::new(), old : HashSet::new() }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub struct RefDefObj {
+    pub refs: IndexMap<String, RefValue>,
+    ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
+    pub old : HashSet<String>,
+}
+impl RefDefObj{
+    pub fn new() -> RefDefObj{
+        RefDefObj{ refs : IndexMap::new(), old : HashSet::new() }
     }
 }
 

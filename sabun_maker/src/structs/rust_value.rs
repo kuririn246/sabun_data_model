@@ -1,6 +1,6 @@
 use crate::structs::value_type::ValueType;
 use crate::structs::qv::{QvType, Qv};
-use crate::structs::rust_list::{ConstData, ConstList, MutList, InnerList };
+use crate::structs::rust_list::{ConstData, ConstList, MutList, InnerList, InnerData, InnerMutList};
 use crate::structs::array_type::ArrayType;
 use crate::structs::root_object::ListDefObj;
 
@@ -18,8 +18,12 @@ pub enum RustValue{
     Data(ConstData),
     List(ConstList),
     Mut(MutList),
-    Inner(InnerList),
-    InnerDef(ListDefObj),
+    InnerList(InnerList),
+    InnerData(InnerData),
+    InnerMut(InnerMutList),
+    InnerListDef(ListDefObj),
+    InnerDataDef(ListDefObj),
+    InnerMutDef(ListDefObj),
 }
 
 #[derive(Debug, PartialEq)]
@@ -49,10 +53,12 @@ impl RustValue{
                 RustParam::String(_) => 2,
                 RustParam::Array(_, _) => 3,
             },
-            RustValue::Data(_) => 4,
-            RustValue::List(_) => 5,
+            RustValue::List(_) => 4,
+            RustValue::Data(_) => 5,
             RustValue::Mut(_) => 6,
-            RustValue::Inner(_) | RustValue::InnerDef(_) => 7,
+            RustValue::InnerList(_) | RustValue::InnerListDef(_) => 7,
+            RustValue::InnerData(_) | RustValue::InnerDataDef(_) => 8,
+            RustValue::InnerMut(_) | RustValue::InnerMutDef(_) => 9,
         }
     }
 

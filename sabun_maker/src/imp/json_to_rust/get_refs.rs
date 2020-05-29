@@ -11,8 +11,8 @@ use crate::imp::json_to_rust::tmp::tmp_obj::TmpRefs;
 use linked_hash_map::LinkedHashMap;
 
 pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<TmpRefs> {
-    let obj = json_obj_to_rust(v, true, names)?;
-    if obj.refs.len() != 0 {
+    let obj = json_obj_to_rust(v, span, names)?;
+    if obj.refs.map.len() != 0 {
         Err(format!(r#"{} Ref can't be declared in a Ref object {}"#, span.line_str(), names))?
     }
     if obj.id.is_some() {
@@ -21,6 +21,7 @@ pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -
     if obj.include.len() != 0{
         Err(format!(r#"{} Include can't be declared in a Ref object {}"#, span.line_str(), names))?
     }
+
 
     let mut map: IndexMap<String, RefValue> = IndexMap::new();
     for (k, v) in &obj.default {
@@ -43,7 +44,7 @@ pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -
             }
         }
     }
-    return Ok(TmpRefs{ map, old : obj.old });
+    return Ok(TmpRefs{ map, old : obj.old, span : span.clone() });
 }
 
 

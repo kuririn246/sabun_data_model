@@ -4,7 +4,7 @@ use crate::imp::json_to_rust::json_array_to_rust::get_array;
 use crate::error::Result;
 use crate::structs::array_type::ArrayType;
 use crate::structs::qv::Qv;
-use crate::structs::rust_value::RustValue;
+use crate::structs::rust_value::{RustParam};
 
 pub fn get_include(v : &JVal, names : &Names) -> Result<Vec<String>>{
     let names = &names.append("Include");
@@ -16,7 +16,7 @@ pub fn get_include(v : &JVal, names : &Names) -> Result<Vec<String>>{
             let mut incl : Vec<String> = vec![];
             for item in &val.vec{
                 match item{
-                    RustValue::String(s, _) =>{
+                    RustParam::String(s) =>{
                         match s{
                             Qv::Val(s) =>{ incl.push(s.to_string()); },
                             _ => Err(format!("{} {} {}", v.line_str(), error_message, names))?,

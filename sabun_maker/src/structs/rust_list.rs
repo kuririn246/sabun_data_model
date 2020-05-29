@@ -36,14 +36,29 @@ pub struct MutList{
     pub next_id : u64,
 }
 
-///Data or Listの内部に作るList。上がMutの場合はMutだし、ConstならConstだが、アクセス制限の違いだけで中身の違いはない。Constの場合idは無視できる。ListDefObjにはDefaultだけ書き、ListItemでは必要ならItemのみを書く。
+///Data or Listの内部に作るList。ListDefObjの内部にはDefaultだけ書き、ListItemの内部にはItemのみを書く。
 #[derive(Debug, PartialEq)]
 pub struct InnerList{
-    pub list : Vec<MutListItem>,
-    ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1秒間に1億生成しても1万年ぐらいかかるはず
-    pub next_id : u64,
+    pub list : Vec<ListItem>,
     pub compatible : HashSet<String>,
 }
+
+
+///アイテムごとにIDをもち、Refで参照することが可能である
+#[derive(Debug, PartialEq)]
+pub struct InnerData{
+    pub list : IndexMap<String, ListItem>,
+    ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
+    pub old : HashSet<String>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct InnerMutList{
+    pub list : Vec<MutListItem>,
+    ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
+    pub next_id : u64,
+}
+
 
 #[derive(Debug, PartialEq)]
 pub struct ListItem{
