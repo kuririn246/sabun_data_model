@@ -55,13 +55,13 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
                 ValueType::Normal =>{
                     let tmp = json_list_to_rust(&array[1..], names)?;
                     match gat{
-                        List => RustValue::List(tmp.to_const_list()?),
-                        Data => RustValue::Data(tmp.to_const_data()?),
-                        MutList => RustValue::Mut(tmp.to_mut_list()?),
+                        List => Ok(RustValue::List(tmp.to_const_list()?)),
+                        Data => Ok(RustValue::Data(tmp.to_const_data()?)),
+                        MutList => Ok(RustValue::Mut(tmp.to_mut_list()?)),
                         InnerList => match tmp.to_inner_list()?{
 
                         },
-                        ViolatedList => RustValue::Mut(tmp.to_mut_list()?),
+                        ViolatedList => Ok(RustValue::Mut(tmp.to_violated_list()?)),
                     }
                 },
                 _ =>{

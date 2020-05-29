@@ -2,7 +2,7 @@ use crate::structs::rust_value::RustValue;
 use crate::indexmap::IndexMap;
 use crate::structs::ref_value::RefValue;
 use std::collections::{HashSet, HashMap};
-use crate::structs::rust_list::ListItem;
+use crate::structs::rust_list::{ListItem, MutListItem};
 use json5_parser::Span;
 use crate::error::Result;
 
@@ -76,5 +76,21 @@ impl TmpObj{
                 Err(format!("{} ID must be a string {}", self.span.line_str(), self.span.slice()))?
             }
         }
+    }
+
+    ///idとしてjsonのnumであるf64を使っていて、それをu64に変える処理が入ってしまうので、f64の範囲外のu64のidを正しく表現できない。そもそもこの機能自体が裏道なので、こんな変な制限があってもよかろうとは思うが
+    pub fn to_violated_list_item(self) -> Result<MutListItem>{
+        let id = match self.id{
+            Some(IdValue::Num(id)) => id as u64,
+            _ =>{ Err(format!("{} ID is needed for a violated list item {}", self.span.line_str(), self.span.slice()))? }
+        };
+        if self.old.len() != 0{
+            Err(format!("{} Old is not needed for a violated list item {}", self.span.line_str(), self.span.slice()))?
+        }
+        if self.refs.old.len() != 0{
+            Err(format!("{} Old is not needed for a violated list item {}", self.refs.span.line_str(), self.refs.span.slice()))?
+        }
+
+        Ok(MutListItem{ id, refs : self.refs.get_hash_map(), values : self.default.into_iter().collect() })
     }
 }

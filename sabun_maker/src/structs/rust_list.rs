@@ -42,6 +42,7 @@ pub struct InnerList{
     pub list : Vec<MutListItem>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1秒間に1億生成しても1万年ぐらいかかるはず
     pub next_id : u64,
+    pub compatible : HashSet<String>,
 }
 
 #[derive(Debug, PartialEq)]

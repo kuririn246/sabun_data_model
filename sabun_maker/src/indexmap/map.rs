@@ -111,7 +111,7 @@ impl<K : Eq + Hash,V> Iterator for IndexMapIntoIter<K,V> {
     type Item = (K, V);
 
     fn next(&mut self) -> Option<Self::Item>{
-        if self.counter < self.map.len() {
+        if self.counter < self.vec.len() {
             let counter = self.counter;
 
             self.counter += 1;
