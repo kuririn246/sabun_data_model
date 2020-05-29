@@ -10,10 +10,10 @@ use crate::imp::json_to_rust::get_old::get_old;
 use crate::imp::json_to_rust::get_id::get_id;
 use linked_hash_map::LinkedHashMap;
 use crate::imp::json_to_rust::get_refs::get_ref;
+use json5_parser::Span;
 
-
-pub fn json_obj_to_rust(v : &LinkedHashMap<String, JVal>, names : &Names) -> Result<TmpObj>{
-    let mut r  = TmpObj::new();
+pub fn json_obj_to_rust(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<TmpObj>{
+    let mut r  = TmpObj::new(span.clone());
     for (k,v) in v{
         let name = json_name(k).ok_or_else(|| format!("{} {} is not a valid name {}",v.line_str(), k, names))?;
         match name{

@@ -9,6 +9,7 @@ use crate::structs::root_object::ListDefObj;
 pub enum ListAttribute{
     Default(ListDefObj),
     Old(HashSet<String>),
+    Compatible(HashSet<String>),
 }
 
 
@@ -29,6 +30,10 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
                     let old = get_old(&array[1..], names)?;
                     Ok(ListAttribute::Old(old))
                 },
+                "Compatible" =>{
+                    let compatible = get_old(&array[1..], names)?;
+                    Ok(ListAttribute::Compatible(compatible))
+                }
                 _ =>{
                     Err(format!("{} {} {} {}", span.line_str(), span.slice(), error_message, names))?
                 }

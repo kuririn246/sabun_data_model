@@ -26,8 +26,8 @@ pub fn json_root_to_rust(json : &str) -> Result<RootObject>{
     let jval = json5_parser::from_str(json)?;
 
     return match jval{
-        JVal::Map(map, _) =>{
-            let tmp = json_obj_to_rust::json_obj_to_rust(&map,  &Names::new(""))?;
+        JVal::Map(map, span) =>{
+            let tmp = json_obj_to_rust::json_obj_to_rust(&map, &span, &Names::new(""))?;
             Ok(RootObject{
                 include : tmp.include,
                 old : tmp.old,

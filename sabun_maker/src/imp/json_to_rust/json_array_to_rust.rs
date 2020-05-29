@@ -50,12 +50,18 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
             array_null(&array[1..], gat, value_type, span, names)
         },
         None =>{ Err(format!(r#"{} Array must be "...Array", "List", "Data", "MutList", "InnerList", "Num", "Str" or "Bool" {}"#, span.line_str(), names))? },
-        List | Data | MutList | InnerList =>{
+        List | Data | MutList | InnerList | ViolatedList =>{
             match value_type{
                 ValueType::Normal =>{
                     let tmp = json_list_to_rust(&array[1..], names)?;
                     match gat{
-                        List => RustValue::List()
+                        List => RustValue::List(tmp.to_const_list()?),
+                        Data => RustValue::Data(tmp.to_const_data()?),
+                        MutList => RustValue::Mut(tmp.to_mut_list()?),
+                        InnerList => match tmp.to_inner_list()?{
+
+                        },
+                        ViolatedList => RustValue::Mut(tmp.to_mut_list()?),
                     }
                 },
                 _ =>{
@@ -73,6 +79,7 @@ pub enum GatResult{
     Data,
     MutList,
     InnerList,
+    ViolatedList,
     Num,
     NoTagNum,
     Str,
@@ -88,14 +95,15 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
                 return match s.as_str(){
                     "NumArray" =>{ AT(ArrayType::Num) },
                     "StrArray" =>{ AT(ArrayType::String) },
-                    "Num2Array" =>{ AT(ArrayType::Num2) }
+                    "Num2Array" =>{ AT(ArrayType::Num2) },
                     "Num" =>{ Num },
                     "Str" =>{ Str },
                     "Bool" =>{ Bool },
                     "List" => { GatResult::List },
                     "Data" => { GatResult::Data },
-                    "MutList" => { GatResult::MutList }
-                    "InnerList" => { GatResult::InnerList }
+                    "MutList" => { GatResult::MutList },
+                    "InnerList" => { GatResult::InnerList },
+                    "__ViolatedList" => { GatResult::ViolatedList },
                     _=>{ GatResult::None },
                 }
             },

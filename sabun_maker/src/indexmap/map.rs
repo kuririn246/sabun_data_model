@@ -65,7 +65,10 @@ impl<K : Eq + Hash, V> IndexMap<K,V>{
             None => None,
         }
     }
+
     pub fn iter(&self) -> IndexMapIter<K, V> { IndexMapIter{ map : &self, counter : 0 } }
+
+    pub fn into_iter(self) -> IndexMapIntoIter<K,V>{ IndexMapIntoIter{ vec : self.contents, counter : 0} }
 }
 
 
@@ -97,8 +100,33 @@ impl<'a, K : Eq + Hash,V> Iterator for IndexMapIter<'a, K,V> {
             None
         }
     }
+}
 
- }
+pub struct IndexMapIntoIter<K : Eq + Hash, V>{
+    vec : Vec<Box<(K,V)>>,
+    counter : usize,
+}
+
+impl<K : Eq + Hash,V> Iterator for IndexMapIntoIter<K,V> {
+    type Item = (K, V);
+
+    fn next(&mut self) -> Option<Self::Item>{
+        if self.counter < self.map.len() {
+            let counter = self.counter;
+
+            self.counter += 1;
+
+            unsafe {
+                let b = self.vec.get_unchecked(counter);
+                return Some(std::ptr::read(b.as_ref()));
+            }
+        } else{
+            None
+        }
+    }
+}
+
+
 //
 // #[cfg(test)]
 // mod tests {

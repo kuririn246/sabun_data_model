@@ -14,10 +14,17 @@ pub fn json_list_to_rust(array : &[JVal],  names : &Names) -> Result<TmpList> {
             JVal::Array(a2, span) => {
                 match list_attribute(a2, span, names)?{
                     ListAttribute::Default(obj) =>{
-                        result.default = obj;
+                        if result.default.is_none() {
+                            result.default = Some(obj);
+                        } else{
+                            Err(format!(r#"{} {} Default is defined multiple times {}"#, span().line_str(), span().slice(), names))?
+                        }
                     },
                     ListAttribute::Old(old) =>{
                         result.old = old;
+                    }
+                    ListAttribute::Compatible(compat) =>{
+
                     }
                 }
             },
