@@ -44,7 +44,7 @@ pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -
             }
         }
     }
-    return Ok(TmpRefs{ map, old : obj.old, span : span.clone() });
+    return Ok(TmpRefs{ map, old : obj.old, is_enum : false, span : span.clone() });
 }
 
 

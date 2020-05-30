@@ -36,12 +36,15 @@ impl ListDefObj{
 #[derive(Debug, PartialEq)]
 pub struct RefDefObj {
     pub refs: IndexMap<String, RefValue>,
+    /// Enum とRefの二通りの定義の仕方があり、Enumの場合は Ref のうち一つだけ値があり、ほかは全部nullにしなきゃいけない。
+    /// プログラムからはmatch でアクセス出来る。値があるRefをキャストしてゲットする。
+    pub is_enum : bool,
     ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
     pub old : HashSet<String>,
 }
 impl RefDefObj{
     pub fn new() -> RefDefObj{
-        RefDefObj{ refs : IndexMap::new(), old : HashSet::new() }
+        RefDefObj{ refs : IndexMap::new(), old : HashSet::new(), is_enum : false }
     }
 }
 

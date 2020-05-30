@@ -46,7 +46,12 @@ pub fn json_obj_to_rust(v : &LinkedHashMap<String, JVal>, span : &Span, names : 
                         if r.refs.map.len() == 0{
                             match &v {
                                 JVal::Map(map, span) =>{
-                                    r.refs = get_ref(map, span,names)?;
+                                    let mut refs = get_ref(map, span,names)?;
+                                    match sn{
+                                        SystemNames::Enum =>{ refs.is_enum = true; }
+                                        _=>{},
+                                    }
+                                    r.refs = refs;
                                 },
                                 _ =>{ Err(format!("{} Ref must be an object {}", v.line_str(), names))?;}
                             }
@@ -54,18 +59,12 @@ pub fn json_obj_to_rust(v : &LinkedHashMap<String, JVal>, span : &Span, names : 
                             Err(format!("{} (Ref|Enum) is defined multiple times {}", v.line_str(), names))?;
                         }
                     },
-                    SystemNames::Old =>{
-                        if r.old.len() == 0{
-                            match &v{
-                                JVal::Array(a, _span) =>{
-                                    r.old = get_old(a,  names)?;
-                                },
-                                _ =>{ Err(format!("{}  {}", v.line_str(), names))?; }
-                            }
-
-                        } else{
-                            //そもそも複数回の定義はjsonパーサーによって弾かれるはずだが・・・
-                            Err(format!("{} Old is defined multiple times {}", v.line_str(), names))?;
+                    SystemNames::Old => {
+                        match &v {
+                            JVal::Array(a, _span) => {
+                                r.old = get_old(a, names)?;
+                            },
+                            _ => { Err(format!("{}  {}", v.line_str(), names))?; }
                         }
                     }
                 }

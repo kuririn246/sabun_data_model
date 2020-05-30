@@ -52,8 +52,8 @@ impl<K : Eq + Hash, V> IndexMap<K,V>{
         match self.map.get(&temp_key){
             Some(ptr) => Some(unsafe{ std::mem::replace(&mut **ptr, value) }),
             None=>{
-                self.contents.push(Box::new((key,value)));
-                let (key, value) = self.contents.last_mut().unwrap().as_mut();
+                self.contents.push_back(Box::new((key,value)));
+                let (key, value) = self.contents.back_mut().unwrap().as_mut();
                 self.map.insert(IndexMapKey{ key }, value);
                 None
             }

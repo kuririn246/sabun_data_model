@@ -19,15 +19,20 @@ pub struct TmpObj{
 pub struct TmpRefs{
     pub map : IndexMap<String, RefValue>,
     pub old : HashSet<String>,
+    pub is_enum : bool,
     pub span : Span,
 }
 
 impl TmpRefs{
+    pub fn new(span : Span) -> TmpRefs{
+        TmpRefs{ map : IndexMap::new(), old : HashSet::new(), is_enum : false, span }
+    }
+
     pub fn get_hash_map(self) -> HashMap<String, RefValue>{
         self.map.into_iter().collect()
     }
     pub fn to_ref_def(self) -> RefDefObj{
-        RefDefObj{ old : self.old, refs : self.map, }
+        RefDefObj{ old : self.old, refs : self.map, is_enum : self.is_enum }
     }
 }
 
@@ -39,7 +44,7 @@ pub enum IdValue{
 
 impl TmpObj{
     pub fn new(span : Span) -> TmpObj{
-        TmpObj{ default : IndexMap::new(), id : None, include : vec![], refs : TmpRefs{ map : IndexMap::new(), old : HashSet::new(), span : span.clone() }, old : HashSet::new(), span }
+        TmpObj{ default : IndexMap::new(), id : None, include : vec![], refs : TmpRefs::new(span.clone()), old : HashSet::new(), span }
     }
 
     pub fn insert_default(&mut self, s : String, v : RustValue){
