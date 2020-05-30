@@ -7,11 +7,12 @@ use std::ffi::{OsStr};
 use crate::imp::json_to_rust::{json_root_to_rust, json_item_str_to_rust};
 use std::collections::HashMap;
 
-use crate::structs::root_object::RustObject;
 use crate::structs::json_file::JsonFile;
 use crate::structs::rust_value::RustValue;
+use crate::structs::root_object::RootObject;
+use crate::imp::json_to_rust::construct_root::construct_root;
 
-pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RustObject>{
+pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RootObject>{
     let dirs = std::fs::read_dir(dir_path)?;
 
     let mut vec : Vec<JsonFile> = vec![];
@@ -45,11 +46,9 @@ pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RustObject
 
     json_files_to_rust(vec.into_iter(), validation)
 
-
-    // `file` goes out of scope, and the "hello.txt" file gets closed
 }
 
-pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>, validation : bool) -> Result<RustObject>{
+pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>, validation : bool) -> Result<RootObject>{
     let mut map : HashMap<String, RustValue> = HashMap::new();
     let mut root= None;
 
@@ -62,7 +61,7 @@ pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>, validation : boo
                 Err("There's two 'root.json5's in the directory")? //unreachableだけど一応
             }
         } else{
-            match json_item_str_to_rust(name, &file.json){
+            match json_item_str_to_rust(&file.json, name){
                 Ok(val) =>{ map.insert(name.to_string(), val); }
                 Err(e) =>{ Err(format!("filename {}, {}", name, e.message))? }
             }

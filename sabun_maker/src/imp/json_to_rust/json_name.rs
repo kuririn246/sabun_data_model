@@ -4,7 +4,6 @@ use lazy_static::lazy_static;
 use crate::structs::value_type::ValueType;
 
 pub enum SystemNames{
-    Include,
     Old,
     ID,
     Ref,
@@ -23,7 +22,6 @@ pub fn json_name(s : &str) -> Option<NameType>{
     use SystemNames::*;
 
     match s {
-        "Include" => return some(Include),
         "Old" => return some(Old),
         "ID" => return some(ID),
         "Ref" => return some(Ref),

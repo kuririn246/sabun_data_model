@@ -1,20 +1,21 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap};
 use std::hash::{Hash, Hasher};
 use std::fmt::Debug;
 
 
 ///順番を保持するハッシュマップ。Remove(未実装)はO(n)になるが、実データがVecなのでiterationが早い。
-/// KeyとValueのポインタ２つをハッシュテーブルに入れているのでコンパクトだしかなり効率はいいはずでござる。
-/// 通常Removeは最後尾とのswapで実装するが、「Removeすると順番が保持されない」とかいうなんだかよくわからない存在に成り下がる。
+/// KeyとValueのポインタ２つをハッシュテーブルに入れているのでコンパクトだしlookup効率はいいはずでござる。
+/// 通常Removeは最後尾とのswapで実装するが、「Removeすると順番が保持されない」とかいうなんだかよくわからないことになる
 /// それならただのハッシュマップでいいような？　しかし効率が良くてボーナスもあるMapとして人気があるらしい。
 /// 順番保持という目的だとLinkedHashMapの方が基本的に優れてるように思う
+/// この実装だとVecDequeがポインタ4個分、HashMapが5個分なので9個分も使っている。
 ///
 /// crates.ioにあるIndexMapはcfg設定が特殊でIntelliJでサジェストできないので試しに自作
 #[derive(Debug, PartialEq)]
 pub struct IndexMap<K : Eq + Hash, V>{
     ///Vecは領域が繰り返し作り直されるので、ポインタを永続させるためにBoxが必要
     /// VecだとIntoIterでうまく処理する方法がわからなかったので、VecDequeで妥協
-    contents : VecDeque<Box<(K,V)>>,
+    contents : Vec<Box<(K,V)>>,
     ///Boxの中のポインタをHashMapで保持。
     map : HashMap<IndexMapKey<K>, *mut V>
 }
@@ -42,7 +43,7 @@ impl<K: Eq + Hash> Hash for IndexMapKey<K> {
 
 impl<K : Eq + Hash, V> IndexMap<K,V>{
     pub fn new() -> IndexMap<K,V>{
-        IndexMap{ contents : VecDeque::new(), map : HashMap::new() }
+        IndexMap{ contents : Vec::new(), map : HashMap::new() }
     }
 
     pub fn len(&self) -> usize{ self.contents.len() }
@@ -52,8 +53,8 @@ impl<K : Eq + Hash, V> IndexMap<K,V>{
         match self.map.get(&temp_key){
             Some(ptr) => Some(unsafe{ std::mem::replace(&mut **ptr, value) }),
             None=>{
-                self.contents.push_back(Box::new((key,value)));
-                let (key, value) = self.contents.back_mut().unwrap().as_mut();
+                self.contents.push(Box::new((key,value)));
+                let (key, value) = self.contents.last_mut().unwrap().as_mut();
                 self.map.insert(IndexMapKey{ key }, value);
                 None
             }
@@ -69,7 +70,7 @@ impl<K : Eq + Hash, V> IndexMap<K,V>{
 
     pub fn iter(&self) -> IndexMapIter<K, V> { IndexMapIter{ map : &self, counter : 0 } }
 
-    pub fn into_iter(self) -> IndexMapIntoIter<K,V>{ IndexMapIntoIter{ vec : self.contents } }
+    pub fn into_iter(self) -> IndexMapIntoIter<K,V>{ IndexMapIntoIter{ iter : self.contents.into_iter() } }
 }
 
 
@@ -103,21 +104,39 @@ impl<'a, K : Eq + Hash,V> Iterator for IndexMapIter<'a, K,V> {
     }
 }
 
+// pub struct IndexMapIntoIter<K : Eq + Hash, V>{
+//     //VecのBoxを効率的に先頭からRemoveしてく方法が思いつかないのでVecDequeに一回うつす。
+//     vec : VecDeque<Box<(K,V)>>,
+// }
+
+// impl<K : Eq + Hash,V> Iterator for IndexMapIntoIter<K,V> {
+//     type Item = (K, V);
+//
+//     fn next(&mut self) -> Option<Self::Item>{
+//         match self.vec.pop_front(){
+//             Some(b) => Some(*b),
+//             None => None,
+//         }
+//     }
+// }
+
 pub struct IndexMapIntoIter<K : Eq + Hash, V>{
     //VecのBoxを効率的に先頭からRemoveしてく方法が思いつかないのでVecDequeに一回うつす。
-    vec : VecDeque<Box<(K,V)>>,
+    iter : std::vec::IntoIter<Box<(K,V)>>
 }
 
 impl<K : Eq + Hash,V> Iterator for IndexMapIntoIter<K,V> {
     type Item = (K, V);
 
     fn next(&mut self) -> Option<Self::Item>{
-        match self.vec.pop_front(){
-            Some(b) => Some(*b),
-            None => None,
+        match self.iter.next(){
+            Some(b) =>{ Some(*b) },
+            None => None
         }
     }
 }
+
+
 
 
 //

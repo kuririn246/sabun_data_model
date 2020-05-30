@@ -4,7 +4,6 @@ use super::json_name::{json_name, NameType, SystemNames};
 use super::json_item_to_rust::json_item_to_rust;
 use crate::error::Result;
 
-use crate::imp::json_to_rust::get_include::get_include;
 use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
 use crate::imp::json_to_rust::get_old::get_old;
 use crate::imp::json_to_rust::get_id::get_id;
@@ -33,13 +32,6 @@ pub fn json_obj_to_rust(v : &LinkedHashMap<String, JVal>, span : &Span, names : 
                             }
                         } else{
                             Err(format!("{} ID is defined multiple times {}", v.line_str(), names))?;
-                        }
-                    },
-                    SystemNames::Include=>{
-                        if r.include.len() == 0{
-                            r.include.append(&mut get_include(v, &names.append("Include"))?)
-                        } else{
-                            Err(format!("{} Include is defined multiple times {}", v.line_str(), names))?;
                         }
                     },
                     SystemNames::Ref | SystemNames::Enum =>{
