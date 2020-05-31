@@ -6,7 +6,7 @@ use super::get_list_items::get_list_items;
 use crate::imp::json_to_rust::tmp::tmp_list::TmpList;
 
 pub fn json_list_to_rust(array : &[JVal],  span : &Span, names : &Names) -> Result<TmpList> {
-    let mut result = TmpList::new(span.clone());
+    let mut result = TmpList::new(array.len(),span.clone());
     for ind in 0..array.len() {
         let item = &array[ind];
         match item {

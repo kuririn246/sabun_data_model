@@ -5,7 +5,7 @@ use crate::imp::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
 
 pub fn get_list_items(array : &[JVal],   _span : &Span, names : &Names) -> Result<Vec<TmpObj>>{
-    let mut result : Vec<TmpObj> = vec![];
+    let mut result : Vec<TmpObj> = Vec::with_capacity(array.len());
     for index in 0..array.len(){
         let item = &array[index];
         match item{

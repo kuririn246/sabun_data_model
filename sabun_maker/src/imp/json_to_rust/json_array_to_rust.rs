@@ -136,7 +136,7 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
 }
 
 pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result<Qv<RustArray>>{
-    let mut vec : Vec<RustParam> = vec![];
+    let mut vec : Vec<RustParam> = Vec::with_capacity(a.len());
     for item in a{
         let val = match item{
             JVal::Double(f, _) => {

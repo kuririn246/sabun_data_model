@@ -17,8 +17,8 @@ pub struct TmpList{
 }
 
 impl TmpList{
-    pub fn new(span : Span) -> TmpList{
-        TmpList{ vec : vec![], old : None, default : None, compatible : None, next_id : None, span }
+    pub fn new(capacity : usize, span : Span) -> TmpList{
+        TmpList{ vec : Vec::with_capacity(capacity), old : None, default : None, compatible : None, next_id : None, span }
     }
 
     pub fn to_const_list(self) -> Result<ConstList>{

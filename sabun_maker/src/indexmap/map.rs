@@ -8,13 +8,11 @@ use std::fmt::Debug;
 /// 通常Removeは最後尾とのswapで実装するが、「Removeすると順番が保持されない」とかいうなんだかよくわからないことになる
 /// それならただのハッシュマップでいいような？　しかし効率が良くてボーナスもあるMapとして人気があるらしい。
 /// 順番保持という目的だとLinkedHashMapの方が基本的に優れてるように思う
-/// この実装だとVecDequeがポインタ4個分、HashMapが5個分なので9個分も使っている。
 ///
 /// crates.ioにあるIndexMapはcfg設定が特殊でIntelliJでサジェストできないので試しに自作
 #[derive(Debug, PartialEq)]
 pub struct IndexMap<K : Eq + Hash, V>{
     ///Vecは領域が繰り返し作り直されるので、ポインタを永続させるためにBoxが必要
-    /// VecだとIntoIterでうまく処理する方法がわからなかったので、VecDequeで妥協
     contents : Vec<Box<(K,V)>>,
     ///Boxの中のポインタをHashMapで保持。
     map : HashMap<IndexMapKey<K>, *mut V>
@@ -106,24 +104,7 @@ impl<'a, K : Eq + Hash,V> Iterator for IndexMapIter<'a, K,V> {
     }
 }
 
-// pub struct IndexMapIntoIter<K : Eq + Hash, V>{
-//     //VecのBoxを効率的に先頭からRemoveしてく方法が思いつかないのでVecDequeに一回うつす。
-//     vec : VecDeque<Box<(K,V)>>,
-// }
-
-// impl<K : Eq + Hash,V> Iterator for IndexMapIntoIter<K,V> {
-//     type Item = (K, V);
-//
-//     fn next(&mut self) -> Option<Self::Item>{
-//         match self.vec.pop_front(){
-//             Some(b) => Some(*b),
-//             None => None,
-//         }
-//     }
-// }
-
 pub struct IndexMapIntoIter<K : Eq + Hash, V>{
-    //VecのBoxを効率的に先頭からRemoveしてく方法が思いつかないのでVecDequeに一回うつす。
     iter : std::vec::IntoIter<Box<(K,V)>>
 }
 

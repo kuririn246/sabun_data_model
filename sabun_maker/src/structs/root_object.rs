@@ -2,13 +2,14 @@ use crate::structs::rust_value::{RustValue, RustParam};
 use std::collections::{HashSet, HashMap};
 use crate::indexmap::IndexMap;
 use crate::structs::ref_value::RefValue;
+use crate::indexmap::str_vec_map::StrVecMap;
 
 #[derive(Debug, PartialEq)]
 pub struct RootObject{
     //別ファイルにあったことを記録しておくためのもの。どう使うかは後で考える。
     pub include : Vec<String>,
     //listのobjectの場合、defaultはlist側にあるが、ここには初期値が入る。
-    pub default : IndexMap<String, RustValue>,
+    pub default : StrVecMap<RustValue>,
     //変更されたものを記録。差分変更時に、defaultと同じになったらここから削除する
     //listの変更はRustListが直接上書きされるので、sabunには入らない
     pub sabun : HashMap<String, RustParam>,
@@ -20,22 +21,22 @@ pub struct RootObject{
 
 #[derive(Debug, PartialEq)]
 pub struct ListDefObj{
-    pub default : IndexMap<String, RustValue>,
+    pub default : StrVecMap<RustValue>,
     pub refs: RefDefObj,
     ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
     pub old : HashSet<String>,
 }
 
 impl ListDefObj{
-    ///多分いらないんだけど、まああってもいいか・・・？
-    pub fn new() -> ListDefObj{
-        ListDefObj{ default : IndexMap::new(), refs : RefDefObj::new(), old : HashSet::new() }
-    }
+    //多分いらないんだけど、まああってもいいか・・・？
+    // pub fn new() -> ListDefObj{
+    //     ListDefObj{ default : IndexMap::new(), refs : RefDefObj::new(), old : HashSet::new() }
+    // }
 }
 
 #[derive(Debug, PartialEq)]
 pub struct RefDefObj {
-    pub refs: IndexMap<String, RefValue>,
+    pub refs: StrVecMap<RefValue>,
     /// Enum とRefの二通りの定義の仕方があり、Enumの場合は Ref のうち一つだけ値があり、ほかは全部nullにしなきゃいけない。
     /// プログラムからはmatch でアクセス出来る。値があるRefをキャストしてゲットする。
     pub is_enum : bool,
@@ -43,9 +44,9 @@ pub struct RefDefObj {
     pub old : HashSet<String>,
 }
 impl RefDefObj{
-    pub fn new() -> RefDefObj{
-        RefDefObj{ refs : IndexMap::new(), old : HashSet::new(), is_enum : false }
-    }
+    // pub fn new() -> RefDefObj{
+    //     RefDefObj{ refs : IndexMap::new(), old : HashSet::new(), is_enum : false }
+    // }
 }
 
 //

@@ -9,6 +9,7 @@ use crate::imp::json_to_rust::json_name::json_simple_name;
 use crate::structs::qv::Qv;
 use crate::imp::json_to_rust::tmp::tmp_obj::TmpRefs;
 use linked_hash_map::LinkedHashMap;
+use crate::indexmap::str_vec_map::StrVecMap;
 
 pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<TmpRefs> {
     let obj = json_obj_to_rust(v, span, names)?;
@@ -23,14 +24,14 @@ pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -
     }
 
 
-    let mut map: IndexMap<String, RefValue> = IndexMap::new();
+    let mut map: StrVecMap<RefValue> = StrVecMap::with_capacity(obj.default.len());
     for (k, v) in &obj.default {
         match v {
             RustValue::Param(RustParam::String(v), vt) => {
                 match v {
                     Qv::Val(s) =>{
                         if json_simple_name(s).is_none(){
-                            //undefinedは勝手にいれちゃいけないから・・・メッセージには
+                            //undefinedは勝手にいれちゃいけないから、エラーメッセージには表示しないが、別に入れられる
                             Err(format!(r#"{} {} Ref's value must be a simple name or null {}"#, span.line_str(), s, names))?
                         }
                     },

@@ -6,9 +6,10 @@ use crate::structs::rust_list::{ListItem, MutListItem};
 use json5_parser::Span;
 use crate::error::Result;
 use crate::structs::root_object::RefDefObj;
+use crate::indexmap::str_vec_map::StrVecMap;
 
 pub struct TmpObj{
-    pub default : IndexMap<String, RustValue>,
+    pub default : StrVecMap<RustValue>,
     pub id : Option<IdValue>,
     pub include : Vec<String>,
     pub refs: TmpRefs,
@@ -17,15 +18,15 @@ pub struct TmpObj{
 }
 
 pub struct TmpRefs{
-    pub map : IndexMap<String, RefValue>,
+    pub map : StrVecMap<RefValue>,
     pub old : HashSet<String>,
     pub is_enum : bool,
     pub span : Span,
 }
 
 impl TmpRefs{
-    pub fn new(span : Span) -> TmpRefs{
-        TmpRefs{ map : IndexMap::new(), old : HashSet::new(), is_enum : false, span }
+    pub fn new(capacity : usize, span : Span) -> TmpRefs{
+        TmpRefs{ map : StrVecMap::with_capacity(capacity), old : HashSet::new(), is_enum : false, span }
     }
 
     pub fn get_hash_map(self) -> HashMap<String, RefValue>{
@@ -43,8 +44,8 @@ pub enum IdValue{
 }
 
 impl TmpObj{
-    pub fn new(span : Span) -> TmpObj{
-        TmpObj{ default : IndexMap::new(), id : None, include : vec![], refs : TmpRefs::new(span.clone()), old : HashSet::new(), span }
+    pub fn new(capacity : usize, span : Span) -> TmpObj{
+        TmpObj{ default : StrVecMap::with_capacity(capacity), id : None, include : vec![], refs : TmpRefs::new(0,span.clone()), old : HashSet::new(), span }
     }
 
     pub fn insert_default(&mut self, s : String, v : RustValue){
