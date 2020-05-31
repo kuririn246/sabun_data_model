@@ -7,16 +7,14 @@ use std::slice::from_raw_parts;
 /// StringをKeyとし、順番を保持する、追加は出来るが削除はできないハッシュマップ
 /// Removeを実装しないことで、Vecとindexでのアイテムの指定を可能にし、データを連続させ可能な限り間接ポインタアクセス、キャッシュミスを減らそうと試みている
 /// ついでにstringのcapacityも削っている
-///
-/// hashbrownからソースを持ってきてHashMapからlenを削っても良いはずだ・・・
 #[derive(Debug, PartialEq)]
 pub struct StrVecMap<V>{
     contents : Vec<(StrSlice,V)>,
-    ///Vecは再構成されるのでポインタとしては使えないが、キーの書き換えも削除もないのでインデックスで保持出来る
+    ///Vecは再構成されるのでポインタとしては使えないが、キーの書き換えも削除もないのでインデックスで参照出来る
     map : HashMap<MapKey, usize>
 }
 
-///len==capacityのStringから作られる
+///len==capacityのStringから作られ、バッファの所有権を持つ
 struct StrSlice{
     buf : *mut u8,
     len : usize,
@@ -53,7 +51,6 @@ impl StrSlice{
 impl Drop for StrSlice{
     ///これでええんとちゃいますかね・・・？
     fn drop(&mut self) {
-        println!("{} dropped", self.to_slice());
         unsafe{
             String::from_raw_parts(self.buf, self.len, self.len);
         }
@@ -79,9 +76,8 @@ impl PartialEq for StrSlice{
 ///     data: *const T,
 ///     pub(crate) len: usize,
 /// }
-/// なので、&MapKey->&[u8]のTransmuteもできないか・・・？
-///
-/// 果たして速度にどれほど違いが出るのか・・・？
+/// なので、&MapKey->&[u8]のTransmuteもできるかもしれない・・・？
+/// やらないけど
 #[repr(C)]
 struct MapKey{
     buf : *const u8,
@@ -133,8 +129,8 @@ impl<V> StrVecMap<V> {
 
         match self.map.get(&tmp_key) {
             Some(idx) => {
-                let item = unsafe { self.contents.get_unchecked_mut(*idx) };
-                Some(std::mem::replace(&mut item.1, value))
+                let (key,_) = unsafe { self.contents.get_unchecked_mut(*idx) };
+                Some(std::mem::replace(key, value))
             }
             None => {
                 let slice = StrSlice::new(key);
@@ -222,33 +218,25 @@ impl<V> IntoIterator for StrVecMap<V> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use std::collections::HashMap;
-    use crate::indexmap::str_vec_map::StrVecMap;
-
-    #[test]
-    fn it_works() {
-        let mut im : StrVecMap<i32> = StrVecMap::new();
-        im.insert("hoge".to_string(), 10);
-        im.insert("hoge2".to_string(), 20);
-
-        for (k,v) in &im{
-            println!("{} {}", k, v);
-        }
-
-
-        println!("{:?}", im.insert("hoge".to_string(), 40));
-        for (k,v) in &im{
-            println!("{} {}", k, v);
-        }
-    }
-
-    #[test]
-    fn it_works2() {
-
-    }
-
-
-
-}
+// #[cfg(test)]
+// mod tests {
+//     use std::collections::HashMap;
+//     use crate::indexmap::str_vec_map::StrVecMap;
+//
+//     #[test]
+//     fn it_works() {
+//         let mut im : StrVecMap<i32> = StrVecMap::new();
+//         im.insert("hoge".to_string(), 10);
+//         im.insert("hoge2".to_string(), 20);
+//
+//         for (k,v) in &im{
+//             println!("{} {}", k, v);
+//         }
+//
+//
+//         println!("{:?}", im.insert("hoge".to_string(), 40));
+//         for (k,v) in im{
+//             println!("{} {}", k, v);
+//         }
+//     }
+// }
