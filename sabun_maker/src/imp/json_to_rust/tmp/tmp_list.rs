@@ -36,7 +36,7 @@ impl TmpList{
             Err(format!("{} NextID must not be defined {}", self.span.line_str(), self.span.slice()))?
         }
 
-        Ok(ConstList{ default : self.default.unwrap(), list : to_list_items(self.vec)? })
+        Ok(ConstList{ default : Box::new(self.default.unwrap()), list : to_list_items(self.vec)? })
     }
 
     pub fn to_inner_list(self) -> Result<InnerList>{
@@ -52,9 +52,8 @@ impl TmpList{
         if self.next_id.is_some(){
             Err(format!("{} NextID must not be defined for InnerList {}", self.span.line_str(), self.span.slice()))?
         }
-        let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
 
-        Ok(InnerList{ compatible, list : to_list_items(self.vec)? })
+        Ok(InnerList{ list : to_list_items(self.vec)? })
     }
 
     pub fn to_const_data(self) -> Result<ConstData>{
@@ -69,7 +68,7 @@ impl TmpList{
         }
         let old = self.old.unwrap_or_else(|| HashSet::new());
 
-        Ok(ConstData{ default : self.default.unwrap(), old, list : to_data_items(self.vec)? })
+        Ok(ConstData{ default : Box::new(self.default.unwrap()), old, list : to_data_items(self.vec)? })
     }
     pub fn to_inner_data(self) -> Result<InnerData>{
         if self.compatible.is_some(){
@@ -100,7 +99,7 @@ impl TmpList{
             Err(format!("{} MutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
         let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
-        Ok(MutList{ default : self.default.unwrap(), compatible, list : LinkedHashMap::new(), next_id : 0 })
+        Ok(MutList{ default : Box::new(self.default.unwrap()), compatible, list : LinkedHashMap::new(), next_id : 0 })
     }
 
     pub fn to_inner_mut_list(self) -> Result<InnerMutList>{
@@ -135,7 +134,7 @@ impl TmpList{
         let next_id = self.next_id.unwrap();
         let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
 
-        Ok(MutList{ default : self.default.unwrap(), list : to_violated_list_items(self.vec)?, compatible, next_id })
+        Ok(MutList{ default : Box::new(self.default.unwrap()), list : to_violated_list_items(self.vec)?, compatible, next_id })
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。

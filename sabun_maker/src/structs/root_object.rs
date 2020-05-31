@@ -21,7 +21,8 @@ pub struct RootObject{
 #[derive(Debug, PartialEq)]
 pub struct ListDefObj{
     pub default : StrVecMap<RustValue>,
-    pub refs: RefDefObj,
+    ///RustValueを巨大にしすぎないためにちょっとサイズを削る
+    pub refs: Box<RefDefObj>,
     ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
     pub old : HashSet<String>,
 }

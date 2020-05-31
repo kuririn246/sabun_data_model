@@ -10,7 +10,7 @@ use crate::indexmap::str_vec_map::StrVecMap;
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq)]
 pub struct ConstData{
-    pub default : ListDefObj,
+    pub default : Box<ListDefObj>,
     pub list : StrVecMap<ListItem>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
     pub old : HashSet<String>,
@@ -19,7 +19,7 @@ pub struct ConstData{
 ///IDを持たず、参照できない。MutListの初期値を書くのが主な使い道か。IDは必要ないけど単にデータを書いておきたい場合もあるだろう。
 #[derive(Debug, PartialEq)]
 pub struct ConstList{
-    pub default : ListDefObj,
+    pub default : Box<ListDefObj>,
     pub list : Vec<ListItem>,
 }
 
@@ -28,7 +28,7 @@ pub struct ConstList{
 /// 順序を変えなければidでソートされたSortedListになるのでPrimaryKeyを持ったTableとしても使えないこともないか
 #[derive(Debug, PartialEq)]
 pub struct MutList{
-    pub default : ListDefObj,
+    pub default : Box<ListDefObj>,
     pub list : LinkedHashMap<u64, MutListItem>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
     pub next_id : u64,
@@ -42,7 +42,7 @@ pub struct MutList{
 #[derive(Debug, PartialEq)]
 pub struct InnerList{
     pub list : Vec<ListItem>,
-    pub compatible : HashSet<String>,
+    //pub compatible : HashSet<String>,
 }
 
 
