@@ -23,6 +23,9 @@ impl TmpList{
     }
 
     pub fn to_const_list(self) -> Result<ConstList>{
+        if self.compatible.is_some(){
+            Err(format!("{} Compatible is not needed for a List {}", self.span.line_str(), self.span.slice()))?
+        }
         if self.old.is_some(){
             Err(format!("{} Old is not needed for a List {}", self.span.line_str(), self.span.slice()))?
         }
@@ -33,12 +36,13 @@ impl TmpList{
             Err(format!("{} NextID must not be defined {}", self.span.line_str(), self.span.slice()))?
         }
 
-        let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
-
-        Ok(ConstList{ default : self.default.unwrap(), compatible, list : to_list_items(self.vec)? })
+        Ok(ConstList{ default : self.default.unwrap(), list : to_list_items(self.vec)? })
     }
 
     pub fn to_inner_list(self) -> Result<InnerList>{
+        if self.compatible.is_some(){
+            Err(format!("{} Compatible is not needed for InnerList {}", self.span.line_str(), self.span.slice()))?
+        }
         if self.old.is_some(){
             Err(format!("{} Old is not needed for InnerList {}", self.span.line_str(), self.span.slice()))?
         }
@@ -83,9 +87,6 @@ impl TmpList{
     }
 
     pub fn to_mut_list(self) -> Result<MutList>{
-        if self.compatible.is_some(){
-            Err(format!("{} Compatible is not needed for MutList {}", self.span.line_str(), self.span.slice()))?
-        }
         if self.old.is_some(){
             Err(format!("{} Old is not needed for MutList {}", self.span.line_str(), self.span.slice()))?
         }
@@ -98,13 +99,12 @@ impl TmpList{
         if self.vec.len() != 0{
             Err(format!("{} MutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
-        Ok(MutList{ default : self.default.unwrap(), list : LinkedHashMap::new(), next_id : 0 })
+        let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
+        Ok(MutList{ default : self.default.unwrap(), compatible, list : LinkedHashMap::new(), next_id : 0 })
     }
 
     pub fn to_inner_mut_list(self) -> Result<InnerMutList>{
-        if self.compatible.is_some(){
-            Err(format!("{} Compatible is not needed for InnerMutList {}", self.span.line_str(), self.span.slice()))?
-        }
+
         if self.old.is_some(){
             Err(format!("{} Old is not needed for InnerMutList {}", self.span.line_str(), self.span.slice()))?
         }
@@ -117,14 +117,12 @@ impl TmpList{
         if self.vec.len() != 0{
             Err(format!("{} InnerMutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
-        Ok(InnerMutList{ list : LinkedHashMap::new(), next_id : 0 })
+        let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
+        Ok(InnerMutList{ list : LinkedHashMap::new(), compatible, next_id : 0 })
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
     pub fn to_violated_list(self) -> Result<MutList>{
-        if self.compatible.is_some(){
-            Err(format!("{} Compatible is not needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
-        }
         if self.old.is_some(){
             Err(format!("{} Old is not needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
         }
@@ -135,15 +133,13 @@ impl TmpList{
             Err(format!("{} NextID is needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
         }
         let next_id = self.next_id.unwrap();
+        let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
 
-        Ok(MutList{ default : self.default.unwrap(), list : to_violated_list_items(self.vec)?, next_id })
+        Ok(MutList{ default : self.default.unwrap(), list : to_violated_list_items(self.vec)?, compatible, next_id })
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
     pub fn to_inner_violated_list(self) -> Result<InnerMutList>{
-        if self.compatible.is_some(){
-            Err(format!("{} Compatible is not needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
-        }
         if self.old.is_some(){
             Err(format!("{} Old is not needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
         }
@@ -154,8 +150,9 @@ impl TmpList{
             Err(format!("{} NextID is needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
         }
         let next_id = self.next_id.unwrap();
+        let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
 
-        Ok(InnerMutList{ list : to_violated_list_items(self.vec)?, next_id })
+        Ok(InnerMutList{ list : to_violated_list_items(self.vec)?, compatible, next_id })
     }
 
     pub fn to_inner_def(self) -> Result<ListDefObj>{

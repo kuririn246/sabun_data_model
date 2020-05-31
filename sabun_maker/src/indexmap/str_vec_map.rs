@@ -4,9 +4,20 @@ use std::fmt::{Debug, Formatter, Error};
 use std::slice::from_raw_parts;
 
 
-/// StringをKeyとし、順番を保持する、追加は出来るが削除はできないハッシュマップ
+/// StringをKeyとし、入れた順番を保持する、追加は出来るが削除はできないハッシュマップ
 /// Removeを実装しないことで、Vecとindexでのアイテムの指定を可能にし、データを連続させ可能な限り間接ポインタアクセス、キャッシュミスを減らそうと試みている
-/// ついでにstringのcapacityも削っている
+/// ついでにstringのcapacityも削っている。
+/// 本当にやる気なら、理論的にはRawVecを使うことでVec.lenも削れるが・・・8バイトは大きいか・・・？
+///
+/// 性能的なことを言うと、大体の数字でいえば、iterationはHashMapより50%速い
+/// lookupはHashMapより5%遅い
+/// constructはHashMapより早いが、HashMap(Box(value))よりなぜか遅い
+/// IndexMapやlinkedHashMapと比べると、with_capacityがない場合のconstructが遅い
+/// これら2つはlookup性能がHashMapより10%低い。
+/// LinkedHashMapはiterationがこれの5倍ぐらい遅く、with_capacityがなくてもそんなにconstruct性能が落ちない
+/// indexmapはiteration性能はこれと同じで、with_capacityがなくてもそんなに落ちないのも同じ
+///
+/// with_capacityがあれば、順番保持できるHashMapの中で、lookup,construct,iteration全てにおいて最強というのが今の所の評価
 #[derive(Debug, PartialEq)]
 pub struct StrVecMap<V>{
     contents : Vec<(StrSlice,V)>,
@@ -69,15 +80,7 @@ impl PartialEq for StrSlice{
     }
 }
 
-/// Sliceの実際の型は
-/// https://doc.rust-lang.org/stable/src/core/ptr/mod.rs.html#219-230
-/// [repr(C)]
-/// pub(crate) struct FatPtr<T> {
-///     data: *const T,
-///     pub(crate) len: usize,
-/// }
-/// なので、&MapKey->&[u8]のTransmuteもできるかもしれない・・・？
-/// やらないけど
+///基本的にunsafe。Stringの寿命よりこれが長生きした場合ぶっ壊れる
 #[repr(C)]
 struct MapKey{
     buf : *const u8,
@@ -91,14 +94,6 @@ impl MapKey{
             std::str::from_utf8_unchecked(s)
         }
     }
-
-    // fn to_slice(&self) -> &[u8]{
-    //     unsafe{
-    //         from_raw_parts(self.buf, self.len)
-    //     }
-    // }
-
-
 }
 
 impl PartialEq for MapKey {

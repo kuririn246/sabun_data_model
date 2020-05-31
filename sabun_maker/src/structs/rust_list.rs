@@ -21,9 +21,6 @@ pub struct ConstData{
 pub struct ConstList{
     pub default : ListDefObj,
     pub list : Vec<ListItem>,
-    ///MutListは初期値を持てないのでConstListに初期値を書いておくことになるだろう。
-    /// その場合、compatibleを設定しdefaultが同一であることを保証することで、そのままListItemをコピーすることが可能になる
-    pub compatible : HashSet<String>,
 }
 
 ///追加、削除、順番の変更等ができるリスト。初期値を持てず最初は必ず空リストである。これはバージョン違いを読み出す時に問題を単純化するために必要。
@@ -35,6 +32,10 @@ pub struct MutList{
     pub list : LinkedHashMap<u64, MutListItem>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
     pub next_id : u64,
+
+    ///MutListは初期値を持てないのでConstListに初期値を書いておくことになるだろう。
+    /// その場合、compatibleを設定しdefaultが同一であることを保証することで、そのままListItemをコピーすることが可能になる
+    pub compatible : HashSet<String>,
 }
 
 ///Data or Listの内部に作るList。ListDefObjの内部にはDefaultだけ書き、ListItemの内部にはItemのみを書く。
@@ -58,6 +59,10 @@ pub struct InnerMutList{
     pub list : LinkedHashMap<u64, MutListItem>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
     pub next_id : u64,
+
+    ///MutListは初期値を持てないのでConstListに初期値を書いておくことになるだろう。
+    /// その場合、compatibleを設定しdefaultが同一であることを保証することで、そのままListItemをコピーすることが可能になる
+    pub compatible : HashSet<String>,
 }
 
 

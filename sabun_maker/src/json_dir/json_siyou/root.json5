@@ -11,32 +11,33 @@
   "hegoNumber?" : ["Num", null], //型を指定し、null値を入れる。これでnullになる。
 
   //!で終わる場合、バージョン違いでこのメンバを持っていなかった場合、デフォルト値でなくundefinedが入る。
-  //undefinedを代入する手段はない。
+  //undefinedを手入力してはいけない
   "pugyaNumber!" : 10,
   "pugyaNumber2!?" : ["Num", null], //!?も出来る。?!ではダメ
 
   //配列はいまのところnumber配列、string配列、number配列の配列の4通り。
-  numArray : [ "Num-Array", 0, 3, 10 ],
+  numArray : [ "NumArray", 0, 3, 10 ],
 
   //numArrayはタグなしでも書ける特殊記法がある
   numArrayNoTag : [ 5.8, 8, 10 ],
-  emptyNumArray : [ "Num-Array" ], //初期値が空配列のnum-array
-  "nullableNumArray?" : [ "Num-Array", null ], //nullable配列の初期値をnullにする場合
-  num2Array : [ "Num2-Array", [2,3], [3,1] ], //二次元のnumarray
+  emptyNumArray : [ "NumArray" ], //初期値が空配列のnum-array
+  "nullableNumArray?" : [ "NumArray", null ], //nullable配列の初期値をnullにする場合
+  num2Array : [ "Num2Array", [2,3], [3,1] ], //二次元のnumarray
 
-  strArray : [ "Str-Array", "hoge", "hogehoge" ], //文字列配列
+  strArray : [ "StrArray", "hoge", "hogehoge" ], //文字列配列
   //そもそも配列なんてこのシステムに必要なんだろうか・・・？　まともに差分生成出来る気もしないしなあ。
 
-  Renamed : [ "prevName->currentName",
-              "prevName2->currentName2" ], //メンバ名の変更をした場合、これを書いておくことで自動でメンバ名の対応表を作ってくれる。
-              //参照可能なListの名前が変わった場合参照先も追跡できる
+  //古くて今では使っていないが、互換性のために残すメンバはOldに指定する
+  ///oldに設定されたメンバは、_Oldを付けなければプログラムから使用できず、
+  ///ConstDataである場合、jsonで Refできない
+  Old : [ "oldName", "oldName2" ],
 
-  currentName : 0,
-  currentName2 : 0,
+  //nullを入れておく。この変数に値が入っているなら、それは古いデータということになるだろう
+  oldName? : ["Str", null],
+  oldName2? : ["Num", null],
 
   unkoList : [
-	"List", //Listは配列とは違う。オブジェクトのコレクションを作るためにはlistを使う必要がある。
-	["Reffered"], //参照可能になる
+	"Data", //オブジェクトのコレクションを作るためにはList,Data,MutListのどれかを使う必要がある。DataはIDによる参照が可能である
 	["Default", {
 		hogeNumber : 0,
 		hogeString : "hoge"
@@ -54,8 +55,7 @@
 
 
   usable : [
-    "List",
-    ["Reffered"],
+    "Data",
     ["Default",{ num : 0 }],
     {
       ID : "yakusou",
@@ -68,9 +68,8 @@
   ],
 
   weapon : [
-    "List",
+    "Data",
     ["Default", { atk : 0 }],
-    ["Reffered"],
     {
       ID : "katana",
       atk : 5
@@ -81,13 +80,13 @@
     }
   ],
 
-  itemList : [
+  iniItemList : [
     "List",
-    ["AutoID"], //RefferedとAutoIDは同時には使えない
     ["Default",{
       "atk?" : ["Num", null],
       "Ref": { weapon : "" }, //Refの基本の形、なにか入れないとエラーになる。
     }],
+    ["Compatible", "itemList"],
     {
       Ref : { weapon : "doutanuki" }, //どうたぬきを参照。
       atk : 8 //override的ななにか
@@ -95,8 +94,7 @@
   ],
 
   hogeList : [
-    "List",
-    ["Reffered"],
+    "Data",
     ["Default",{ mem : "" }],
     {
       ID : "hogehoge",
@@ -105,8 +103,7 @@
   ],
 
   hugaList: [
-    "List",
-    ["Reffered"],
+    "Data",
     ["Default",{}],
     {
       ID : "hugahuga"
@@ -114,26 +111,23 @@
   ],
 
   hegoList: [
-    "List",
-    ["Reffered"],
-    ["Redef", "hugahuga->hegohego"],
+    "Data",
     ["Default", {
         mem : "",
-        Renamed: ["memOld->mem"] //DefaultメンバではRenamedの設定が可能
     }],
+    ["Old", "nantoka"],//Oldに指定されたItemは、jsonから参照できず、プログラムから使うときもnantoka_Oldという名前でアクセスしないとコンパイルエラーになる
     {
       ID : "hegohego",
       mem : "b",
     },
     {
       ID : "nantoka",
-      Obsolete : true //被参照リストでは要らなくなっても削除は危険なのでObsoleteするのが良いと思われる。
+
     }
   ],
 
   itemList3 : [
     "List",
-    ["AutoID"],
     ["Default",{
       "memOverride?" : ["Str", null],
       "Ref" : { hogeList : "", "hugaList?" : null, hegoList : "" },
@@ -148,36 +142,104 @@
   ],
 
   dim2List : [
-    "List",
-    ["AutoID"],
+    "Data",
     ["Default",{
-      innerList : [
-        "List",
-        ["AutoID"], //AutoIDのListの中にはAutoIDなListが作れる
+      innerData : [
+        "InnerDataDef",
+        ["Default",{
+          innerList : [
+            "InnerListDef",
+            ["Default",{
+              Ref : { hegoList :  "" },
+              val : 3,
+            }],
+          ],
+          innerListMem : 10,
+        }],
+        innerDataMem : 5,
+      ],
+      dataMem : 3,
+    }],
+    {
+      ID : "item1",
+      innerData : [
+        "InnerData", //InnerItemではDefaultは書かない
+        {
+          ID : "innerDataItem1",
+          innerDataMem : 505,
+          innerList : [
+            "InnerList",
+            {
+              Ref : { hegoList : "hegohego" },
+              val : 20,
+            }
+          ],
+        },
+        {
+          ID : "innerDataItem2",
+          //innerListは定義しない
+        }
+      ],
+      dataMem : 300,
+    },
+    {
+      ID : "item2",
+      //innerData定義なし
+    },
+    {
+      ID : "item3",
+      innerData : [
+        "InnerData",
+        {
+          ID : "innerDataItem1", //同じIDを使ってみたり
+        }
+      ]
+    }
+  ],
+
+  mut1 : [
+    "MutList",
+    ["Default",{
+      innerMutList : [
+        "innerMut",
+        ["Compatible", "dim2List.innerData.innerList"],
         ["Default",{
           Ref : { hegoList :  "" },
           val : 3,
         }],
-        //AutoIDのListには本来初期値を用意するべきではない。
       ],
+      someName : "",
+    ],//MutListには初期値を与えてはいけない。InnerMutにも。
+  ],
 
-      val2 : 4,
+  enumList : [
+    "List",
+    ["Default",{
+      Enum :{
+        hogeList? : null, hugaList? : null, hegoList? : null //enumはどれか一つだけ参照し、プログラムからはmatchでアクセスできる
+      },
+      mem : "unti",
     }],
     {
-      //AutoIDのListには本来初期値を用意するべきではないが、仕様を示すために出しとく。
-      innerList : [
-        "List",
-        ["AutoID"],
-        ["Default",{
-          Ref : { hegoList :  "" },
-          val : 3,
-        }], //本来Defaultの定義は上にあるので書く必要のないものだが、手書きされることが想定されておらず、機械的に生成されるとこれは出てくる。
-        {
-          val : 10,
-          Ref : { hegoList : "hegohego" }
-        },
-      ],
-      val2 : 30,
+      Enum :{
+        hogeList : "hogehoge"
+      }
+    },
+    {
+      Enum :{
+        hegoList : "hegohego"
+      }
     }
+  ],
+
+  mut2 : [
+    "MutList",
+    ["Default",{
+      Enum :{
+        hogeList? : null, hugaList? : null, hegoList? : null //enumはどれか一つだけ参照し、プログラムからはmatchでアクセスできる
+      },
+      mem : "unti",
+    }],
+    ["Compatible","enumList"]
   ]
 }
