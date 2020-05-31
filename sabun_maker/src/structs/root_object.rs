@@ -1,6 +1,5 @@
 use crate::structs::rust_value::{RustValue, RustParam};
 use std::collections::{HashSet, HashMap};
-use crate::indexmap::IndexMap;
 use crate::structs::ref_value::RefValue;
 use crate::indexmap::str_vec_map::StrVecMap;
 
@@ -27,12 +26,7 @@ pub struct ListDefObj{
     pub old : HashSet<String>,
 }
 
-impl ListDefObj{
-    //多分いらないんだけど、まああってもいいか・・・？
-    // pub fn new() -> ListDefObj{
-    //     ListDefObj{ default : IndexMap::new(), refs : RefDefObj::new(), old : HashSet::new() }
-    // }
-}
+
 
 #[derive(Debug, PartialEq)]
 pub struct RefDefObj {
@@ -43,35 +37,4 @@ pub struct RefDefObj {
     ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
     pub old : HashSet<String>,
 }
-impl RefDefObj{
-    // pub fn new() -> RefDefObj{
-    //     RefDefObj{ refs : IndexMap::new(), old : HashSet::new(), is_enum : false }
-    // }
-}
 
-//
-//
-// impl RootObject {
-//     pub fn new() -> RootObject {
-//         RustObject {
-//             include: vec![],
-//             default: IndexMap::new(),
-//             sabun: HashMap::new(),
-//             obsolete: false
-//         }
-//     }
-// }
-//
-//     pub fn insert_default(&mut self, key : String, value : RustValue) -> Option<RustValue>{
-//         return self.default.insert(key, value);
-//     }
-//
-//     pub fn get_list(&self, name : &str) -> Option<&RustList>{
-//         match self.default.get(name){
-//             Some(RustValue::List(l)) =>{
-//                 Some(l)
-//             },
-//             _ => None,
-//         }
-//     }
-// }

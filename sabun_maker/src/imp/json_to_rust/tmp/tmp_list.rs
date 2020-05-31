@@ -4,7 +4,8 @@ use crate::structs::root_object::ListDefObj;
 use crate::structs::rust_list::{ConstList, ListItem, ConstData, MutList, MutListItem, InnerList, InnerData, InnerMutList};
 use json5_parser::Span;
 use crate::error::Result;
-use crate::indexmap::IndexMap;
+use crate::indexmap::str_vec_map::StrVecMap;
+use linked_hash_map::LinkedHashMap;
 
 pub struct TmpList{
     pub vec : Vec<TmpObj>,
@@ -97,7 +98,7 @@ impl TmpList{
         if self.vec.len() != 0{
             Err(format!("{} MutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
-        Ok(MutList{ default : self.default.unwrap(), list : vec![], next_id : 0 })
+        Ok(MutList{ default : self.default.unwrap(), list : LinkedHashMap::new(), next_id : 0 })
     }
 
     pub fn to_inner_mut_list(self) -> Result<InnerMutList>{
@@ -116,7 +117,7 @@ impl TmpList{
         if self.vec.len() != 0{
             Err(format!("{} InnerMutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
-        Ok(InnerMutList{ list : vec![], next_id : 0 })
+        Ok(InnerMutList{ list : LinkedHashMap::new(), next_id : 0 })
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
@@ -181,15 +182,15 @@ impl TmpList{
 
 
 fn to_list_items(vec : Vec<TmpObj>) -> Result<Vec<ListItem>>{
-    let mut result : Vec<ListItem> = vec![];
+    let mut result : Vec<ListItem> = Vec::with_capacity(vec.len());
     for item in vec{
         result.push(item.to_list_item()?);
     }
     return Ok(result);
 }
 
-fn to_data_items(vec : Vec<TmpObj>) -> Result<IndexMap<String, ListItem>>{
-    let mut result : IndexMap<String, ListItem> = IndexMap::new();
+fn to_data_items(vec : Vec<TmpObj>) -> Result<StrVecMap<ListItem>>{
+    let mut result : StrVecMap<ListItem> = StrVecMap::with_capacity(vec.len());
     for item in vec{
         let (s,m) = item.to_list_item_with_id()?;
         result.insert(s, m);
@@ -197,10 +198,11 @@ fn to_data_items(vec : Vec<TmpObj>) -> Result<IndexMap<String, ListItem>>{
     return Ok(result);
 }
 
-fn to_violated_list_items(vec : Vec<TmpObj>) -> Result<Vec<MutListItem>>{
-    let mut result : Vec<MutListItem> = vec![];
+fn to_violated_list_items(vec : Vec<TmpObj>) -> Result<LinkedHashMap<u64, MutListItem>>{
+    let mut result : LinkedHashMap<u64, MutListItem> = LinkedHashMap::with_capacity(vec.len());
     for item in vec{
-        result.push(item.to_violated_list_item()?)
+        let item = item.to_violated_list_item()?;
+        result.insert(item.id, item);
     }
     return Ok(result);
 }
