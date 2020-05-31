@@ -1,0 +1,92 @@
+
+1万件の場合、実質的にL2キャッシュのテストになるだろう
+10000件
+test indexmap::lookup_performance_test::tests::bench_hash_map          ... bench:     285,620 ns/iter (+/- 4,775)
+test indexmap::lookup_performance_test::tests::bench_hash_map_with_box ... bench:     287,755 ns/iter (+/- 4,364)
+test indexmap::lookup_performance_test::tests::bench_index_map         ... bench:     327,195 ns/iter (+/- 5,877)
+test indexmap::lookup_performance_test::tests::bench_linked_hash_map   ... bench:     334,920 ns/iter (+/- 51,435)
+test indexmap::lookup_performance_test::tests::bench_str_vec           ... bench:     290,370 ns/iter (+/- 4,729)
+test indexmap::lookup_performance_test::tests::bench_str_vec_with_box  ... bench:     325,089 ns/iter (+/- 5,146)
+
+何度も実行されるので、実質的に小さいマップを何回も使いまわしてキャッシュが大いに効く場合のテストであろう
+10件
+test indexmap::lookup_performance_test::tests::bench_hash_map          ... bench:         193 ns/iter (+/- 1)
+test indexmap::lookup_performance_test::tests::bench_hash_map_with_box ... bench:         202 ns/iter (+/- 1)
+test indexmap::lookup_performance_test::tests::bench_index_map         ... bench:         217 ns/iter (+/- 5)
+test indexmap::lookup_performance_test::tests::bench_linked_hash_map   ... bench:         218 ns/iter (+/- 12)
+test indexmap::lookup_performance_test::tests::bench_str_vec           ... bench:         234 ns/iter (+/- 0)
+test indexmap::lookup_performance_test::tests::bench_str_vec_with_box  ... bench:         224 ns/iter (+/- 3)
+
+小さいマップを何回も使いまわしてキャッシュが大いに効く場合
+10件*1000
+test indexmap::lookup_performance_test::tests::bench_hash_map          ... bench:     193,771 ns/iter (+/- 768)
+test indexmap::lookup_performance_test::tests::bench_hash_map_with_box ... bench:     197,188 ns/iter (+/- 185)
+test indexmap::lookup_performance_test::tests::bench_index_map         ... bench:     218,900 ns/iter (+/- 6,114)
+test indexmap::lookup_performance_test::tests::bench_linked_hash_map   ... bench:     216,590 ns/iter (+/- 8,152)
+test indexmap::lookup_performance_test::tests::bench_str_vec           ... bench:     216,703 ns/iter (+/- 5,767)
+test indexmap::lookup_performance_test::tests::bench_str_vec_with_box  ... bench:     216,612 ns/iter (+/- 5,455)
+
+100万件&1万 lookup
+test indexmap::lookup_performance_test::tests::bench_hash_map          ... bench:     584,115 ns/iter (+/- 30,770)
+test indexmap::lookup_performance_test::tests::bench_hash_map_with_box ... bench:     660,766 ns/iter (+/- 239,311)
+test indexmap::lookup_performance_test::tests::bench_index_map         ... bench:     665,835 ns/iter (+/- 25,363)
+test indexmap::lookup_performance_test::tests::bench_linked_hash_map   ... bench:     658,045 ns/iter (+/- 17,216)
+test indexmap::lookup_performance_test::tests::bench_str_vec           ... bench:     646,401 ns/iter (+/- 33,534)
+test indexmap::lookup_performance_test::tests::bench_str_vec_with_box  ... bench:     806,973 ns/iter (+/- 49,696)
+
+100万件&1000 lookup
+test indexmap::lookup_performance_test::tests::bench_hash_map          ... bench:      40,189 ns/iter (+/- 1,850)
+test indexmap::lookup_performance_test::tests::bench_hash_map_with_box ... bench:      42,395 ns/iter (+/- 198)
+test indexmap::lookup_performance_test::tests::bench_index_map         ... bench:      48,364 ns/iter (+/- 1,211)
+test indexmap::lookup_performance_test::tests::bench_linked_hash_map   ... bench:      49,049 ns/iter (+/- 360)
+test indexmap::lookup_performance_test::tests::bench_str_vec           ... bench:      45,945 ns/iter (+/- 325)
+test indexmap::lookup_performance_test::tests::bench_str_vec_with_box  ... bench:      50,286 ns/iter (+/- 596)
+
+1000万件&100 lookup
+test indexmap::lookup_performance_test::tests::bench_hash_map          ... bench:       2,331 ns/iter (+/- 10)
+test indexmap::lookup_performance_test::tests::bench_hash_map_with_box ... bench:       2,465 ns/iter (+/- 11)
+test indexmap::lookup_performance_test::tests::bench_index_map         ... bench:       2,735 ns/iter (+/- 53)
+test indexmap::lookup_performance_test::tests::bench_linked_hash_map   ... bench:       2,705 ns/iter (+/- 22)
+test indexmap::lookup_performance_test::tests::bench_str_vec           ... bench:       2,559 ns/iter (+/- 11)
+test indexmap::lookup_performance_test::tests::bench_str_vec_with_box  ... bench:       2,696 ns/iter (+/- 28)
+
+100万件&100 lookup
+test indexmap::lookup_performance_test::tests::bench_hash_map          ... bench:       2,342 ns/iter (+/- 15)
+test indexmap::lookup_performance_test::tests::bench_hash_map_with_box ... bench:       2,446 ns/iter (+/- 14)
+test indexmap::lookup_performance_test::tests::bench_index_map         ... bench:       2,682 ns/iter (+/- 15)
+test indexmap::lookup_performance_test::tests::bench_linked_hash_map   ... bench:       2,669 ns/iter (+/- 14)
+test indexmap::lookup_performance_test::tests::bench_str_vec           ... bench:       2,577 ns/iter (+/- 11)
+test indexmap::lookup_performance_test::tests::bench_str_vec_with_box  ... bench:       2,639 ns/iter (+/- 18)
+
+10万件&100lookup
+test indexmap::lookup_performance_test::tests::bench_hash_map          ... bench:       2,218 ns/iter (+/- 27)
+test indexmap::lookup_performance_test::tests::bench_hash_map_with_box ... bench:       2,335 ns/iter (+/- 118)
+test indexmap::lookup_performance_test::tests::bench_index_map         ... bench:       2,646 ns/iter (+/- 35)
+test indexmap::lookup_performance_test::tests::bench_linked_hash_map   ... bench:       2,586 ns/iter (+/- 37)
+test indexmap::lookup_performance_test::tests::bench_str_vec           ... bench:       2,495 ns/iter (+/- 16)
+test indexmap::lookup_performance_test::tests::bench_str_vec_with_box  ... bench:       2,598 ns/iter (+/- 43)
+
+1万件&100lookup
+test indexmap::lookup_performance_test::tests::bench_hash_map          ... bench:       2,157 ns/iter (+/- 30)
+test indexmap::lookup_performance_test::tests::bench_hash_map_with_box ... bench:       2,200 ns/iter (+/- 16)
+test indexmap::lookup_performance_test::tests::bench_index_map         ... bench:       2,453 ns/iter (+/- 42)
+test indexmap::lookup_performance_test::tests::bench_linked_hash_map   ... bench:       2,437 ns/iter (+/- 23)
+test indexmap::lookup_performance_test::tests::bench_str_vec           ... bench:       2,353 ns/iter (+/- 25)
+test indexmap::lookup_performance_test::tests::bench_str_vec_with_box  ... bench:       2,460 ns/iter (+/- 39)
+
+1000件&100lookup
+test indexmap::lookup_performance_test::tests::bench_hash_map          ... bench:       2,041 ns/iter (+/- 20)
+test indexmap::lookup_performance_test::tests::bench_hash_map_with_box ... bench:       2,021 ns/iter (+/- 28)
+test indexmap::lookup_performance_test::tests::bench_index_map         ... bench:       2,291 ns/iter (+/- 36)
+test indexmap::lookup_performance_test::tests::bench_linked_hash_map   ... bench:       2,279 ns/iter (+/- 16)
+test indexmap::lookup_performance_test::tests::bench_str_vec           ... bench:       2,196 ns/iter (+/- 27)
+test indexmap::lookup_performance_test::tests::bench_str_vec_with_box  ... bench:       2,290 ns/iter (+/- 7)
+
+100件&100lookup
+test indexmap::lookup_performance_test::tests::bench_hash_map          ... bench:       1,940 ns/iter (+/- 26)
+test indexmap::lookup_performance_test::tests::bench_hash_map_with_box ... bench:       1,986 ns/iter (+/- 11)
+test indexmap::lookup_performance_test::tests::bench_index_map         ... bench:       2,169 ns/iter (+/- 34)
+test indexmap::lookup_performance_test::tests::bench_linked_hash_map   ... bench:       2,160 ns/iter (+/- 27)
+test indexmap::lookup_performance_test::tests::bench_str_vec           ... bench:       2,151 ns/iter (+/- 47)
+test indexmap::lookup_performance_test::tests::bench_str_vec_with_box  ... bench:       2,287 ns/iter (+/- 47)
+

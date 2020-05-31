@@ -15,6 +15,8 @@
 //     const NAME_LEN : usize = 5;
 //     const NUM_NAMES : usize = 10;
 //
+//     ///40バイトだとBoxに入れる価値はない
+//     /// 120バイトだとBoxに入れる価値大いにある
 //     struct BigItem {
 //         map1: HashMap<String, usize>,
 //         map2: HashMap<String, usize>,
@@ -23,7 +25,11 @@
 //
 //     impl BigItem {
 //         fn new() -> BigItem {
-//             BigItem{ map1 : HashMap::new(), map2 : HashMap::new(), map3 : HashMap::new() }
+//             BigItem{
+//                 map1 : HashMap::new(),
+//                 map2 : HashMap::new(),
+//                 map3 : HashMap::new()
+//             }
 //         }
 //     }
 //
@@ -66,6 +72,13 @@
 //         let (rng, names) = init1();
 //
 //         b.iter(|| init_str_vec_fast(&names));
+//     }
+//
+//     #[bench]
+//     fn bench_init_str_vec_fast_with_box(b: &mut Bencher) {
+//         let (rng, names) = init1();
+//
+//         b.iter(|| init_str_vec_fast_with_box(&names));
 //     }
 //
 //     #[bench]
@@ -116,7 +129,13 @@
 //         let (rng, names) = init1();
 //
 //         b.iter(|| init_hash_map_fast_with_box(&names));
+//     }
 //
+//     #[bench]
+//     fn bench_init_hash_map_fast_with_2boxes(b: &mut Bencher) {
+//         let (rng, names) = init1();
+//
+//         b.iter(|| init_hash_map_fast_with_2boxes(&names));
 //     }
 //
 //
@@ -145,6 +164,16 @@
 //
 //         for name in names{
 //             map.insert(name.to_string(), BigItem::new());
+//         }
+//
+//         return map;
+//     }
+//
+//     fn init_str_vec_fast_with_box(names : &Vec<String>) -> StrVecMap<Box<BigItem>> {
+//         let mut map : StrVecMap<Box<BigItem>> = StrVecMap::with_capacity(names.len());
+//
+//         for name in names{
+//             map.insert(name.to_string(), Box::new(BigItem::new()));
 //         }
 //
 //         return map;
@@ -217,6 +246,16 @@
 //
 //         for name in names{
 //             map.insert(name.to_string(), Box::new(BigItem::new()));
+//         }
+//
+//         return map;
+//     }
+//
+//     fn init_hash_map_fast_with_2boxes(names : &Vec<String>) -> HashMap<Box<String>, Box<BigItem>>{
+//         let mut map : HashMap<Box<String>, Box<BigItem>> = HashMap::with_capacity(names.len());
+//
+//         for name in names{
+//             map.insert(Box::new(name.to_string()), Box::new(BigItem::new()));
 //         }
 //
 //         return map;
