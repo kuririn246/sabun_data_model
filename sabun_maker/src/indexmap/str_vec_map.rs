@@ -91,6 +91,14 @@ impl MapKey{
             std::str::from_utf8_unchecked(s)
         }
     }
+
+    // fn to_slice(&self) -> &[u8]{
+    //     unsafe{
+    //         from_raw_parts(self.buf, self.len)
+    //     }
+    // }
+
+
 }
 
 impl PartialEq for MapKey {
@@ -129,8 +137,8 @@ impl<V> StrVecMap<V> {
 
         match self.map.get(&tmp_key) {
             Some(idx) => {
-                let (key,_) = unsafe { self.contents.get_unchecked_mut(*idx) };
-                Some(std::mem::replace(key, value))
+                let (_key,val) = unsafe { self.contents.get_unchecked_mut(*idx) };
+                Some(std::mem::replace(val, value))
             }
             None => {
                 let slice = StrSlice::new(key);

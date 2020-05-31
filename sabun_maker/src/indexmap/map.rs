@@ -46,6 +46,8 @@ impl<K : Eq + Hash, V> IndexMap<K,V>{
         IndexMap{ contents : Vec::new(), map : HashMap::new() }
     }
 
+    pub fn with_capacity(capacity : usize) -> IndexMap<K,V>{ IndexMap{ contents : Vec::with_capacity(capacity), map : HashMap::with_capacity(capacity) }}
+
     pub fn len(&self) -> usize{ self.contents.len() }
 
     pub fn insert(&mut self, key : K, value : V) -> Option<V>{
