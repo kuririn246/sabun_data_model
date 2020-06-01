@@ -4,14 +4,13 @@ use std::collections::{HashSet, HashMap};
 use crate::structs::rust_value::RustValue;
 use crate::structs::ref_value::RefValue;
 use linked_hash_map::LinkedHashMap;
-use crate::indexmap::str_vec_map::StrVecMap;
 
 
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq)]
 pub struct ConstData{
     pub default : ListDefObj,
-    pub list : Box<StrVecMap<ListItem>>,
+    pub list : Box<HashMap<String, ListItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
     pub old : Box<HashSet<String>>,
 }
@@ -49,7 +48,7 @@ pub struct InnerList{
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq)]
 pub struct InnerData{
-    pub list : Box<StrVecMap<ListItem>>,
+    pub list : Box<HashMap<String, ListItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
     pub old : Box<HashSet<String>>,
 }

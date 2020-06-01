@@ -8,7 +8,7 @@ use crate::imp::json_to_rust::json_name::json_simple_name;
 use crate::structs::qv::Qv;
 use crate::imp::json_to_rust::tmp::tmp_obj::TmpRefs;
 use linked_hash_map::LinkedHashMap;
-use crate::indexmap::str_vec_map::StrVecMap;
+use std::collections::HashMap;
 
 pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<TmpRefs> {
     let obj = json_obj_to_rust(v, true, span, names)?;
@@ -23,7 +23,7 @@ pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -
     }
 
 
-    let mut map: StrVecMap<RefValue> = StrVecMap::with_capacity(obj.default.len());
+    let mut map: HashMap<String, RefValue> = HashMap::with_capacity(obj.default.len());
     for (k, v) in &obj.default {
         match v {
             RustValue::Param(RustParam::String(v), vt) => {

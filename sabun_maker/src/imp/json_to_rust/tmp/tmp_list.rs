@@ -1,10 +1,9 @@
 use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap};
 use crate::structs::root_object::{ListDefObj, InnerMutDefObj};
 use crate::structs::rust_list::{ConstList, ListItem, ConstData, MutList, MutListItem, InnerList, InnerData, InnerMutList};
 use json5_parser::Span;
 use crate::error::Result;
-use crate::indexmap::str_vec_map::StrVecMap;
 use linked_hash_map::LinkedHashMap;
 
 pub struct TmpList{
@@ -205,8 +204,8 @@ fn to_list_items(vec : Vec<TmpObj>) -> Result<Vec<ListItem>>{
     return Ok(result);
 }
 
-fn to_data_items(vec : Vec<TmpObj>) -> Result<StrVecMap<ListItem>>{
-    let mut result : StrVecMap<ListItem> = StrVecMap::with_capacity(vec.len());
+fn to_data_items(vec : Vec<TmpObj>) -> Result<HashMap<String, ListItem>>{
+    let mut result : HashMap<String, ListItem> = HashMap::with_capacity(vec.len());
     for item in vec{
         let (s,m) = item.to_list_item_with_id()?;
         result.insert(s, m);

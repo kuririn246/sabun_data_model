@@ -1,16 +1,10 @@
 use crate::structs::value_type::ValueType;
 use crate::structs::qv::Qv;
-use crate::indexmap::IndexMap;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct RefValue{
     pub value_type : ValueType,
     pub value : Qv<String>,
-}
-
-pub struct RefaMap{
-    pub map : IndexMap<String, RefValue>,
-    pub is_enum : bool,
 }
 
 impl RefValue{

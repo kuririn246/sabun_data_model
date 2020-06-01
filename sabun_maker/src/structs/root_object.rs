@@ -1,14 +1,13 @@
 use crate::structs::rust_value::{RustValue, RustParam};
 use std::collections::{HashSet, HashMap};
 use crate::structs::ref_value::RefValue;
-use crate::indexmap::str_vec_map::StrVecMap;
 
 #[derive(Debug, PartialEq)]
 pub struct RootObject{
     //別ファイルにあったことを記録しておくためのもの。どう使うかは後で考える。
     pub include : Vec<String>,
     //listのobjectの場合、defaultはlist側にあるが、ここには初期値が入る。
-    pub default : StrVecMap<RustValue>,
+    pub default : HashMap<String, RustValue>,
     //変更されたものを記録。差分変更時に、defaultと同じになったらここから削除する
     //listの変更はRustListが直接上書きされるので、sabunには入らない
     pub sabun : HashMap<String, RustParam>,
@@ -20,7 +19,7 @@ pub struct RootObject{
 
 #[derive(Debug, PartialEq)]
 pub struct ListDefObj{
-    pub default : Box<StrVecMap<RustValue>>,
+    pub default : Box<HashMap<String, RustValue>>,
     ///RustValueを巨大にしすぎないためにBoxにしてサイズを削る
     pub refs: Box<RefDefObj>,
     ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
@@ -29,7 +28,7 @@ pub struct ListDefObj{
 
 #[derive(Debug, PartialEq)]
 pub struct RefDefObj {
-    pub refs: Box<StrVecMap<RefValue>>,
+    pub refs: Box<HashMap<String, RefValue>>,
     /// Enum とRefの二通りの定義の仕方があり、Enumの場合は Ref のうち一つだけ値があり、ほかは全部nullにしなきゃいけない。
     /// プログラムからはmatch でアクセス出来る。値があるRefをキャストしてゲットする。
     pub is_enum : bool,

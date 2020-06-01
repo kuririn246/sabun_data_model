@@ -3,7 +3,6 @@ use std::hash::{Hash, Hasher};
 use std::fmt::{Debug, Formatter, Error};
 use std::slice::from_raw_parts;
 
-
 /// StringをKeyとし、入れた順番を保持する、追加は出来るが削除はできないハッシュマップ
 /// Removeを実装しないことで、Vecとindexでのアイテムの指定を可能にし、データを連続させ可能な限り間接ポインタアクセス、キャッシュミスを減らそうと試みている
 /// ついでにstringのcapacityも削っている。

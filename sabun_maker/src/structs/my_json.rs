@@ -1,4 +1,4 @@
-use crate::indexmap::IndexMap;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub enum Value{
@@ -6,7 +6,7 @@ pub enum Value{
     String(String),
     Number(f64),
     Array(Vec<Value>),
-    Map(IndexMap<String, Value>),
+    Map(HashMap<String, Value>),
     Null,
     Undefined,
 }
@@ -68,7 +68,7 @@ fn indent_str(indent_level : usize) -> String{
     "  ".repeat(indent_level)
 }
 
-fn write_map(map : &IndexMap<String, Value>, s : &mut String, indent_level : usize) {
+fn write_map(map : &HashMap<String, Value>, s : &mut String, indent_level : usize) {
     if map.len() == 0{
         s.push_str("{}");
     } else if map.len() == 1 {
