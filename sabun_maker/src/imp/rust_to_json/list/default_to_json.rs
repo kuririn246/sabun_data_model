@@ -1,7 +1,7 @@
-use crate::my_json::Value;
 use crate::error::Result;
 use crate::rust_to_json_new_default;
 use crate::structs::root_object::RustObject;
+use crate::structs::my_json::Value;
 
 pub fn default_to_json(obj : &RustObject, root : &RustObject) -> Result<Value>{
     let mut result : Vec<Value> = vec![];

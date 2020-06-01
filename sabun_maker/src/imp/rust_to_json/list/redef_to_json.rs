@@ -1,5 +1,5 @@
-use crate::my_json::Value;
 use std::collections::BTreeMap;
+use crate::structs::my_json::Value;
 
 pub fn redef_to_json(map : &BTreeMap<String, String>) -> Value{
     let mut result : Vec<Value> = vec![ Value::String("Redef".to_string()) ];

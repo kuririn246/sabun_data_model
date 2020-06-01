@@ -43,7 +43,6 @@ impl RustParam{
 }
 
 impl RustValue{
-
     ///この数値は仮
     pub(crate) fn type_num(&self) -> usize{
         match self{
@@ -62,6 +61,12 @@ impl RustValue{
         }
     }
 
+    pub fn value_type(&self) -> ValueType{
+        match self{
+            RustValue::Param(_param, vt) => vt.clone(),
+            _ => ValueType::Normal,
+        }
+    }
 
 
 

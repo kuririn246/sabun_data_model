@@ -1,15 +1,15 @@
-use crate::indexmap::IndexMap;
-use crate::my_json::Value;
 use crate::imp::rust_to_json::rust_value_to_json_value::rust_value_to_json_value;
 use crate::error::Result;
-use crate::structs::rust_value::RustValue;
-use crate::structs::root_object::RustObject;
+use crate::structs::rust_value::{RustValue, RustParam};
+use crate::structs::my_json::Value;
+use crate::structs::root_object::RootObject;
+use std::collections::HashMap;
 
 ///差分まで含めて全部デフォルトにしてしまう。
 /// listの場合はlist_defが必ずあるものと想定。Noneの場合はdefがしっかりあって、sabunはdefで定義された名前のものしかないと想定。
 /// list_defは実際はメンバの定義順と合わせるためにしか使っていない
-pub fn get_new_default_listitem(list_def : &IndexMap<String, RustValue>, def : &IndexMap<String, RustValue>, sabun : &IndexMap<String, RustValue>, root : &RustObject) -> Result<IndexMap<String, Value>> {
-    let mut result = IndexMap::new();
+pub fn get_new_default_listitem(list_def : &HashMap<String, RustValue>, def : &HashMap<String, RustValue>, sabun : &HashMap<String, RustParam>, root : &RootObject) -> Result<IndexMap<String, Value>> {
+    let mut result = HashMap::new();
 
     for (k, _) in list_def {
         let v: &RustValue =
@@ -29,12 +29,12 @@ pub fn get_new_default_listitem(list_def : &IndexMap<String, RustValue>, def : &
     return Ok(result);
 }
 
-pub fn get_new_default(def : &IndexMap<String, RustValue>, sabun : &IndexMap<String, RustValue>, root : &RustObject) -> Result<IndexMap<String, Value>> {
-    let mut result = IndexMap::new();
+pub fn get_new_default(def : &HashMap<String, RustValue>, sabun : &HashMap<String, RustParam>, root : &RootObject) -> Result<HashMap<String, Value>> {
+    let mut result = HashMap::new();
 
     for (k, v) in def {
         let v: &RustValue = if let Some(sv) = sabun.get(k) {
-            sv
+            RustValue::Param(sv, v.)
         } else {
             v
         };

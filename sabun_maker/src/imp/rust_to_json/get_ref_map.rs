@@ -1,11 +1,11 @@
-use crate::my_json::{Value};
-use crate::indexmap::IndexMap;
 use crate::structs::qv::Qv;
 use crate::structs::value_type::ValueType;
 use crate::structs::ref_value::RefValue;
+use crate::structs::my_json::Value;
+use std::collections::HashMap;
 
-pub fn get_ref_map(r : &IndexMap<String, RefValue>) -> IndexMap<String, Value>{
-    let mut map = IndexMap::new();
+pub fn get_ref_map(r : &HashMap<String, RefValue>) -> IndexMap<String, Value>{
+    let mut map = HashMap::new();
 
     for (k, rv) in r{
         let rv : &RefValue = rv;

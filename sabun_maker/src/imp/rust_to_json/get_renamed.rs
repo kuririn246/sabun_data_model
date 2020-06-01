@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
-use crate::my_json::Value;
+use crate::structs::my_json::Value;
+
 pub fn get_renamed(map : &BTreeMap<String, String>) -> Vec<Value>{
     let mut result : Vec<Value> = vec![];
 
