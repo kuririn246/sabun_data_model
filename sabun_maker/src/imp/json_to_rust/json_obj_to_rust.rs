@@ -10,14 +10,20 @@ use crate::imp::json_to_rust::get_id::get_id;
 use linked_hash_map::LinkedHashMap;
 use crate::imp::json_to_rust::get_refs::get_ref;
 use json5_parser::Span;
+use crate::imp::json_to_rust::json_item_to_rust::json_item_to_rust_ref;
 
-pub fn json_obj_to_rust(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<TmpObj>{
+pub fn json_obj_to_rust(v : &LinkedHashMap<String, JVal>, is_ref_obj : bool, span : &Span, names : &Names) -> Result<TmpObj>{
     let mut r  = TmpObj::new(v.len(),span.clone());
     for (k,v) in v{
         let name = json_name(k).ok_or_else(|| format!("{} {} is not a valid name {}",v.line_str(), k, names))?;
         match name{
             NameType::Name(name, vt) =>{
-                let v = json_item_to_rust(&name, vt,v, names)?;
+                let v = if is_ref_obj {
+                    //きったないコードだなあ。でもこれが一番簡単で分かりやすいと思う・・・
+                    json_item_to_rust_ref(&name, vt, v, names)?
+                } else{
+                    json_item_to_rust(&name, vt,v, names)?
+                };
 
                 r.insert_default(name.to_string(), v);
             },

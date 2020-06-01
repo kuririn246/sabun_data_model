@@ -20,22 +20,29 @@ pub struct RootObject{
 
 #[derive(Debug, PartialEq)]
 pub struct ListDefObj{
-    pub default : StrVecMap<RustValue>,
-    ///RustValueを巨大にしすぎないためにちょっとサイズを削る
+    pub default : Box<StrVecMap<RustValue>>,
+    ///RustValueを巨大にしすぎないためにBoxにしてサイズを削る
     pub refs: Box<RefDefObj>,
     ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
-    pub old : HashSet<String>,
+    pub old : Box<HashSet<String>>,
 }
-
-
 
 #[derive(Debug, PartialEq)]
 pub struct RefDefObj {
-    pub refs: StrVecMap<RefValue>,
+    pub refs: Box<StrVecMap<RefValue>>,
     /// Enum とRefの二通りの定義の仕方があり、Enumの場合は Ref のうち一つだけ値があり、ほかは全部nullにしなきゃいけない。
     /// プログラムからはmatch でアクセス出来る。値があるRefをキャストしてゲットする。
     pub is_enum : bool,
     ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
-    pub old : HashSet<String>,
+    pub old : Box<HashSet<String>>,
 }
+
+
+#[derive(Debug, PartialEq)]
+pub struct InnerMutDefObj {
+    pub list_def : ListDefObj,
+    pub compatible : Box<HashSet<String>>,
+}
+
+
 

@@ -1,6 +1,6 @@
 use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
 use std::collections::HashSet;
-use crate::structs::root_object::ListDefObj;
+use crate::structs::root_object::{ListDefObj, InnerMutDefObj};
 use crate::structs::rust_list::{ConstList, ListItem, ConstData, MutList, MutListItem, InnerList, InnerData, InnerMutList};
 use json5_parser::Span;
 use crate::error::Result;
@@ -68,7 +68,7 @@ impl TmpList{
         }
         let old = self.old.unwrap_or_else(|| HashSet::new());
 
-        Ok(ConstData{ default : Box::new(self.default.unwrap()), old, list : to_data_items(self.vec)? })
+        Ok(ConstData{ default : self.default.unwrap(), old : Box::new(old), list : Box::new(to_data_items(self.vec)?) })
     }
     pub fn to_inner_data(self) -> Result<InnerData>{
         if self.compatible.is_some(){
@@ -82,7 +82,7 @@ impl TmpList{
         }
         let old = self.old.unwrap_or_else(|| HashSet::new());
 
-        Ok(InnerData{ old, list : to_data_items(self.vec)? })
+        Ok(InnerData{ old : Box::new(old), list : Box::new(to_data_items(self.vec)?) })
     }
 
     pub fn to_mut_list(self) -> Result<MutList>{
@@ -99,11 +99,13 @@ impl TmpList{
             Err(format!("{} MutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
         let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
-        Ok(MutList{ default : Box::new(self.default.unwrap()), compatible, list : LinkedHashMap::new(), next_id : 0 })
+        Ok(MutList{ default : Box::new(self.default.unwrap()), compatible : Box::new(compatible), list : Box::new(LinkedHashMap::new()), next_id : 0 })
     }
 
     pub fn to_inner_mut_list(self) -> Result<InnerMutList>{
-
+        if self.compatible.is_some(){
+            Err(format!("{} Compatible is not needed for InnerMutList {}", self.span.line_str(), self.span.slice()))?
+        }
         if self.old.is_some(){
             Err(format!("{} Old is not needed for InnerMutList {}", self.span.line_str(), self.span.slice()))?
         }
@@ -116,8 +118,7 @@ impl TmpList{
         if self.vec.len() != 0{
             Err(format!("{} InnerMutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
-        let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
-        Ok(InnerMutList{ list : LinkedHashMap::new(), compatible, next_id : 0 })
+        Ok(InnerMutList{ list : Box::new(LinkedHashMap::new()), next_id : 0 })
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
@@ -134,11 +135,15 @@ impl TmpList{
         let next_id = self.next_id.unwrap();
         let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
 
-        Ok(MutList{ default : Box::new(self.default.unwrap()), list : to_violated_list_items(self.vec)?, compatible, next_id })
+        Ok(MutList{ default : Box::new(self.default.unwrap()), list : Box::new(to_violated_list_items(self.vec)?),
+            compatible : Box::new(compatible), next_id })
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
     pub fn to_inner_violated_list(self) -> Result<InnerMutList>{
+        if self.compatible.is_some(){
+            Err(format!("{} Compatible is not needed for InnerViolatedList {}", self.span.line_str(), self.span.slice()))?
+        }
         if self.old.is_some(){
             Err(format!("{} Old is not needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
         }
@@ -149,9 +154,8 @@ impl TmpList{
             Err(format!("{} NextID is needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
         }
         let next_id = self.next_id.unwrap();
-        let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
 
-        Ok(InnerMutList{ list : to_violated_list_items(self.vec)?, compatible, next_id })
+        Ok(InnerMutList{ list : Box::new(to_violated_list_items(self.vec)?),next_id })
     }
 
     pub fn to_inner_def(self) -> Result<ListDefObj>{
@@ -174,6 +178,22 @@ impl TmpList{
         Ok(self.default.unwrap())
     }
 
+    pub fn to_inner_mut_def(self) -> Result<InnerMutDefObj>{
+        if self.old.is_some(){
+            Err(format!("{} Old is not needed for InnerDef {}", self.span.line_str(), self.span.slice()))?
+        }
+        if self.default.is_none(){
+            Err(format!("{} Default must be defined {}", self.span.line_str(), self.span.slice()))?
+        }
+        if self.next_id.is_some(){
+            Err(format!("{} NextID is not needed for InnerDef {}", self.span.line_str(), self.span.slice()))?
+        }
+        if self.vec.len() != 0{
+            Err(format!("{} InnerDef must not have items {}", self.span.line_str(), self.span.slice()))?
+        }
+        let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
+        Ok(InnerMutDefObj{list_def :self.default.unwrap(), compatible : Box::new(compatible) })
+    }
 }
 
 

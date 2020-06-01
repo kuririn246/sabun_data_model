@@ -25,6 +25,7 @@ pub fn json_name(s : &str) -> Option<NameType>{
         "Old" => return some(Old),
         "ID" => return some(ID),
         "Ref" => return some(Ref),
+        "Enum" => return some(Enum),
         _ => {},
     }
 
@@ -40,6 +41,16 @@ pub fn json_simple_name(s : &str) -> Option<String> {
         },
         _ => { None }
     }
+}
+
+pub fn dot_chained_name(s : &str) -> Option<&str>{
+    let splitted : Vec<&str> = s.split('.').collect();
+    for item in splitted{
+        if json_simple_name(item).is_none(){
+            return None;
+        }
+    }
+    return Some(s)
 }
 
 

@@ -11,7 +11,7 @@ use linked_hash_map::LinkedHashMap;
 use crate::indexmap::str_vec_map::StrVecMap;
 
 pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<TmpRefs> {
-    let obj = json_obj_to_rust(v, span, names)?;
+    let obj = json_obj_to_rust(v, true, span, names)?;
     if obj.refs.map.len() != 0 {
         Err(format!(r#"{} Ref can't be declared in a Ref object {}"#, span.line_str(), names))?
     }
@@ -29,9 +29,9 @@ pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -
             RustValue::Param(RustParam::String(v), vt) => {
                 match v {
                     Qv::Val(s) =>{
-                        if json_simple_name(s).is_none(){
+                        if json_simple_name(s).is_none() && s.is_empty() == false{
                             //undefinedは勝手にいれちゃいけないから、エラーメッセージには表示しないが、別に入れられる
-                            Err(format!(r#"{} {} Ref's value must be a simple name or null {}"#, span.line_str(), s, names))?
+                            Err(format!(r#"{} {} Ref's value must be a simple name, null or empty {}"#, span.line_str(), s, names))?
                         }
                     },
                     _ =>{},

@@ -24,17 +24,18 @@
   "nullableNumArray?" : [ "NumArray", null ], //nullable配列の初期値をnullにする場合
   num2Array : [ "Num2Array", [2,3], [3,1] ], //二次元のnumarray
 
-  strArray : [ "StrArray", "hoge", "hogehoge" ], //文字列配列
+  //文字列配列
   //そもそも配列なんてこのシステムに必要なんだろうか・・・？　まともに差分生成出来る気もしないしなあ。
+  strArray : [ "StrArray", "hoge", "hogehoge" ],
 
   //古くて今では使っていないが、互換性のために残すメンバはOldに指定する
-  ///oldに設定されたメンバは、_Oldを付けなければプログラムから使用できず、
-  ///ConstDataである場合、jsonで Refできない
+  //oldに設定されたメンバは、_Oldを付けなければプログラムから使用できず、
+  //ConstDataである場合、jsonで Refできない。
   Old : [ "oldName", "oldName2" ],
 
   //nullを入れておく。この変数に値が入っているなら、それは古いデータということになるだろう
-  oldName? : ["Str", null],
-  oldName2? : ["Num", null],
+  "oldName?" : ["Str", null],
+  "oldName2?" : ["Num", null],
 
   unkoList : [
 	"Data", //オブジェクトのコレクションを作るためにはList,Data,MutListのどれかを使う必要がある。DataはIDによる参照が可能である
@@ -86,7 +87,6 @@
       "atk?" : ["Num", null],
       "Ref": { weapon : "" }, //Refの基本の形、なにか入れないとエラーになる。
     }],
-    ["Compatible", "itemList"],
     {
       Ref : { weapon : "doutanuki" }, //どうたぬきを参照。
       atk : 8 //override的ななにか
@@ -151,19 +151,18 @@
             "InnerListDef",
             ["Default",{
               Ref : { hegoList :  "" },
-              val : 3,
+              innerListMem : 10,
             }],
           ],
-          innerListMem : 10,
+          innerDataMem : 5,
         }],
-        innerDataMem : 5,
       ],
       dataMem : 3,
     }],
     {
       ID : "item1",
       innerData : [
-        "InnerData", //InnerItemではDefaultは書かない
+        "InnerData", //InnerDataではDefaultは書かない
         {
           ID : "innerDataItem1",
           innerDataMem : 505,
@@ -201,7 +200,7 @@
     "MutList",
     ["Default",{
       innerMutList : [
-        "innerMut",
+        "InnerMutDef",
         ["Compatible", "dim2List.innerData.innerList"],
         ["Default",{
           Ref : { hegoList :  "" },
@@ -209,14 +208,14 @@
         }],
       ],
       someName : "",
-    ],//MutListには初期値を与えてはいけない。InnerMutにも。
+    }],//MutListには初期値を与えてはいけない。InnerMutにも。
   ],
 
   enumList : [
     "List",
     ["Default",{
       Enum :{
-        hogeList? : null, hugaList? : null, hegoList? : null //enumはどれか一つだけ参照し、プログラムからはmatchでアクセスできる
+        "hogeList?" : null, "hugaList?" : null, "hegoList?" : null //enumはどれか一つだけ参照し、プログラムからはmatchでアクセスできる
       },
       mem : "unti",
     }],
@@ -236,7 +235,7 @@
     "MutList",
     ["Default",{
       Enum :{
-        hogeList? : null, hugaList? : null, hegoList? : null //enumはどれか一つだけ参照し、プログラムからはmatchでアクセスできる
+        "hogeList?" : null, "hugaList?" : null, "hegoList?" : null //enumはどれか一つだけ参照し、プログラムからはmatchでアクセスできる
       },
       mem : "unti",
     }],

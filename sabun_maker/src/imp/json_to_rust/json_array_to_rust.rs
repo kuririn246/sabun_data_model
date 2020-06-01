@@ -49,7 +49,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
             //いまのところ["Num", null] のような形での、nullのセットしか認めていない。Arrayを使った記法では、null以外はセットできない。
             array_null(&array[1..], gat, value_type, span, names)
         },
-        None =>{ Err(format!(r#"{} Array must be "...Array", "List", "Data", "MutList", "InnerList", "Num", "Str" or "Bool" {}"#, span.line_str(), names))? },
+        None =>{ Err(format!(r#"{} Array must be "...Array", "List", "Data", "MutList", "InnerData", "InnerList", "InnerMut", "Num", "Str" or "Bool" {}"#, span.line_str(), names))? },
         List | Data | MutList | InnerList | InnerData | InnerMut | InnerListDef | InnerDataDef | InnerMutDef |
         ViolatedList | InnerViolatedList | InnerViolatedListDef =>{
             match value_type{
@@ -64,10 +64,10 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
                         InnerMut => Ok(RustValue::InnerMut(tmp.to_inner_mut_list()?)),
                         InnerListDef => Ok(RustValue::InnerListDef(tmp.to_inner_def()?)),
                         InnerDataDef => Ok(RustValue::InnerDataDef(tmp.to_inner_def()?)),
-                        InnerMutDef => Ok(RustValue::InnerMutDef(tmp.to_inner_def()?)),
+                        InnerMutDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def()?)),
                         ViolatedList => Ok(RustValue::Mut(tmp.to_violated_list()?)),
                         InnerViolatedList => Ok(RustValue::InnerMut(tmp.to_inner_violated_list()?)),
-                        InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.to_inner_def()?)),
+                        InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def()?)),
                         _ => unreachable!(),
                     }
                 },

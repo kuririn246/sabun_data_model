@@ -5,6 +5,7 @@ use crate::error::Result;
 use std::collections::{ HashSet};
 use crate::imp::json_to_rust::get_old::get_old;
 use crate::structs::root_object::ListDefObj;
+use crate::imp::json_to_rust::get_compatible::get_compatible;
 
 pub enum ListAttribute{
     Default(ListDefObj),
@@ -32,7 +33,7 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
                     Ok(ListAttribute::Old(old))
                 },
                 "Compatible" =>{
-                    let compatible = get_old(&array[1..], names)?;
+                    let compatible = get_compatible(&array[1..], names)?;
                     Ok(ListAttribute::Compatible(compatible))
                 },
                 "NextID" =>{

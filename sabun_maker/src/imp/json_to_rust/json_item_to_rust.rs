@@ -35,31 +35,31 @@ pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names :
     }
 }
 
-// pub fn json_item_to_rust_ref(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {
-//     let names = &names.append(name);
-//     match v {
-//         JVal::Bool(_, span) => {
-//             Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
-//         },
-//         JVal::Double(_, span)=>{
-//             Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
-//         }
-//         JVal::String(s, _) => {
-//             let s = s.to_string();
-//             Ok(RustValue::String(Qv::Val(s), value_type))
-//         },
-//         JVal::Array(_, span) => {
-//             Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
-//         },
-//         JVal::Map(_, span) => {
-//             Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
-//         },
-//         JVal::Null(_) =>{
-//             Ok(RustValue::String(Qv::Null, value_type))
-//         },
-//         JVal::Undefined(_)=>{
-//             Ok(RustValue::String(Qv::Undefined, value_type))
-//         }
-//     }
-// }
+pub fn json_item_to_rust_ref(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {
+    let names = &names.append(name);
+    match v {
+        JVal::Bool(_, span) => {
+            Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
+        },
+        JVal::Double(_, span)=>{
+            Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
+        }
+        JVal::String(s, _) => {
+            let s = s.to_string();
+            Ok(RustValue::Param(RustParam::String(Qv::Val(s)), value_type))
+        },
+        JVal::Array(_, span) => {
+            Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
+        },
+        JVal::Map(_, span) => {
+            Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
+        },
+        JVal::Null(_) =>{
+            Ok(RustValue::Param(RustParam::String(Qv::Null), value_type))
+        },
+        JVal::Undefined(_)=>{
+            Ok(RustValue::Param(RustParam::String(Qv::Undefined), value_type))
+        }
+    }
+}
 

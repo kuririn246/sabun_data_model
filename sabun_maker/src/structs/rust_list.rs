@@ -10,10 +10,10 @@ use crate::indexmap::str_vec_map::StrVecMap;
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq)]
 pub struct ConstData{
-    pub default : Box<ListDefObj>,
-    pub list : StrVecMap<ListItem>,
+    pub default : ListDefObj,
+    pub list : Box<StrVecMap<ListItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
-    pub old : HashSet<String>,
+    pub old : Box<HashSet<String>>,
 }
 
 ///IDを持たず、参照できない。MutListの初期値を書くのが主な使い道か。IDは必要ないけど単にデータを書いておきたい場合もあるだろう。
@@ -29,13 +29,13 @@ pub struct ConstList{
 #[derive(Debug, PartialEq)]
 pub struct MutList{
     pub default : Box<ListDefObj>,
-    pub list : LinkedHashMap<u64, MutListItem>,
+    pub list : Box<LinkedHashMap<u64, MutListItem>>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
     pub next_id : u64,
 
     ///MutListは初期値を持てないのでConstListに初期値を書いておくことになるだろう。
     /// その場合、compatibleを設定しdefaultが同一であることを保証することで、そのままListItemをコピーすることが可能になる
-    pub compatible : HashSet<String>,
+    pub compatible : Box<HashSet<String>>,
 }
 
 ///Data or Listの内部に作るList。ListDefObjの内部にはDefaultだけ書き、ListItemの内部にはItemのみを書く。
@@ -49,29 +49,25 @@ pub struct InnerList{
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq)]
 pub struct InnerData{
-    pub list : StrVecMap<ListItem>,
+    pub list : Box<StrVecMap<ListItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
-    pub old : HashSet<String>,
+    pub old : Box<HashSet<String>>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct InnerMutList{
-    pub list : LinkedHashMap<u64, MutListItem>,
+    pub list : Box<LinkedHashMap<u64, MutListItem>>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
     pub next_id : u64,
-
-    ///MutListは初期値を持てないのでConstListに初期値を書いておくことになるだろう。
-    /// その場合、compatibleを設定しdefaultが同一であることを保証することで、そのままListItemをコピーすることが可能になる
-    pub compatible : HashSet<String>,
 }
 
 
 #[derive(Debug, PartialEq)]
 pub struct ListItem{
     ///ListItemの値は常にDefaultからの差分である
-    pub values : HashMap<String, RustValue>,
+    pub values : Box<HashMap<String, RustValue>>,
     ///ListItemの値はRefも常にDefaultからの差分である
-    pub refs : HashMap<String, RefValue>,
+    pub refs : Box<HashMap<String, RefValue>>,
 }
 
 ///たとえばキャラクターAとキャラクターBの間で出来事Cが起こったとする。
@@ -98,7 +94,7 @@ pub struct MutListItem{
     ///アイテムごとにidが振られ、これによって削除や順番の変更を検出できる
     pub id : u64,
     ///ListItemの値は常にDefaultからの差分である
-    pub values : HashMap<String, RustValue>,
+    pub values : Box<HashMap<String, RustValue>>,
     ///ListItemの値はRefでも常にDefaultからの差分である
-    pub refs : HashMap<String, RefValue>,
+    pub refs : Box<HashMap<String, RefValue>>,
 }

@@ -8,7 +8,7 @@ pub struct RefValue{
     pub value : Qv<String>,
 }
 
-pub struct RefMap{
+pub struct RefaMap{
     pub map : IndexMap<String, RefValue>,
     pub is_enum : bool,
 }

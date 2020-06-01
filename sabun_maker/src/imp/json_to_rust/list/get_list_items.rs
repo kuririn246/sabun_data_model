@@ -10,7 +10,7 @@ pub fn get_list_items(array : &[JVal],   _span : &Span, names : &Names) -> Resul
         let item = &array[index];
         match item{
             JVal::Map(map, span) =>{
-                result.push(json_obj_to_rust(map, span, names)?)
+                result.push(json_obj_to_rust(map, false, span, names)?)
             },
             _ =>{
                 Err(format!(r#"{} List's object sequence must not be interrupted {}"#, item.span().line_str(), names))?
