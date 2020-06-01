@@ -11,11 +11,12 @@ use std::collections::HashMap;
 pub fn get_new_default_listitem(list_def : &HashMap<String, RustValue>, def : &HashMap<String, RustValue>, sabun : &HashMap<String, RustParam>, root : &RootObject) -> Result<IndexMap<String, Value>> {
     let mut result = HashMap::new();
 
-    for (k, _) in list_def {
+    for (k, v) in list_def {
         let v: &RustValue =
             if let Some(sv) = sabun.get(k) {
+
                 //差分に保存された値を優先
-                sv
+                &RustValue::Param(sv.clone(), v.value_type())
             } else if let Some(dv) = def.get(k) {
                 dv
             } else {
@@ -34,7 +35,7 @@ pub fn get_new_default(def : &HashMap<String, RustValue>, sabun : &HashMap<Strin
 
     for (k, v) in def {
         let v: &RustValue = if let Some(sv) = sabun.get(k) {
-            RustValue::Param(sv, v.)
+            &RustValue::Param(sv.clone(), v.value_type())
         } else {
             v
         };

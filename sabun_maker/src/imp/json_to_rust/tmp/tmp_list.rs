@@ -177,7 +177,7 @@ impl TmpList{
         Ok(self.default.unwrap())
     }
 
-    pub fn to_inner_mut_def(self, undefiable : bool) -> Result<InnerMutDefObj>{
+    pub fn to_inner_mut_def(self, undefinable : bool) -> Result<InnerMutDefObj>{
         if self.old.is_some(){
             Err(format!("{} Old is not needed for InnerDef {}", self.span.line_str(), self.span.slice()))?
         }
@@ -191,7 +191,7 @@ impl TmpList{
             Err(format!("{} InnerDef must not have items {}", self.span.line_str(), self.span.slice()))?
         }
         let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
-        Ok(InnerMutDefObj{list_def :self.default.unwrap(), compatible : Box::new(compatible), undefiable })
+        Ok(InnerMutDefObj{list_def :self.default.unwrap(), compatible : Box::new(compatible), undefinable })
     }
 }
 

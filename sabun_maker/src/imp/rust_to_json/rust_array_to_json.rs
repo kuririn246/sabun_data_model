@@ -3,7 +3,6 @@ use crate::error::Result;
 use crate::structs::qv::Qv;
 use crate::structs::array_type::ArrayType;
 use crate::structs::rust_value::RustArray;
-use crate::structs::root_object::RustObject;
 use crate::structs::my_json::Value;
 
 pub fn rust_array_to_json(qv : &Qv<RustArray>, at : &ArrayType, root : &RustObject, name : &str) -> Result<Value>{

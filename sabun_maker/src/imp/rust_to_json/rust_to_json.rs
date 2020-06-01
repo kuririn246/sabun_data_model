@@ -48,6 +48,6 @@ pub fn rust_to_json_new_default(obj : &RootObject, list_def : Option<&HashMap<St
     return Ok(Value::Map(map_item));
 }
 
-fn insert(map : &mut IndexMap<String, Value>, s : &str, v : Value){
+fn insert(map : &mut LinkedHashMap<String, Value>, s : &str, v : Value){
     map.insert(s.to_string(), v);
 }

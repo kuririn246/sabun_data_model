@@ -62,7 +62,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
                         ViolatedList => Ok(RustValue::Mut(tmp.to_violated_list()?)),
                         InnerViolatedList => Ok(RustValue::InnerMut(Some(tmp.to_inner_violated_list()?))),
                         InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def(false)?)),
-                        _ => unreachable!(),
+                        _ => unreachable!() ,
                     }
                 },
                 ValueType::Undefinable =>{

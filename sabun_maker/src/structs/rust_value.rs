@@ -4,7 +4,7 @@ use crate::structs::rust_list::{ConstData, ConstList, MutList, InnerList, InnerD
 use crate::structs::array_type::ArrayType;
 use crate::structs::root_object::{ListDefObj, InnerMutDefObj};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum RustParam{
     Bool(Qv<bool>),
     Number(Qv<f64>),
@@ -18,18 +18,21 @@ pub enum RustValue{
     Data(ConstData),
     List(ConstList),
     Mut(MutList),
-    InnerList(InnerList),
     InnerData(InnerData),
+    InnerList(InnerList),
     ///InnerMutListだけundefinedになりうる
     InnerMut(Option<InnerMutList>),
-    InnerListDef(ListDefObj),
     InnerDataDef(ListDefObj),
+    InnerListDef(ListDefObj),
     InnerMutDef(InnerMutDefObj),
 }
 
+pub enum ListType{
+    Data, List, Mut, InnerData, InnerList, InnerMut, InnderDataDef, InnerListDef, InnerMutDef,
+}
 
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct RustArray{
     pub vec : Vec<RustParam>,
 }
@@ -67,10 +70,25 @@ impl RustValue{
     pub fn value_type(&self) -> ValueType{
         match self{
             RustValue::Param(_param, vt) => vt.clone(),
+            RustValue::InnerMutDef(obj) => if obj.undefinable { ValueType::Undefinable } else{ ValueType::Normal }
             _ => ValueType::Normal,
         }
     }
 
+    pub fn list_type(&self) -> Option<ListType>{
+        Some(match self{
+            RustValue::Data(_) => ListType::Data,
+            RustValue::List(_) => ListType::Data,
+            RustValue::Mut(_) => ListType::Data,
+            RustValue::InnerData(_) => ListType::InnerData,
+            RustValue::InnerList(_) => ListType::InnerList,
+            RustValue::InnerMut(_) => ListType::InnerMut,
+            RustValue::InnerDataDef(_) => ListType::InnderDataDef,
+            RustValue::InnerListDef(_) => ListType::InnerListDef,
+            RustValue::InnerMutDef(_) => ListType::InnerMutDef,
+            _ => return None,
+        })
+    }
 
 
 }
