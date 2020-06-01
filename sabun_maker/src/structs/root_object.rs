@@ -40,6 +40,7 @@ pub struct RefDefObj {
 #[derive(Debug, PartialEq)]
 pub struct InnerMutDefObj {
     pub list_def : ListDefObj,
+    pub undefiable : bool,
     pub compatible : Box<HashSet<String>>,
 }
 

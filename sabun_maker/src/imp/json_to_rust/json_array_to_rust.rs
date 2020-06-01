@@ -58,15 +58,25 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
                         InnerMut => Ok(RustValue::InnerMut(Some(tmp.to_inner_mut_list()?))),
                         InnerListDef => Ok(RustValue::InnerListDef(tmp.to_inner_def()?)),
                         InnerDataDef => Ok(RustValue::InnerDataDef(tmp.to_inner_def()?)),
-                        InnerMutDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def()?)),
+                        InnerMutDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def(false)?)),
                         ViolatedList => Ok(RustValue::Mut(tmp.to_violated_list()?)),
                         InnerViolatedList => Ok(RustValue::InnerMut(Some(tmp.to_inner_violated_list()?))),
-                        InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def()?)),
+                        InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def(false)?)),
                         _ => unreachable!(),
                     }
                 },
+                ValueType::Undefinable =>{
+                    let tmp = json_list_to_rust(&array[1..], span, names)?;
+                    match gat {
+                        InnerMutDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def(true)?)),
+                        InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def(true)?)),
+                        _ =>{
+                            Err(format!(r#"{} Lists can't be undefined {} except for InnerMut"#, span.line_str(), names))?
+                        }
+                    }
+                },
                 _ =>{
-                    Err(format!(r#"{} Lists can't be undefined or null {}"#, span.line_str(), names))?
+                    Err(format!(r#"{} Lists can't be null {}"#, span.line_str(), names))?
                 }
             }
 

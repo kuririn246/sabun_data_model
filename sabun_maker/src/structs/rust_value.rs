@@ -27,11 +27,7 @@ pub enum RustValue{
     InnerMutDef(InnerMutDefObj),
 }
 
-// #[derive(Debug, PartialEq)]
-// pub struct InnerMutObj{
-//     pub list : Option<InnerMutList>,
-//     pub undefinable : bool,
-// }
+
 
 #[derive(Debug, PartialEq)]
 pub struct RustArray{
