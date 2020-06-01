@@ -2,12 +2,12 @@
 use crate::error::Result;
 use super::names::Names;
 use json5_parser::{JVal, Span};
-use super::array_null::array_null;
 use super::list::json_list_to_rust::json_list_to_rust;
 use crate::structs::value_type::ValueType;
 use crate::structs::rust_value::{RustValue, RustArray, RustParam};
 use crate::structs::qv::Qv;
 use crate::structs::array_type::ArrayType;
+use crate::imp::json_to_rust::array_null::array_null_or_undefined;
 
 pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue>{
     use GatResult::*;
@@ -20,18 +20,10 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
                     Ok(RustValue::Param(RustParam::Array(Qv::Val(array), array_type), value_type))
                 },
                 Qv::Null => {
-                    if value_type.is_nullable() {
-                        Ok(RustValue::Param(RustParam::Array(Qv::Null, array_type), value_type))
-                    } else{
-                        Err(format!(r#"{} Nullable parameters must have "?" in the end of their name {}"#, span.line_str(), names))?
-                    }
+                    Ok(RustValue::Param(RustParam::Array(Qv::Null, array_type), value_type))
                 },
                 Qv::Undefined => {
-                    if value_type.is_undefable() {
-                        Ok(RustValue::Param(RustParam::Array(Qv::Undefined, array_type), value_type))
-                    } else{
-                        Err(format!(r#"{} Undefiable parameters must have "!" in the end of their name {}"#, span.line_str(), names))?
-                    }
+                    Ok(RustValue::Param(RustParam::Array(Qv::Undefined, array_type), value_type))
                 },
             }
         },
@@ -46,8 +38,14 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
             }
         }
         Num | Str | Bool =>{
-            //いまのところ["Num", null] のような形での、nullのセットしか認めていない。Arrayを使った記法では、null以外はセットできない。
-            array_null(&array[1..], gat, value_type, span, names)
+            array_null_or_undefined(&array[1..], gat, value_type, span, names)
+        },
+        InnerMutDef =>{
+            if value_type.is_undefable() {
+                Ok(RustValue::Param(RustParam::Array(Qv::Undefined, array_type), value_type))
+            } else{
+                Err(format!(r#"{} Undefiable parameters must have "!" in the end of their name {}"#, span.line_str(), names))?
+            }
         },
         None =>{ Err(format!(r#"{} Array must be "...Array", "List", "Data", "MutList", "InnerData", "InnerList", "InnerMut", "Num", "Str" or "Bool" {}"#, span.line_str(), names))? },
         List | Data | MutList | InnerList | InnerData | InnerMut | InnerListDef | InnerDataDef | InnerMutDef |
@@ -98,6 +96,7 @@ pub enum GatResult{
     NoTagNum,
     Str,
     Bool,
+    InnerMutUndefined,
     None
 }
 
@@ -125,6 +124,7 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
                     "__ViolatedList" => { GatResult::ViolatedList },
                     "__InnerViolatedList" => { GatResult::InnerViolatedList },
                     "__InnerViolatedListDef" => { GatResult::InnerViolatedListDef },
+                    "__InnerMutUndefined" => { GatResult::InnerMutUndefined },
                     _=>{ GatResult::None },
                 }
             },

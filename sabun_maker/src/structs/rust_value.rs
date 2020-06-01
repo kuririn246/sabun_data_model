@@ -20,10 +20,16 @@ pub enum RustValue{
     Mut(MutList),
     InnerList(InnerList),
     InnerData(InnerData),
-    InnerMut(InnerMutList),
+    InnerMut(InnerMutObj),
     InnerListDef(ListDefObj),
     InnerDataDef(ListDefObj),
     InnerMutDef(InnerMutDefObj),
+}
+
+#[derive(Debug, PartialEq)]
+pub struct InnerMutObj{
+    pub list : Option<InnerMutList>,
+    pub undefinable : bool,
 }
 
 #[derive(Debug, PartialEq)]

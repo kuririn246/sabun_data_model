@@ -5,6 +5,7 @@ use crate::structs::rust_list::{ConstList, ListItem, ConstData, MutList, MutList
 use json5_parser::Span;
 use crate::error::Result;
 use linked_hash_map::LinkedHashMap;
+use crate::structs::rust_value::InnerMutObj;
 
 pub struct TmpList{
     pub vec : Vec<TmpObj>,
@@ -101,7 +102,7 @@ impl TmpList{
         Ok(MutList{ default : Box::new(self.default.unwrap()), compatible : Box::new(compatible), list : Box::new(LinkedHashMap::new()), next_id : 0 })
     }
 
-    pub fn to_inner_mut_list(self) -> Result<InnerMutList>{
+    pub fn to_inner_mut_obj(self, undefinable : bool) -> Result<InnerMutObj>{
         if self.compatible.is_some(){
             Err(format!("{} Compatible is not needed for InnerMutList {}", self.span.line_str(), self.span.slice()))?
         }
@@ -117,7 +118,7 @@ impl TmpList{
         if self.vec.len() != 0{
             Err(format!("{} InnerMutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
-        Ok(InnerMutList{ list : Box::new(LinkedHashMap::new()), next_id : 0 })
+        Ok(InnerMutObj{ list : Some(InnerMutList{ list : Box::new(LinkedHashMap::new()), next_id : 0 }), undefinable })
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
