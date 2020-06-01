@@ -4,7 +4,7 @@ use super::names::Names;
 use json5_parser::{JVal, Span};
 use super::list::json_list_to_rust::json_list_to_rust;
 use crate::structs::value_type::ValueType;
-use crate::structs::rust_value::{RustValue, RustArray, RustParam};
+use crate::structs::rust_value::{RustValue, RustArray, RustParam };
 use crate::structs::qv::Qv;
 use crate::structs::array_type::ArrayType;
 use crate::imp::json_to_rust::array_null::array_null_or_undefined;
@@ -40,14 +40,10 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
         Num | Str | Bool =>{
             array_null_or_undefined(&array[1..], gat, value_type, span, names)
         },
-        InnerMutDef =>{
-            if value_type.is_undefable() {
-                Ok(RustValue::Param(RustParam::Array(Qv::Undefined, array_type), value_type))
-            } else{
-                Err(format!(r#"{} Undefiable parameters must have "!" in the end of their name {}"#, span.line_str(), names))?
-            }
+        InnerMutUndefined =>{
+            Ok(RustValue::InnerMut(None))
         },
-        None =>{ Err(format!(r#"{} Array must be "...Array", "List", "Data", "MutList", "InnerData", "InnerList", "InnerMut", "Num", "Str" or "Bool" {}"#, span.line_str(), names))? },
+        NotDefined =>{ Err(format!(r#"{} Array must be "...Array", "List", "Data", "MutList", "InnerData", "InnerList", "InnerMut", "InnderDataDef", "InnerListDef", "InnerMutDef", "Num", "Str" or "Bool" {}"#, span.line_str(), names))? },
         List | Data | MutList | InnerList | InnerData | InnerMut | InnerListDef | InnerDataDef | InnerMutDef |
         ViolatedList | InnerViolatedList | InnerViolatedListDef =>{
             match value_type{
@@ -59,12 +55,12 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
                         MutList => Ok(RustValue::Mut(tmp.to_mut_list()?)),
                         InnerList => Ok(RustValue::InnerList(tmp.to_inner_list()?)),
                         InnerData => Ok(RustValue::InnerData(tmp.to_inner_data()?)),
-                        InnerMut => Ok(RustValue::InnerMut(tmp.to_inner_mut_list()?)),
+                        InnerMut => Ok(RustValue::InnerMut(Some(tmp.to_inner_mut_list()?))),
                         InnerListDef => Ok(RustValue::InnerListDef(tmp.to_inner_def()?)),
                         InnerDataDef => Ok(RustValue::InnerDataDef(tmp.to_inner_def()?)),
                         InnerMutDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def()?)),
                         ViolatedList => Ok(RustValue::Mut(tmp.to_violated_list()?)),
-                        InnerViolatedList => Ok(RustValue::InnerMut(tmp.to_inner_violated_list()?)),
+                        InnerViolatedList => Ok(RustValue::InnerMut(Some(tmp.to_inner_violated_list()?))),
                         InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def()?)),
                         _ => unreachable!(),
                     }
@@ -97,7 +93,7 @@ pub enum GatResult{
     Str,
     Bool,
     InnerMutUndefined,
-    None
+    NotDefined,
 }
 
 fn get_array_type(a : &Vec<JVal>) -> GatResult{
@@ -125,14 +121,14 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
                     "__InnerViolatedList" => { GatResult::InnerViolatedList },
                     "__InnerViolatedListDef" => { GatResult::InnerViolatedListDef },
                     "__InnerMutUndefined" => { GatResult::InnerMutUndefined },
-                    _=>{ GatResult::None },
+                    _=>{ GatResult::NotDefined },
                 }
             },
             JVal::Double(_num, _) => NoTagNum,
-            _ => None,
+            _ => NotDefined,
         }
     }
-    None
+    NotDefined
 }
 
 pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result<Qv<RustArray>>{
