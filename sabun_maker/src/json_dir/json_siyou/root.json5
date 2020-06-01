@@ -57,7 +57,8 @@
 
   usable : [
     "Data",
-    ["Default",{ num : 0 }],
+    //Defaultを省略する
+    [{ num : 0 }],
     {
       ID : "yakusou",
       num : 3

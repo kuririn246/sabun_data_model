@@ -52,6 +52,11 @@ pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Resul
                 }
             }
         },
+        //タグなしでいきなりデフォルトを書く省略記法
+        JVal::Map(_,_) =>{
+            let def = get_default(&array, span, names)?;
+            Ok(ListAttribute::Default(def))
+        }
         _ =>{
             Err(format!("{} {} {} {}", span.line_str(), span.slice(), error_message, names))?
         }
