@@ -4,7 +4,7 @@ use json5_parser::{JVal};
 pub fn get_id(v : &JVal) -> Option<IdValue> {
     match v {
         JVal::String(s, _) => Some(IdValue::Str(s.to_string())),
-        JVal::Double(d, _) => Some(IdValue::Num(*d)),
+        JVal::Double(d, _) => Some(IdValue::Num(*d as u64)),
         _ => None
     }
 }

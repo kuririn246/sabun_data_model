@@ -38,7 +38,7 @@ impl TmpRefs{
 
 pub enum IdValue{
     Str(String),
-    Num(f64)
+    Num(u64)
 }
 
 impl TmpObj{

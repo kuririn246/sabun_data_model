@@ -4,6 +4,7 @@ use crate::structs::ref_value::RefValue;
 use crate::structs::my_json::Value;
 use std::collections::{HashMap, BTreeMap};
 use crate::structs::root_object::RefDefObj;
+use crate::imp::rust_to_json::name_with_suffix::name_with_suffix;
 
 pub fn get_ref_map(r : &HashMap<String, RefValue>) -> BTreeMap<String, Value>{
     let mut map = BTreeMap::new();
@@ -11,7 +12,7 @@ pub fn get_ref_map(r : &HashMap<String, RefValue>) -> BTreeMap<String, Value>{
     for (k, rv) in r{
         let qv : &Qv<String> = &rv.value;
         let vt : &ValueType = &rv.value_type;
-        let name = format!("{}{}", k, vt.to_suffix());
+        let name = name_with_suffix(k, *vt);
         match qv{
             Qv::Val(v) => map.insert(name, Value::String(v.to_string())),
             Qv::Null => map.insert(name, Value::Null),
