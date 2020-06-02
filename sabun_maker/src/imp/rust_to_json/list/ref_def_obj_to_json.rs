@@ -7,8 +7,8 @@ use crate::structs::value_type::ValueType;
 pub fn ref_def_obj_to_json(obj : &RefDefObj) -> BTreeMap<String, Value>{
     let mut result : BTreeMap<String, Value> = BTreeMap::new();
 
-    for (key,value) in obj.refs.as_ref() {
-        let (key, value) = reconstruct_ref_value(key, &value.value, value.value_type);
+    for (key,value) in obj.refs() {
+        let (key, value) = reconstruct_ref_value(key, value.value(), value.value_type());
         result.insert(key, value);
     }
 

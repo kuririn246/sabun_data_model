@@ -29,5 +29,5 @@ fn get_default_obj(map : &LinkedHashMap<String, JVal>, span : &Span, names : &Na
     }
 
 
-    return Ok(ListDefObj { default: Box::new(obj.default), refs: Box::new(obj.refs.to_ref_def()), old: Box::new(obj.old) })
+    return Ok(ListDefObj::new(obj.default, obj.refs.to_ref_def(),obj.old))
 }

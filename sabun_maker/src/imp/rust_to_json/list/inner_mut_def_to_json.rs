@@ -8,11 +8,11 @@ pub fn inner_mut_def_to_json(d : &InnerMutDefObj) -> Value{
     let mut result : Vec<Value> = Vec::new();
 
     result.push(Value::String("InnerMutDef".to_string()));
-    if d.compatible.len() != 0{
-        result.push(string_set_to_json("Compatible", &btree_set(d.compatible.as_ref())));
+    if d.compatible().len() != 0{
+        result.push(string_set_to_json("Compatible", &btree_set(d.compatible())));
     }
 
-    result.push(Value::Array(vec![default_to_json(&d.list_def)]));
+    result.push(Value::Array(vec![default_to_json(d.list_def())]));
 
 
     return Value::Array(result);

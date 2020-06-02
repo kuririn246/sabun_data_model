@@ -4,7 +4,7 @@ use super::names::Names;
 use json5_parser::{JVal, Span};
 use super::list::json_list_to_rust::json_list_to_rust;
 use crate::structs::value_type::ValueType;
-use crate::structs::rust_value::{RustValue, RustArray, RustParam };
+use crate::structs::rust_value::{RustValue, RustArray, RustParam, RustString};
 use crate::structs::qv::Qv;
 use crate::structs::array_type::ArrayType;
 use crate::imp::json_to_rust::array_null::array_null_or_undefined;
@@ -15,27 +15,11 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
     return match gat{
         AT(array_type) =>{
             let array = get_array( &array[1..], &array_type, names)?;
-            match array{
-                Qv::Val(array) =>{
-                    Ok(RustValue::Param(RustParam::Array(Box::new(Qv::Val(array)), array_type), value_type))
-                },
-                Qv::Null => {
-                    Ok(RustValue::Param(RustParam::Array(Box::new(Qv::Null), array_type), value_type))
-                },
-                Qv::Undefined => {
-                    Ok(RustValue::Param(RustParam::Array(Box::new(Qv::Undefined), array_type), value_type))
-                },
-            }
+            Ok(RustValue::Param(RustParam::Array(array, array_type), value_type))
         },
         NoTagNum =>{
             let array = get_array(&array, &ArrayType::Num, names)?;
-            match array{
-                Qv::Val(array) =>{
-                    Ok(RustValue::Param(RustParam::Array(Box::new(Qv::Val(array)), ArrayType::Num), value_type))
-                },
-                Qv::Null =>{ unreachable!() },
-                Qv::Undefined => { unreachable!() },
-            }
+            Ok(RustValue::Param(RustParam::Array(array, ArrayType::Num), value_type))
         }
         Num | Str | Bool =>{
             array_null_or_undefined(&array[1..], gat, value_type, span, names)
@@ -153,7 +137,7 @@ pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result
             },
             JVal::String(s, _) =>{
                 match array_type {
-                    ArrayType::String => RustParam::String(Box::new(Qv::Val(s.to_string()))),
+                    ArrayType::String => RustParam::String(Qv::Val(RustString::new(s.to_string()))),
                     _ => Err(format!(r#"{} {} string is not valid in this array {}"#, item.line_str(), item.slice(), names))?,
                 }
             },
@@ -177,7 +161,7 @@ pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result
                         let rv = json_array_to_rust(a2, ValueType::Normal, span, names)?;
                         match rv{
                             RustValue::Param(RustParam::Array(array, at), _vt) =>{
-                                match array.as_ref() {
+                                match &array {
                                     Qv::Val(_val) => {
                                         match at {
                                             ArrayType::Num => RustParam::Array(array, ArrayType::Num),
@@ -203,5 +187,5 @@ pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result
         };
         vec.push(val);
     }
-    return Ok(Qv::Val(RustArray{ vec : vec }));
+    return Ok(Qv::Val(RustArray::new(vec)));
 }

@@ -12,7 +12,7 @@ pub fn rust_array_to_json(qv : &Qv<RustArray>, at : &ArrayType) -> Value{
         ArrayType::String =>{ result.push(Value::String("StrArray".to_string())) },
         ArrayType::Num =>{
             let array_len = if let Qv::Val(v) = qv{
-                v.vec.len()
+                v.vec().len()
             } else{ 0 };
             //noisyすぎるので基本省略
             if array_len == 0 {
@@ -23,7 +23,7 @@ pub fn rust_array_to_json(qv : &Qv<RustArray>, at : &ArrayType) -> Value{
     }
     match qv{
         Qv::Val(v) => {
-            for item in &v.vec{
+            for item in v.vec(){
                 result.push(get_param(item));
             }
         },

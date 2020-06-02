@@ -30,11 +30,7 @@ pub fn json_root_to_rust(json : &str) -> Result<RootObject>{
     return match jval{
         JVal::Map(map, span) =>{
             let tmp = json_obj_to_rust::json_obj_to_rust(&map, false, &span, &Names::new(""))?;
-            Ok(RootObject{
-                old : tmp.old,
-                default : tmp.default,
-                sabun : HashMap::new(),
-            })
+            Ok(RootObject::new(tmp.default, HashMap::new(), tmp.old))
         },
         _ =>{
             Err(format!(r#"root object is not found"#))?

@@ -3,14 +3,16 @@ use crate::structs::qv::Qv;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct RefValue{
-    pub value_type : ValueType,
-    pub value : Qv<String>,
+    value_type : ValueType,
+    value : Qv<String>,
 }
 
 impl RefValue{
     pub fn new(value : Qv<String>, value_type : ValueType) -> RefValue{
         RefValue{ value, value_type }
     }
+    pub fn value_type(&self) -> ValueType{ self.value_type }
+    pub fn value(&self) -> &Qv<String>{ &self.value }
 
     ///nullやundefinedの場合None
     pub fn get_reference(&self) -> Option<&str>{

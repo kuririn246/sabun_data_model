@@ -28,7 +28,7 @@ pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> (String, Value){
         RustValue::InnerListDef(d) =>{ inner_def_to_json(d, ListType::InnerListDef) },
         RustValue::InnerMutDef(obj) =>{
             let val = inner_mut_def_to_json(obj);
-            if obj.undefinable{
+            if obj.undefinable(){
                 return (name_with_suffix(name, ValueType::Undefinable), val);
             } else{
                 val

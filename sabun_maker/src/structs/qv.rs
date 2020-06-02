@@ -11,6 +11,14 @@ impl<T> Qv<T>{
             Qv::Undefined => QvType::Undefined,
         }
     }
+
+    pub fn map<U>(&self, f : impl Fn(&T) -> U) -> Qv<U> {
+        match self {
+            Qv::Val(v) => Qv::Val(f(v)),
+            Qv::Null => Qv::Null,
+            Qv::Undefined => Qv::Undefined
+        }
+    }
 }
 
 pub enum QvType{

@@ -31,7 +31,7 @@ impl TmpRefs{
         self.map.into_iter().collect()
     }
     pub fn to_ref_def(self) -> RefDefObj{
-        RefDefObj{ old : Box::new(self.old), refs : Box::new(self.map), is_enum : self.is_enum }
+        RefDefObj::new(self.map,  self.is_enum, self.old)
     }
 }
 
@@ -63,7 +63,7 @@ impl TmpObj{
             Err(format!("{} Old is not needed for a list item {}", self.refs.span.line_str(), self.refs.span.slice()))?
         }
 
-        Ok(ListItem{ refs : Box::new(self.refs.get_hash_map()), values : Box::new(self.default.into_iter().collect()) })
+        Ok(ListItem::new(self.default.into_iter().collect(), self.refs.get_hash_map()))
     }
 
     pub fn to_list_item_with_id(self) -> Result<(String, ListItem)>{
@@ -78,7 +78,7 @@ impl TmpObj{
         }
         match self.id.unwrap(){
             IdValue::Str(s) =>{
-                Ok((s, ListItem{ refs : Box::new(self.refs.get_hash_map()), values : Box::new(self.default.into_iter().collect()) }))
+                Ok((s, ListItem::new(self.default.into_iter().collect(),self.refs.get_hash_map())))
             },
             IdValue::Num(_) =>{
                 Err(format!("{} ID must be a string {}", self.span.line_str(), self.span.slice()))?
@@ -99,6 +99,6 @@ impl TmpObj{
             Err(format!("{} Old is not needed for a violated list item {}", self.refs.span.line_str(), self.refs.span.slice()))?
         }
 
-        Ok(MutListItem{ id, refs : Box::new(self.refs.get_hash_map()), values : Box::new(self.default.into_iter().collect()) })
+        Ok(MutListItem::new(id,self.default.into_iter().collect(),self.refs.get_hash_map()))
     }
 }

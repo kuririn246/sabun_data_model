@@ -9,13 +9,16 @@ use linked_hash_map::LinkedHashMap;
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConstData{
-    pub default : Box<ListDefObj>,
-    pub list : Box<HashMap<String, ListItem>>,
+    default : Box<ListDefObj>,
+    list : Box<HashMap<String, ListItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
-    pub old : Box<HashSet<String>>,
+    old : Box<HashSet<String>>,
 }
 
 impl ConstData{
+    pub fn new(default : ListDefObj, list : HashMap<String, ListItem>, old : HashSet<String>) -> ConstData{
+        ConstData{ default : Box::new(default), list : Box::new(list), old : Box::new(old) }
+    }
     pub fn default(&self) -> &ListDefObj{ self.default.as_ref() }
     pub fn list(&self) -> &HashMap<String, ListItem>{ self.list.as_ref() }
     pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
@@ -24,11 +27,12 @@ impl ConstData{
 ///IDを持たず、参照できない。MutListの初期値を書くのが主な使い道か。IDは必要ないけど単にデータを書いておきたい場合もあるだろう。
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConstList{
-    pub default : Box<ListDefObj>,
-    pub list : Box<Vec<ListItem>>,
+    default : Box<ListDefObj>,
+    list : Box<Vec<ListItem>>,
 }
 
 impl ConstList{
+    pub fn new(default : ListDefObj, list : Vec<ListItem>) -> ConstList{ ConstList{ default : Box::new(default), list : Box::new(list) } }
     pub fn default(&self) -> &ListDefObj{ self.default.as_ref() }
     pub fn list(&self) -> &Vec<ListItem>{ self.list.as_ref() }
 }
@@ -38,22 +42,25 @@ impl ConstList{
 /// 順序を変えなければidでソートされたSortedListになるのでPrimaryKeyを持ったTableとしても使えないこともないか
 #[derive(Debug, PartialEq, Clone)]
 pub struct MutList{
-    pub default : Box<ListDefObj>,
-    pub list : Box<LinkedHashMap<u64, MutListItem>>,
-    pub prop : Box<MutListProp>,
+    default : Box<ListDefObj>,
+    list : Box<LinkedHashMap<u64, MutListItem>>,
+    prop : Box<MutListProp>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct MutListProp{
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
-    pub next_id : u64,
+    next_id : u64,
 
     ///MutListは初期値を持てないのでConstListに初期値を書いておくことになるだろう。
     /// その場合、compatibleを設定しdefaultが同一であることを保証することで、そのままListItemをコピーすることが可能になる
-    pub compatible : HashSet<String>,
+    compatible : HashSet<String>,
 }
 
 impl MutList{
+    pub fn new(default : ListDefObj, list : LinkedHashMap<u64, MutListItem>, next_id : u64, compatible : HashSet<String>) -> MutList{
+        MutList{ default : Box::new(default), list : Box::new(list), prop : Box::new(MutListProp{ next_id, compatible }) }
+    }
     pub fn default(&self) -> &ListDefObj{ self.default.as_ref() }
     pub fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
     pub fn next_id(&self) -> u64{ self.prop.next_id }
@@ -63,11 +70,12 @@ impl MutList{
 ///Data or Listの内部に作るList。ListDefObjの内部にはDefaultだけ書き、ListItemの内部にはItemのみを書く。
 #[derive(Debug, PartialEq, Clone)]
 pub struct InnerList{
-    pub list : Vec<ListItem>,
+    list : Vec<ListItem>,
     //pub compatible : HashSet<String>,
 }
 
 impl InnerList{
+    pub fn new(list : Vec<ListItem>) -> InnerList{ InnerList { list }}
     pub fn list(&self) -> &Vec<ListItem>{ &self.list }
 }
 
@@ -75,36 +83,41 @@ impl InnerList{
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq, Clone)]
 pub struct InnerData{
-    pub list : Box<HashMap<String, ListItem>>,
+    list : Box<HashMap<String, ListItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
-    pub old : Box<HashSet<String>>,
+    old : Box<HashSet<String>>,
 }
 
 impl InnerData{
+    pub fn new(list : HashMap<String, ListItem>, old : HashSet<String>) -> InnerData{ InnerData{ list : Box::new(list), old : Box::new(old)} }
     pub fn list(&self) -> &HashMap<String, ListItem>{ self.list.as_ref() }
     pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct InnerMutList{
-    pub list : Box<LinkedHashMap<u64, MutListItem>>,
+    list : Box<LinkedHashMap<u64, MutListItem>>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
-    pub next_id : u64,
+    next_id : u64,
 }
 
 impl InnerMutList{
+    pub fn new(list : LinkedHashMap<u64, MutListItem>, next_id : u64) -> InnerMutList{ InnerMutList{ list : Box::new(list), next_id } }
     pub fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ListItem{
     ///ListItemの値は常にDefaultからの差分である
-    pub values : Box<HashMap<String, RustValue>>,
+    values : Box<HashMap<String, RustValue>>,
     ///ListItemの値はRefも常にDefaultからの差分である
-    pub refs : Box<HashMap<String, RefValue>>,
+    refs : Box<HashMap<String, RefValue>>,
 }
 
 impl ListItem{
+    pub fn new(values : HashMap<String, RustValue>, refs : HashMap<String, RefValue>) -> ListItem{
+        ListItem{ values : Box::new(values), refs : Box::new(refs) }
+    }
     pub fn values(&self) -> &HashMap<String, RustValue>{ self.values.as_ref() }
     pub fn refs(&self) -> &HashMap<String, RefValue>{ self.refs.as_ref() }
 }
@@ -131,14 +144,17 @@ impl ListItem{
 #[derive(Debug, PartialEq, Clone)]
 pub struct MutListItem{
     ///アイテムごとにidが振られ、これによって削除や順番の変更を検出できる
-    pub id : u64,
+    id : u64,
     ///ListItemの値は常にDefaultからの差分である
-    pub values : Box<HashMap<String, RustValue>>,
+    values : Box<HashMap<String, RustValue>>,
     ///ListItemの値はRefでも常にDefaultからの差分である
-    pub refs : Box<HashMap<String, RefValue>>,
+    refs : Box<HashMap<String, RefValue>>,
 }
 
 impl MutListItem{
+    pub fn new(id : u64, values : HashMap<String, RustValue>, refs : HashMap<String, RefValue>) -> MutListItem{
+        MutListItem{ id, values : Box::new(values), refs : Box::new(refs) }
+    }
     pub fn id(&self) -> u64{ self.id }
     pub fn values(&self) -> &HashMap<String, RustValue>{ self.values.as_ref() }
     pub fn refs(&self) -> &HashMap<String, RefValue>{ self.refs.as_ref() }

@@ -3,13 +3,14 @@ use crate::structs::qv::{QvType, Qv};
 use crate::structs::rust_list::{ConstData, ConstList, MutList, InnerList, InnerData, InnerMutList};
 use crate::structs::array_type::ArrayType;
 use crate::structs::root_object::{ListDefObj, InnerMutDefObj};
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum RustParam{
     Bool(Qv<bool>),
     Number(Qv<f64>),
-    String(Box<Qv<String>>),
-    Array(Box<Qv<RustArray>>, ArrayType),
+    String(Qv<RustString>),
+    Array(Qv<RustArray>, ArrayType),
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -31,12 +32,32 @@ pub enum ListType{
     Data, List, Mut, InnerData, InnerList, InnerMut, InnderDataDef, InnerListDef, InnerMutDef,
 }
 
-
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct RustArray{
-    pub vec : Vec<RustParam>,
+    vec : Box<Vec<RustParam>>,
 }
+
+impl RustArray{
+    pub fn new(v : Vec<RustParam>) -> RustArray{ RustArray{ vec : Box::new(v)} }
+    pub fn vec(&self) -> &[RustParam]{ self.vec.as_ref().as_ref() }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct RustString{
+    str : Box<String>,
+}
+
+impl RustString{
+    pub fn new(s : String) -> RustString{ RustString{ str : Box::new(s) }}
+    pub fn str(&self) -> &str{ self.str.as_ref().as_ref() }
+}
+
+impl Display for RustString{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        self.str().fmt(f)
+    }
+}
+
 
 impl RustParam{
     pub fn qv_type(&self) -> QvType {
@@ -71,7 +92,7 @@ impl RustValue{
     pub fn value_type(&self) -> ValueType{
         match self{
             RustValue::Param(_param, vt) => vt.clone(),
-            RustValue::InnerMutDef(obj) => if obj.undefinable { ValueType::Undefinable } else{ ValueType::Normal }
+            RustValue::InnerMutDef(obj) => if obj.undefinable() { ValueType::Undefinable } else{ ValueType::Normal }
             _ => ValueType::Normal,
         }
     }

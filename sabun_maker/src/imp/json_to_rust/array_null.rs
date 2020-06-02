@@ -15,7 +15,7 @@ pub fn array_null_or_undefined(a : &[JVal], gat : GatResult, value_type : ValueT
         JVal::Null(_) => {
             match gat {
                 GatResult::Num => RustValue::Param(RustParam::Number(Qv::Null), value_type),
-                GatResult::Str => RustValue::Param(RustParam::String(Box::new(Qv::Null)), value_type),
+                GatResult::Str => RustValue::Param(RustParam::String(Qv::Null), value_type),
                 GatResult::Bool => RustValue::Param(RustParam::Bool(Qv::Null), value_type),
                 _ => unreachable!(),
             }
@@ -23,7 +23,7 @@ pub fn array_null_or_undefined(a : &[JVal], gat : GatResult, value_type : ValueT
         JVal::Undefined(_) =>{
             match gat {
                 GatResult::Num => RustValue::Param(RustParam::Number(Qv::Undefined), value_type),
-                GatResult::Str => RustValue::Param(RustParam::String(Box::new(Qv::Undefined)), value_type),
+                GatResult::Str => RustValue::Param(RustParam::String(Qv::Undefined), value_type),
                 GatResult::Bool => RustValue::Param(RustParam::Bool(Qv::Undefined), value_type),
                 _ => unreachable!(),
             }

@@ -1,7 +1,7 @@
 use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
 use std::collections::{HashSet, HashMap};
 use crate::structs::root_object::{ListDefObj, InnerMutDefObj};
-use crate::structs::rust_list::{ConstList, ListItem, ConstData, MutList, MutListItem, InnerList, InnerData, InnerMutList, MutListProp};
+use crate::structs::rust_list::{ConstList, ListItem, ConstData, MutList, MutListItem, InnerList, InnerData, InnerMutList };
 use json5_parser::Span;
 use crate::error::Result;
 use linked_hash_map::LinkedHashMap;
@@ -35,7 +35,7 @@ impl TmpList{
             Err(format!("{} NextID must not be defined {}", self.span.line_str(), self.span.slice()))?
         }
 
-        Ok(ConstList{ default : Box::new(self.default.unwrap()), list : Box::new(to_list_items(self.vec)?) })
+        Ok(ConstList::new(self.default.unwrap(),to_list_items(self.vec)?))
     }
 
 
@@ -54,7 +54,7 @@ impl TmpList{
             Err(format!("{} NextID must not be defined for InnerList {}", self.span.line_str(), self.span.slice()))?
         }
 
-        Ok(InnerList{ list : to_list_items(self.vec)? })
+        Ok(InnerList::new(to_list_items(self.vec)?))
     }
 
     pub fn to_const_data(self) -> Result<ConstData>{
@@ -69,7 +69,7 @@ impl TmpList{
         }
         let old = self.old.unwrap_or_else(|| HashSet::new());
 
-        Ok(ConstData{ default : Box::new(self.default.unwrap()), old : Box::new(old), list : Box::new(to_data_items(self.vec)?) })
+        Ok(ConstData::new(self.default.unwrap(), to_data_items(self.vec)?,  old))
     }
     pub fn to_inner_data(self) -> Result<InnerData>{
         if self.compatible.is_some(){
@@ -83,7 +83,7 @@ impl TmpList{
         }
         let old = self.old.unwrap_or_else(|| HashSet::new());
 
-        Ok(InnerData{ old : Box::new(old), list : Box::new(to_data_items(self.vec)?) })
+        Ok(InnerData::new(to_data_items(self.vec)?, old))
     }
 
     pub fn to_mut_list(self) -> Result<MutList>{
@@ -101,7 +101,7 @@ impl TmpList{
             Err(format!("{} MutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
         let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
-        Ok(MutList{ default : Box::new(self.default.unwrap()), list : Box::new(LinkedHashMap::new()), prop: Box::new(MutListProp{ compatible : compatible, next_id : 0 } ) })
+        Ok(MutList::new(self.default.unwrap(),LinkedHashMap::new(),0, compatible))
     }
 
     pub fn to_inner_mut_list(self) -> Result<InnerMutList>{
@@ -120,7 +120,7 @@ impl TmpList{
         if self.vec.len() != 0{
             Err(format!("{} InnerMutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
-        Ok(InnerMutList{ list : Box::new(LinkedHashMap::new()), next_id : 0 })
+        Ok(InnerMutList::new(LinkedHashMap::new(), 0))
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
@@ -137,8 +137,7 @@ impl TmpList{
         let next_id = self.next_id.unwrap();
         let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
 
-        Ok(MutList{ default : Box::new(self.default.unwrap()), list : Box::new(to_violated_list_items(self.vec)?),
-            prop : Box::new(MutListProp{ compatible, next_id } ) })
+        Ok(MutList::new(self.default.unwrap(), to_violated_list_items(self.vec)?, next_id, compatible))
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
@@ -157,7 +156,7 @@ impl TmpList{
         }
         let next_id = self.next_id.unwrap();
 
-        Ok(InnerMutList{ list : Box::new(to_violated_list_items(self.vec)?),next_id })
+        Ok(InnerMutList::new(to_violated_list_items(self.vec)?, next_id))
     }
 
     pub fn to_inner_def(self) -> Result<ListDefObj>{
@@ -194,7 +193,7 @@ impl TmpList{
             Err(format!("{} InnerDef must not have items {}", self.span.line_str(), self.span.slice()))?
         }
         let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
-        Ok(InnerMutDefObj{list_def :Box::new(self.default.unwrap()), compatible : Box::new(compatible), undefinable })
+        Ok(InnerMutDefObj::new(self.default.unwrap(), undefinable, compatible))
     }
 }
 
@@ -220,7 +219,7 @@ fn to_violated_list_items(vec : Vec<TmpObj>) -> Result<LinkedHashMap<u64, MutLis
     let mut result : LinkedHashMap<u64, MutListItem> = LinkedHashMap::with_capacity(vec.len());
     for item in vec{
         let item = item.to_violated_list_item()?;
-        result.insert(item.id, item);
+        result.insert(item.id(), item);
     }
     return Ok(result);
 }
