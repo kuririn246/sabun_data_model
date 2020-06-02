@@ -93,9 +93,10 @@ impl TmpList{
         if self.default.is_none(){
             Err(format!("{} Default must be defined {}", self.span.line_str(), self.span.slice()))?
         }
-        if self.next_id.is_some(){
-            Err(format!("{} NextID is not needed for MutList {}", self.span.line_str(), self.span.slice()))?
-        }
+        // mut_listのときだけnext_idを消す処理が難しいしめんどいので無視してしまう・・・
+        //if self.next_id.is_some(){
+          //  Err(format!("{} NextID is not needed for MutList {}", self.span.line_str(), self.span.slice()))?
+        //}
         if self.vec.len() != 0{
             Err(format!("{} MutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }

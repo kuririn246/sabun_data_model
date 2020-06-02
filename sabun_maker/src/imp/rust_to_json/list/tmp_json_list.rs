@@ -55,10 +55,19 @@ impl TmpJsonRefs{
     }
 }
 
+fn get_from_set(set : &HashSet<String>) -> Option<BTreeSet<String>>{
+    if set.is_empty(){
+        None
+    } else{
+        Some(btree_set(set))
+    }
+}
+
 impl TmpJsonList{
     pub fn from_const_data(l : &ConstData) -> TmpJsonList{
-         TmpJsonList{ vec: l.list.iter().map(|(id,item)| TmpJsonObj::from_list_item(item, Some(id))).collect(),
-             compatible : None, next_id: None, old : Some(btree_set(l.old.as_ref())), default : Some(l.default.as_ref().clone()) }
+        //最近のハッシュマップは中身の順番がランダム化されるようなので、btree_mapにうつして順番を揃える
+         TmpJsonList{ vec: btree_map(l.list()).iter().map(|(id,item)| TmpJsonObj::from_list_item(item, Some(id))).collect(),
+             compatible : None, next_id: None, old : get_from_set(l.old.as_ref()), default : Some(l.default.as_ref().clone()) }
     }
 
     pub fn from_const_list(l : &ConstList) -> TmpJsonList{
@@ -68,12 +77,12 @@ impl TmpJsonList{
 
     pub fn from_mut_list(l : &MutList) -> TmpJsonList{
         TmpJsonList{ vec: l.list.iter().map(|(_,item)| TmpJsonObj::from_mut_list_item(item)).collect(),
-            compatible : Some(btree_set(l.compatible())), next_id: Some(l.next_id()), old : None, default : Some(l.default.as_ref().clone()) }
+            compatible : get_from_set(l.compatible()), next_id: Some(l.next_id()), old : None, default : Some(l.default.as_ref().clone()) }
     }
 
     pub fn from_inner_data(l : &InnerData) -> TmpJsonList{
-        TmpJsonList{ vec : l.list.iter().map(|(id, item)| TmpJsonObj::from_list_item(item, Some(id))).collect(),
-            compatible : None, next_id: None, old : Some(btree_set(l.old.as_ref())), default : None }
+        TmpJsonList{ vec : btree_map(l.list()).iter().map(|(id, item)| TmpJsonObj::from_list_item(item, Some(id))).collect(),
+            compatible : None, next_id: None, old : get_from_set(l.old.as_ref()), default : None }
     }
 
     pub fn from_inner_list(l : &InnerList) -> TmpJsonList{

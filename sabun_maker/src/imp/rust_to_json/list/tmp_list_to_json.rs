@@ -10,9 +10,7 @@ pub fn rust_list_to_json(l : &TmpJsonList, list_type : ListType) -> Value{
    let mut result : Vec<Value> = vec![];
 
    result.push(val_s(list_type_to_string(&list_type, l.vec.len() != 0)));
-   if let Some(default) = &l.default{
-      result.push(Value::Array(vec![default_to_json(default)]))
-   }
+
    if let Some(compatible) = &l.compatible{
       result.push(string_set_to_json("Compatible", compatible));
    }
@@ -24,6 +22,10 @@ pub fn rust_list_to_json(l : &TmpJsonList, list_type : ListType) -> Value{
          val_str("NextID"),
          Value::Number(next_id as f64)
       ]));
+   }
+   //余計な情報は上に持ってきて、defaultとvecの距離を近づけよう
+   if let Some(default) = &l.default{
+      result.push(Value::Array(vec![default_to_json(default)]))
    }
 
    for item in &l.vec{

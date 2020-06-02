@@ -2,18 +2,18 @@ use crate::structs::root_object::InnerMutDefObj;
 use crate::structs::my_json::Value;
 use crate::imp::rust_to_json::list::default_to_json::default_to_json;
 use crate::imp::rust_to_json::list::tmp_json_list::btree_set;
+use crate::imp::rust_to_json::string_set_to_json::{string_set_to_json};
 
 pub fn inner_mut_def_to_json(d : &InnerMutDefObj) -> Value{
     let mut result : Vec<Value> = Vec::new();
 
     result.push(Value::String("InnerMutDef".to_string()));
-    result.push(Value::Array(vec![default_to_json(&d.list_def)]));
-    let mut compatible = vec![Value::String("Compatible".to_string())];
-    let set = btree_set(d.compatible.as_ref());
-    for comp in set{
-        compatible.push(Value::String(comp))
+    if d.compatible.len() != 0{
+        result.push(string_set_to_json("Compatible", &btree_set(d.compatible.as_ref())));
     }
-    result.push(Value::Array(compatible));
+
+    result.push(Value::Array(vec![default_to_json(&d.list_def)]));
+
 
     return Value::Array(result);
 }

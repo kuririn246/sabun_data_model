@@ -15,11 +15,22 @@ pub struct ConstData{
     pub old : Box<HashSet<String>>,
 }
 
+impl ConstData{
+    pub fn default(&self) -> &ListDefObj{ self.default.as_ref() }
+    pub fn list(&self) -> &HashMap<String, ListItem>{ self.list.as_ref() }
+    pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+}
+
 ///IDを持たず、参照できない。MutListの初期値を書くのが主な使い道か。IDは必要ないけど単にデータを書いておきたい場合もあるだろう。
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConstList{
     pub default : Box<ListDefObj>,
     pub list : Box<Vec<ListItem>>,
+}
+
+impl ConstList{
+    pub fn default(&self) -> &ListDefObj{ self.default.as_ref() }
+    pub fn list(&self) -> &Vec<ListItem>{ self.list.as_ref() }
 }
 
 ///追加、削除、順番の変更等ができるリスト。初期値を持てず最初は必ず空リストである。これはバージョン違いを読み出す時に問題を単純化するために必要。
@@ -43,6 +54,8 @@ pub struct MutListProp{
 }
 
 impl MutList{
+    pub fn default(&self) -> &ListDefObj{ self.default.as_ref() }
+    pub fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
     pub fn next_id(&self) -> u64{ self.prop.next_id }
     pub fn compatible(&self) -> &HashSet<String>{ &self.prop.compatible }
 }
@@ -54,6 +67,10 @@ pub struct InnerList{
     //pub compatible : HashSet<String>,
 }
 
+impl InnerList{
+    pub fn list(&self) -> &Vec<ListItem>{ &self.list }
+}
+
 
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq, Clone)]
@@ -63,6 +80,11 @@ pub struct InnerData{
     pub old : Box<HashSet<String>>,
 }
 
+impl InnerData{
+    pub fn list(&self) -> &HashMap<String, ListItem>{ self.list.as_ref() }
+    pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct InnerMutList{
     pub list : Box<LinkedHashMap<u64, MutListItem>>,
@@ -70,6 +92,9 @@ pub struct InnerMutList{
     pub next_id : u64,
 }
 
+impl InnerMutList{
+    pub fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
+}
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ListItem{
@@ -77,6 +102,11 @@ pub struct ListItem{
     pub values : Box<HashMap<String, RustValue>>,
     ///ListItemの値はRefも常にDefaultからの差分である
     pub refs : Box<HashMap<String, RefValue>>,
+}
+
+impl ListItem{
+    pub fn values(&self) -> &HashMap<String, RustValue>{ self.values.as_ref() }
+    pub fn refs(&self) -> &HashMap<String, RefValue>{ self.refs.as_ref() }
 }
 
 ///たとえばキャラクターAとキャラクターBの間で出来事Cが起こったとする。
@@ -106,4 +136,10 @@ pub struct MutListItem{
     pub values : Box<HashMap<String, RustValue>>,
     ///ListItemの値はRefでも常にDefaultからの差分である
     pub refs : Box<HashMap<String, RefValue>>,
+}
+
+impl MutListItem{
+    pub fn id(&self) -> u64{ self.id }
+    pub fn values(&self) -> &HashMap<String, RustValue>{ self.values.as_ref() }
+    pub fn refs(&self) -> &HashMap<String, RefValue>{ self.refs.as_ref() }
 }

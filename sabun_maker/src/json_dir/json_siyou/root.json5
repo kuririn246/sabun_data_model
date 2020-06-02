@@ -143,22 +143,15 @@
   ],
 
   dim2List : [
-    "Data",
-    ["Default",{
-      innerData : [
-        "InnerDataDef",
-        ["Default",{
-          innerList : [
-            "InnerListDef",
-            ["Default",{
-              Ref : { hegoList :  "" },
-              innerListMem : 10,
-            }],
-          ],
-          innerDataMem : 5,
-        }],
-      ],
+    "Data", [{
       dataMem : 3,
+      innerData : [ "InnerDataDef",[{
+        innerDataMem : 5,
+        innerList : ["InnerListDef",[{
+          Ref : { hegoList :  "" },
+          innerListMem : 10,
+        }]],
+      }]],
     }],
     {
       ID : "item1",

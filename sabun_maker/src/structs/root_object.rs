@@ -24,6 +24,12 @@ pub struct ListDefObj{
     pub old : Box<HashSet<String>>,
 }
 
+impl ListDefObj{
+    pub fn default(&self) -> &HashMap<String, RustValue>{ self.default.as_ref() }
+    pub fn refs(&self) -> &RefDefObj{ self.refs.as_ref() }
+    pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct RefDefObj {
     pub refs: Box<HashMap<String, RefValue>>,
@@ -34,6 +40,12 @@ pub struct RefDefObj {
     pub old : Box<HashSet<String>>,
 }
 
+impl RefDefObj{
+    pub fn refs(&self) -> &HashMap<String, RefValue>{ self.refs.as_ref() }
+    pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+    pub fn is_enum(&self) -> bool{ self.is_enum }
+}
+
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct InnerMutDefObj {
@@ -42,5 +54,9 @@ pub struct InnerMutDefObj {
     pub compatible : Box<HashSet<String>>,
 }
 
-
+impl InnerMutDefObj{
+    pub fn list_def(&self) -> &ListDefObj{ self.list_def.as_ref() }
+    pub fn undefinable(&self) -> bool{ self.undefinable }
+    pub fn compatible(&self) -> &HashSet<String>{ self.compatible.as_ref() }
+}
 
