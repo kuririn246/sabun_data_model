@@ -7,7 +7,7 @@ use linked_hash_map::LinkedHashMap;
 
 
 ///アイテムごとにIDをもち、Refで参照することが可能である
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ConstData{
     pub default : ListDefObj,
     pub list : Box<HashMap<String, ListItem>>,
@@ -16,7 +16,7 @@ pub struct ConstData{
 }
 
 ///IDを持たず、参照できない。MutListの初期値を書くのが主な使い道か。IDは必要ないけど単にデータを書いておきたい場合もあるだろう。
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ConstList{
     pub default : Box<ListDefObj>,
     pub list : Vec<ListItem>,
@@ -25,7 +25,7 @@ pub struct ConstList{
 ///追加、削除、順番の変更等ができるリスト。初期値を持てず最初は必ず空リストである。これはバージョン違いを読み出す時に問題を単純化するために必要。
 /// ConstListとMutListはstruct定義を見ると近い存在なので、まとめてもいいように思うかもしれないけれど、意味が全く別ものなので型を分けたほうが混乱が少ない。
 /// 順序を変えなければidでソートされたSortedListになるのでPrimaryKeyを持ったTableとしても使えないこともないか
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct MutList{
     pub default : Box<ListDefObj>,
     pub list : Box<LinkedHashMap<u64, MutListItem>>,
@@ -38,7 +38,7 @@ pub struct MutList{
 }
 
 ///Data or Listの内部に作るList。ListDefObjの内部にはDefaultだけ書き、ListItemの内部にはItemのみを書く。
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct InnerList{
     pub list : Vec<ListItem>,
     //pub compatible : HashSet<String>,
@@ -46,14 +46,14 @@ pub struct InnerList{
 
 
 ///アイテムごとにIDをもち、Refで参照することが可能である
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct InnerData{
     pub list : Box<HashMap<String, ListItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
     pub old : Box<HashSet<String>>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct InnerMutList{
     pub list : Box<LinkedHashMap<u64, MutListItem>>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
@@ -61,7 +61,7 @@ pub struct InnerMutList{
 }
 
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ListItem{
     ///ListItemの値は常にDefaultからの差分である
     pub values : Box<HashMap<String, RustValue>>,
@@ -88,7 +88,7 @@ pub struct ListItem{
 /// （パラメータは上書きされうるので、その場合(item_id, BTreeのid)のRelationも使って、上書き時にBTreeをアップデートできるようにしておく必要もあり大変だが)
 /// Relationとパラメータ範囲での検索が効率的にできるシステムが作れる。ただそれは外部に作ればいいので、このシステム自体の守備範囲ではない
 /// それが出来る土台として、idとLinkedHashMapで出来たMutListがある
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct MutListItem{
     ///アイテムごとにidが振られ、これによって削除や順番の変更を検出できる
     pub id : u64,

@@ -12,7 +12,7 @@ pub enum RustParam{
     Array(Qv<RustArray>, ArrayType),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum RustValue{
     Param(RustParam, ValueType),
     Data(ConstData),
@@ -30,6 +30,7 @@ pub enum RustValue{
 pub enum ListType{
     Data, List, Mut, InnerData, InnerList, InnerMut, InnderDataDef, InnerListDef, InnerMutDef,
 }
+
 
 
 #[derive(Debug, PartialEq, Clone)]

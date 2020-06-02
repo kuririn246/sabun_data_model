@@ -11,7 +11,6 @@ pub fn construct_root(root : RootObject, map : HashMap<String, RustValue>, valid
         let name = json_name(&key).ok_or_else(|| format!("filename:{} is not a valid name", &key))?;
         match name {
             NameType::Name(name, ValueType::Normal) => {
-                root.include.push(key);
                 root.default.insert(name, value);
             },
             _=>{ Err(format!("{} is not a valid name", &key))?; }

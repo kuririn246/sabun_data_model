@@ -10,9 +10,7 @@ pub mod get_old;
 pub mod get_compatible;
 pub mod get_id;
 pub mod get_refs;
-// pub mod rename_map;
 pub mod json_dir_to_rust;
-pub mod get_include;
 pub mod construct_root;
 // pub mod validation;
 //
@@ -33,7 +31,6 @@ pub fn json_root_to_rust(json : &str) -> Result<RootObject>{
         JVal::Map(map, span) =>{
             let tmp = json_obj_to_rust::json_obj_to_rust(&map, false, &span, &Names::new(""))?;
             Ok(RootObject{
-                include : tmp.include,
                 old : tmp.old,
                 default : tmp.default,
                 sabun : HashMap::new(),
