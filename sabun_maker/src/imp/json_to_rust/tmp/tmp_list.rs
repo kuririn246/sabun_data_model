@@ -38,6 +38,8 @@ impl TmpList{
         Ok(ConstList{ default : Box::new(self.default.unwrap()), list : to_list_items(self.vec)? })
     }
 
+
+
     pub fn to_inner_list(self) -> Result<InnerList>{
         if self.compatible.is_some(){
             Err(format!("{} Compatible is not needed for InnerList {}", self.span.line_str(), self.span.slice()))?

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap};
 
 #[derive(Debug)]
 pub enum Value{
@@ -6,7 +6,8 @@ pub enum Value{
     String(String),
     Number(f64),
     Array(Vec<Value>),
-    Map(HashMap<String, Value>),
+    ///HashMapだと毎回順序が変わるみたいなので、一応alphabetical orderにしておこう
+    Map(BTreeMap<String, Value>),
     Null,
     Undefined,
 }
@@ -68,7 +69,7 @@ fn indent_str(indent_level : usize) -> String{
     "  ".repeat(indent_level)
 }
 
-fn write_map(map : &HashMap<String, Value>, s : &mut String, indent_level : usize) {
+fn write_map(map : &BTreeMap<String, Value>, s : &mut String, indent_level : usize) {
     if map.len() == 0{
         s.push_str("{}");
     } else if map.len() == 1 {

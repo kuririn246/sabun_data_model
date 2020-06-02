@@ -4,10 +4,12 @@ use crate::imp::rust_to_json::list::default_to_json::default_to_json;
 use crate::rust_to_json_new_default;
 use crate::structs::my_json::Value;
 use crate::imp::json_to_rust::tmp::tmp_list::TmpList;
+use crate::structs::rust_value::ListType;
 
-pub fn rust_list_to_json(l : &TmpList, name : &str) -> Result<Value>{
+pub fn rust_list_to_json(l : &TmpList, t : ListType) -> Result<Value>{
    let mut result : Vec<Value> = vec![val_str("List")];
 
+   l.
    // match l.list_type {
    //    ListType::Normal =>{},
    //    _ =>{  result.push(list_type_to_json(&l.list_type, name)?); }

@@ -4,8 +4,6 @@ use crate::structs::ref_value::RefValue;
 
 #[derive(Debug, PartialEq)]
 pub struct RootObject{
-    //別ファイルにあったことを記録しておくためのもの。どう使うかは後で考える。
-    pub include : Vec<String>,
     //listのobjectの場合、defaultはlist側にあるが、ここには初期値が入る。
     pub default : HashMap<String, RustValue>,
     //変更されたものを記録。差分変更時に、defaultと同じになったらここから削除する
@@ -17,7 +15,7 @@ pub struct RootObject{
     pub old : HashSet<String>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ListDefObj{
     pub default : Box<HashMap<String, RustValue>>,
     ///RustValueを巨大にしすぎないためにBoxにしてサイズを削る
@@ -26,7 +24,7 @@ pub struct ListDefObj{
     pub old : Box<HashSet<String>>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct RefDefObj {
     pub refs: Box<HashMap<String, RefValue>>,
     /// Enum とRefの二通りの定義の仕方があり、Enumの場合は Ref のうち一つだけ値があり、ほかは全部nullにしなきゃいけない。
@@ -37,7 +35,7 @@ pub struct RefDefObj {
 }
 
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct InnerMutDefObj {
     pub list_def : ListDefObj,
     pub undefinable: bool,
