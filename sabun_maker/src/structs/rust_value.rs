@@ -8,8 +8,8 @@ use crate::structs::root_object::{ListDefObj, InnerMutDefObj};
 pub enum RustParam{
     Bool(Qv<bool>),
     Number(Qv<f64>),
-    String(Qv<String>),
-    Array(Qv<RustArray>, ArrayType),
+    String(Box<Qv<String>>),
+    Array(Box<Qv<RustArray>>, ArrayType),
 }
 
 #[derive(Debug, PartialEq, Clone)]

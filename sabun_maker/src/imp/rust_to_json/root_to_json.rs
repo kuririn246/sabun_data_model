@@ -3,29 +3,23 @@ use crate::structs::rust_value::RustValue;
 use crate::structs::my_json::Value;
 use crate::structs::root_object::RootObject;
 use std::collections::{HashMap, BTreeMap};
+use crate::imp::rust_to_json::list::value_map_to_json::value_map_to_json;
+use crate::imp::rust_to_json::list::tmp_json_list::{btree_map, btree_set};
+use crate::imp::rust_to_json::string_set_to_json::{string_set_to_json_short};
 
 ///本来デフォルト値と差分が保存されているのだが、見やすくするためにまとめてデフォルト値にしてしまう。
-///デフォルト値も差分も全部Json化したいユースケースもあるとは思うのだけど・・・
+///デフォルト値も差分も全部Json化したいユースケースもあるかもしれない・・・？
 
-pub fn root_to_json_new_default(obj : &RootObject, list_def : Option<&HashMap<String, RustValue>>, root : &RootObject) -> Result<Value> {
-    let mut map_item = BTreeMap::new();
-    let map = &mut map_item;
+pub fn root_to_json_new_default(obj : &RootObject) -> Result<Value> {
+    let mut default = obj.default.clone();
+    for (name, param) in &obj.sabun{
+        if let Some(val) = default.get_mut(name){
+            *val = RustValue::Param(param.clone(), val.value_type());
+        }
+    }
+    let mut map = value_map_to_json(&btree_map(&obj.default));
+    map.insert( "Old".to_string(), string_set_to_json_short(&btree_set(&obj.old)));
 
-
-
-
-
-    // let new = match list_def {
-    //     Some(def) => get_new_default_listitem(def, &obj.default, &obj.sabun, root)?,
-    //     None => get_new_default(&obj.default, &obj.sabun, root)?
-    // };
-    // for (k, v) in new {
-    //     map.insert(k, v);
-    // }
-
-    return Ok(Value::Map(map_item));
+    return Ok(Value::Map(map));
 }
 
-fn insert(map : &mut BTreeMap<String, Value>, s : &str, v : Value){
-    map.insert(s.to_string(), v);
-}

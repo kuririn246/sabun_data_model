@@ -27,7 +27,7 @@ pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -
     for (k, v) in &obj.default {
         match v {
             RustValue::Param(RustParam::String(v), vt) => {
-                match v {
+                match v.as_ref() {
                     Qv::Val(s) =>{
                         if json_simple_name(s).is_none() && s.is_empty() == false{
                             //undefinedは勝手にいれちゃいけないから、エラーメッセージには表示しないが、別に入れられる
@@ -36,7 +36,7 @@ pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -
                     },
                     _ =>{},
                 }
-                map.insert(k.to_string(), RefValue::new(v.clone(), vt.clone()));
+                map.insert(k.to_string(), RefValue::new(v.as_ref().clone(), vt.clone()));
 
             },
             _ => {

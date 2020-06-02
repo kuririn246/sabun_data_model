@@ -58,7 +58,7 @@ impl TmpJsonRefs{
 impl TmpJsonList{
     pub fn from_const_data(l : &ConstData) -> TmpJsonList{
          TmpJsonList{ vec: l.list.iter().map(|(id,item)| TmpJsonObj::from_list_item(item, Some(id))).collect(),
-             compatible : None, next_id: None, old : Some(btree_set(l.old.as_ref())), default : Some(l.default.clone()) }
+             compatible : None, next_id: None, old : Some(btree_set(l.old.as_ref())), default : Some(l.default.as_ref().clone()) }
     }
 
     pub fn from_const_list(l : &ConstList) -> TmpJsonList{
@@ -68,7 +68,7 @@ impl TmpJsonList{
 
     pub fn from_mut_list(l : &MutList) -> TmpJsonList{
         TmpJsonList{ vec: l.list.iter().map(|(_,item)| TmpJsonObj::from_mut_list_item(item)).collect(),
-            compatible : Some(btree_set(l.compatible.as_ref())), next_id: Some(l.next_id), old : None, default : Some(l.default.as_ref().clone()) }
+            compatible : Some(btree_set(l.compatible())), next_id: Some(l.next_id()), old : None, default : Some(l.default.as_ref().clone()) }
     }
 
     pub fn from_inner_data(l : &InnerData) -> TmpJsonList{

@@ -18,7 +18,7 @@ pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names :
         }
         JVal::String(s, _) => {
             let s = s.to_string();
-            Ok(RustValue::Param(RustParam::String(Qv::Val(s)), value_type))
+            Ok(RustValue::Param(RustParam::String(Box::new(Qv::Val(s))), value_type))
         },
         JVal::Array(a, _) => {
             Ok(json_array_to_rust(a, value_type, v.span(), names)?)
@@ -46,7 +46,7 @@ pub fn json_item_to_rust_ref(name : &str, value_type : ValueType, v : &JVal, nam
         }
         JVal::String(s, _) => {
             let s = s.to_string();
-            Ok(RustValue::Param(RustParam::String(Qv::Val(s)), value_type))
+            Ok(RustValue::Param(RustParam::String(Box::new(Qv::Val(s))), value_type))
         },
         JVal::Array(_, span) => {
             Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
@@ -55,10 +55,10 @@ pub fn json_item_to_rust_ref(name : &str, value_type : ValueType, v : &JVal, nam
             Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
         },
         JVal::Null(_) =>{
-            Ok(RustValue::Param(RustParam::String(Qv::Null), value_type))
+            Ok(RustValue::Param(RustParam::String(Box::new(Qv::Null)), value_type))
         },
         JVal::Undefined(_)=>{
-            Ok(RustValue::Param(RustParam::String(Qv::Undefined), value_type))
+            Ok(RustValue::Param(RustParam::String(Box::new(Qv::Undefined)), value_type))
         }
     }
 }

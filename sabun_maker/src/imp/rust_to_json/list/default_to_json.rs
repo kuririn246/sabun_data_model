@@ -2,7 +2,7 @@ use crate::structs::my_json::Value;
 use crate::structs::root_object::ListDefObj;
 use crate::imp::rust_to_json::list::value_map_to_json::value_map_to_json;
 use crate::imp::rust_to_json::list::ref_def_obj_to_json::ref_def_obj_to_json;
-use crate::imp::rust_to_json::old_to_json::old_to_json_short;
+use crate::imp::rust_to_json::string_set_to_json::string_set_to_json_short;
 use crate::imp::rust_to_json::list::tmp_json_list::{btree_map, btree_set};
 
 pub fn default_to_json(obj : &ListDefObj) -> Value{
@@ -15,7 +15,7 @@ pub fn default_to_json(obj : &ListDefObj) -> Value{
         nd.insert("Ref".to_string(), Value::Map(ref_def_obj_to_json(obj.refs.as_ref())));
     }
     if obj.old.len() != 0 {
-        nd.insert("Old".to_string(), old_to_json_short(&btree_set(&obj.old)));
+        nd.insert("Old".to_string(), string_set_to_json_short(&btree_set(&obj.old)));
     }
     result.push(Value::Map(nd));
 

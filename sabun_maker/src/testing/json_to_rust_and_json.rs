@@ -1,19 +1,39 @@
 #[cfg(test)]
 mod tests {
     use crate::imp::json_to_rust::json_dir_to_rust::json_dir_to_rust;
-    use crate::structs::value_type::ValueType;
+    use crate::structs::rust_value::{RustValue, RustParam};
+    use crate::structs::rust_list::{ConstData, InnerMutList, InnerList, InnerData, MutList, ConstList};
+    use crate::structs::root_object::{ListDefObj, InnerMutDefObj};
+    use crate::imp::rust_to_json::root_to_json::root_to_json_new_default;
 
     #[test]
     fn it_works() {
         match json_dir_to_rust("src/json_dir/json_siyou", true) {
-            Ok(a) => { println!("ok ok {:?}", a.default) },
+            Ok(a) => {
+                match root_to_json_new_default(&a){
+                    Ok(json) =>{
+                        println!("{}", json.to_string_pretty());
+                    },
+                    Err(e) =>{ println!("{}", e.message); }
+                }
+            },
             Err(e) => { println!("{}", e.message) }
         }
     }
 
     #[test]
     fn check_size(){
-        println!("size {} ",std::mem::size_of::<ValueType>());
+        // println!("size {} ",std::mem::size_of::<RustValue>());
+        // println!("size {} ",std::mem::size_of::<RustParam>());
+        // println!("size {} ",std::mem::size_of::<ConstData>());
+        // println!("size {} ",std::mem::size_of::<ConstList>());
+        // println!("size {} ",std::mem::size_of::<MutList>());
+        // println!("size {} ",std::mem::size_of::<InnerData>());
+        // println!("size {} ",std::mem::size_of::<InnerList>());
+        // println!("size {} ",std::mem::size_of::<Option<InnerMutList>>());
+        // println!("size {} ",std::mem::size_of::<ListDefObj>());
+        // println!("size {} ",std::mem::size_of::<InnerMutDefObj>());
+        //Param(RustParam, ValueType),
     }
 
 
