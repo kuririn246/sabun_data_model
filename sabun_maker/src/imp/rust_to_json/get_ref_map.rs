@@ -9,7 +9,7 @@ pub fn get_ref_map(r : &HashMap<String, RefValue>) -> BTreeMap<String, Value>{
     let mut map = BTreeMap::new();
 
     for (k, rv) in r{
-        let qv : &Qv<String> = rv.get_value();
+        let qv : &Qv<String> = &rv.value;
         let vt : &ValueType = &rv.value_type;
         let name = format!("{}{}", k, vt.to_suffix());
         match qv{
@@ -25,7 +25,6 @@ pub fn get_ref_map(r : &HashMap<String, RefValue>) -> BTreeMap<String, Value>{
 
 pub fn get_ref_def(r : &RefDefObj) -> BTreeMap<String, Value>{
     let mut ref_map = get_ref_map(&r.refs);
-    r.
-
-    map
+    //r.map
+    todo!()
 }

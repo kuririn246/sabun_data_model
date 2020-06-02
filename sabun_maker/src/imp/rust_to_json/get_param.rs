@@ -11,7 +11,7 @@ pub fn get_param(v : &RustParam) -> Result<Value>{
         RustParam::Bool(b) => to(b,  "Bool",|b| Value::Bool(*b)),
         RustParam::String(s) => to(s, "Str", |s| Value::String(s.to_string())),
         RustParam::Number(n)=> to(n, "Num", |n| Value::Number(*n)),
-        RustParam::Array(a, at)=> rust_array_to_json(a, at, root, name)?,
+        RustParam::Array(a, at)=>{todo!() }// rust_array_to_json(a, at, root, name)?,
     };
     return Ok(r);
 }
