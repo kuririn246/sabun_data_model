@@ -3,7 +3,11 @@ use std::collections::HashMap;
 use crate::structs::rust_list::ListItem;
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
+use crate::imp::json_to_rust::validation::validate_list_item::validate_list_item;
 
 pub fn validate_data(def : &ListDefObj, data_map : &HashMap<String, ListItem>, root : &RootObject, names : &Names) -> Result<()>{
-    def.
+    for (name, val) in data_map{
+        validate_list_item(def.default(), val.values(), root, &names.append(name))?
+    }
+    return Ok(());
 }
