@@ -32,6 +32,26 @@ pub enum ListType{
     Data, List, Mut, InnerData, InnerList, InnerMut, InnderDataDef, InnerListDef, InnerMutDef,
 }
 
+pub enum ExistenceType {
+    Param, InnerDef, InnerList, List
+}
+
+pub impl ExistenceType {
+    pub fn acceptable(&self, other : &Self) -> bool{
+        match self{
+            ExistenceType::Param => match other{
+                ExistenceType::Param => true,
+                _ => false,
+            }
+            ExistenceType::InnerDef => match other{
+                ExistenceType::InnerList => true,
+                _ => false,
+            }
+            ExistenceType::List | ExistenceType::InnerList => false,
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct RustArray{
     vec : Box<Vec<RustParam>>,
@@ -100,8 +120,8 @@ impl RustValue{
     pub fn list_type(&self) -> Option<ListType>{
         Some(match self{
             RustValue::Data(_) => ListType::Data,
-            RustValue::List(_) => ListType::Data,
-            RustValue::Mut(_) => ListType::Data,
+            RustValue::List(_) => ListType::List,
+            RustValue::Mut(_) => ListType::Mut,
             RustValue::InnerData(_) => ListType::InnerData,
             RustValue::InnerList(_) => ListType::InnerList,
             RustValue::InnerMut(_) => ListType::InnerMut,
@@ -112,6 +132,43 @@ impl RustValue{
         })
     }
 
+    pub fn qv_type(&self) -> QvType{
+        match self{
+            RustValue::Param(p, _) => p.qv_type(),
+            RustValue::InnerMut(b) => if b.is_some(){ QvType::Val } else{ QvType::Undefined },
+            _ =>{ QvType::Val }
+        }
+    }
+
+    pub fn existence_type(&self) -> ExistenceType{
+        match self{
+            RustValue::Param(_,_) => ExistenceType::Param,
+            RustValue::Data(_) | RustValue::List(_) | RustValue::Mut(_) => ExistenceType::List,
+            RustValue::InnerData(_) | RustValue::InnerList(_) | RustValue::InnerMut(_) => ExistenceType::InnerList,
+            RustValue::InnerDataDef(_) |RustValue::InnerListDef(_) |RustValue::InnerMutDef(_) => ExistenceType::InnerDef,
+        }
+    }
+
+    pub fn inner_def(&self) -> Option<&ListDefObj>{
+        match self{
+            RustValue::InnerDataDef(d) => Some(d),
+            RustValue::InnerListDef(d) => Some(d),
+            RustValue::InnerMutDef(obj) => Some(obj.list_def()),
+            _ => None,
+        }
+    }
+
+    ///defaultとsabun, list_defとlist_item sabunのような時に、defaultの変化値としてsabunが適当かどうか
+    pub fn acceptable(&self, value : &Self) -> bool{
+        if self.type_num() == value.type_num(){
+            if self.value_type().acceptable(&value.qv_type()){
+                if self.existence_type().acceptable(&value.existence_type()){
+                    true
+                }
+            }
+        }
+        false
+    }
 
 }
 

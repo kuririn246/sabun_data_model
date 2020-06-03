@@ -34,14 +34,14 @@ impl ValueType{
     }
 
 
-    pub(crate) fn _type_num(&self) -> usize{
-        match self{
-            ValueType::Normal => 0,
-            ValueType::Nullable => 1,
-            ValueType::Undefinable => 2,
-            ValueType::UndefNullable => 3,
-        }
-    }
+    // pub(crate) fn _type_num(&self) -> usize{
+    //     match self{
+    //         ValueType::Normal => 0,
+    //         ValueType::Nullable => 1,
+    //         ValueType::Undefinable => 2,
+    //         ValueType::UndefNullable => 3,
+    //     }
+    // }
 
     pub fn acceptable(&self, t : &QvType) -> bool {
         match self{

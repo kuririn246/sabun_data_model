@@ -12,7 +12,7 @@ pub mod get_id;
 pub mod get_refs;
 pub mod json_dir_to_rust;
 pub mod construct_root;
-// pub mod validation;
+pub mod validation;
 //
 //
 use json5_parser::JVal;
