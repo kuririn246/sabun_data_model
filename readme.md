@@ -6,7 +6,7 @@ Robust against transition of the data format
 
 Saves every history
 
-Generates static interface to read and modify data for some programming languages
+Generates the static interface to read and modify data for some programming languages
 
 Not slow for opening and saving data
 
