@@ -71,7 +71,6 @@ impl MutList{
 #[derive(Debug, PartialEq, Clone)]
 pub struct InnerList{
     list : Vec<ListItem>,
-    //pub compatible : HashSet<String>,
 }
 
 impl InnerList{
@@ -104,6 +103,7 @@ pub struct InnerMutList{
 impl InnerMutList{
     pub fn new(list : LinkedHashMap<u64, MutListItem>, next_id : u64) -> InnerMutList{ InnerMutList{ list : Box::new(list), next_id } }
     pub fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
+    pub fn next_id(&self) -> u64{ self.next_id }
 }
 
 #[derive(Debug, PartialEq, Clone)]
