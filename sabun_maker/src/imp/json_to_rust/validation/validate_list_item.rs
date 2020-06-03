@@ -12,7 +12,11 @@ pub fn validate_list_item(def_map : &HashMap<String, RustValue>, sabun_values : 
                     Err(format!("{} {} the default value doesn't correspond to the list item's value", names, name))?
                 }
                 if let Some(def_obj) = def.inner_def(){
-
+                    match def{
+                        RustValue::InnerDataDef(def) => if let RustValue::InnerData(data) = val{
+                            validate_data(def, data.list(), root, &names.next(name))
+                        } else{ unreachable!(); }
+                    }
                 }
 
             },
