@@ -4,7 +4,7 @@ use crate::structs::qv::QvType;
 pub enum ValueType{
     Normal,
     Nullable,
-    Undefinable,
+    Undefiable,
     UndefNullable,
 }
 
@@ -16,9 +16,9 @@ impl ValueType{
         }
     }
 
-    pub fn is_undefable(&self) -> bool{
+    pub fn undefiable(&self) -> bool{
         match self{
-            ValueType::Undefinable | ValueType::UndefNullable => true,
+            ValueType::Undefiable | ValueType::UndefNullable => true,
             _ => false,
         }
     }
@@ -27,7 +27,7 @@ impl ValueType{
         let s = match self{
             ValueType::Normal => "",
             ValueType::Nullable => "?",
-            ValueType::Undefinable => "!",
+            ValueType::Undefiable => "!",
             ValueType::UndefNullable => "!?",
         };
         s.to_string()
@@ -57,12 +57,30 @@ impl ValueType{
                     _ => false,
                 }
             },
-            ValueType::Undefinable => {
+            ValueType::Undefiable => {
                 match t {
                     QvType::Val | QvType::Undefined => true,
                     _ => false,
                 }
             },
+            ValueType::UndefNullable => true,
+        }
+    }
+
+    pub fn compatible(&self, other : &Self) -> bool{
+        match self{
+            ValueType::Normal => match other{
+                ValueType::Normal => true,
+                _ => false,
+            },
+            ValueType::Nullable => match other{
+                ValueType::Normal | ValueType::Nullable => true,
+                _ => false,
+            }
+            ValueType::Undefiable => match other{
+                ValueType::Normal | ValueType::Undefiable => true,
+                _ => false,
+            }
             ValueType::UndefNullable => true,
         }
     }

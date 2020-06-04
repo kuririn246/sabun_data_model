@@ -32,22 +32,22 @@ pub enum ListType{
     Data, List, Mut, InnerData, InnerList, InnerMut, InnderDataDef, InnerListDef, InnerMutDef,
 }
 
-pub enum ExistenceType {
+pub enum RustValueKind {
     Param, InnerDef, InnerList, List
 }
 
-impl ExistenceType {
+impl RustValueKind {
     pub fn acceptable(&self, other : &Self) -> bool{
         match self{
-            ExistenceType::Param => match other{
-                ExistenceType::Param => true,
+            RustValueKind::Param => match other{
+                RustValueKind::Param => true,
                 _ => false,
             }
-            ExistenceType::InnerDef => match other{
-                ExistenceType::InnerList => true,
+            RustValueKind::InnerDef => match other{
+                RustValueKind::InnerList => true,
                 _ => false,
             }
-            ExistenceType::List | ExistenceType::InnerList => false,
+            RustValueKind::List | RustValueKind::InnerList => false,
         }
     }
 }
@@ -88,6 +88,30 @@ impl RustParam{
             RustParam::Array(a, _) => a.qv_type(),
         }
     }
+
+    pub(crate) fn type_num(&self) -> usize{
+        match self{
+            RustParam::Bool(_) => 0,
+            RustParam::Number(_) => 1,
+            RustParam::String(_) => 2,
+            RustParam::Array(_, _) => 3,
+        }
+    }
+
+    pub fn acceptable(&self, other : &Self) -> bool {
+        if self.type_num() != other.type_num() {
+            return false;
+        }
+        if let RustParam::Array(_, s_at) = self {
+            if let RustParam::Array(_, o_at) = other {
+                //array_typeが一致してるかはここまでしないと調べられないだろうか・・・？
+                if s_at.type_num() != o_at.type_num() {
+                    return false;
+                }
+            } else { unreachable!() }
+        }
+        return true;
+    }
 }
 
 impl RustValue{
@@ -109,10 +133,14 @@ impl RustValue{
         }
     }
 
+    pub fn is_param(&self) -> bool{
+        self.type_num() <= 3
+    }
+
     pub fn value_type(&self) -> ValueType{
         match self{
             RustValue::Param(_param, vt) => vt.clone(),
-            RustValue::InnerMutDef(obj) => if obj.undefinable() { ValueType::Undefinable } else{ ValueType::Normal }
+            RustValue::InnerMutDef(obj) => if obj.undefinable() { ValueType::Undefiable } else{ ValueType::Normal }
             _ => ValueType::Normal,
         }
     }
@@ -140,12 +168,12 @@ impl RustValue{
         }
     }
 
-    pub fn existence_type(&self) -> ExistenceType{
+    pub fn value_kind(&self) -> RustValueKind {
         match self{
-            RustValue::Param(_,_) => ExistenceType::Param,
-            RustValue::Data(_) | RustValue::List(_) | RustValue::Mut(_) => ExistenceType::List,
-            RustValue::InnerData(_) | RustValue::InnerList(_) | RustValue::InnerMut(_) => ExistenceType::InnerList,
-            RustValue::InnerDataDef(_) |RustValue::InnerListDef(_) |RustValue::InnerMutDef(_) => ExistenceType::InnerDef,
+            RustValue::Param(_,_) => RustValueKind::Param,
+            RustValue::Data(_) | RustValue::List(_) | RustValue::Mut(_) => RustValueKind::List,
+            RustValue::InnerData(_) | RustValue::InnerList(_) | RustValue::InnerMut(_) => RustValueKind::InnerList,
+            RustValue::InnerDataDef(_) |RustValue::InnerListDef(_) |RustValue::InnerMutDef(_) => RustValueKind::InnerDef,
         }
     }
 
@@ -172,25 +200,23 @@ impl RustValue{
 
     ///defaultとsabun, list_defとlist_item sabunのような時に、defaultの変化値としてsabunが適当かどうか
     ///調べるのは型だけで、listの中身がちゃんとdefaultと整合してるかまでは調べてくれない
-    pub fn acceptable(&self, value : &Self) -> bool {
-        if self.type_num() == value.type_num() {
-            if let RustValue::Param(RustParam::Array(_, s_at), _) = self {
-                if let RustValue::Param(RustParam::Array(_, o_at), _) = value {
-                    //array_typeが一致してるかはここまでしないと調べられないだろうか・・・？
-                    if s_at.type_num() != o_at.type_num() {
-                        return false;
-                    }
-                } else { unreachable!() }
-            }
-            if self.value_type().acceptable(&value.qv_type()) {
-                if self.existence_type().acceptable(&value.existence_type()) {
-                    return true;
-                }
-            }
+    pub fn acceptable(&self, other : &Self) -> bool {
+        if self.type_num() != other.type_num() {
+            return false;
         }
-        false
+        if self.value_type().acceptable(&other.qv_type()) == false {
+            return false;
+        }
+        if let RustValue::Param(sp,_) = self {
+            if let RustValue::Param(op, _) = other {
+                return sp.acceptable(op)
+            } else { unreachable!() }
+        }
+        if self.value_kind().acceptable(&other.value_kind()) == false {
+            return false;
+        }
+        return true;
     }
-
 }
 
 

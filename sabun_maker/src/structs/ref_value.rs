@@ -23,12 +23,18 @@ impl RefValue{
         }
     }
 
+    ///右の値を自身に代入できるか
     pub fn acceptable(&self, other : &Self) -> bool{
         self.value_type.acceptable(&other.value.qv_type())
     }
 
+    ///右が取りうる値すべてが左に代入できるか
+    pub fn compatible(&self, other : &Self) -> bool{
+        self.value_type.compatible(&other.value_type)
+    }
+
     ///null undefined "value" のどれか
-    pub fn value_string(&self) -> String{
+    pub fn value_js_string(&self) -> String{
         match &self.value{
             Qv::Val(s) => format!(r#""{}""#,s.to_string()),
             Qv::Null => "null".to_string(),

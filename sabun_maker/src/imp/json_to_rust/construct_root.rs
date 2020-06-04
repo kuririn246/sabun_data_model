@@ -19,7 +19,7 @@ pub fn construct_root(root : RootObject, map : HashMap<String, RustValue>, valid
     }
     let root = RootObject::new(default, root.sabun().clone(), root.old().clone());
     if validation{
-        validate_root(&root)?
+        validate_root(&root, false)?
     }
 
     return Ok(root);

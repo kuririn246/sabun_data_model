@@ -52,7 +52,7 @@ impl ListDefObj{
                 None =>{ return false; }
             }
         }
-        return true;
+        return self.refs.compatible(other.refs())
     }
 }
 
@@ -73,6 +73,20 @@ impl RefDefObj{
     pub fn refs(&self) -> &HashMap<String, RefValue>{ self.refs.as_ref() }
     pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
     pub fn is_enum(&self) -> bool{ self.is_enum }
+
+    pub fn compatible(&self, other : &Self) -> bool{
+        for (k,v) in self.refs(){
+            match other.refs.get(k){
+                Some(v2) =>{
+                    if v.acceptable(v2) == false{
+                        return false;
+                    }
+                },
+                None =>{ return false; }
+            }
+        }
+        return true;
+    }
 }
 
 

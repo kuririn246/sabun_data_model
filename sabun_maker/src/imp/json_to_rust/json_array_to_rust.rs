@@ -49,7 +49,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
                         _ => unreachable!() ,
                     }
                 },
-                ValueType::Undefinable =>{
+                ValueType::Undefiable =>{
                     let tmp = json_list_to_rust(&array[1..], span, names)?;
                     match gat {
                         InnerMutDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def(true)?)),
@@ -58,7 +58,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
                             Err(format!(r#"{} Lists can't be undefined {} except for InnerMut"#, span.line_str(), names))?
                         }
                     }
-                },
+                }
                 _ =>{
                     Err(format!(r#"{} Lists can't be null {}"#, span.line_str(), names))?
                 }

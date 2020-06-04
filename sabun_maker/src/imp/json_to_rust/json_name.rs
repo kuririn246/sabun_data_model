@@ -83,11 +83,11 @@ pub fn analyze_name(s : &str) -> Option<Captures>{
 pub fn value_type_and_name(s : &str) -> Option<(ValueType, String)>{
     if let Some(cap) = analyze_name(s){
         let name = cap[1].to_string();
-        let suffix = cap[2].to_string();
+        let suffix = &cap[2];
         let value_type = if suffix == "!?" || suffix == "?!"{
             ValueType::UndefNullable
         } else if suffix == "!"{
-            ValueType::Undefinable
+            ValueType::Undefiable
         } else if suffix == "?"{
             ValueType::Nullable
         } else if suffix == ""{

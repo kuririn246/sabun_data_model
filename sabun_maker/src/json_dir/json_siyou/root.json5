@@ -164,7 +164,7 @@
             "InnerList",
             {
               Ref : { hegoList : "hegohego" },
-              val : 20,
+              innerListMem : 20,
             }
           ],
         },
