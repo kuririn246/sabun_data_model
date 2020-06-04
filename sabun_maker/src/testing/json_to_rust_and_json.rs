@@ -1,11 +1,11 @@
-#[cfg(test)]
-mod tests {
-    use crate::imp::json_to_rust::json_dir_to_rust::json_dir_to_rust;
+//#[cfg(test)]
+//mod tests {
+    //use crate::imp::json_to_rust::json_dir_to_rust::json_dir_to_rust;
     //use crate::structs::rust_value::{RustValue, RustParam};
     //use crate::structs::rust_list::{ConstData, InnerMutList, InnerList, InnerData, MutList, ConstList};
     //use crate::structs::root_object::{ListDefObj, InnerMutDefObj};
-    use crate::rust_to_json_new_default;
-    use crate::imp::json_to_rust::json_root_to_rust;
+    //use crate::rust_to_json_new_default;
+    //use crate::imp::json_to_rust::json_root_to_rust;
 
     // #[test]
     // fn it_works() {
@@ -78,4 +78,4 @@ mod tests {
     //         Err(e) => println!("type1 {}", e.message),
     //     }
     // }
-}
+//}

@@ -4,6 +4,7 @@ use crate::error::Result;
 use crate::structs::root_object::{ RootObject};
 use crate::structs::rust_value::RustValue;
 use crate::structs::value_type::ValueType;
+use crate::imp::json_to_rust::validation::validate_root::validate_root;
 
 pub fn construct_root(root : RootObject, map : HashMap<String, RustValue>, validation : bool) -> Result<RootObject>{
     let mut default : HashMap<String, RustValue> = root.default().clone();
@@ -18,7 +19,7 @@ pub fn construct_root(root : RootObject, map : HashMap<String, RustValue>, valid
     }
     let root = RootObject::new(default, root.sabun().clone(), root.old().clone());
     if validation{
-        //validate_root(&root)?
+        validate_root(&root)?
     }
 
     return Ok(root);

@@ -72,5 +72,7 @@ pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>, validation : boo
         Err("root.json5 is needed")?
     }
 
+
+
     return construct_root(root.unwrap(), map, validation);
 }

@@ -158,11 +158,32 @@ impl RustValue{
         }
     }
 
+    pub fn list_def(&self) ->  Option<&ListDefObj> {
+        match self {
+            RustValue::Data(d) => Some(d.default()),
+            RustValue::List(d) => Some(d.default()),
+            RustValue::Mut(d) => Some(d.default()),
+            RustValue::InnerDataDef(d) => Some(d),
+            RustValue::InnerListDef(d) => Some(d),
+            RustValue::InnerMutDef(obj) => Some(obj.list_def()),
+            _ => None,
+        }
+    }
+
     ///defaultとsabun, list_defとlist_item sabunのような時に、defaultの変化値としてsabunが適当かどうか
-    pub fn acceptable(&self, value : &Self) -> bool{
-        if self.type_num() == value.type_num(){
-            if self.value_type().acceptable(&value.qv_type()){
-                if self.existence_type().acceptable(&value.existence_type()){
+    ///調べるのは型だけで、listの中身がちゃんとdefaultと整合してるかまでは調べてくれない
+    pub fn acceptable(&self, value : &Self) -> bool {
+        if self.type_num() == value.type_num() {
+            if let RustValue::Param(RustParam::Array(_, s_at), _) = self {
+                if let RustValue::Param(RustParam::Array(_, o_at), _) = value {
+                    //array_typeが一致してるかはここまでしないと調べられないだろうか・・・？
+                    if s_at.type_num() != o_at.type_num() {
+                        return false;
+                    }
+                } else { unreachable!() }
+            }
+            if self.value_type().acceptable(&value.qv_type()) {
+                if self.existence_type().acceptable(&value.existence_type()) {
                     return true;
                 }
             }

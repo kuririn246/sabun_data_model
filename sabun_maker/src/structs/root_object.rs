@@ -40,6 +40,20 @@ impl ListDefObj{
     pub fn default(&self) -> &HashMap<String, RustValue>{ self.default.as_ref() }
     pub fn refs(&self) -> &RefDefObj{ self.refs.as_ref() }
     pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+
+    pub fn compatible(&self, other : &Self) -> bool{
+        for (k,v) in self.default(){
+            match other.default.get(k){
+                Some(v2) =>{
+                    if v.acceptable(v2) == false{
+                        return false;
+                    }
+                },
+                None =>{ return false; }
+            }
+        }
+        return true;
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]

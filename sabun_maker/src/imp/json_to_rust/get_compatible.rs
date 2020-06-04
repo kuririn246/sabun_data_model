@@ -2,7 +2,7 @@ use json5_parser::{JVal};
 use crate::imp::json_to_rust::names::Names;
 use std::collections::{HashSet};
 use crate::error::Result;
-use crate::imp::json_to_rust::json_name::{dot_chained_name};
+use crate::imp::json_to_rust::json_name::{is_dot_chained_name};
 
 pub fn get_compatible(array : &[JVal], names : &Names) -> Result<HashSet<String>>{
     let mut result : HashSet<String> = HashSet::with_capacity(array.len());
@@ -10,13 +10,10 @@ pub fn get_compatible(array : &[JVal], names : &Names) -> Result<HashSet<String>
     for item in array{
         match item{
             JVal::String(s, span) =>{
-                match dot_chained_name(s){
-                    Some(s) =>{
-                        //result.insert(s.to_string());
-                    },
-                    _ =>{
-                        Err(format!("{} {} is not a valid dot-chained name {}",span.line_str(), s, names))?;
-                    }
+                if is_dot_chained_name(s) {
+                    result.insert(s.to_string());
+                }else {
+                    Err(format!("{} {} is not a valid dot-chained name {}", span.line_str(), s, names))?;
                 }
             },
             _ =>{

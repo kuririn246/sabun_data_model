@@ -45,12 +45,21 @@ pub fn json_simple_name(s : &str) -> Option<String> {
 
 pub fn dot_chained_name(s : &str) -> Option<Vec<&str>>{
     let splitted : Vec<&str> = s.split('.').collect();
-    for item in splitted{
+    for item in &splitted{
         if json_simple_name(item).is_none(){
             return None;
         }
     }
     return Some(splitted)
+}
+
+pub fn is_dot_chained_name(s : &str) -> bool{
+    for item in s.split('.'){
+        if json_simple_name(item).is_none(){
+            return false;
+        }
+    }
+    return true
 }
 
 
