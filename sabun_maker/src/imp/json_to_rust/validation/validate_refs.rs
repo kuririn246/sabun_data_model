@@ -5,6 +5,7 @@ use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::json_to_rust::validation::validate_list_item::validate_list_item;
 use crate::structs::ref_value::RefValue;
+use crate::imp::rust_to_json::name_with_suffix::name_with_suffix;
 
 pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefValue>, root : &RootObject, names : &Names) -> Result<()>{
     for (name, val) in sabun{
@@ -12,8 +13,14 @@ pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefValue>, root 
             Err(format!("{} {} is old", names, name))?
         }
 
-        def.refs()
-        //validate_list_item(def.default(), val.values(), root, &names.append(name))?
+        match def.refs().get(name){
+            Some(h) =>{
+                if h.acceptable(val) == false{
+                    Err(format!("{} {} {} is not valid for {}", names, name, val.to_string(), name_with_suffix(name, h.value_type())))?
+                }
+            },
+            None =>{ Err(format!("{} there's no default ref members named {}", names, name))? }
+        }
     }
     return Ok(());
 }

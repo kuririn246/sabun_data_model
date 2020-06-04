@@ -2,7 +2,7 @@ use json5_parser::{JVal};
 use crate::imp::json_to_rust::names::Names;
 use std::collections::{HashSet};
 use crate::error::Result;
-use crate::imp::json_to_rust::json_name::{ dot_chained_name};
+use crate::imp::json_to_rust::json_name::{dot_chained_name};
 
 pub fn get_compatible(array : &[JVal], names : &Names) -> Result<HashSet<String>>{
     let mut result : HashSet<String> = HashSet::with_capacity(array.len());

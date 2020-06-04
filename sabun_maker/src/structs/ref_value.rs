@@ -22,4 +22,17 @@ impl RefValue{
             Qv::Undefined => None,
         }
     }
+
+    pub fn acceptable(&self, other : &Self) -> bool{
+        self.value_type.acceptable(&other.value.qv_type())
+    }
+
+    ///null undefined "value" のどれか
+    pub fn value_string(&self) -> String{
+        match &self.value{
+            Qv::Val(s) => format!(r#""{}""#,s.to_string()),
+            Qv::Null => "null".to_string(),
+            Qv::Undefined => "undefined".to_string(),
+        }
+    }
 }
