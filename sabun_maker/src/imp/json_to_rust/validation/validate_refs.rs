@@ -16,7 +16,7 @@ pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefValue>, root 
         match def.refs().get(name){
             Some(h) =>{
                 if h.acceptable(val) == false{
-                    Err(format!("{} {} {} is not valid for {}", names, name, val.to_string(), name_with_suffix(name, h.value_type())))?
+                    Err(format!("{} {} {} is not valid for {}", names, name, val.value_string(), name_with_suffix(name, h.value_type())))?
                 }
             },
             None =>{ Err(format!("{} there's no default ref members named {}", names, name))? }

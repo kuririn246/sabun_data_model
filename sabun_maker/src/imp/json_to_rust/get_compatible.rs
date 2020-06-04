@@ -12,7 +12,7 @@ pub fn get_compatible(array : &[JVal], names : &Names) -> Result<HashSet<String>
             JVal::String(s, span) =>{
                 match dot_chained_name(s){
                     Some(s) =>{
-                        result.insert(s.to_string());
+                        //result.insert(s.to_string());
                     },
                     _ =>{
                         Err(format!("{} {} is not a valid dot-chained name {}",span.line_str(), s, names))?;

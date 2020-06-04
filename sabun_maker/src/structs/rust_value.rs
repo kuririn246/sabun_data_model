@@ -36,7 +36,7 @@ pub enum ExistenceType {
     Param, InnerDef, InnerList, List
 }
 
-pub impl ExistenceType {
+impl ExistenceType {
     pub fn acceptable(&self, other : &Self) -> bool{
         match self{
             ExistenceType::Param => match other{
@@ -163,7 +163,7 @@ impl RustValue{
         if self.type_num() == value.type_num(){
             if self.value_type().acceptable(&value.qv_type()){
                 if self.existence_type().acceptable(&value.existence_type()){
-                    true
+                    return true;
                 }
             }
         }
