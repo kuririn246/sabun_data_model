@@ -8,3 +8,4 @@ pub mod validate_ref_def;
 pub mod validate_compatible;
 pub mod validate_mut_list;
 pub mod validate_list_def;
+pub mod validate_old_def_mem;

@@ -135,7 +135,7 @@
     }],
     {
       Ref : { //参照先を記述
-        hogeLista : "hogehoge",
+        hogeList : "hogehoge",
         //入力しなければデフォルトになる。この場合null
         hegoList : "hegohego",
       },

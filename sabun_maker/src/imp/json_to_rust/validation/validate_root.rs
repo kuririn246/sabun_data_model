@@ -7,6 +7,7 @@ use crate::imp::json_to_rust::validation::validate_list::validate_list;
 use crate::imp::json_to_rust::validation::validate_mut_list::validate_mut_list;
 use crate::imp::json_to_rust::validation::validate_compatible::validate_compatible;
 use crate::imp::json_to_rust::validation::validate_list_def::validate_list_def;
+use crate::imp::json_to_rust::validation::validate_old_def_mem::validate_old_def_mem;
 
 /// json読み出し時のチェックがあり、adjust時のチェックもあり、modifyインターフェース上のチェックもある。
 /// それらでは補足しきれないチェックをするのがこれの役割。
@@ -19,11 +20,14 @@ use crate::imp::json_to_rust::validation::validate_list_def::validate_list_def;
 /// ・ref先が存在し、(optional)oldじゃないか
 /// ・InnerListDefがListのDefにあり、InnerListがListItemにあるか。Root直下にInnerがないか。
 /// ・Compatible指定されたリストが存在し、(optional)Oldでなく、Defが実際にCompatibleであるか
+/// ・Oldに指定されたメンバまたはIDが存在するか
 /// を確かめている
 ///
 /// can_use_oldがあるとoldでも気にしなくなる。Jsonで初期値を読み込んだ後はcan_use_old=false,
 /// 旧バージョンから以降した場合はcan_use_old=trueでやるとよかろうと思う
 pub fn validate_root(root : &RootObject, can_use_old: bool) -> Result<()>{
+    validate_old_def_mem(root.old(), root.default(), &Names::new("."))?;
+
     for (name, val) in root.default(){
         let names = &Names::new(name);
         //RootはOldでも値を入れざるを得ないので入れて良い
@@ -38,7 +42,7 @@ pub fn validate_root(root : &RootObject, can_use_old: bool) -> Result<()>{
             },
             RustValue::Data(data) =>{
                 validate_list_def(data.default(), root, can_use_old, names)?;
-                validate_data(data.default(), data.list(), root, can_use_old, names)?
+                validate_data(data.default(), data.list(), root, data.old(), can_use_old, names)?
             },
             RustValue::List(list) =>{
                 validate_list_def(list.default(), root, can_use_old, names)?;

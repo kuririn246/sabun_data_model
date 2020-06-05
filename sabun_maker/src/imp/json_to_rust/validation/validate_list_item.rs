@@ -28,7 +28,7 @@ pub fn validate_list_item(def : &ListDefObj, sabun_values : &HashMap<String, Rus
         match def_value {
             RustValue::InnerDataDef(def) => {
                 if let RustValue::InnerData(data) = val {
-                    validate_data(def, data.list(), root, can_use_old, &names.append(name))?
+                    validate_data(def, data.list(), root, data.old(), can_use_old, &names.append(name))?
                 } else {
                     //correspondしてることは確認済みである
                     unreachable!();

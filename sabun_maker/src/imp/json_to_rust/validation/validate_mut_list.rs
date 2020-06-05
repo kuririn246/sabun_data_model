@@ -7,7 +7,6 @@ use linked_hash_map::LinkedHashMap;
 
 pub fn validate_mut_list(def : &ListDefObj, map : &LinkedHashMap<u64, MutListItem>, root : &RootObject,
                          can_use_old: bool, names : &Names) -> Result<()>{
-
     for (idx, val) in map{
         let idx = idx.to_string();
         let names = &names.append(&idx);

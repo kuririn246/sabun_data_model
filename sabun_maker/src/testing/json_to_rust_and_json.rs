@@ -11,10 +11,10 @@ mod tests {
                     Ok(_json) =>{
                         //println!("{}", json.to_string_pretty());
                     },
-                    Err(e) =>{ println!("{}", e.message); }
+                    Err(e) =>{ println!("val 2 {}", e.message); }
                 }
             },
-            Err(e) => { println!("{}", e.message) }
+            Err(e) => { println!("val 1 {}", e.message) }
         }
     }
 
