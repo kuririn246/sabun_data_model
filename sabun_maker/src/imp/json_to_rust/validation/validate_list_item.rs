@@ -5,7 +5,6 @@ use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::imp::json_to_rust::validation::validate_data::validate_data;
 use crate::imp::json_to_rust::validation::validate_list::validate_list;
-use crate::imp::json_to_rust::validation::validate_ref_def::validate_ref_def;
 use crate::imp::json_to_rust::validation::validate_refs::validate_refs;
 use crate::structs::ref_value::RefValue;
 use crate::imp::json_to_rust::validation::validate_mut_list::validate_mut_list;
@@ -13,7 +12,6 @@ use crate::imp::json_to_rust::validation::validate_mut_list::validate_mut_list;
 pub fn validate_list_item(def : &ListDefObj, sabun_values : &HashMap<String, RustValue>,
                           ref_values : &HashMap<String, RefValue>, root : &RootObject,
                           can_use_old: bool, names : &Names) -> Result<()> {
-    validate_ref_def(def.refs(), names)?;
     validate_refs(def.refs(), ref_values, root, can_use_old, names)?;
 
     for (name, val) in sabun_values {
@@ -45,7 +43,7 @@ pub fn validate_list_item(def : &ListDefObj, sabun_values : &HashMap<String, Rus
                 let list = if let RustValue::InnerMut(list) = val { list } else { unreachable!() };
                 match list {
                     Some(list) => {
-                        validate_mut_list(def.list_def(), list.list(), def.compatible(), root, can_use_old, &names.append(name))?
+                        validate_mut_list(def.list_def(), list.list(), root, can_use_old, &names.append(name))?
                     },
                     None => {
                         if def.undefinable() == false {

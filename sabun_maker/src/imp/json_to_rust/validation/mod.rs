@@ -7,3 +7,4 @@ pub mod validate_ref_from_root;
 pub mod validate_ref_def;
 pub mod validate_compatible;
 pub mod validate_mut_list;
+pub mod validate_list_def;

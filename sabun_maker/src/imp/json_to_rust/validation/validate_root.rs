@@ -5,6 +5,8 @@ use crate::imp::json_to_rust::validation::validate_data::validate_data;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::json_to_rust::validation::validate_list::validate_list;
 use crate::imp::json_to_rust::validation::validate_mut_list::validate_mut_list;
+use crate::imp::json_to_rust::validation::validate_compatible::validate_compatible;
+use crate::imp::json_to_rust::validation::validate_list_def::validate_list_def;
 
 /// json読み出し時のチェックがあり、adjust時のチェックもあり、modifyインターフェース上のチェックもある。
 /// それらでは補足しきれないチェックをするのがこれの役割。
@@ -35,13 +37,17 @@ pub fn validate_root(root : &RootObject, can_use_old: bool) -> Result<()>{
                 }
             },
             RustValue::Data(data) =>{
+                validate_list_def(data.default(), root, can_use_old, names)?;
                 validate_data(data.default(), data.list(), root, can_use_old, names)?
             },
             RustValue::List(list) =>{
+                validate_list_def(list.default(), root, can_use_old, names)?;
                 validate_list(list.default(), list.list(), root, can_use_old, names)?
             },
             RustValue::Mut(m) =>{
-                validate_mut_list(m.default(), m.list(), m.compatible(), root, can_use_old, names)?
+                validate_compatible(m.default(), m.compatible(), root, can_use_old, names)?;
+                validate_list_def(m.default(), root, can_use_old, names)?;
+                validate_mut_list(m.default(), m.list(),  root, can_use_old, names)?
             },
             RustValue::InnerData(_) => { Err(format!("{} : InnerData must not be defined in the root object", name))? },
             RustValue::InnerList(_) => { Err(format!("{} : InnerList must not be defined in the root object", name))? },

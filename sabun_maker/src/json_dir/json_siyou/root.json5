@@ -135,7 +135,7 @@
     }],
     {
       Ref : { //参照先を記述
-        hogeList : "hogehoge",
+        hogeLista : "hogehoge",
         //入力しなければデフォルトになる。この場合null
         hegoList : "hegohego",
       },
@@ -198,12 +198,14 @@
         ["Compatible", "dim2List.innerData.innerList"],
         ["Default",{
           Ref : { hegoList :  "" },
-          val : 3,
+          innerListMem : 3,
         }],
       ],
       someName : "",
     }],//MutListには初期値を与えてはいけない。InnerMutにも。
   ],
+
+
 
   enumList : [
     "List",
@@ -215,7 +217,7 @@
     }],
     {
       Enum :{
-        hogeList : "hogehoge"
+        hogeList : "hogehoge",
       }
     },
     {

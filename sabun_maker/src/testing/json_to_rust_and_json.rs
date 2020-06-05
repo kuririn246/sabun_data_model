@@ -8,8 +8,8 @@ mod tests {
         match json_dir_to_rust("src/json_dir/json_siyou", true) {
             Ok(a) => {
                 match root_to_json_new_default(&a){
-                    Ok(json) =>{
-                        println!("{}", json.to_string_pretty());
+                    Ok(_json) =>{
+                        //println!("{}", json.to_string_pretty());
                     },
                     Err(e) =>{ println!("{}", e.message); }
                 }

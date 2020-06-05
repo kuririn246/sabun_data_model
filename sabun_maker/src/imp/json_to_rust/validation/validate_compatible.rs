@@ -13,7 +13,7 @@ pub fn validate_compatible(def : &ListDefObj, compatible : &HashSet<String>, roo
                     Err(format!("{}'s compatible doesn't have valid name {}", names, dot_chained))?
                 }
                 let name = v[0];
-                //compatibleはlist_defであってlist_defは旧バージョンから移行したデータには残っていないはずだが一応・・・
+                //compatibleはlist_defであってlist_defは旧バージョンから移行したデータには残っていないからcan_use_oldは関係ないはずだが一応
                 if can_use_old == false && root.old().contains(name){
                     Err(format!("{} the root object's {} is old {}", names, name, dot_chained))?
                 }
@@ -42,29 +42,39 @@ fn search_recursive(def : &ListDefObj, value : &RustValue, rest_dot_chained : &[
         }
     }
 
-    let data = if let RustValue::InnerData(data) = value { data } else {
-        Err(format!("{} is not Data {} {}", current_name, source_name, dot_chained))?
+    //let data = if let RustValue::InnerData(data) = value { data } else {
+      //  Err(format!("{} is not Data {} {}", current_name, source_name, dot_chained))?
+    //};
+
+    let list_def = match value{
+        RustValue::InnerDataDef(data) => data,
+        RustValue::InnerListDef(data) => data,
+        RustValue::InnerMutDef(data) => data.list_def(),
+        RustValue::Data(data) =>data.default(),
+        RustValue::List(data) =>data.default(),
+        RustValue::Mut(data) =>data.default(),
+        _ =>{ Err(format!("{} doesn't have Default {} {}", current_name, source_name, dot_chained))? }
     };
 
     let name = rest_dot_chained[0];
     let current_name = &current_name.append(name);
 
-    if can_use_old == false && data.old().contains(name) {
+    if can_use_old == false && list_def.old().contains(name) {
         Err(format!("{} is old {} {}", current_name, source_name, dot_chained))?
     }
 
-    let item = if let Some(item) = data.list().get(name) { item } else {
+    let value = if let Some(item) = list_def.default().get(name) { item } else {
         Err(format!("{} was not found {} {}", current_name, source_name, dot_chained))?
     };
-    if rest_dot_chained.len() == 1 {
-        Err(format!("{} doesn't have ID {} {}", current_name, source_name, dot_chained))?
-    }
-    let name = rest_dot_chained[1];
-    let current_name = &current_name.append(name);
+    //if rest_dot_chained.len() == 1 {
+      //  Err(format!("{} doesn't have ID {} {}", current_name, source_name, dot_chained))?
+    //}
+    //let name = rest_dot_chained[1];
+    //let current_name = &current_name.append(name);
 
-    let value = if let Some(value) = item.values().get(name) { value } else {
-        Err(format!("{} was not found {} {}", current_name, source_name, dot_chained))?
-    };
-    search_recursive(def, value, &rest_dot_chained[2..], can_use_old, source_name, current_name, dot_chained)?;
+    //let value = if let Some(value) = item.values().get(name) { value } else {
+      //  Err(format!("{} was not found {} {}", current_name, source_name, dot_chained))?
+    //};
+    search_recursive(def, value, &rest_dot_chained[1..], can_use_old, source_name, current_name, dot_chained)?;
     return Ok(());
 }
