@@ -7,11 +7,11 @@ use std::collections::{HashMap, HashSet};
 use crate::structs::rust_list::ListItem;
 
 ///refしている対象が存在しているかを調べる
-pub fn validate_ref_from_root(member_name : &str, dot_chained : &str, can_ref_old : bool, root : &RootObject, names : &Names) -> Result<()>{
+pub fn validate_ref_from_root(member_name : &str, dot_chained : &str, can_use_old: bool, root : &RootObject, names : &Names) -> Result<()>{
     if dot_chained.is_empty(){
         Err(format!("{} {} is empty", names, member_name))?
     }
-    if can_ref_old == false && root.old().contains(member_name){
+    if can_use_old == false && root.old().contains(member_name){
         Err(format!("{} the root object's {} is old {}", names, member_name, dot_chained))?
     }
 
@@ -21,7 +21,7 @@ pub fn validate_ref_from_root(member_name : &str, dot_chained : &str, can_ref_ol
             if let Some(id) = v.get(0){
                 if let Some(first_data) = root.default().get(member_name){
                     if let RustValue::Data(d) = first_data{
-                        validate_ref_recursive(d.list(), id, &v[1..], can_ref_old,d.old(), names,
+                        validate_ref_recursive(d.list(), id, &v[1..], can_use_old, d.old(), names,
                                                &Names::new(member_name), dot_chained)?;
                         return Ok(())
                     } else{
@@ -35,12 +35,12 @@ pub fn validate_ref_from_root(member_name : &str, dot_chained : &str, can_ref_ol
     }
 }
 
-fn validate_ref_recursive(map : &HashMap<String, ListItem>, id : &str, rest_dot_chained : &[&str], can_ref_old : bool,
-                      old : &HashSet<String>, source_names : &Names, current_name : &Names, dot_chained : &str) -> Result<()> {
+fn validate_ref_recursive(map : &HashMap<String, ListItem>, id : &str, rest_dot_chained : &[&str], can_use_old: bool,
+                          old : &HashSet<String>, source_names : &Names, current_name : &Names, dot_chained : &str) -> Result<()> {
     if map.get(id).is_none() {
         Err(format!("{}'s {} was not found {} {}", current_name, id, source_names, dot_chained))?
     }
-    if can_ref_old == false && old.contains(id) {
+    if can_use_old == false && old.contains(id) {
         Err(format!("{}'s {} is old {} {}", current_name, id, source_names, dot_chained))?
     }
 
@@ -58,7 +58,7 @@ fn validate_ref_recursive(map : &HashMap<String, ListItem>, id : &str, rest_dot_
     }
     let id = rest_dot_chained[1];
     if let RustValue::InnerData(d) = value {
-        validate_ref_recursive(d.list(), id, &rest_dot_chained[2..], can_ref_old, d.old(), source_names, current_name, dot_chained)?;
+        validate_ref_recursive(d.list(), id, &rest_dot_chained[2..], can_use_old, d.old(), source_names, current_name, dot_chained)?;
         return Ok(());
     } else {
         Err(format!("{} is not Data {}", current_name, source_names))?

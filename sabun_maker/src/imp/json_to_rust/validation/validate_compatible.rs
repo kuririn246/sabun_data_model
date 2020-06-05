@@ -5,7 +5,7 @@ use crate::error::Result;
 use crate::imp::json_to_rust::json_name::dot_chained_name;
 use crate::structs::rust_value::RustValue;
 
-pub fn validate_compatible(def : &ListDefObj, compatible : &HashSet<String>, root : &RootObject, names : &Names) -> Result<()>{
+pub fn validate_compatible(def : &ListDefObj, compatible : &HashSet<String>, root : &RootObject, can_use_old : bool, names : &Names) -> Result<()>{
     for dot_chained in compatible{
         match dot_chained_name(dot_chained){
             Some(v) =>{
@@ -13,11 +13,12 @@ pub fn validate_compatible(def : &ListDefObj, compatible : &HashSet<String>, roo
                     Err(format!("{}'s compatible doesn't have valid name {}", names, dot_chained))?
                 }
                 let name = v[0];
-                if root.old().contains(name){
+                //compatibleはlist_defであってlist_defは旧バージョンから移行したデータには残っていないはずだが一応・・・
+                if can_use_old == false && root.old().contains(name){
                     Err(format!("{} the root object's {} is old {}", names, name, dot_chained))?
                 }
                 if let Some(value) = root.default().get(name){
-                    search_recursive(def, value, &v[1..], names, &Names::new(name), dot_chained)?
+                    search_recursive(def, value, &v[1..], can_use_old,names, &Names::new(name), dot_chained)?
                 } else{
                     Err(format!("{} root doesn't have {} {}", names, name, dot_chained))?
                 }
@@ -28,7 +29,7 @@ pub fn validate_compatible(def : &ListDefObj, compatible : &HashSet<String>, roo
     return Ok(())
 }
 
-fn search_recursive(def : &ListDefObj, value : &RustValue, rest_dot_chained : &[&str],
+fn search_recursive(def : &ListDefObj, value : &RustValue, rest_dot_chained : &[&str], can_use_old : bool,
                     source_name : &Names, current_name : &Names, dot_chained : &str) -> Result<()> {
     if rest_dot_chained.len() == 0 {
         let other = if let Some(other) = value.list_def() { other } else {
@@ -48,7 +49,7 @@ fn search_recursive(def : &ListDefObj, value : &RustValue, rest_dot_chained : &[
     let name = rest_dot_chained[0];
     let current_name = &current_name.append(name);
 
-    if data.old().contains(name) {
+    if can_use_old == false && data.old().contains(name) {
         Err(format!("{} is old {} {}", current_name, source_name, dot_chained))?
     }
 
@@ -64,6 +65,6 @@ fn search_recursive(def : &ListDefObj, value : &RustValue, rest_dot_chained : &[
     let value = if let Some(value) = item.values().get(name) { value } else {
         Err(format!("{} was not found {} {}", current_name, source_name, dot_chained))?
     };
-    search_recursive(def, value, &rest_dot_chained[2..], source_name, current_name, dot_chained)?;
+    search_recursive(def, value, &rest_dot_chained[2..], can_use_old, source_name, current_name, dot_chained)?;
     return Ok(());
 }
