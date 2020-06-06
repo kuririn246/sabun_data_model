@@ -11,9 +11,9 @@ pub struct RootObject{
     ///listの変更はMutListが直接上書きされるので、sabunには入らない。よってparamだけ記録される
     sabun : HashMap<String, RustParam>,
 
-    // ///oldに設定されたメンバは、_Oldを付けなければプログラムから使用できず、
-    // ///ConstDataである場合、jsonで Refできない
-    // old : HashSet<String>,
+    ///oldに設定されたメンバは、_Oldを付けなければプログラムから使用できず、
+    ///ConstDataである場合、jsonで Refできない
+    old : HashSet<String>,
 }
 
 impl RootObject{

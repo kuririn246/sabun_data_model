@@ -27,7 +27,12 @@
 	constList: [
 		"List",
 		["Default",{
-			Ref : { refedData : "" },
+			Ref : {
+				refedData : "",
+				"oldRefedData?" : null,
+				newRefedData : "",
+				Old : ["oldRefedData"]
+			},
 			mem : -100,
 			tuikaMem : 20,
 			"hoge?" : null,
@@ -38,12 +43,12 @@
 		//どうするのがいいんでしょうね。参照先が消えているとExceptionするしかないのでなんかしら入れとく必要はあるだろうけど、
 		//oldが入ってるのが有効なデータともいい難い気はする。かなり中途半端な存在になってしまう
 		{
-			Ref : { refedData :  "second" },
+			Ref : { refedData :  "second", newRefedData : "hugahuga" },
 			mem : 4000,
 			tuikaMem : 30,
 		},
 		{
-			Ref : { refedData : "newItem" },
+			Ref : { refedData : "newItem", newRefedData : "hogehoge" },
 			mem : 5000,
 			hogeNew : 90,
 		},
@@ -53,8 +58,13 @@
 	mutList : [
 		"MutList",
 		[{
-			//oldRefedDataはここでは参照しないので、adjust時には単に移行されず消滅する
-			Ref : { refedData : "" },
+
+			Ref : {
+				refedData : "",
+				"oldRefedData?" : null,
+				newRefedData : "",
+				Old : ["oldRefedData"],
+			},
 			mem : 0,
 			tuikaMem : 0, //新メンバ。旧バージョンのデータではこのデフォルト値が使われる
 			"hoge?" : null, //新定義にしたいので旧定義はnullにし、old指定して上書きできなくする。旧バージョンではここに値が残っている
@@ -63,15 +73,24 @@
 		["Compatible", "constList"],
 	],
 
-	//移行されず単に消滅するのならば、この指定もoldRefedDataも必要ないのでは？
-	//"必要ないフラグ"を立てるためだけにこれを用意する価値があるだろうか・・・？
-	//一旦コンパイルが通ったら(コンパイルと呼ぶべきか？　呼ぶべきなくらいのことはしてると思う・・・)
-	//これは消しても良い、という感じになるだろうか
+
 	Old : ["oldRefedData"],
 
-	//一応定義する必要があるが、Old指定したいだけなので中身はいらない・・・
+	//一応定義する必要があるが、Old指定したいだけなので中身はいらない
 	oldRefedData : [
 		"Data",
 		[{}],
+	],
+
+	//これでDataのRenameは可能になっている・・・Renameは重要・・・
+	newRefedData : [
+		"Data",
+		[{}],
+		{
+			ID : "hogehoge",
+		},
+		{
+			ID : "hugahuga",
+		}
 	]
 }

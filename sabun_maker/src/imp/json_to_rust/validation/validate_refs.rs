@@ -14,23 +14,19 @@ pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefValue>, root 
        }
     }
 
-    for (name, val) in sabun{
-        //println!("{} name {}", name, sabun.len());
+    for (name, sab_val) in sabun{
         if can_use_old == false && def.old().contains(name) {
             Err(format!("{} {} is old", names, name))?
         }
-        //println!("2 {} ", name);
         match def.refs().get(name){
             Some(h) =>{
-               // println!("3 {} ", name);
-                if h.acceptable(val) == false{
-                    Err(format!("{} {} {} is not valid for {}", names, name, val.value_js_string(), name_with_suffix(name, h.value_type())))?
+                if h.acceptable(sab_val) == false{
+                    Err(format!("{} {} {} is not valid for {}", names, name, sab_val.value_js_string(), name_with_suffix(name, h.value_type())))?
                 }
-                //println!("4 {} ", name);
-                match val.value() {
+                match sab_val.value() {
                     Qv::Val(id) =>{
                         if id.is_empty(){
-                            continue;
+                            Err(format!("{} ref {} is empty", names, name))?
                         }
                         match root.default().get(name) {
                             Some(RustValue::Data(d)) => {
@@ -51,7 +47,7 @@ pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefValue>, root 
                         }
                     },
                     _ =>{
-                        //nullとかundefinedとかもemptyと同じく有効な値である
+                        //nullとかundefinedとかは有効な値である
                     }
                 }
             },
