@@ -6,9 +6,10 @@ use std::collections::HashMap;
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
 
-///paramのsabunがあれば上書き、mut_listはoldのものを全部入れ、（あるなら）newの方のものは全削除して入れ替える
+/// paramのsabunがあれば上書き、mut_listはoldのものを全部入れ、（あるなら）newの方のものは全削除して入れ替える
 /// 基本的に、新バージョンのjsonと旧バージョンのデータが有り、旧バージョンのデータはRootにsabun、MutListは追加が行われていることが想定されている
 /// Json段階ではMutListにアイテムは入れられない建前なので、出来る変化はMutListの追加とRootの差分だけのはず
+/// Defaultが更新されるので、undefinedが設定され、
 pub fn adjust_versions(new : RootObject, old : RootObject, validation : bool) -> Result<RootObject>{
 
     let (def, sabun, old_hash) = new.deconstruct();

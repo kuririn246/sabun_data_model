@@ -1,42 +1,33 @@
 {
-	currentNum : 10,
+	num : 10,
+	str : "a",
 
-	curStr : "a",
-
-
-
-	newList: [
-		"Data",
+	refedList: [
+		"List",
 		[{
-			Mem1 : 5,
+			mem : 10,
 			mem2 : 9,
-			oldMem1 : 0,
-			Old : ["oldMem1"],
 		}],
-		["Old", "first"],
-		{
-			ID : "second",
-		},
-		{
-			ID : "newItem",
-			mem1 : 100,
-		},
 		{
 			ID : "first",
+			oldMem1 : 10,
 			mem2 : 20,
+		},
+		{
+			ID : "second",
 		}
 	],
 
-	newConstList: [
+	constList: [
 		"List",
 		["Default",{
-			Ref : { newList : "" },
-			mem : 3000,
+			Ref : { refedList : "" },
+			mem : -100,
 			tuikaMem : 20, //新メンバだが旧バージョンのデータにはただこのデフォルト値が入るだけである。
 			"hoge?" : null, //新定義の値を用意し、旧バージョンのこの値は使わないので新バージョンのリストではnullになっている。
 			"hogeNew!" : 80, //旧バージョンのデータはこのメンバを持たないのでundefinedになる。undefinedを発見したら、hogeの値等から適切なhogeNewを計算する。
+			Old : ["hoge"],
 		}],
-
 		{
 			Ref : { newList :  "second" },
 			mem : 4000,
@@ -51,7 +42,7 @@
 	],
 
 
-	newMutList : [
+	mutList : [
 		"MutList",
 		[{
 			Ref : { newList : "" },
@@ -60,6 +51,6 @@
 			"hoge?" : null,
 			"hogeNew!" : 0,
 		}],
-		["Compatible", "newConstList"],
+		["Compatible", "constList"],
 	]
 }

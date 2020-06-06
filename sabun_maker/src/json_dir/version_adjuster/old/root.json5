@@ -1,13 +1,12 @@
 {
-	oldNum : -2,
-	oldoldStr : "old",
+	num : -2, //numとかstrは今は書き換える方法がないので、テスト出来ませんね・・・
+	str : "old",
 
-	oldList: [
-		"List",
-		["Reffered"],
-		["Default",{
-			oldMem1 : 5,
-			mem2 : 9,
+	refedList: [
+		"Data",
+		[{
+			oldMem1 : 1,
+			mem2 : 2,
 		}],
 		{
 			ID : "first",
@@ -16,41 +15,45 @@
 		},
 		{
 			ID : "second",
+			oldMem1 : 100,
+			mem2 : 200,
 		}
 	],
 
-	oldRefList: [
+	constList: [
 		"List",
 		["Default",{
-			Ref : { oldList : "" },
+			Ref : { refedList : "" },
 			mem : 0,
 			hoge : 20,
 		}],
 		{
-			ID : "1",
-			Ref : { oldList : "first" }
+			mem : 100,
+			Ref : { refedList : "first" }
 		},
 		{
-			ID : "2",
-			Ref : { oldList :  "second" },
-			mem : 2001,
+			Ref : { refedList :  "second" },
+			mem : 200,
 			hoge : 30,
 		}
 	],
 
-	oldAutoIdList : [
-		"List",
+	mutList : [
+		"__ViolatedList",
 		["Default",{
-			mem : 1,
-			Ref: { oldList : "" },
+			mem : 0,
+			hoge : 0,
+			Ref: { refedList : "" },
 		}],
+		["Compatible", "constList"],
 		{
-			mem : 2,
-			Ref: { oldList : "first" },
+			mem : 100,
+			Ref : { refedList : "first" }
 		},
 		{
-			mem : 3,
-			Ref : { oldList :  "second" },
+			Ref : { refedList :  "second" },
+			mem : 200,
+			hoge : 30,
 		}
 	]
 }
