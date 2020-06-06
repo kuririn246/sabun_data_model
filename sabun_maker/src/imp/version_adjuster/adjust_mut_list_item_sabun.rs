@@ -7,8 +7,11 @@ use crate::imp::version_adjuster::adjust_mut_list::adjust_inner_mut_list;
 
 pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String, RustValue>, names : &Names) -> Result<HashMap<String, RustValue>>{
     let mut old_sabun = old_sabun;
-    //おおむねold_sabun.len()でいいはず
-    let mut result : HashMap<String, RustValue> = HashMap::with_capacity(old_sabun.len());
+
+    //最大量で見積もっておく。デフォルトから変化しない場合はsabunには加わらないが、sabun.len()だと、
+    //undefinedで一個増えただけでテーブル再構成＆cap2倍にされてしまう
+    let mut result : HashMap<String, RustValue> = HashMap::with_capacity(def.default().len());
+
     for (def_key, def_v) in def.default(){
         let sabun_v = if let Some(v) = old_sabun.remove(def_key){ v } else {
             match def_v{
@@ -50,5 +53,8 @@ pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String,
             _ =>{ Err(format!("{} {} mut list items can only have Param or InnerMut", names, def_key))? }
         }
     }
+    //最大量で見積もってshrink_to_fitするというのは安全で効率的に一見見えるが・・・所詮は事前最適化で効果は不明である。
+    //performanceが向上する自信がないのでコメントアウトしておく
+    //result.shrink_to_fit();
     Ok(result)
 }
