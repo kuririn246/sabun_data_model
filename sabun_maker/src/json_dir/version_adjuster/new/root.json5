@@ -3,23 +3,17 @@
 
 	curStr : "a",
 
-	Rename : [
-		"oldNum->currentNum",
-		"oldoldStr->oldStr",
-		"oldStr->curStr",
-		"oldList->newList",
-		"oldAutoIDList->newAutoIDList",
-	],
+
 
 	newList: [
-		"List",
-		["Reffered"],
-		["Default",{
+		"Data",
+		[{
 			Mem1 : 5,
 			mem2 : 9,
-			Rename : ["oldMem1->oldMem2"]
+			oldMem1 : 0,
+			Old : ["oldMem1"],
 		}],
-		["Redef", "first->obsolete1" ],
+		["Old", "first"],
 		{
 			ID : "second",
 		},
@@ -28,17 +22,15 @@
 			mem1 : 100,
 		},
 		{
-			ID : "obsolete1",
-			oldMem1 : 10,
+			ID : "first",
 			mem2 : 20,
-			Obsolete : true,
 		}
 	],
 
-	newRefList: [
+	newConstList: [
 		"List",
 		["Default",{
-			Ref : { oldList : "" },
+			Ref : { newList : "" },
 			mem : 3000,
 			tuikaMem : 20, //新メンバだが旧バージョンのデータにはただこのデフォルト値が入るだけである。
 			"hoge?" : null, //新定義の値を用意し、旧バージョンのこの値は使わないので新バージョンのリストではnullになっている。
@@ -46,12 +38,7 @@
 		}],
 
 		{
-			ID : "2",
-			Ref : { oldList :  "second" },
-
-			//上書きされている。これはどうするべきだろうか。
-			//「oldがdefaultから変化がないなら新defaultにして、それ以外は書き換えられた値を維持」というような玉虫色の解決を考えている。それが実装しやすいから。
-			//うまいこと新定義の値に変化させたい場合は、undefinedとnullを使ってうまいことやればよい。
+			Ref : { newList :  "second" },
 			mem : 4000,
 			tuikaMem : 30,
 		},
@@ -61,29 +48,18 @@
 			mem : 5000,
 			hogeNew : 90,
 		},
-
-		{
-			ID : "1",
-			Ref : { oldList : "first" },
-			Obsolete : true, //Obsoleteを参照するものはObsoleteでないと弾かれる。
-		}
 	],
 
-	//AutoIDの場合、Listに初期値が入っているのはそもそもおかしいと考えている。プログラムで追加、削除もされるのがAutoIDのリスト。
-	//別バージョンのデータが有ったとして今のバージョンのアイテムとどっちを優先するか、IDが同じだったら、IDが違ったら？　どれも答えが出ない。
-	//私が思うに、単にAutoIDの場合は初期値を入れることは推奨しない、旧バージョンがある場合、旧バージョンをすべて優先、今のリストの初期値にあるアイテムは全部削除されるのが良いと思う。
-	//たとえばRPGのアイテムリストだったら、ある程度ゲームが進んだときに別のリストから追加する、初期値としては与えず、「リストの初期値を定義するためのリスト」にデータを用意しておいて
-	//時期が来たらプログラムで加える。新バージョンのデータに仮に初期持ち物があったとしても、ゲームを進めた後のデータにいきなり新バージョンの初期持ち物が加わるのはおかしいので、加わらず、ただ消える。
-	newAutoIDList : [
-		"List",
-		"AutoID",
-		["Default",{
-			mem : 10,
-			Ref : { newList : "" }
+
+	newMutList : [
+		"MutList",
+		[{
+			Ref : { newList : "" },
+			mem : 0,
+			tuikaMem : 0,
+			"hoge?" : null,
+			"hogeNew!" : 0,
 		}],
-		{
-			mem : 100,
-			Ref : { newList :  "second" },
-		}
+		["Compatible", "newConstList"],
 	]
 }
