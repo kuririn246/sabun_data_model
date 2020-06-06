@@ -30,12 +30,12 @@
 			Ref : {
 				refedData : "",
 				"oldRefedData?" : null,
-				newRefedData : "",
+				"newRefedData!" : "",
 				Old : ["oldRefedData"]
 			},
 			mem : -100,
 			tuikaMem : 20,
-			"hoge?" : null,
+			"hoge?" : ["Num",null],
 			"hogeNew!" : 80,
 			Old : ["hoge"],
 		}],
@@ -58,28 +58,29 @@
 	mutList : [
 		"MutList",
 		[{
-
 			Ref : {
 				refedData : "",
 				"oldRefedData?" : null,
-				newRefedData : "",
+				"newRefedData!" : "",
 				Old : ["oldRefedData"],
 			},
 			mem : 0,
 			tuikaMem : 0, //新メンバ。旧バージョンのデータではこのデフォルト値が使われる
-			"hoge?" : null, //新定義にしたいので旧定義はnullにし、old指定して上書きできなくする。旧バージョンではここに値が残っている
+			"hoge?" : ["Num",null], //新定義にしたいので旧定義はnullにし、old指定して上書きできなくする。旧バージョンではここに値が残っている,
 			"hogeNew!" : 0, //新定義はundefined可能にする。旧バージョンのデータではundefinedになるので、適切な値を計算して代入。計算のために旧定義の値も残す
+			Old : ["hoge"],
 		}],
 		["Compatible", "constList"],
 	],
 
-
 	Old : ["oldRefedData"],
 
-	//一応定義する必要があるが、Old指定したいだけなので中身はいらない
 	oldRefedData : [
 		"Data",
 		[{}],
+		{
+			ID : "hogehoge",
+		}
 	],
 
 	//これでDataのRenameは可能になっている・・・Renameは重要・・・

@@ -12,6 +12,18 @@ pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefValue>, root 
        if sabun.len() != 1{
            Err(format!("{} one of the Enum's member must be defined", names))?
        }
+    } else{
+        //defのdefault値がemptyで、sabunでも定義されていないのを探す。もっと効率的に実装できないものかなあ
+        for (name, def_val) in def.refs(){
+            if sabun.contains_key(name) == false{
+                if let Qv::Val(v) = def_val.value(){
+                    if v.is_empty(){
+                        Err(format!("{} ref {} is not defined", names, name))?
+                    }
+                }
+
+            }
+        }
     }
 
     for (name, sab_val) in sabun{
@@ -54,5 +66,7 @@ pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefValue>, root 
             None =>{ Err(format!("{} there's no default ref members named {}", names, name))? }
         }
     }
+
+
     return Ok(());
 }

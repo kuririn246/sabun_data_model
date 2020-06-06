@@ -125,19 +125,19 @@ impl TmpList{
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
     pub fn to_violated_list(self) -> Result<MutList>{
+
         if self.old.is_some(){
             Err(format!("{} Old is not needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
         }
         if self.default.is_none(){
             Err(format!("{} Default must be defined {}", self.span.line_str(), self.span.slice()))?
         }
-        if self.next_id.is_none(){
-            Err(format!("{} NextID is needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
-        }
-        let next_id = self.next_id.unwrap();
+
+        let items = to_violated_list_items(self.vec)?;
+        let next_id = self.next_id.unwrap_or(items.len() as u64);
         let compatible = self.compatible.unwrap_or_else(|| HashSet::new());
 
-        Ok(MutList::new(self.default.unwrap(), to_violated_list_items(self.vec)?, next_id, compatible))
+        Ok(MutList::new(self.default.unwrap(), items , next_id, compatible))
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
@@ -151,12 +151,11 @@ impl TmpList{
         if self.default.is_some(){
             Err(format!("{} Default must not be defined {}", self.span.line_str(), self.span.slice()))?
         }
-        if self.next_id.is_none(){
-            Err(format!("{} NextID is needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
-        }
-        let next_id = self.next_id.unwrap();
 
-        Ok(InnerMutList::new(to_violated_list_items(self.vec)?, next_id))
+        let items = to_violated_list_items(self.vec)?;
+        let next_id = self.next_id.unwrap_or(items.len() as u64);
+
+        Ok(InnerMutList::new(items, next_id))
     }
 
     pub fn to_inner_def(self) -> Result<ListDefObj>{
@@ -217,9 +216,15 @@ fn to_data_items(vec : Vec<TmpObj>) -> Result<HashMap<String, ListItem>>{
 
 fn to_violated_list_items(vec : Vec<TmpObj>) -> Result<LinkedHashMap<u64, MutListItem>>{
     let mut result : LinkedHashMap<u64, MutListItem> = LinkedHashMap::with_capacity(vec.len());
-    for item in vec{
-        let item = item.to_violated_list_item()?;
-        result.insert(item.id(), item);
+    for (idx, tmp_item) in vec.into_iter().enumerate(){
+        let span = tmp_item.span.clone();
+        let item = tmp_item.to_violated_list_item(idx)?;
+        match result.insert(item.id(), item){
+            Some(_) =>{
+                Err(format!("{} Item's ID is invalid. Maybe all list items should have IDs, or all IDs should be elided. {}", span.line_str(), span.slice()))?
+            }
+            None =>{},
+        }
     }
     return Ok(result);
 }

@@ -86,12 +86,16 @@ impl TmpObj{
         }
     }
 
-    ///idとしてjsonのnumであるf64を使っていて、それをu64に変える処理が入ってしまうので、f64の範囲外のu64のidを正しく表現できない。そもそもこの機能自体が裏道なので、こんな変な制限があってもよかろうとは思うが
-    pub fn to_violated_list_item(self) -> Result<MutListItem>{
-        let id = match self.id{
-            Some(IdValue::Num(id)) => id as u64,
-            _ =>{ Err(format!("{} ID is needed for a violated list item {}", self.span.line_str(), self.span.slice()))? }
+
+    pub fn to_violated_list_item(self, id : usize) -> Result<MutListItem>{
+        let id = match self.id {
+            Some(IdValue::Num(id)) => id,
+            Some(_) =>{
+                Err(format!("{} Violated List's item's ID must be a number {}", self.span.line_str(), self.span.slice()))?
+            },
+            None => id as u64,
         };
+
         if self.old.len() != 0{
             Err(format!("{} Old is not needed for a violated list item {}", self.span.line_str(), self.span.slice()))?
         }
