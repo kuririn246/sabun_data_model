@@ -29,9 +29,9 @@
 		["Default",{
 			Ref : { refedData : "" },
 			mem : -100,
-			tuikaMem : 20, //新メンバだが旧バージョンのデータにはただこのデフォルト値が入るだけである。
-			"hoge?" : null, //新定義の値を用意し、旧バージョンのこの値は使わないので新バージョンのリストではnullになっている。
-			"hogeNew!" : 80, //旧バージョンのデータはこのメンバを持たないのでundefinedになる。undefinedを発見したら、hogeの値等から適切なhogeNewを計算する。
+			tuikaMem : 20,
+			"hoge?" : null,
+			"hogeNew!" : 80,
 			Old : ["hoge"],
 		}],
 		//firstはold化されているので、ここではrefしない。しかし、旧バージョンのmutlistを読みだした時には、firstは入っている
@@ -56,9 +56,9 @@
 			//oldRefedDataはここでは参照しないので、adjust時には単に移行されず消滅する
 			Ref : { refedData : "" },
 			mem : 0,
-			tuikaMem : 0,
-			"hoge?" : null,
-			"hogeNew!" : 0,
+			tuikaMem : 0, //新メンバ。旧バージョンのデータではこのデフォルト値が使われる
+			"hoge?" : null, //新定義にしたいので旧定義はnullにし、old指定して上書きできなくする。旧バージョンではここに値が残っている
+			"hogeNew!" : 0, //新定義はundefined可能にする。旧バージョンのデータではundefinedになるので、適切な値を計算して代入。計算のために旧定義の値も残す
 		}],
 		["Compatible", "constList"],
 	],
