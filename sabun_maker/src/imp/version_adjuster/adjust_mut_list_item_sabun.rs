@@ -8,9 +8,15 @@ use crate::imp::version_adjuster::adjust_mut_list::adjust_inner_mut_list;
 pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String, RustValue>, names : &Names) -> Result<HashMap<String, RustValue>>{
     let mut old_sabun = old_sabun;
 
-    //最大量で見積もっておく。デフォルトから変化しない場合はsabunには加わらないが、sabun.len()だと、
-    //undefinedで一個増えただけでテーブル再構成＆cap2倍にされてしまう
-    let mut result : HashMap<String, RustValue> = HashMap::with_capacity(def.default().len());
+    //デフォルトから変化しない場合はsabunには加わらないが、sabun.len()だと、
+    //undefinedで一個増えただけでテーブル再構成＆cap2倍にされてしまう可能性がある
+    //実際はpower of 2のcapacityにしかならないので、その可能性は低そうにも見えるが、1個,2個,4個とかのことも多いと思うのでどうなんでしょうな
+    //まあ1,2,4個とかなら再構成されても誤差の範囲ではないかと思うが・・・
+    //sabun数256個 undefined1個とかでのperformance低下を重く見るべきか？
+    //default.len()でサイズを大きくとって、やたらと無駄が発生することを重く見るべきか？　（そんなに無駄が出るだろうか。書き換えないメンバはそう多くないと思うが・・・)
+    //変なユースケースでの最悪を想定するべきで、やたらとdefにメンバを大量に用意して、sabunはちょっとしかないという戦略もありうるので、
+    //その場合に無駄で巨大なhashtableを初期化する可能性を重く見るべきではなかろうか
+    let mut result : HashMap<String, RustValue> = HashMap::with_capacity(old_sabun.len());
 
     for (def_key, def_v) in def.default(){
         let sabun_v = if let Some(v) = old_sabun.remove(def_key){ v } else {
@@ -53,8 +59,5 @@ pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String,
             _ =>{ Err(format!("{} {} mut list items can only have Param or InnerMut", names, def_key))? }
         }
     }
-    //最大量で見積もってshrink_to_fitするというのは安全で効率的に一見見えるが・・・所詮は事前最適化で効果は不明である。
-    //performanceが向上する自信がないのでコメントアウトしておく
-    //result.shrink_to_fit();
     Ok(result)
 }
