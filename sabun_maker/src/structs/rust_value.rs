@@ -112,6 +112,16 @@ impl RustParam{
         }
         return true;
     }
+
+    ///型情報を維持したままundefinedに変える
+    pub fn to_undefined(&self) -> Self{
+        match self{
+            RustParam::Bool(_) => RustParam::Bool(Qv::Undefined),
+            RustParam::Number(_) => RustParam::Number(Qv::Undefined),
+            RustParam::String(_) => RustParam::String(Qv::Undefined),
+            RustParam::Array(_, at) => RustParam::Array(Qv::Undefined, at.clone()),
+        }
+    }
 }
 
 impl RustValue{
