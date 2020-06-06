@@ -2,7 +2,7 @@
 	num : -2, //numとかstrは今は書き換える方法がないので、テスト出来ませんね・・・
 	str : "old",
 
-	refedList: [
+	refedData: [
 		"Data",
 		[{
 			oldMem1 : 1,
@@ -20,19 +20,27 @@
 		}
 	],
 
+	oldRefedData : [
+		"Data",
+		[{}],
+		{
+			ID : "hogehoge",
+		}
+	],
+
 	constList: [
 		"List",
 		["Default",{
-			Ref : { refedList : "" },
+			Ref : { refedData : "", oldRefedData : "" },
 			mem : 0,
 			hoge : 20,
 		}],
 		{
 			mem : 100,
-			Ref : { refedList : "first" }
+			Ref : { refedData : "first", oldRefedData : "hogehoge" }
 		},
 		{
-			Ref : { refedList :  "second" },
+			Ref : { refedData :  "second", oldRefedData : "hogehoge" },
 			mem : 200,
 			hoge : 30,
 		}
@@ -43,17 +51,17 @@
 		["Default",{
 			mem : 0,
 			hoge : 0,
-			Ref: { refedList : "" },
+			Ref: { refedData : "", oldRefedData: "", },
 		}],
 		["Compatible", "constList"],
 		{
 			mem : 100,
-			Ref : { refedList : "first" }
+			hoge : 30,
+			Ref : { refedData : "first", oldRefedData : "hogehoge" }
 		},
 		{
-			Ref : { refedList :  "second" },
-			mem : 200,
-			hoge : 30,
+			Ref : { refedData :  "second", oldRefedData : "hogehoge" },
+			hoge : 40,
 		}
 	]
 }

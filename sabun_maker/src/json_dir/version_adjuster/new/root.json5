@@ -2,40 +2,48 @@
 	num : 10,
 	str : "a",
 
-	refedList: [
-		"List",
+	refedData: [
+		"Data",
 		[{
-			mem : 10,
+			//MutListとCompatibleでない場合、oldメンバが使われることはないので、old指定する必要はなく単に消せばいいはず
+			//Compatibleかどうかの判断が難しいので、oldをつけて消さないという選択もあるかもしれないが・・・？
+			//そもそもDataとCompatibleにする必要があるのか・・・？
+			newMem : 10,
 			mem2 : 9,
 		}],
+		["Old", "first"],
 		{
 			ID : "first",
-			oldMem1 : 10,
-			mem2 : 20,
 		},
 		{
 			ID : "second",
+		},
+		{
+			ID : "newItem",
 		}
+
 	],
 
 	constList: [
 		"List",
 		["Default",{
-			Ref : { refedList : "" },
+			Ref : { refedData : "" },
 			mem : -100,
 			tuikaMem : 20, //新メンバだが旧バージョンのデータにはただこのデフォルト値が入るだけである。
 			"hoge?" : null, //新定義の値を用意し、旧バージョンのこの値は使わないので新バージョンのリストではnullになっている。
 			"hogeNew!" : 80, //旧バージョンのデータはこのメンバを持たないのでundefinedになる。undefinedを発見したら、hogeの値等から適切なhogeNewを計算する。
 			Old : ["hoge"],
 		}],
+		//firstはold化されているので、ここではrefしない。しかし、旧バージョンのmutlistを読みだした時には、firstは入っている
+		//どうするのがいいんでしょうね。参照先が消えているとExceptionするしかないのでなんかしら入れとく必要はあるだろうけど、
+		//oldが入ってるのが有効なデータともいい難い気はする。かなり中途半端な存在になってしまう
 		{
-			Ref : { newList :  "second" },
+			Ref : { refedData :  "second" },
 			mem : 4000,
 			tuikaMem : 30,
 		},
 		{
-			ID : "3",
-			Ref : { oldList : "newItem" },
+			Ref : { refedData : "newItem" },
 			mem : 5000,
 			hogeNew : 90,
 		},
@@ -45,12 +53,25 @@
 	mutList : [
 		"MutList",
 		[{
-			Ref : { newList : "" },
+			//oldRefedDataはここでは参照しないので、adjust時には単に移行されず消滅する
+			Ref : { refedData : "" },
 			mem : 0,
 			tuikaMem : 0,
 			"hoge?" : null,
 			"hogeNew!" : 0,
 		}],
 		["Compatible", "constList"],
+	],
+
+	//移行されず単に消滅するのならば、この指定もoldRefedDataも必要ないのでは？
+	//"必要ないフラグ"を立てるためだけにこれを用意する価値があるだろうか・・・？
+	//一旦コンパイルが通ったら(コンパイルと呼ぶべきか？　呼ぶべきなくらいのことはしてると思う・・・)
+	//これは消しても良い、という感じになるだろうか
+	Old : ["oldRefedData"],
+
+	//一応定義する必要があるが、Old指定したいだけなので中身はいらない・・・
+	oldRefedData : [
+		"Data",
+		[{}],
 	]
 }
