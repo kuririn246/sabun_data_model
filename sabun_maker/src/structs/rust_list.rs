@@ -65,6 +65,10 @@ impl MutList{
     pub fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
     pub fn next_id(&self) -> u64{ self.prop.next_id }
     pub fn compatible(&self) -> &HashSet<String>{ &self.prop.compatible }
+    pub fn deconstruct(self) -> (ListDefObj, LinkedHashMap<u64, MutListItem>, u64, HashSet<String>){
+        let prop = *self.prop;
+        (*self.default, *self.list, prop.next_id, prop.compatible)
+    }
 }
 
 ///Data or Listの内部に作るList。ListDefObjの内部にはDefaultだけ書き、ListItemの内部にはItemのみを書く。
@@ -102,6 +106,7 @@ pub struct InnerMutList{
 
 impl InnerMutList{
     pub fn new(list : LinkedHashMap<u64, MutListItem>, next_id : u64) -> InnerMutList{ InnerMutList{ list : Box::new(list), next_id } }
+    pub fn deconstruct(self) -> (LinkedHashMap<u64, MutListItem>, u64){ (*self.list, self.next_id) }
     pub fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
     pub fn next_id(&self) -> u64{ self.next_id }
 }
@@ -155,6 +160,7 @@ impl MutListItem{
     pub fn new(id : u64, values : HashMap<String, RustValue>, refs : HashMap<String, RefValue>) -> MutListItem{
         MutListItem{ id, values : Box::new(values), refs : Box::new(refs) }
     }
+    pub fn deconstruct(self) -> (HashMap<String, RustValue>, HashMap<String, RefValue>){ (*self.values, *self.refs) }
     pub fn id(&self) -> u64{ self.id }
     pub fn values(&self) -> &HashMap<String, RustValue>{ self.values.as_ref() }
     pub fn refs(&self) -> &HashMap<String, RefValue>{ self.refs.as_ref() }

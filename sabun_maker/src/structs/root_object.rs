@@ -20,8 +20,16 @@ impl RootObject{
         RootObject{ default, sabun, old }
     }
     pub fn default(&self) -> &HashMap<String, RustValue>{ &self.default }
+    pub fn deconstruct(self) -> (HashMap<String, RustValue>, HashMap<String, RustParam>, HashSet<String>){ (self.default, self.sabun, self.old) }
+    pub fn deconstruct2(&mut self) -> RootObjDecon { RootObjDecon{ default : &mut self.default, sabun : &mut self.sabun, old : &mut self.old } }
     pub fn sabun(&self) -> &HashMap<String, RustParam>{ &self.sabun }
     pub fn old(&self) -> &HashSet<String>{ &self.old }
+}
+
+pub struct RootObjDecon<'a> {
+    pub default: &'a mut HashMap<String, RustValue>,
+    pub sabun: &'a mut HashMap<String, RustParam>,
+    pub old: &'a mut HashSet<String>
 }
 
 #[derive(Debug, PartialEq, Clone)]
