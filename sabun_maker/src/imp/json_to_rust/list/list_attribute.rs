@@ -7,7 +7,7 @@ use crate::imp::json_to_rust::get_old::get_old;
 use crate::structs::root_object::ListDefObj;
 use crate::imp::json_to_rust::get_compatible::get_compatible;
 
-pub enum ListAttribute{
+pub(crate) enum ListAttribute{
     Default(ListDefObj),
     Old(HashSet<String>),
     Compatible(HashSet<String>),
@@ -15,7 +15,7 @@ pub enum ListAttribute{
 }
 
 
-pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Result<ListAttribute>{
+pub(crate) fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Result<ListAttribute>{
     let error_message = "List's array must be Default, Old, Compatible or NextID";
 
     if array.len() == 0{

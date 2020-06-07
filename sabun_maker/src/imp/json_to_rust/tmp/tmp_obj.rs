@@ -6,7 +6,7 @@ use json5_parser::Span;
 use crate::error::Result;
 use crate::structs::root_object::{RefDefObj, RootObject, ListDefObj};
 
-pub struct TmpObj{
+pub(crate) struct TmpObj{
     pub default : HashMap<String, RustValue>,
     pub id : Option<IdValue>,
     pub include : Vec<String>,
@@ -15,7 +15,7 @@ pub struct TmpObj{
     pub span : Span,
 }
 
-pub struct TmpRefs{
+pub(crate) struct TmpRefs{
     pub map : HashMap<String, RefValue>,
     pub old : HashSet<String>,
     pub is_enum : bool,

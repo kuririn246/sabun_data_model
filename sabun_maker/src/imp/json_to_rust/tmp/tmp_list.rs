@@ -6,7 +6,7 @@ use json5_parser::Span;
 use crate::error::Result;
 use linked_hash_map::LinkedHashMap;
 
-pub struct TmpList{
+pub(crate) struct TmpList{
     pub vec : Vec<TmpObj>,
     ///複数回定義のエラーを検出したいのでOptionにする
     pub old : Option<HashSet<String>>,

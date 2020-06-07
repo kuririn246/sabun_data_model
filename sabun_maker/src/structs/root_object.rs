@@ -26,7 +26,7 @@ impl RootObject{
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct ListDefObj{
+pub(crate) struct ListDefObj{
     default : Box<HashMap<String, ListDefValue>>,
     ///RustValueを巨大にしすぎないためにBoxにしてサイズを削る
     refs: Box<RefDefObj>,
@@ -58,7 +58,7 @@ impl ListDefObj{
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct RefDefObj {
+pub(crate) struct RefDefObj {
     refs: Box<HashMap<String, RefValue>>,
     /// Enum とRefの二通りの定義の仕方があり、Enumの場合は Ref のうち一つだけ値があり、ほかは全部nullにしなきゃいけない。
     /// プログラムからはmatch でアクセス出来る。値があるRefをキャストしてゲットする。
@@ -92,7 +92,7 @@ impl RefDefObj{
 
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct InnerMutDefObj {
+pub(crate) struct InnerMutDefObj {
     list_def : Box<ListDefObj>,
     undefinable: bool,
     compatible : Box<HashSet<String>>,

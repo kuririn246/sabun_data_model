@@ -1,7 +1,7 @@
 
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum Qv<T>{ Val(T), Undefined, Null }
+pub(crate) enum Qv<T>{ Val(T), Undefined, Null }
 
 impl<T> Qv<T>{
     pub(crate) fn qv_type(&self) -> QvType{
@@ -21,7 +21,7 @@ impl<T> Qv<T>{
     }
 }
 
-pub enum QvType{
+pub(crate) enum QvType{
     Val, Undefined, Null
 }
 

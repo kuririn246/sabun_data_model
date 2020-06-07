@@ -8,7 +8,7 @@ use linked_hash_map::LinkedHashMap;
 
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq, Clone)]
-pub struct ConstData{
+pub(crate) struct ConstData{
     default : Box<ListDefObj>,
     list : Box<HashMap<String, ListItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
@@ -26,7 +26,7 @@ impl ConstData{
 
 ///IDを持たず、参照できない。MutListの初期値を書くのが主な使い道か。IDは必要ないけど単にデータを書いておきたい場合もあるだろう。
 #[derive(Debug, PartialEq, Clone)]
-pub struct ConstList{
+pub(crate) struct ConstList{
     default : Box<ListDefObj>,
     list : Box<Vec<ListItem>>,
 }
@@ -41,14 +41,14 @@ impl ConstList{
 /// ConstListとMutListはstruct定義を見ると近い存在なので、まとめてもいいように思うかもしれないけれど、意味が全く別ものなので型を分けたほうが混乱が少ない。
 /// 順序を変えなければidでソートされたSortedListになるのでPrimaryKeyを持ったTableとしても使えないこともないか
 #[derive(Debug, PartialEq, Clone)]
-pub struct MutList{
+pub(crate) struct MutList{
     default : Box<ListDefObj>,
     list : Box<LinkedHashMap<u64, MutListItem>>,
     prop : Box<MutListProp>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct MutListProp{
+pub(crate) struct MutListProp{
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
     next_id : u64,
 
@@ -73,7 +73,7 @@ impl MutList{
 
 ///Data or Listの内部に作るList。ListDefObjの内部にはDefaultだけ書き、ListItemの内部にはItemのみを書く。
 #[derive(Debug, PartialEq, Clone)]
-pub struct InnerList{
+pub(crate) struct InnerList{
     list : Vec<ListItem>,
 }
 
@@ -85,7 +85,7 @@ impl InnerList{
 
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq, Clone)]
-pub struct InnerData{
+pub(crate) struct InnerData{
     list : Box<HashMap<String, ListItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
     old : Box<HashSet<String>>,
@@ -98,7 +98,7 @@ impl InnerData{
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct InnerMutList{
+pub(crate) struct InnerMutList{
     list : Box<LinkedHashMap<u64, MutListItem>>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
     next_id : u64,
@@ -112,7 +112,7 @@ impl InnerMutList{
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct ListItem{
+pub(crate) struct ListItem{
     ///ListItemの値は常にDefaultからの差分である
     values : Box<HashMap<String, ListSabValue>>,
     ///ListItemの値はRefも常にDefaultからの差分である
@@ -147,7 +147,7 @@ impl ListItem{
 /// Relationとパラメータ範囲での検索が効率的にできるシステムが作れる。ただそれは外部に作ればいいので、このシステム自体の守備範囲ではない
 /// それが出来る土台として、idとLinkedHashMapで出来たMutListがある
 #[derive(Debug, PartialEq, Clone)]
-pub struct MutListItem{
+pub(crate) struct MutListItem{
     ///アイテムごとにidが振られ、これによって削除や順番の変更を検出できる
     id : u64,
     ///ListItemの値は常にDefaultからの差分である

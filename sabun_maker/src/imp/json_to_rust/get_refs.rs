@@ -10,7 +10,7 @@ use crate::imp::json_to_rust::tmp::tmp_obj::TmpRefs;
 use linked_hash_map::LinkedHashMap;
 use std::collections::HashMap;
 
-pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<TmpRefs> {
+pub(crate) fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<TmpRefs> {
     let obj = json_obj_to_rust(v, true, span, names)?;
     if obj.refs.map.len() != 0 {
         Err(format!(r#"{} Ref can't be declared in a Ref object {}"#, span.line_str(), names))?

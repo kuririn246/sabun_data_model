@@ -5,7 +5,7 @@ use crate::error::Result;
 use crate::structs::root_object::ListDefObj;
 use linked_hash_map::LinkedHashMap;
 
-pub fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<ListDefObj>{
+pub(crate) fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<ListDefObj>{
     let error_message = r#"["Default", \{ default_obj \}] is valid"#;
     if array.len() != 1{
         Err(format!(r#"{} {} {} {}"#, span.line_str(), span.slice(), error_message, names))?

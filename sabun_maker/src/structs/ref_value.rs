@@ -2,13 +2,13 @@ use crate::structs::value_type::ValueType;
 use crate::structs::qv::Qv;
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct RefValue{
+pub(crate) struct RefValue{
     value_type : ValueType,
     value : Qv<String>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct RefSabValue{
+pub(crate) struct RefSabValue{
     value : Qv<String>,
 }
 

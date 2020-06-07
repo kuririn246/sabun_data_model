@@ -6,7 +6,7 @@ use crate::structs::root_object::{ListDefObj, InnerMutDefObj};
 use std::fmt::{Display, Formatter};
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum RustParam{
+pub(crate) enum RustParam{
     Bool(Qv<bool>),
     Number(Qv<f64>),
     String(Qv<RustString>),
@@ -14,7 +14,7 @@ pub enum RustParam{
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum RustValue{
+pub(crate) enum RustValue{
     Param(RustParam, ValueType),
     Data(ConstData),
     List(ConstList),
@@ -88,7 +88,7 @@ impl RustValue{
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum RootValue{
+pub(crate) enum RootValue{
     Param(RustParam, ValueType),
     Data(ConstData),
     List(ConstList),
@@ -96,7 +96,7 @@ pub enum RootValue{
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum ListDefValue{
+pub(crate) enum ListDefValue{
     Param(RustParam, ValueType),
     InnerDataDef(ListDefObj),
     InnerListDef(ListDefObj),
@@ -104,7 +104,7 @@ pub enum ListDefValue{
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum ListSabValue{
+pub(crate) enum ListSabValue{
     Param(RustParam),
     InnerData(InnerData),
     InnerList(InnerList),
@@ -113,7 +113,7 @@ pub enum ListSabValue{
 }
 
 
-pub enum ListType{
+pub(crate) enum ListType{
     Data, List, Mut, InnerData, InnerList, InnerMut, InnderDataDef, InnerListDef, InnerMutDef,
 }
 
@@ -138,12 +138,12 @@ pub enum ListType{
 // }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct RustArray{
+pub(crate) struct RustArray{
     array : Box<RustArrayInternal>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct RustArrayInternal{
+pub(crate) struct RustArrayInternal{
     qv : Qv<Vec<RustParam>>,
     at : ArrayType,
 }
@@ -169,7 +169,7 @@ impl RustArray{
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct RustString{
+pub(crate) struct RustString{
     str : Box<String>,
 }
 
@@ -235,111 +235,7 @@ impl RustParam{
     }
 }
 
-impl RustValue{
-    // ///この数値は仮
-    // pub(crate) fn type_num(&self) -> usize{
-    //     match self{
-    //         RustValue::Param(param, _) => match param{
-    //             RustParam::Bool(_) => 0,
-    //             RustParam::Number(_) => 1,
-    //             RustParam::String(_) => 2,
-    //             RustParam::Array(_) => 3,
-    //         },
-    //         RustValue::Data(_) => 4,
-    //         RustValue::List(_) => 5,
-    //         RustValue::Mut(_) => 6,
-    //         RustValue::InnerListDef(_) | RustValue::InnerList(_) => 7,
-    //         RustValue::InnerDataDef(_) | RustValue::InnerMut(_)=> 8,
-    //         RustValue::InnerMutDef(_) | RustValue::InnerMut(_)=> 9,
-    //
-    //     }
-    // }
-    //
-    // pub fn is_param(&self) -> bool{
-    //     self.type_num() <= 3
-    // }
 
-    // pub(crate) fn value_type(&self) -> ValueType{
-    //     match self{
-    //         RustValue::Param(_param, vt) => vt.clone(),
-    //         RustValue::InnerMutDef(obj) => if obj.undefinable() { ValueType::Undefiable } else{ ValueType::Normal }
-    //         _ => ValueType::Normal,
-    //     }
-    // }
-
-    // pub(crate) fn list_type(&self) -> Option<ListType>{
-    //     Some(match self{
-    //         RustValue::Data(_) => ListType::Data,
-    //         RustValue::List(_) => ListType::List,
-    //         RustValue::Mut(_) => ListType::Mut,
-    //         RustValue::InnerData(_) => ListType::InnerData,
-    //         RustValue::InnerList(_) => ListType::InnerList,
-    //         RustValue::InnerMut(_) => ListType::InnerMut,
-    //         RustValue::InnerDataDef(_) => ListType::InnderDataDef,
-    //         RustValue::InnerListDef(_) => ListType::InnerListDef,
-    //         RustValue::InnerMutDef(_) => ListType::InnerMutDef,
-    //         _ => return None,
-    //     })
-    // }
-
-    // pub(crate) fn qv_type(&self) -> QvType{
-    //     match self{
-    //         RustValue::Param(p, _) => p.qv_type(),
-    //         RustValue::InnerMut(b) => if b.is_some(){ QvType::Val } else{ QvType::Undefined },
-    //         _ =>{ QvType::Val }
-    //     }
-    // }
-
-    // pub fn value_kind(&self) -> RustValueKind {
-    //     match self{
-    //         RustValue::Param(_,_) => RustValueKind::Param,
-    //         RustValue::Data(_) | RustValue::List(_) | RustValue::Mut(_) => RustValueKind::List,
-    //         RustValue::InnerData(_) | RustValue::InnerList(_) | RustValue::InnerMut(_) => RustValueKind::InnerList,
-    //         RustValue::InnerDataDef(_) |RustValue::InnerListDef(_) |RustValue::InnerMutDef(_) => RustValueKind::InnerDef,
-    //     }
-    // }
-
-    // pub(crate) fn inner_def(&self) -> Option<&ListDefObj>{
-    //     match self{
-    //         RustValue::InnerDataDef(d) => Some(d),
-    //         RustValue::InnerListDef(d) => Some(d),
-    //         RustValue::InnerMutDef(obj) => Some(obj.list_def()),
-    //         _ => None,
-    //     }
-    // }
-
-    // pub(crate) fn list_def(&self) ->  Option<&ListDefObj> {
-    //     match self {
-    //         RustValue::Data(d) => Some(d.default()),
-    //         RustValue::List(d) => Some(d.default()),
-    //         RustValue::Mut(d) => Some(d.default()),
-    //         RustValue::InnerDataDef(d) => Some(d),
-    //         RustValue::InnerListDef(d) => Some(d),
-    //         RustValue::InnerMutDef(obj) => Some(obj.list_def()),
-    //         _ => None,
-    //     }
-    // }
-
-    //defaultとsabun, list_defとlist_item sabunのような時に、defaultの変化値としてsabunが適当かどうか
-    //調べるのは型だけで、listの中身がちゃんとdefaultと整合してるかまでは調べてくれない
-    // pub fn acceptable(&self, other : &Self) -> bool {
-    //     if self.type_num() != other.type_num() {
-    //         return false;
-    //     }
-    //     if self.value_type().acceptable(&other.qv_type()) == false {
-    //         return false;
-    //     }
-    //     if let RustValue::Param(sp,_) = self {
-    //         if let RustValue::Param(op, _) = other {
-    //             return sp.acceptable(op)
-    //         } else { unreachable!() }
-    //     }
-    //     if self.value_kind().acceptable(&other.value_kind()) == false {
-    //         return false;
-    //     }
-    //     return true;
-    // }
-}
 
 impl ListDefValue{
     pub(crate) fn to_rust_value(self) -> RustValue{
@@ -456,13 +352,6 @@ impl RootValue{
         }
     }
 
-    // pub(crate) fn value_type(&self) -> ValueType{
-    //     match self{
-    //         RootValue::Param(_param, vt) => vt.clone(),
-    //         //RustValue::InnerMutDef(obj) => if obj.undefinable() { ValueType::Undefiable } else{ ValueType::Normal }
-    //         _ => ValueType::Normal,
-    //     }
-    // }
 
     pub(crate) fn to_rust_value(self) -> RustValue{
         match self{

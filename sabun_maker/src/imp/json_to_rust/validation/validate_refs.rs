@@ -7,7 +7,7 @@ use crate::imp::rust_to_json::name_with_suffix::name_with_suffix;
 use crate::structs::qv::{Qv};
 use crate::structs::rust_value::{RootValue};
 
-pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefSabValue>, root : &RootObject, can_use_old: bool, names : &Names) -> Result<()>{
+pub(crate) fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefSabValue>, root : &RootObject, can_use_old: bool, names : &Names) -> Result<()>{
     if def.is_enum(){
        if sabun.len() != 1{
            Err(format!("{} one of the Enum's member must be defined", names))?

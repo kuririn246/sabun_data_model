@@ -6,7 +6,7 @@ use crate::structs::value_type::ValueType;
 use crate::structs::rust_value::{RustValue, RustParam};
 use crate::structs::qv::Qv;
 
-pub fn array_null_or_undefined(a : &[JVal], gat : GatResult, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue> {
+pub(crate) fn array_null_or_undefined(a : &[JVal], gat : GatResult, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue> {
     if a.len() != 1 {
         Err(format!(r#"{} {} null must be ["type", null] {}"#, span.line_str(), span.slice(), names))?
     }

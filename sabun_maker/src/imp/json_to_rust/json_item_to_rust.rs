@@ -7,7 +7,7 @@ use crate::structs::rust_value::{RustValue, RustParam, RustString};
 use crate::structs::qv::Qv;
 
 
-pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {
+pub(crate) fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {
     let names = &names.append(name);
     match v {
         JVal::Bool(b, _) => {
@@ -35,7 +35,7 @@ pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names :
     }
 }
 
-pub fn json_item_to_rust_ref(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {
+pub(crate) fn json_item_to_rust_ref(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {
     let names = &names.append(name);
     match v {
         JVal::Bool(_, span) => {

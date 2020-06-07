@@ -1,7 +1,7 @@
 use crate::structs::qv::QvType;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum ValueType{
+pub(crate) enum ValueType{
     Normal,
     Nullable,
     Undefiable,
@@ -9,12 +9,7 @@ pub enum ValueType{
 }
 
 impl ValueType{
-    // pub(crate) fn is_nullable(&self) -> bool{
-    //     match self{
-    //         ValueType::Nullable | ValueType::UndefNullable => true,
-    //         _ => false,
-    //     }
-    // }
+
 
     pub(crate) fn undefiable(&self) -> bool{
         match self{
@@ -34,14 +29,7 @@ impl ValueType{
     }
 
 
-    // pub(crate) fn _type_num(&self) -> usize{
-    //     match self{
-    //         ValueType::Normal => 0,
-    //         ValueType::Nullable => 1,
-    //         ValueType::Undefinable => 2,
-    //         ValueType::UndefNullable => 3,
-    //     }
-    // }
+
 
     pub(crate) fn acceptable(&self, t : &QvType) -> bool {
         match self{
