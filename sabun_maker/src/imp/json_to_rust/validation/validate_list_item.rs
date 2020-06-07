@@ -10,7 +10,7 @@ use crate::imp::structs::ref_value::RefSabValue;
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::structs::list_value::{ListDefValue, ListSabValue};
 
-pub(crate) fn validate_list_item(def : &ListDefObj, sabun_values : &HashMap<String, ListSabValue>,
+pub fn validate_list_item(def : &ListDefObj, sabun_values : &HashMap<String, ListSabValue>,
                           ref_values : &HashMap<String, RefSabValue>, root : &RootObject,
                           can_use_old: bool, names : &Names) -> Result<()> {
     validate_refs(def.refs(), ref_values, root, can_use_old, names)?;

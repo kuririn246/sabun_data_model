@@ -7,7 +7,7 @@ use crate::imp::structs::def_obj::ListDefObj;
 use crate::imp::structs::rust_list::{MutListItem, MutList, InnerMutList};
 
 
-pub(crate) fn adjust_mut(def : &ListDefObj, old_list : LinkedHashMap<u64, MutListItem>, names : &Names) -> Result<LinkedHashMap<u64, MutListItem>>{
+pub fn adjust_mut(def : &ListDefObj, old_list : LinkedHashMap<u64, MutListItem>, names : &Names) -> Result<LinkedHashMap<u64, MutListItem>>{
     let mut counter : u64 = 0;
     let mut result = LinkedHashMap::with_capacity(old_list.len());
     for (_, value) in old_list{
@@ -20,7 +20,7 @@ pub(crate) fn adjust_mut(def : &ListDefObj, old_list : LinkedHashMap<u64, MutLis
     return Ok(result);
 }
 
-pub(crate) fn adjust_mut_list(new : MutList, old : MutList, names : &Names) -> Result<MutList>{
+pub fn adjust_mut_list(new : MutList, old : MutList, names : &Names) -> Result<MutList>{
     let (_,old_list,_,_) = old.deconstruct();
 
     let new_list = adjust_mut(new.default(), old_list, names)?;
@@ -29,7 +29,7 @@ pub(crate) fn adjust_mut_list(new : MutList, old : MutList, names : &Names) -> R
     Ok(MutList::new(default, new_list, next_id, compatible))
 }
 
-pub(crate) fn adjust_inner_mut_list(def : &ListDefObj, old : InnerMutList, names : &Names) -> Result<InnerMutList>{
+pub fn adjust_inner_mut_list(def : &ListDefObj, old : InnerMutList, names : &Names) -> Result<InnerMutList>{
     let (old_list,_) = old.deconstruct();
 
     let new_list = adjust_mut(def, old_list, names)?;

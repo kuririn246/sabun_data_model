@@ -8,7 +8,7 @@ use crate::imp::structs::qv::Qv;
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::structs::root_value::RootValue;
 
-pub(crate) fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefSabValue>, root : &RootObject, can_use_old: bool, names : &Names) -> Result<()>{
+pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefSabValue>, root : &RootObject, can_use_old: bool, names : &Names) -> Result<()>{
     if def.is_enum(){
        if sabun.len() != 1{
            Err(format!("{} one of the Enum's member must be defined", names))?

@@ -4,7 +4,7 @@ use crate::imp::structs::qv::Qv;
 use crate::imp::structs::value_type::ValueType;
 use crate::imp::structs::my_json::Value;
 
-pub(crate) fn ref_def_obj_to_json(obj : &RefDefObj) -> BTreeMap<String, Value>{
+pub fn ref_def_obj_to_json(obj : &RefDefObj) -> BTreeMap<String, Value>{
     let mut result : BTreeMap<String, Value> = BTreeMap::new();
 
     for (key,value) in obj.refs() {

@@ -3,7 +3,7 @@ use crate::imp::structs::qv::Qv;
 use crate::imp::structs::my_json::Value;
 use crate::imp::structs::rust_param::RustParam;
 
-pub(crate) fn get_param(v : &RustParam) -> Value{
+pub fn get_param(v : &RustParam) -> Value{
     let r = match v{
         RustParam::Bool(b) => to(b,  "Bool",|b| Value::Bool(*b)),
         RustParam::String(s) => to(s, "Str", |s| Value::String(s.str().to_string())),

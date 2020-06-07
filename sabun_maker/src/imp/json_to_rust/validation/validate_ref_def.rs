@@ -5,7 +5,7 @@ use crate::imp::structs::def_obj::RefDefObj;
 use crate::imp::structs::qv::Qv;
 
 
-pub(crate) fn validate_ref_def(def : &RefDefObj, names : &Names) -> Result<()> {
+pub fn validate_ref_def(def : &RefDefObj, names : &Names) -> Result<()> {
     if def.is_enum() {
         for (_, v) in def.refs() {
             match v.value() {

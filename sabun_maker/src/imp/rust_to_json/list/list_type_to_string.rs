@@ -1,6 +1,6 @@
 use crate::imp::structs::list_type::ListType;
 
-pub(crate) fn list_type_to_string(l : &ListType, has_item : bool) -> String{
+pub fn list_type_to_string(l : &ListType, has_item : bool) -> String{
     let s = match l{
         ListType::Data => "Data",
         ListType::List => "List",

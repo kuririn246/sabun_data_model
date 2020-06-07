@@ -11,7 +11,7 @@ use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::qv::Qv;
 use crate::imp::structs::rust_param::RustParam;
 
-pub(crate) fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<TmpRefs> {
+pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<TmpRefs> {
     let obj = json_obj_to_rust(v, true, span, names)?;
     if obj.refs.map.len() != 0 {
         Err(format!(r#"{} Ref can't be declared in a Ref object {}"#, span.line_str(), names))?

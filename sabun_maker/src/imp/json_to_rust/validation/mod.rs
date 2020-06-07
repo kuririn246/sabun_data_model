@@ -3,7 +3,6 @@ pub mod validate_list_item;
 pub mod validate_data;
 pub mod validate_list;
 pub mod validate_refs;
-pub mod validate_ref_from_root;
 pub mod validate_ref_def;
 pub mod validate_compatible;
 pub mod validate_mut_list;

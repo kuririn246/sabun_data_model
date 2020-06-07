@@ -3,19 +3,19 @@ use regex::Captures;
 use lazy_static::lazy_static;
 use crate::imp::structs::value_type::ValueType;
 
-pub(crate) enum SystemNames{
+pub enum SystemNames{
     Old,
     ID,
     Ref,
     Enum,
 }
 
-pub(crate) enum NameType{
+pub enum NameType{
     Name(String, ValueType),
     SystemName(SystemNames)
 }
 
-pub(crate) fn json_name(s : &str) -> Option<NameType>{
+pub fn json_name(s : &str) -> Option<NameType>{
     fn some(sn: SystemNames) -> Option<NameType> {
         return Some(NameType::SystemName(sn));
     }
@@ -80,7 +80,7 @@ pub fn analyze_name(s : &str) -> Option<Captures>{
     RE.captures(s)
 }
 
-pub(crate) fn value_type_and_name(s : &str) -> Option<(ValueType, String)>{
+pub fn value_type_and_name(s : &str) -> Option<(ValueType, String)>{
     if let Some(cap) = analyze_name(s){
         let name = cap[1].to_string();
         let suffix = &cap[2];

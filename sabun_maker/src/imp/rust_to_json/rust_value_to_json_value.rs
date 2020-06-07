@@ -9,7 +9,7 @@ use crate::imp::structs::value_type::ValueType;
 use crate::imp::structs::my_json::Value;
 use crate::imp::structs::list_type::ListType;
 
-pub(crate) fn rust_value_to_json_value(v : &RustValue, name : &str) -> (String, Value){
+pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> (String, Value){
     let value = match v {
         RustValue::Param(param, vt) => {
             return (name_with_suffix(name, *vt), get_param(param))

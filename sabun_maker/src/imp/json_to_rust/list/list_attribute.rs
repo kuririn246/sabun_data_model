@@ -15,7 +15,7 @@ pub enum ListAttribute{
 }
 
 
-pub fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Result<ListAttribute>{
+pub(crate) fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -> Result<ListAttribute>{
     let error_message = "List's array must be Default, Old, Compatible or NextID";
 
     if array.len() == 0{

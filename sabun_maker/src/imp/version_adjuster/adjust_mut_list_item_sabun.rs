@@ -5,7 +5,7 @@ use crate::imp::version_adjuster::adjust_mut_list::adjust_inner_mut_list;
 use crate::imp::structs::def_obj::ListDefObj;
 use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
 
-pub(crate) fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String, ListSabValue>, names : &Names) -> Result<HashMap<String, ListSabValue>>{
+pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String, ListSabValue>, names : &Names) -> Result<HashMap<String, ListSabValue>>{
     let mut old_sabun = old_sabun;
 
     //デフォルトから変化しない場合はsabunには加わらないが、sabun.len()だと、

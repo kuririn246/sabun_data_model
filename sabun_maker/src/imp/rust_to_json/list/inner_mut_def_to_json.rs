@@ -4,7 +4,7 @@ use crate::imp::rust_to_json::string_set_to_json::{string_set_to_json};
 use crate::imp::structs::def_obj::InnerMutDefObj;
 use crate::imp::structs::my_json::Value;
 
-pub(crate) fn inner_mut_def_to_json(d : &InnerMutDefObj) -> Value{
+pub fn inner_mut_def_to_json(d : &InnerMutDefObj) -> Value{
     let mut result : Vec<Value> = Vec::new();
 
     result.push(Value::String("InnerMutDef".to_string()));

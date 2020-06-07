@@ -12,7 +12,7 @@ use crate::imp::json_to_rust::get_refs::get_ref;
 use json5_parser::Span;
 use crate::imp::json_to_rust::json_item_to_rust::json_item_to_rust_ref;
 
-pub(crate) fn json_obj_to_rust(v : &LinkedHashMap<String, JVal>, is_ref_obj : bool, span : &Span, names : &Names) -> Result<TmpObj>{
+pub fn json_obj_to_rust(v : &LinkedHashMap<String, JVal>, is_ref_obj : bool, span : &Span, names : &Names) -> Result<TmpObj>{
     let mut r  = TmpObj::new(v.len(),span.clone());
     for (k,v) in v{
         let name = json_name(k).ok_or_else(|| format!("{} {} is not a valid name {}",v.line_str(), k, names))?;

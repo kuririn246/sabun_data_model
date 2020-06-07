@@ -12,7 +12,7 @@ use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_array::RustArray;
 use crate::imp::structs::rust_string::RustString;
 
-pub(crate) fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue>{
+pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue>{
     use GatResult::*;
     let gat = get_array_type(array);
     return match gat{
@@ -71,7 +71,7 @@ pub(crate) fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, spa
     }
 }
 
-pub(crate) enum GatResult{
+pub enum GatResult{
     AT(ArrayType),
     List,
     Data,
@@ -128,7 +128,7 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
     NotDefined
 }
 
-pub(crate) fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result<RustArray>{
+pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result<RustArray>{
     let mut vec : Vec<RustParam> = Vec::with_capacity(a.len());
     for item in a{
         let val = match item{

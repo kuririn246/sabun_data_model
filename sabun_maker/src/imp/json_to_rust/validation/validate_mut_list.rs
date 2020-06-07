@@ -6,7 +6,7 @@ use crate::imp::structs::def_obj::ListDefObj;
 use crate::imp::structs::rust_list::MutListItem;
 use crate::imp::structs::root_obj::RootObject;
 
-pub(crate) fn validate_mut_list(def : &ListDefObj, map : &LinkedHashMap<u64, MutListItem>, root : &RootObject,
+pub fn validate_mut_list(def : &ListDefObj, map : &LinkedHashMap<u64, MutListItem>, root : &RootObject,
                          can_use_old: bool, names : &Names) -> Result<()>{
     for (idx, val) in map{
         let idx = idx.to_string();

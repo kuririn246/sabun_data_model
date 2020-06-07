@@ -7,7 +7,7 @@ use crate::imp::structs::def_obj::ListDefObj;
 use crate::imp::structs::my_json::Value;
 use crate::imp::structs::list_type::ListType;
 
-pub(crate) fn default_to_json(obj : &ListDefObj) -> Value{
+pub fn default_to_json(obj : &ListDefObj) -> Value{
     let mut def = value_map_to_json(&btree_map(&obj.default().iter().map(|(k,v)| (k.to_string(), v.clone().into_rust_value())).collect()));
     if obj.refs().refs().len() != 0 {
         if obj.refs().is_enum() {
@@ -22,7 +22,7 @@ pub(crate) fn default_to_json(obj : &ListDefObj) -> Value{
     return Value::Map(def);
 }
 
-pub(crate) fn inner_def_to_json(obj : &ListDefObj, lt : ListType) -> Value{
+pub fn inner_def_to_json(obj : &ListDefObj, lt : ListType) -> Value{
     let mut result = vec![];
     result.push(Value::String(list_type_to_string(&lt, false)));
     result.push(Value::Array(vec![default_to_json(obj)]));

@@ -7,7 +7,7 @@ use crate::imp::structs::def_obj::ListDefObj;
 use crate::imp::structs::rust_list::ListItem;
 use crate::imp::structs::root_obj::RootObject;
 
-pub(crate) fn validate_data(def : &ListDefObj, data_map : &HashMap<String, ListItem>, root : &RootObject, old : &HashSet<String>,
+pub fn validate_data(def : &ListDefObj, data_map : &HashMap<String, ListItem>, root : &RootObject, old : &HashSet<String>,
                      can_use_old: bool, names : &Names) -> Result<()>{
     validate_old_data_id(old,data_map, names)?;
 

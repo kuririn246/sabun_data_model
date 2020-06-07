@@ -10,7 +10,7 @@ use crate::imp::structs::list_value::ListDefValue;
 ///ちゃんとDataDef型になっているかどうか、RefDefがちゃんとしてるかどうか、Compatibleかどうか、などDefについて調べる
 /// Itemについて調べるvalidate_list/data/mut_listとは違う
 /// is_mutの場合、InnerMutしか認めない
-pub(crate) fn validate_list_def(def : &ListDefObj, root : &RootObject, can_use_old : bool, is_mut : bool, names : &Names) -> Result<()> {
+pub fn validate_list_def(def : &ListDefObj, root : &RootObject, can_use_old : bool, is_mut : bool, names : &Names) -> Result<()> {
     validate_ref_def(def.refs(), names)?;
     validate_old_def_mem(def.old(), def.default(), names)?;
 

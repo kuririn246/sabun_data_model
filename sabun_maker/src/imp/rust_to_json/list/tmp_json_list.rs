@@ -5,7 +5,7 @@ use crate::imp::structs::rust_value::RustValue;
 use crate::imp::structs::rust_list::{ListItem, MutListItem, ConstData, ConstList, MutList, InnerData, InnerList, InnerMutList};
 use crate::imp::structs::ref_value::RefValue;
 
-pub(crate) struct TmpJsonList{
+pub struct TmpJsonList{
     pub vec : Vec<TmpJsonObj>,
     pub old : Option<BTreeSet<String>>,
     pub default : Option<ListDefObj>,
@@ -13,7 +13,7 @@ pub(crate) struct TmpJsonList{
     pub next_id : Option<u64>,
 }
 
-pub(crate) struct TmpJsonObj{
+pub struct TmpJsonObj{
     pub default : BTreeMap<String, RustValue>,
     pub id : Option<IdValue>,
     pub refs: Option<TmpJsonRefs>,
@@ -39,7 +39,7 @@ impl TmpJsonObj{
     }
 }
 
-pub(crate) struct TmpJsonRefs{
+pub struct TmpJsonRefs{
     pub map : BTreeMap<String, RefValue>,
     pub old : Option<BTreeSet<String>>,
     pub is_enum : bool,

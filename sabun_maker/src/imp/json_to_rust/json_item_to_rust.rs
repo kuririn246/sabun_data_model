@@ -9,7 +9,7 @@ use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_string::RustString;
 
 
-pub(crate) fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {
+pub fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {
     let names = &names.append(name);
     match v {
         JVal::Bool(b, _) => {
@@ -37,7 +37,7 @@ pub(crate) fn json_item_to_rust(name : &str, value_type : ValueType, v : &JVal, 
     }
 }
 
-pub(crate) fn json_item_to_rust_ref(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {
+pub fn json_item_to_rust_ref(name : &str, value_type : ValueType, v : &JVal, names : &Names) -> Result<RustValue> {
     let names = &names.append(name);
     match v {
         JVal::Bool(_, span) => {
