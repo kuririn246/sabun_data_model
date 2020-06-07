@@ -13,8 +13,6 @@ pub mod get_refs;
 pub mod json_dir_to_rust;
 pub mod construct_root;
 pub mod validation;
-//
-//
 use json5_parser::JVal;
 use names::Names;
 use crate::error::Result;
@@ -22,8 +20,7 @@ use crate::structs::root_object::{RootObject};
 use crate::structs::rust_value::{RustValue};
 use crate::structs::value_type::ValueType;
 
-//
-pub fn json_root_to_rust(json : &str) -> Result<RootObject>{
+pub(crate) fn json_root_to_rust(json : &str) -> Result<RootObject>{
     let jval = json5_parser::from_str(json)?;
 
     return match jval{
@@ -37,7 +34,7 @@ pub fn json_root_to_rust(json : &str) -> Result<RootObject>{
     };
 }
 
-pub fn json_item_str_to_rust(json : &str, item_name : &str) -> Result<RustValue>{
+pub(crate) fn json_item_str_to_rust(json : &str, item_name : &str) -> Result<RustValue>{
     let jval = json5_parser::from_str(json)?;
 
     json_item_to_rust::json_item_to_rust(item_name, ValueType::Normal, &jval, &Names::new(""))

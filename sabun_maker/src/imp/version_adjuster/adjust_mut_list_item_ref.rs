@@ -5,7 +5,7 @@ use crate::imp::json_to_rust::names::Names;
 use crate::structs::ref_value::{RefSabValue};
 use crate::structs::qv::Qv;
 
-pub fn adjust_mut_list_item_ref(def : &RefDefObj, old_ref : HashMap<String, RefSabValue>, _names : &Names) -> Result<HashMap<String, RefSabValue>>{
+pub(crate) fn adjust_mut_list_item_ref(def : &RefDefObj, old_ref : HashMap<String, RefSabValue>, _names : &Names) -> Result<HashMap<String, RefSabValue>>{
     let mut old_ref = old_ref;
 
     //事前に大きさが決定できないが、refのusecaseだとundefinedは少なく、default値のままが多いと思うので、sabunのlenを使う

@@ -8,7 +8,7 @@ use crate::imp::rust_to_json::list::default_to_json::{ inner_def_to_json};
 use crate::imp::rust_to_json::list::inner_mut_def_to_json::inner_mut_def_to_json;
 use crate::structs::value_type::ValueType;
 
-pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> (String, Value){
+pub(crate) fn rust_value_to_json_value(v : &RustValue, name : &str) -> (String, Value){
     let value = match v {
         RustValue::Param(param, vt) => {
             return (name_with_suffix(name, *vt), get_param(param))

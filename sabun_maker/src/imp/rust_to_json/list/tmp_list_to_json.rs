@@ -6,7 +6,7 @@ use crate::imp::rust_to_json::list::default_to_json::default_to_json;
 use crate::imp::rust_to_json::string_set_to_json::{string_set_to_json};
 use crate::imp::rust_to_json::list::tmp_obj_to_json::tmp_obj_to_json;
 
-pub fn rust_list_to_json(l : &TmpJsonList, list_type : ListType) -> Value{
+pub(crate) fn rust_list_to_json(l : &TmpJsonList, list_type : ListType) -> Value{
    let mut result : Vec<Value> = vec![];
 
    result.push(val_s(list_type_to_string(&list_type, l.vec.len() != 0)));

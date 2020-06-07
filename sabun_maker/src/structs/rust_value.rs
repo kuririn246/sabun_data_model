@@ -114,28 +114,10 @@ pub(crate) enum ListSabValue{
 
 
 pub(crate) enum ListType{
-    Data, List, Mut, InnerData, InnerList, InnerMut, InnderDataDef, InnerListDef, InnerMutDef,
+    Data, List, Mut, InnerData, InnerList, InnerMut, InnderDataDef, InnerListDef, //InnerMutDef,
 }
 
-// pub enum RustValueKind {
-//     Param, InnerDef, InnerList, List
-// }
-//
-// impl RustValueKind {
-//     pub fn acceptable(&self, other : &Self) -> bool{
-//         match self{
-//             RustValueKind::Param => match other{
-//                 RustValueKind::Param => true,
-//                 _ => false,
-//             }
-//             RustValueKind::InnerDef => match other{
-//                 RustValueKind::InnerList => true,
-//                 _ => false,
-//             }
-//             RustValueKind::List | RustValueKind::InnerList => false,
-//         }
-//     }
-// }
+
 
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) struct RustArray{

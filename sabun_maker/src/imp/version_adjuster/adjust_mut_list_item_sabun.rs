@@ -5,7 +5,7 @@ use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::version_adjuster::adjust_mut_list::adjust_inner_mut_list;
 
-pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String, ListSabValue>, names : &Names) -> Result<HashMap<String, ListSabValue>>{
+pub(crate) fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String, ListSabValue>, names : &Names) -> Result<HashMap<String, ListSabValue>>{
     let mut old_sabun = old_sabun;
 
     //デフォルトから変化しない場合はsabunには加わらないが、sabun.len()だと、

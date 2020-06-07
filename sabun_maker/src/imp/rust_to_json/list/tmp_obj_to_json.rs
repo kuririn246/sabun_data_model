@@ -5,7 +5,7 @@ use crate::imp::json_to_rust::tmp::tmp_obj::IdValue;
 use crate::imp::rust_to_json::string_set_to_json::string_set_to_json_short;
 use crate::imp::rust_to_json::list::tmp_refs_to_json::tmp_refs_to_json;
 
-pub fn tmp_obj_to_json(obj : &TmpJsonObj) -> Value{
+pub(crate) fn tmp_obj_to_json(obj : &TmpJsonObj) -> Value{
     let mut result = value_map_to_json(&obj.default);
     if let Some(id) = &obj.id{
         match id{
