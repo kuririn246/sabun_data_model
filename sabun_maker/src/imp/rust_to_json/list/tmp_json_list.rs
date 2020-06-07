@@ -1,6 +1,6 @@
 use crate::imp::json_to_rust::tmp::tmp_obj::{ IdValue};
 use std::collections::{HashSet, HashMap, BTreeSet, BTreeMap};
-use crate::imp::structs::root_object::ListDefObj;
+use crate::imp::structs::def_obj::ListDefObj;
 use crate::imp::structs::rust_value::RustValue;
 use crate::imp::structs::rust_list::{ListItem, MutListItem, ConstData, ConstList, MutList, InnerData, InnerList, InnerMutList};
 use crate::imp::structs::ref_value::RefValue;

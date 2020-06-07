@@ -1,7 +1,7 @@
 use crate::imp::structs::qv::QvType;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub(crate) enum ValueType{
+pub enum ValueType{
     Normal,
     Nullable,
     Undefiable,

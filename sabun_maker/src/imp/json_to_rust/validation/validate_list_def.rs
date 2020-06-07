@@ -3,9 +3,9 @@ use crate::imp::json_to_rust::validation::validate_compatible::validate_compatib
 use crate::imp::json_to_rust::validation::validate_ref_def::validate_ref_def;
 use crate::error::Result;
 use crate::imp::json_to_rust::validation::validate_old_def_mem::validate_old_def_mem;
-use crate::imp::structs::root_object::ListDefObj;
-use crate::structs::root_obj::RootObject;
-use crate::imp::structs::rust_value::ListDefValue;
+use crate::imp::structs::def_obj::ListDefObj;
+use crate::imp::structs::root_obj::RootObject;
+use crate::imp::structs::list_value::ListDefValue;
 
 ///ちゃんとDataDef型になっているかどうか、RefDefがちゃんとしてるかどうか、Compatibleかどうか、などDefについて調べる
 /// Itemについて調べるvalidate_list/data/mut_listとは違う

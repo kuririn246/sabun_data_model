@@ -1,13 +1,15 @@
 use std::collections::{HashSet, HashMap};
 use json5_parser::Span;
 use crate::error::Result;
-use crate::imp::structs::rust_value::{RustValue, ListSabValue, ListDefValue, RootValue};
+use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::ref_value::{RefValue, RefSabValue};
-use crate::imp::structs::root_object::{RefDefObj, ListDefObj};
-use crate::structs::root_obj::RootObject;
+use crate::imp::structs::def_obj::{RefDefObj, ListDefObj};
 use crate::imp::structs::rust_list::{ListItem, MutListItem};
+use crate::imp::structs::root_obj::RootObject;
+use crate::imp::structs::root_value::RootValue;
+use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
 
-pub(crate) struct TmpObj{
+pub struct TmpObj{
     pub default : HashMap<String, RustValue>,
     pub id : Option<IdValue>,
     pub include : Vec<String>,
@@ -16,7 +18,7 @@ pub(crate) struct TmpObj{
     pub span : Span,
 }
 
-pub(crate) struct TmpRefs{
+pub struct TmpRefs{
     pub map : HashMap<String, RefValue>,
     pub old : HashSet<String>,
     pub is_enum : bool,

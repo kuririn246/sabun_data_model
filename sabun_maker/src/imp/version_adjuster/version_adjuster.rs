@@ -3,8 +3,8 @@ use crate::imp::version_adjuster::adjust_mut_list::adjust_mut_list;
 use std::collections::HashMap;
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
-use crate::structs::root_obj::RootObject;
-use crate::imp::structs::rust_value::RootValue;
+use crate::imp::structs::root_obj::RootObject;
+use crate::imp::structs::root_value::RootValue;
 
 /// paramのsabunがあれば上書き、mut_listはoldのものを全部入れ、（あるなら）newの方のものは全削除して入れ替える
 /// 基本的に、新バージョンのjsonと旧バージョンのデータが有り、旧バージョンのデータはRootにsabun、MutListは追加が行われていることが想定されている

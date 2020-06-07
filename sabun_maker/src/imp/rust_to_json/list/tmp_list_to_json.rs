@@ -1,10 +1,10 @@
-use crate::structs::my_json::Value;
 use crate::imp::rust_to_json::list::tmp_json_list::TmpJsonList;
 use crate::imp::rust_to_json::list::list_type_to_string::list_type_to_string;
 use crate::imp::rust_to_json::list::default_to_json::default_to_json;
 use crate::imp::rust_to_json::string_set_to_json::{string_set_to_json};
 use crate::imp::rust_to_json::list::tmp_obj_to_json::tmp_obj_to_json;
-use crate::imp::structs::rust_value::ListType;
+use crate::imp::structs::my_json::Value;
+use crate::imp::structs::list_type::ListType;
 
 pub(crate) fn rust_list_to_json(l : &TmpJsonList, list_type : ListType) -> Value{
    let mut result : Vec<Value> = vec![];

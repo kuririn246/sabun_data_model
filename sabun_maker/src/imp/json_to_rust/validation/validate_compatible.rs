@@ -2,8 +2,8 @@ use std::collections::{HashSet};
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::imp::json_to_rust::json_name::dot_chained_name;
-use crate::imp::structs::root_object::ListDefObj;
-use crate::structs::root_obj::RootObject;
+use crate::imp::structs::def_obj::ListDefObj;
+use crate::imp::structs::root_obj::RootObject;
 
 pub(crate) fn validate_compatible(source_def : &ListDefObj, compatible : &HashSet<String>, root : &RootObject, can_use_old : bool, names : &Names) -> Result<()>{
     for dot_chained in compatible{

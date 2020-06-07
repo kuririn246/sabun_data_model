@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
-use crate::imp::structs::root_object::RefDefObj;
+use crate::imp::structs::def_obj::RefDefObj;
 use crate::imp::structs::ref_value::RefSabValue;
 use crate::imp::structs::qv::Qv;
 

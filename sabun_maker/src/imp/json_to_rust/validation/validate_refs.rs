@@ -2,11 +2,11 @@ use std::collections::{HashMap};
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::rust_to_json::name_with_suffix::name_with_suffix;
-use crate::imp::structs::root_object::RefDefObj;
+use crate::imp::structs::def_obj::RefDefObj;
 use crate::imp::structs::ref_value::RefSabValue;
-use crate::structs::root_obj::RootObject;
 use crate::imp::structs::qv::Qv;
-use crate::imp::structs::rust_value::RootValue;
+use crate::imp::structs::root_obj::RootObject;
+use crate::imp::structs::root_value::RootValue;
 
 pub(crate) fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefSabValue>, root : &RootObject, can_use_old: bool, names : &Names) -> Result<()>{
     if def.is_enum(){

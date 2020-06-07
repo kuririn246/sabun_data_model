@@ -1,3 +1,3 @@
-pub mod root_obj;
-pub mod my_json;
-pub mod json_file;
+pub use crate::imp::structs::json_file::JsonFile as JsonFile;
+pub use crate::imp::structs::json_file::JsonDir as JsonDir;
+pub use crate::imp::structs::root_obj::RootObject as RootObject;

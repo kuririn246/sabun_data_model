@@ -8,9 +8,9 @@ use crate::imp::json_to_rust::{json_root_to_rust, json_item_str_to_rust};
 use std::collections::HashMap;
 
 use crate::imp::json_to_rust::construct_root::construct_root;
-use crate::structs::root_obj::RootObject;
-use crate::structs::json_file::JsonFile;
-use crate::imp::structs::rust_value::RootValue;
+use crate::imp::structs::root_obj::RootObject;
+use crate::imp::structs::json_file::JsonFile;
+use crate::imp::structs::root_value::RootValue;
 
 pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RootObject>{
     let dirs = std::fs::read_dir(dir_path)?;

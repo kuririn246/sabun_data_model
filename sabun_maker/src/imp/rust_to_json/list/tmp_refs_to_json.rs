@@ -1,8 +1,8 @@
 use crate::imp::rust_to_json::list::tmp_json_list::TmpJsonRefs;
-use crate::structs::my_json::Value;
 use crate::imp::rust_to_json::list::ref_def_obj_to_json::reconstruct_ref_value;
 use std::collections::BTreeMap;
 use crate::imp::rust_to_json::string_set_to_json::string_set_to_json_short;
+use crate::imp::structs::my_json::Value;
 
 pub(crate) fn tmp_refs_to_json(refs : &TmpJsonRefs) -> Value{
     let mut result :BTreeMap<String, Value> = BTreeMap::new();

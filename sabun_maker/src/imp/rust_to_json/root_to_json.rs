@@ -3,9 +3,10 @@ use crate::imp::rust_to_json::list::value_map_to_json::value_map_to_json;
 use crate::imp::rust_to_json::list::tmp_json_list::{btree_map, btree_set};
 use crate::imp::rust_to_json::string_set_to_json::{string_set_to_json_short};
 use std::collections::HashMap;
-use crate::structs::root_obj::RootObject;
-use crate::structs::my_json::Value;
-use crate::imp::structs::rust_value::{RustValue, RootValue};
+use crate::imp::structs::rust_value::{RustValue};
+use crate::imp::structs::root_obj::RootObject;
+use crate::imp::structs::my_json::Value;
+use crate::imp::structs::root_value::RootValue;
 
 ///本来デフォルト値と差分が保存されているのだが、見やすくするためにまとめてデフォルト値にしてしまう。
 ///デフォルト値も差分も全部Json化したいユースケースもあるかもしれない・・・？

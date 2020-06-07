@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::version_adjuster::adjust_mut_list::adjust_inner_mut_list;
-use crate::imp::structs::root_object::ListDefObj;
-use crate::imp::structs::rust_value::{ListSabValue, ListDefValue};
+use crate::imp::structs::def_obj::ListDefObj;
+use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
 
 pub(crate) fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String, ListSabValue>, names : &Names) -> Result<HashMap<String, ListSabValue>>{
     let mut old_sabun = old_sabun;

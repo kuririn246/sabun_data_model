@@ -5,9 +5,12 @@ use json5_parser::{JVal, Span};
 use super::list::json_list_to_rust::json_list_to_rust;
 use crate::imp::json_to_rust::array_null::array_null_or_undefined;
 use crate::imp::structs::value_type::ValueType;
-use crate::imp::structs::rust_value::{RustValue, RustParam, RustArray, RustString};
+use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::array_type::ArrayType;
 use crate::imp::structs::qv::Qv;
+use crate::imp::structs::rust_param::RustParam;
+use crate::imp::structs::rust_array::RustArray;
+use crate::imp::structs::rust_string::RustString;
 
 pub(crate) fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue>{
     use GatResult::*;

@@ -3,7 +3,7 @@ use crate::error::Result;
 use crate::imp::version_adjuster::adjust_mut_list_item_sabun::adjust_mut_list_item_sabun;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::version_adjuster::adjust_mut_list_item_ref::adjust_mut_list_item_ref;
-use crate::imp::structs::root_object::ListDefObj;
+use crate::imp::structs::def_obj::ListDefObj;
 use crate::imp::structs::rust_list::{MutListItem, MutList, InnerMutList};
 
 

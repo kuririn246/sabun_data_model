@@ -1,10 +1,10 @@
 use std::collections::{HashSet, HashMap};
-use crate::imp::structs::rust_value::ListDefValue;
 use crate::imp::structs::ref_value::RefValue;
+use crate::imp::structs::list_value::ListDefValue;
 
 
 #[derive(Debug, PartialEq, Clone)]
-pub(crate) struct ListDefObj{
+pub struct ListDefObj{
     default : Box<HashMap<String, ListDefValue>>,
     ///RustValueを巨大にしすぎないためにBoxにしてサイズを削る
     refs: Box<RefDefObj>,
@@ -36,7 +36,7 @@ impl ListDefObj{
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub(crate) struct RefDefObj {
+pub struct RefDefObj {
     refs: Box<HashMap<String, RefValue>>,
     /// Enum とRefの二通りの定義の仕方があり、Enumの場合は Ref のうち一つだけ値があり、ほかは全部nullにしなきゃいけない。
     /// プログラムからはmatch でアクセス出来る。値があるRefをキャストしてゲットする。
@@ -70,7 +70,7 @@ impl RefDefObj{
 
 
 #[derive(Debug, PartialEq, Clone)]
-pub(crate) struct InnerMutDefObj {
+pub struct InnerMutDefObj {
     list_def : Box<ListDefObj>,
     undefinable: bool,
     compatible : Box<HashSet<String>>,

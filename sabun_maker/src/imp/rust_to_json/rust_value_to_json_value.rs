@@ -4,9 +4,10 @@ use crate::imp::rust_to_json::list::tmp_json_list::TmpJsonList;
 use crate::imp::rust_to_json::name_with_suffix::name_with_suffix;
 use crate::imp::rust_to_json::list::default_to_json::{ inner_def_to_json};
 use crate::imp::rust_to_json::list::inner_mut_def_to_json::inner_mut_def_to_json;
-use crate::imp::structs::rust_value::{RustValue, ListType};
-use crate::structs::my_json::Value;
+use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::my_json::Value;
+use crate::imp::structs::list_type::ListType;
 
 pub(crate) fn rust_value_to_json_value(v : &RustValue, name : &str) -> (String, Value){
     let value = match v {

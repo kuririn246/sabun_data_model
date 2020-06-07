@@ -1,7 +1,7 @@
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::imp::json_to_rust::validation::validate_old_def_mem::validate_old_ref_def;
-use crate::imp::structs::root_object::RefDefObj;
+use crate::imp::structs::def_obj::RefDefObj;
 use crate::imp::structs::qv::Qv;
 
 

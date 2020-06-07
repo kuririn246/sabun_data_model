@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
-use crate::imp::structs::rust_value::{RootValue, RustParam};
+use crate::imp::structs::root_value::RootValue;
+use crate::imp::structs::rust_param::RustParam;
 
 #[derive(Debug, PartialEq)]
 pub struct RootObject{

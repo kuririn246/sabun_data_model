@@ -3,10 +3,10 @@ use std::collections::{HashSet, HashMap};
 use json5_parser::Span;
 use crate::error::Result;
 use linked_hash_map::LinkedHashMap;
-use crate::imp::structs::root_object::{ListDefObj, InnerMutDefObj};
+use crate::imp::structs::def_obj::{ListDefObj, InnerMutDefObj};
 use crate::imp::structs::rust_list::{ConstList, InnerList, ConstData, InnerData, MutList, InnerMutList, ListItem, MutListItem};
 
-pub(crate) struct TmpList{
+pub struct TmpList{
     pub vec : Vec<TmpObj>,
     ///複数回定義のエラーを検出したいのでOptionにする
     pub old : Option<HashSet<String>>,
