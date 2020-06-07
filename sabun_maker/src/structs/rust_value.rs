@@ -320,6 +320,15 @@ impl RustValue{
 }
 
 impl ListDefValue{
+    pub fn to_rust_value(self) -> RustValue{
+        match self{
+            ListDefValue::Param(p,v) => RustValue::Param(p,v),
+            ListDefValue::InnerDataDef(d) => RustValue::InnerDataDef(d),
+            ListDefValue::InnerListDef(l) => RustValue::InnerListDef(l),
+            ListDefValue::InnerMutDef(m) => RustValue::InnerMutDef(m),
+        }
+    }
+
     pub fn acceptable(&self, other : &ListSabValue) -> bool{
 
     }
@@ -336,6 +345,15 @@ impl ListDefValue{
             ListDefValue::InnerListDef(_) => 7,
             ListDefValue::InnerDataDef(_) => 8,
             ListDefValue::InnerMutDef(_) => 9,
+        }
+    }
+
+    pub fn inner_def(&self) -> Option<&ListDefObj>{
+        match self{
+            ListDefValue::InnerDataDef(d) => Some(d),
+            ListDefValue::InnerListDef(d) => Some(d),
+            ListDefValue::InnerMutDef(obj) => Some(obj.list_def()),
+            _ => None,
         }
     }
 }
@@ -357,3 +375,30 @@ impl ListSabValue{
     }
 }
 
+impl RootValue{
+    pub fn list_def(&self) ->  Option<&ListDefObj> {
+        match self {
+            RustValue::Data(d) => Some(d.default()),
+            RustValue::List(d) => Some(d.default()),
+            RustValue::Mut(d) => Some(d.default()),
+            _ => None,
+        }
+    }
+
+    pub fn value_type(&self) -> ValueType{
+        match self{
+            RootValue::Param(_param, vt) => vt.clone(),
+            //RustValue::InnerMutDef(obj) => if obj.undefinable() { ValueType::Undefiable } else{ ValueType::Normal }
+            _ => ValueType::Normal,
+        }
+    }
+
+    pub fn to_rust_value(self) -> RustValue{
+        match self{
+            RootValue::Param(p,v) => RustValue::Param(p,v),
+            RootValue::Data(d) => RustValue::Data(d),
+            RootValue::List(l) => RustValue::List(l),
+            RootValue::Mut(m) => RustValue::Mut(m),
+        }
+    }
+}

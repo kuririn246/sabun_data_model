@@ -8,7 +8,7 @@ use crate::structs::rust_value::ListType;
 use crate::imp::rust_to_json::list::list_type_to_string::list_type_to_string;
 
 pub fn default_to_json(obj : &ListDefObj) -> Value{
-    let mut def = value_map_to_json(&btree_map(obj.default()));
+    let mut def = value_map_to_json(&btree_map(&obj.default().iter().map(|(k,v)| (k.to_string(), v.to_rust_value())).collect()));
     if obj.refs().refs().len() != 0 {
         if obj.refs().is_enum() {
             def.insert("Enum".to_string(), Value::Map(ref_def_obj_to_json(obj.refs())));

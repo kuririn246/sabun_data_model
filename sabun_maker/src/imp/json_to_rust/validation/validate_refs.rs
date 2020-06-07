@@ -2,12 +2,12 @@ use crate::structs::root_object::{RootObject, RefDefObj};
 use std::collections::{HashMap};
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
-use crate::structs::ref_value::RefValue;
+use crate::structs::ref_value::{RefSabValue};
 use crate::imp::rust_to_json::name_with_suffix::name_with_suffix;
 use crate::structs::qv::{Qv};
-use crate::structs::rust_value::RustValue;
+use crate::structs::rust_value::{RootValue};
 
-pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefValue>, root : &RootObject, can_use_old: bool, names : &Names) -> Result<()>{
+pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefSabValue>, root : &RootObject, can_use_old: bool, names : &Names) -> Result<()>{
     if def.is_enum(){
        if sabun.len() != 1{
            Err(format!("{} one of the Enum's member must be defined", names))?
@@ -33,7 +33,7 @@ pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefValue>, root 
         match def.refs().get(name){
             Some(h) =>{
                 if h.acceptable(sab_val) == false{
-                    Err(format!("{} {} {} is not valid for {}", names, name, sab_val.value_js_string(), name_with_suffix(name, h.value_type())))?
+                    Err(format!("{} {} {} is not valid for {}", names, name, sab_val.value().js_string(), name_with_suffix(name, h.value_type())))?
                 }
                 match sab_val.value() {
                     Qv::Val(id) =>{
@@ -41,7 +41,7 @@ pub fn validate_refs(def : &RefDefObj, sabun : &HashMap<String, RefValue>, root 
                             Err(format!("{} ref {} is empty", names, name))?
                         }
                         match root.default().get(name) {
-                            Some(RustValue::Data(d)) => {
+                            Some(RootValue::Data(d)) => {
                                 if d.list().get(id).is_none() {
                                     Err(format!("{}'s {} was not found {}", name, id, names))?
                                 }

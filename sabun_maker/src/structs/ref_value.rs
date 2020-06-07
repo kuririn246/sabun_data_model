@@ -34,7 +34,7 @@ impl RefValue{
     }
 
     ///右の値を自身に代入できるか
-    pub fn acceptable(&self, other : &Self) -> bool{
+    pub fn acceptable(&self, other : &RefSabValue) -> bool{
         self.value_type.acceptable(&other.value.qv_type())
     }
 
@@ -43,12 +43,8 @@ impl RefValue{
         self.value_type.compatible(&other.value_type)
     }
 
-    ///null undefined "value" のどれか
-    pub fn value_js_string(&self) -> String{
-        match &self.value{
-            Qv::Val(s) => format!(r#""{}""#,s.to_string()),
-            Qv::Null => "null".to_string(),
-            Qv::Undefined => "undefined".to_string(),
-        }
-    }
+
+}
+impl RefSabValue{
+    pub fn value(&self) -> &Qv<String>{ &self.value }
 }

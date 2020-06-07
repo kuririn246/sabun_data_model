@@ -1,12 +1,12 @@
 use std::collections::{HashMap};
-use crate::structs::rust_value::{RustValue, ListSabValue};
+use crate::structs::rust_value::{ListSabValue, ListDefValue};
 use crate::structs::root_object::{RootObject, ListDefObj};
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::imp::json_to_rust::validation::validate_data::validate_data;
 use crate::imp::json_to_rust::validation::validate_list::validate_list;
 use crate::imp::json_to_rust::validation::validate_refs::validate_refs;
-use crate::structs::ref_value::{RefValue, RefSabValue};
+use crate::structs::ref_value::{ RefSabValue};
 use crate::imp::json_to_rust::validation::validate_mut_list::validate_mut_list;
 
 pub fn validate_list_item(def : &ListDefObj, sabun_values : &HashMap<String, ListSabValue>,
@@ -26,21 +26,21 @@ pub fn validate_list_item(def : &ListDefObj, sabun_values : &HashMap<String, Lis
         }
         //inner listは中までしっかり調べる必要があるわね
         match def_value {
-            RustValue::InnerDataDef(def) => {
-                if let RustValue::InnerData(data) = val {
+            ListDefValue::InnerDataDef(def) => {
+                if let ListSabValue::InnerData(data) = val {
                     validate_data(def, data.list(), root, data.old(), can_use_old, &names.append(name))?
                 } else {
                     //correspondしてることは確認済みである
                     unreachable!();
                 }
             },
-            RustValue::InnerListDef(def) => {
-                if let RustValue::InnerList(list) = val {
+            ListDefValue::InnerListDef(def) => {
+                if let ListSabValue::InnerList(list) = val {
                     validate_list(def, list.list(), root, can_use_old, &names.append(name))?
                 } else { unreachable!(); }
             },
-            RustValue::InnerMutDef(def) => {
-                let list = if let RustValue::InnerMut(list) = val { list } else { unreachable!() };
+            ListDefValue::InnerMutDef(def) => {
+                let list = if let ListSabValue::InnerMut(list) = val { list } else { unreachable!() };
                 match list {
                     Some(list) => {
                         validate_mut_list(def.list_def(), list.list(), root, can_use_old, &names.append(name))?

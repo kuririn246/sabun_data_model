@@ -24,3 +24,14 @@ impl<T> Qv<T>{
 pub enum QvType{
     Val, Undefined, Null
 }
+
+impl Qv<String>{
+    ///null undefined "value" のどれか
+    pub fn js_string(&self) -> String{
+        match &self.value{
+            Qv::Val(s) => format!(r#""{}""#,s.to_string()),
+            Qv::Null => "null".to_string(),
+            Qv::Undefined => "undefined".to_string(),
+        }
+    }
+}
