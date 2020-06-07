@@ -1,9 +1,9 @@
-use crate::structs::value_type::ValueType;
-use crate::structs::qv::{QvType, Qv};
-use crate::structs::rust_list::{ConstData, ConstList, MutList, InnerList, InnerData, InnerMutList};
-use crate::structs::array_type::ArrayType;
-use crate::structs::root_object::{ListDefObj, InnerMutDefObj};
 use std::fmt::{Display, Formatter};
+use crate::imp::structs::qv::{Qv, QvType};
+use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::rust_list::{ConstData, ConstList, MutList, InnerData, InnerList, InnerMutList};
+use crate::imp::structs::root_object::{ListDefObj, InnerMutDefObj};
+use crate::imp::structs::array_type::ArrayType;
 
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) enum RustParam{
@@ -29,7 +29,7 @@ pub(crate) enum RustValue{
 }
 
 impl RustValue{
-    pub(crate) fn to_root_value(self) -> Result<RootValue, String>{
+    pub(crate) fn into_root_value(self) -> Result<RootValue, String>{
         let v = match self{
             RustValue::Param(p,v) => RootValue::Param(p,v),
             RustValue::Data(d) => RootValue::Data(d),
@@ -40,14 +40,14 @@ impl RustValue{
         Ok(v)
     }
 
-    pub(crate) fn to_root_value2(self, name : &str) -> crate::error::Result<RootValue>{
-        match self.to_root_value(){
+    pub(crate) fn into_root_value2(self, name : &str) -> crate::error::Result<RootValue>{
+        match self.into_root_value(){
             Ok(a) => Ok(a),
             Err(s) =>{ Err(format!("{} the root obj can't have {}", name, s))? }
         }
     }
 
-    pub(crate) fn to_list_def_value(self) -> Result<ListDefValue, String>{
+    pub(crate) fn into_list_def_value(self) -> Result<ListDefValue, String>{
         let v = match self{
             RustValue::Param(p,v) => ListDefValue::Param(p,v),
             RustValue::InnerDataDef(d) => ListDefValue::InnerDataDef(d),
@@ -59,7 +59,7 @@ impl RustValue{
     }
 
     ///失敗時はtype_stringを返す
-    pub(crate) fn to_list_sab_value(self) -> Result<ListSabValue, String>{
+    pub(crate) fn into_list_sab_value(self) -> Result<ListSabValue, String>{
         let v = match self{
             RustValue::Param(p,_v) => ListSabValue::Param(p),
             RustValue::InnerData(d) => ListSabValue::InnerData(d),
@@ -220,7 +220,7 @@ impl RustParam{
 
 
 impl ListDefValue{
-    pub(crate) fn to_rust_value(self) -> RustValue{
+    pub(crate) fn into_rust_value(self) -> RustValue{
         match self{
             ListDefValue::Param(p,v) => RustValue::Param(p,v),
             ListDefValue::InnerDataDef(d) => RustValue::InnerDataDef(d),
@@ -305,7 +305,10 @@ impl ListSabValue{
         }
     }
 
-    pub(crate) fn to_rust_value(self) -> RustValue{
+    ///ValueType::NormalとしてRustValue化する。これをjsonにすると、param_name : ["Num",null]とか言った感じになって、
+    /// nullなのに?がない形だが、ListSabでは名前に?をつけるのは必須ではなく、むしろノイズになるので?は消す方が良いのでこうする
+    /// nullの場合は"param_name?":["Num",null]のように?を補う実装があってもいいとは思うが、使いみちが今の所ない
+    pub(crate) fn into_rust_value_for_json(self) -> RustValue{
         match self{
             //value側は名前に?とか!とかつけなくてよいのでValueType::Normal
             ListSabValue::Param(p) => RustValue::Param(p, ValueType::Normal),
@@ -335,7 +338,7 @@ impl RootValue{
     }
 
 
-    pub(crate) fn to_rust_value(self) -> RustValue{
+    pub(crate) fn into_rust_value(self) -> RustValue{
         match self{
             RootValue::Param(p,v) => RustValue::Param(p,v),
             RootValue::Data(d) => RustValue::Data(d),

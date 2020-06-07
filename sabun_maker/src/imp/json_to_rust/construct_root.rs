@@ -1,10 +1,10 @@
 use crate::imp::json_to_rust::json_name::{json_name, NameType};
 use std::collections::{HashMap};
 use crate::error::Result;
-use crate::structs::root_object::{ RootObject};
-use crate::structs::rust_value::{ RootValue};
-use crate::structs::value_type::ValueType;
 use crate::imp::json_to_rust::validation::validate_root::validate_root;
+use crate::structs::root_obj::RootObject;
+use crate::imp::structs::rust_value::RootValue;
+use crate::imp::structs::value_type::ValueType;
 
 pub(crate) fn construct_root(root : RootObject, map : HashMap<String, RootValue>, validation : bool) -> Result<RootObject>{
     let mut default : HashMap<String, RootValue> = root.default().clone();

@@ -2,9 +2,9 @@ use json5_parser::{JVal, Span};
 use super::names::Names;
 use crate::error::Result;
 use super::json_array_to_rust::GatResult;
-use crate::structs::value_type::ValueType;
-use crate::structs::rust_value::{RustValue, RustParam};
-use crate::structs::qv::Qv;
+use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::rust_value::{RustValue, RustParam};
+use crate::imp::structs::qv::Qv;
 
 pub(crate) fn array_null_or_undefined(a : &[JVal], gat : GatResult, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue> {
     if a.len() != 1 {

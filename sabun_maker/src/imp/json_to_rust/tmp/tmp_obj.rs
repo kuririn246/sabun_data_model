@@ -1,10 +1,11 @@
-use crate::structs::rust_value::{RustValue, RootValue, ListSabValue, ListDefValue};
-use crate::structs::ref_value::{RefValue, RefSabValue};
 use std::collections::{HashSet, HashMap};
-use crate::structs::rust_list::{ListItem, MutListItem};
 use json5_parser::Span;
 use crate::error::Result;
-use crate::structs::root_object::{RefDefObj, RootObject, ListDefObj};
+use crate::imp::structs::rust_value::{RustValue, ListSabValue, ListDefValue, RootValue};
+use crate::imp::structs::ref_value::{RefValue, RefSabValue};
+use crate::imp::structs::root_object::{RefDefObj, ListDefObj};
+use crate::structs::root_obj::RootObject;
+use crate::imp::structs::rust_list::{ListItem, MutListItem};
 
 pub(crate) struct TmpObj{
     pub default : HashMap<String, RustValue>,
@@ -31,7 +32,7 @@ impl TmpRefs{
     //     self.map.into_iter().collect()
     // }
 
-    pub fn to_ref_def_obj(self) -> RefDefObj{
+    pub fn into_ref_def_obj(self) -> RefDefObj{
         RefDefObj::new(self.map,  self.is_enum, self.old)
     }
 }
@@ -47,12 +48,12 @@ impl TmpObj{
         TmpObj{ default : HashMap::with_capacity(capacity), id : None, include : vec![], refs : TmpRefs::new(0,span.clone()), old : HashSet::new(), span }
     }
 
-    pub fn to_root_obj(self) -> Result<RootObject>{
+    pub fn into_root_obj(self) -> Result<RootObject>{
         fn to_root_hash(map : HashMap<String, RustValue>) -> Result<HashMap<String, RootValue>>{
             let mut result : HashMap<String, RootValue> = HashMap::with_capacity(map.len());
 
             for (key,value) in map{
-                match value.to_root_value(){
+                match value.into_root_value(){
                     Ok(v) =>{ result.insert(key, v); },
                     Err(type_s) => Err(format!("{} root object can't have {}", key, type_s))?,
                 }
@@ -72,19 +73,19 @@ impl TmpObj{
             HashMap::new(), self.old))
     }
 
-    pub fn to_list_def_obj(self) -> Result<ListDefObj>{
+    pub fn into_list_def_obj(self) -> Result<ListDefObj>{
         if self.id.is_some(){
             Err(format!("{} list def can't have ID {}", self.span.line_str(), self.span.slice()))?
         }
         Ok(ListDefObj::new(to_list_def_val_map(self.default, &self.span)?,
-        self.refs.to_ref_def_obj(), self.old))
+                           self.refs.into_ref_def_obj(), self.old))
     }
 
     pub fn insert_default(&mut self, s : String, v : RustValue){
         self.default.insert(s, v);
     }
 
-    pub fn to_list_item(self) -> Result<ListItem>{
+    pub fn into_list_item(self) -> Result<ListItem>{
 
         if self.id.is_some(){
             Err(format!("{} ID is not needed for a list item {}", self.span.line_str(), self.span.slice()))?
@@ -99,7 +100,7 @@ impl TmpObj{
         Ok(ListItem::new(to_list_sab_map(self.default, &self.span)?, to_ref_sab_map(self.refs.map)))
     }
 
-    pub fn to_list_item_with_id(self) -> Result<(String, ListItem)>{
+    pub fn into_list_item_with_id(self) -> Result<(String, ListItem)>{
         if self.id.is_none(){
             Err(format!("{} ID must be defined {}", self.span.line_str(), self.span.slice()))?
         }
@@ -119,7 +120,7 @@ impl TmpObj{
         }
     }
 
-    pub fn to_violated_list_item(self, id : usize) -> Result<MutListItem>{
+    pub fn into_violated_list_item(self, id : usize) -> Result<MutListItem>{
         let id = match self.id {
             Some(IdValue::Num(id)) => id,
             Some(_) =>{
@@ -142,7 +143,7 @@ impl TmpObj{
 fn to_list_sab_map(map : HashMap<String, RustValue>, span : &Span) -> Result<HashMap<String, ListSabValue>>{
     let mut result : HashMap<String, ListSabValue> = HashMap::with_capacity(map.len());
     for (k,v) in map{
-        let sab = match v.to_list_sab_value(){
+        let sab = match v.into_list_sab_value(){
             Ok(a) => a,
             Err(s) =>{
                 Err(format!("{} {} list items can't have {}", span.line_str(), k, s))?
@@ -156,7 +157,7 @@ fn to_list_sab_map(map : HashMap<String, RustValue>, span : &Span) -> Result<Has
 fn to_list_def_val_map(map : HashMap<String, RustValue>, span : &Span) -> Result<HashMap<String, ListDefValue>>{
     let mut result : HashMap<String, ListDefValue> = HashMap::with_capacity(map.len());
     for (k,v) in map{
-        let sab = match v.to_list_def_value(){
+        let sab = match v.into_list_def_value(){
             Ok(a) => a,
             Err(s) =>{
                 Err(format!("{} {} list def can't have {}", span.line_str(), k, s))?
@@ -170,7 +171,7 @@ fn to_list_def_val_map(map : HashMap<String, RustValue>, span : &Span) -> Result
 fn to_ref_sab_map(map : HashMap<String, RefValue>) -> HashMap<String, RefSabValue>{
     let mut result : HashMap<String, RefSabValue> = HashMap::with_capacity(map.len());
     for(k,v) in map{
-        result.insert(k, v.to_sab_value());
+        result.insert(k, v.into_sab_value());
     }
     return result;
 }

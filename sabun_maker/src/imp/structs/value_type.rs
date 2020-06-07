@@ -1,4 +1,4 @@
-use crate::structs::qv::QvType;
+use crate::imp::structs::qv::QvType;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum ValueType{
@@ -9,8 +9,6 @@ pub(crate) enum ValueType{
 }
 
 impl ValueType{
-
-
     pub(crate) fn undefiable(&self) -> bool{
         match self{
             ValueType::Undefiable | ValueType::UndefNullable => true,

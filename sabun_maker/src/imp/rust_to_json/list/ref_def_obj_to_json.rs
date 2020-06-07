@@ -1,8 +1,8 @@
-use crate::structs::root_object::RefDefObj;
 use std::collections::BTreeMap;
+use crate::imp::structs::root_object::RefDefObj;
+use crate::imp::structs::qv::Qv;
+use crate::imp::structs::value_type::ValueType;
 use crate::structs::my_json::Value;
-use crate::structs::qv::Qv;
-use crate::structs::value_type::ValueType;
 
 pub(crate) fn ref_def_obj_to_json(obj : &RefDefObj) -> BTreeMap<String, Value>{
     let mut result : BTreeMap<String, Value> = BTreeMap::new();

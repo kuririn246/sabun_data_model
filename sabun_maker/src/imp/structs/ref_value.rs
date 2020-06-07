@@ -1,5 +1,5 @@
-use crate::structs::value_type::ValueType;
-use crate::structs::qv::Qv;
+use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::qv::Qv;
 
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) struct RefValue{
@@ -18,7 +18,7 @@ impl RefValue{
     }
     pub(crate) fn value_type(&self) -> ValueType{ self.value_type }
     pub(crate) fn value(&self) -> &Qv<String>{ &self.value }
-    pub(crate) fn to_sab_value(self) ->RefSabValue{ RefSabValue{ value : self.value } }
+    pub(crate) fn into_sab_value(self) ->RefSabValue{ RefSabValue{ value : self.value } }
 
     ///右の値を自身に代入できるか
     pub(crate) fn acceptable(&self, other : &RefSabValue) -> bool{
@@ -35,7 +35,7 @@ impl RefValue{
 impl RefSabValue{
     pub(crate) fn new(value : Qv<String>) -> RefSabValue{ RefSabValue{ value } }
     pub(crate) fn value(&self) -> &Qv<String>{ &self.value }
-    pub(crate) fn to_ref_value(self) -> RefValue{
+    pub(crate) fn into_ref_value_for_json(self) -> RefValue{
         //sabun側は?とか!とかなくていいのでNormalでよい
         RefValue{ value : self.value, value_type : ValueType::Normal }
     }

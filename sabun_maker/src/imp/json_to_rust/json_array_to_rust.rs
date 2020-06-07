@@ -3,11 +3,11 @@ use crate::error::Result;
 use super::names::Names;
 use json5_parser::{JVal, Span};
 use super::list::json_list_to_rust::json_list_to_rust;
-use crate::structs::value_type::ValueType;
-use crate::structs::rust_value::{RustValue, RustArray, RustParam, RustString};
-use crate::structs::qv::Qv;
-use crate::structs::array_type::ArrayType;
 use crate::imp::json_to_rust::array_null::array_null_or_undefined;
+use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::rust_value::{RustValue, RustParam, RustArray, RustString};
+use crate::imp::structs::array_type::ArrayType;
+use crate::imp::structs::qv::Qv;
 
 pub(crate) fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue>{
     use GatResult::*;
@@ -34,26 +34,26 @@ pub(crate) fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, spa
                 ValueType::Normal =>{
                     let tmp = json_list_to_rust(&array[1..], span, names)?;
                     match gat{
-                        List => Ok(RustValue::List(tmp.to_const_list()?)),
-                        Data => Ok(RustValue::Data(tmp.to_const_data()?)),
-                        MutList => Ok(RustValue::Mut(tmp.to_mut_list()?)),
-                        InnerList => Ok(RustValue::InnerList(tmp.to_inner_list()?)),
-                        InnerData => Ok(RustValue::InnerData(tmp.to_inner_data()?)),
-                        InnerMut => Ok(RustValue::InnerMut(Some(tmp.to_inner_mut_list()?))),
-                        InnerListDef => Ok(RustValue::InnerListDef(tmp.to_inner_def()?)),
-                        InnerDataDef => Ok(RustValue::InnerDataDef(tmp.to_inner_def()?)),
-                        InnerMutDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def(false)?)),
-                        ViolatedList =>{ Ok(RustValue::Mut(tmp.to_violated_list()?)) },
-                        InnerViolatedList => Ok(RustValue::InnerMut(Some(tmp.to_inner_violated_list()?))),
-                        InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def(false)?)),
+                        List => Ok(RustValue::List(tmp.into_const_list()?)),
+                        Data => Ok(RustValue::Data(tmp.into_const_data()?)),
+                        MutList => Ok(RustValue::Mut(tmp.into_mut_list()?)),
+                        InnerList => Ok(RustValue::InnerList(tmp.into_inner_list()?)),
+                        InnerData => Ok(RustValue::InnerData(tmp.into_inner_data()?)),
+                        InnerMut => Ok(RustValue::InnerMut(Some(tmp.into_inner_mut_list()?))),
+                        InnerListDef => Ok(RustValue::InnerListDef(tmp.into_inner_def()?)),
+                        InnerDataDef => Ok(RustValue::InnerDataDef(tmp.into_inner_def()?)),
+                        InnerMutDef => Ok(RustValue::InnerMutDef(tmp.into_inner_mut_def(false)?)),
+                        ViolatedList =>{ Ok(RustValue::Mut(tmp.into_violated_list()?)) },
+                        InnerViolatedList => Ok(RustValue::InnerMut(Some(tmp.into_inner_violated_list()?))),
+                        InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.into_inner_mut_def(false)?)),
                         _ => unreachable!() ,
                     }
                 },
                 ValueType::Undefiable =>{
                     let tmp = json_list_to_rust(&array[1..], span, names)?;
                     match gat {
-                        InnerMutDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def(true)?)),
-                        InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.to_inner_mut_def(true)?)),
+                        InnerMutDef => Ok(RustValue::InnerMutDef(tmp.into_inner_mut_def(true)?)),
+                        InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.into_inner_mut_def(true)?)),
                         _ =>{
                             Err(format!(r#"{} Lists can't be undefined {} except for InnerMut"#, span.line_str(), names))?
                         }

@@ -1,4 +1,4 @@
-use crate::structs::rust_value::ListType;
+use crate::imp::structs::rust_value::ListType;
 
 pub(crate) fn list_type_to_string(l : &ListType, has_item : bool) -> String{
     let s = match l{

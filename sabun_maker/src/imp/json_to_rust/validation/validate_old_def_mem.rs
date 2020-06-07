@@ -1,8 +1,8 @@
 use std::collections::{HashSet, HashMap};
 use crate::imp::json_to_rust::names::Names;
-use crate::structs::ref_value::RefValue;
-use crate::structs::rust_list::ListItem;
 use crate::error::Result;
+use crate::imp::structs::ref_value::RefValue;
+use crate::imp::structs::rust_list::ListItem;
 
 pub(crate) fn validate_old_def_mem<T>(old : &HashSet<String>, map : &HashMap<String, T>, names : &Names) -> Result<()>{
     for name in old{

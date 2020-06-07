@@ -1,8 +1,8 @@
-use crate::structs::root_object::RefDefObj;
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
-use crate::structs::qv::{Qv};
 use crate::imp::json_to_rust::validation::validate_old_def_mem::validate_old_ref_def;
+use crate::imp::structs::root_object::RefDefObj;
+use crate::imp::structs::qv::Qv;
 
 
 pub(crate) fn validate_ref_def(def : &RefDefObj, names : &Names) -> Result<()> {

@@ -1,8 +1,9 @@
-use crate::structs::root_object::{ListDefObj, RootObject};
 use std::collections::{HashSet};
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::imp::json_to_rust::json_name::dot_chained_name;
+use crate::imp::structs::root_object::ListDefObj;
+use crate::structs::root_obj::RootObject;
 
 pub(crate) fn validate_compatible(source_def : &ListDefObj, compatible : &HashSet<String>, root : &RootObject, can_use_old : bool, names : &Names) -> Result<()>{
     for dot_chained in compatible{
@@ -41,20 +42,6 @@ fn search_recursive(source_def : &ListDefObj, current_def : &ListDefObj, rest_do
             Err(format!("{} is not compatible with {} {}", current_name, source_name, dot_chained))?
         }
     }
-
-    // //let data = if let RustValue::InnerData(data) = value { data } else {
-    //   //  Err(format!("{} is not Data {} {}", current_name, source_name, dot_chained))?
-    // //};
-    //
-    // let list_def = match value{
-    //     RustValue::InnerDataDef(data) => data,
-    //     RustValue::InnerListDef(data) => data,
-    //     RustValue::InnerMutDef(data) => data.list_def(),
-    //     RustValue::Data(data) =>data.default(),
-    //     RustValue::List(data) =>data.default(),
-    //     RustValue::Mut(data) =>data.default(),
-    //     _ =>{ Err(format!("{} doesn't have Default {} {}", current_name, source_name, dot_chained))? }
-    // };
 
     let name = rest_dot_chained[0];
     let current_name = &current_name.append(name);

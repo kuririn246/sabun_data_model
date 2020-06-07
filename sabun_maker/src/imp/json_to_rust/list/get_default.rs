@@ -2,8 +2,8 @@ use json5_parser::{JVal, Span};
 use super::super::names::Names;
 use super::super::json_obj_to_rust::json_obj_to_rust;
 use crate::error::Result;
-use crate::structs::root_object::ListDefObj;
 use linked_hash_map::LinkedHashMap;
+use crate::imp::structs::root_object::ListDefObj;
 
 pub(crate) fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<ListDefObj>{
     let error_message = r#"["Default", \{ default_obj \}] is valid"#;
@@ -22,5 +22,5 @@ fn get_default_obj(map : &LinkedHashMap<String, JVal>, span : &Span, names : &Na
     let names = &names.append("default");
     let obj = json_obj_to_rust(map, false, span, names)?;
 
-    return obj.to_list_def_obj();
+    return obj.into_list_def_obj();
 }

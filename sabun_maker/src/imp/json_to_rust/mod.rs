@@ -16,9 +16,9 @@ pub mod validation;
 use json5_parser::JVal;
 use names::Names;
 use crate::error::Result;
-use crate::structs::root_object::{RootObject};
-use crate::structs::rust_value::{RustValue};
-use crate::structs::value_type::ValueType;
+use crate::structs::root_obj::RootObject;
+use crate::imp::structs::rust_value::RustValue;
+use crate::imp::structs::value_type::ValueType;
 
 pub(crate) fn json_root_to_rust(json : &str) -> Result<RootObject>{
     let jval = json5_parser::from_str(json)?;
@@ -26,7 +26,7 @@ pub(crate) fn json_root_to_rust(json : &str) -> Result<RootObject>{
     return match jval{
         JVal::Map(map, span) =>{
             let tmp = json_obj_to_rust::json_obj_to_rust(&map, false, &span, &Names::new(""))?;
-            Ok(tmp.to_root_obj()?)
+            Ok(tmp.into_root_obj()?)
         },
         _ =>{
             Err(format!(r#"root object is not found"#))?

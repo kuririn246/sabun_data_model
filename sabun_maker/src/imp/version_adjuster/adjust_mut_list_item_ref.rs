@@ -1,9 +1,9 @@
-use crate::structs::root_object::{ RefDefObj};
 use std::collections::HashMap;
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
-use crate::structs::ref_value::{RefSabValue};
-use crate::structs::qv::Qv;
+use crate::imp::structs::root_object::RefDefObj;
+use crate::imp::structs::ref_value::RefSabValue;
+use crate::imp::structs::qv::Qv;
 
 pub(crate) fn adjust_mut_list_item_ref(def : &RefDefObj, old_ref : HashMap<String, RefSabValue>, _names : &Names) -> Result<HashMap<String, RefSabValue>>{
     let mut old_ref = old_ref;

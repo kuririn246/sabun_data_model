@@ -1,9 +1,9 @@
-use crate::structs::rust_list::{ConstList, ConstData, ListItem, MutList, MutListItem, InnerData, InnerList, InnerMutList};
 use crate::imp::json_to_rust::tmp::tmp_obj::{ IdValue};
 use std::collections::{HashSet, HashMap, BTreeSet, BTreeMap};
-use crate::structs::root_object::{ListDefObj};
-use crate::structs::rust_value::RustValue;
-use crate::structs::ref_value::RefValue;
+use crate::imp::structs::root_object::ListDefObj;
+use crate::imp::structs::rust_value::RustValue;
+use crate::imp::structs::rust_list::{ListItem, MutListItem, ConstData, ConstList, MutList, InnerData, InnerList, InnerMutList};
+use crate::imp::structs::ref_value::RefValue;
 
 pub(crate) struct TmpJsonList{
     pub vec : Vec<TmpJsonObj>,
@@ -22,16 +22,16 @@ pub(crate) struct TmpJsonObj{
 
 impl TmpJsonObj{
     pub fn from_list_item(l : &ListItem, id : Option<&String>) -> TmpJsonObj{
-        let value_map : HashMap<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().to_rust_value())).collect();
-        let ref_map : HashMap<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().to_ref_value())).collect();
+        let value_map : HashMap<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().into_rust_value_for_json())).collect();
+        let ref_map : HashMap<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().into_ref_value_for_json())).collect();
         TmpJsonObj{ default : btree_map(&value_map),
             refs : TmpJsonRefs::from_list_item(&ref_map),
             id : id.map(|s| IdValue::Str(s.to_string())), old : None }
     }
 
     pub fn from_mut_list_item(l : &MutListItem) -> TmpJsonObj{
-        let value_map : HashMap<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().to_rust_value())).collect();
-        let ref_map : HashMap<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().to_ref_value())).collect();
+        let value_map : HashMap<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().into_rust_value_for_json())).collect();
+        let ref_map : HashMap<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().into_ref_value_for_json())).collect();
         TmpJsonObj{
             default : btree_map(&value_map),
             refs : TmpJsonRefs::from_list_item(&ref_map),

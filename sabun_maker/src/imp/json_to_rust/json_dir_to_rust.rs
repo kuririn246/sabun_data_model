@@ -7,10 +7,10 @@ use std::ffi::{OsStr};
 use crate::imp::json_to_rust::{json_root_to_rust, json_item_str_to_rust};
 use std::collections::HashMap;
 
-use crate::structs::json_file::JsonFile;
-use crate::structs::rust_value::{ RootValue};
-use crate::structs::root_object::RootObject;
 use crate::imp::json_to_rust::construct_root::construct_root;
+use crate::structs::root_obj::RootObject;
+use crate::structs::json_file::JsonFile;
+use crate::imp::structs::rust_value::RootValue;
 
 pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RootObject>{
     let dirs = std::fs::read_dir(dir_path)?;
@@ -62,7 +62,7 @@ pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>, validation : boo
             }
         } else{
             match json_item_str_to_rust(&file.json, name){
-                Ok(val) =>{ map.insert(name.to_string(), val.to_root_value2(name)?); }
+                Ok(val) =>{ map.insert(name.to_string(), val.into_root_value2(name)?); }
                 Err(e) =>{ Err(format!("filename {}, {}", name, e.message))? }
             }
         }
