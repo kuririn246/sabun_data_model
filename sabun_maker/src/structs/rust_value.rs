@@ -10,7 +10,7 @@ pub enum RustParam{
     Bool(Qv<bool>),
     Number(Qv<f64>),
     String(Qv<RustString>),
-    Array(Qv<RustArray>, ArrayType),
+    Array(RustArray),
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -27,6 +27,91 @@ pub enum RustValue{
     InnerListDef(ListDefObj),
     InnerMutDef(InnerMutDefObj),
 }
+
+impl RustValue{
+    pub fn to_root_value(self) -> Result<RootValue, String>{
+        let v = match self{
+            RustValue::Param(p,v) => RootValue::Param(p,v),
+            RustValue::Data(d) => RootValue::Data(d),
+            RustValue::List(l) => RootValue::List(l),
+            RustValue::Mut(m) => RootValue::Mut(m),
+            _ =>{ return Err(self.type_string()); },
+        };
+        Ok(v)
+    }
+
+    pub fn to_root_value2(self, name : &str) -> crate::error::Result<RootValue>{
+        match self.to_root_value(){
+            Ok(a) => Ok(a),
+            Err(s) =>{ Err(format!("{} the root obj can't have {}", name, s))? }
+        }
+    }
+
+    pub fn to_list_def_value(self) -> Result<ListDefValue, String>{
+        let v = match self{
+            RustValue::Param(p,v) => ListDefValue::Param(p,v),
+            RustValue::InnerDataDef(d) => ListDefValue::InnerDataDef(d),
+            RustValue::InnerListDef(l) => ListDefValue::InnerListDef(l),
+            RustValue::InnerMutDef(m) => ListDefValue::InnerMutDef(m),
+            _ =>{ return Err(self.type_string()); },
+        };
+        Ok(v)
+    }
+
+    ///失敗時はtype_stringを返す
+    pub fn to_list_sab_value(self) -> Result<ListSabValue, String>{
+        let v = match self{
+            RustValue::Param(p,v) => ListSabValue::Param(p),
+            RustValue::InnerData(d) => ListSabValue::InnerData(d),
+            RustValue::InnerList(l) => ListSabValue::InnerList(l),
+            RustValue::InnerMut(m) => ListSabValue::InnerMut(m),
+            _ =>{ return Err(self.type_string()); },
+        };
+        Ok(v)
+    }
+
+    pub fn type_string(&self) -> String{
+        let s = match self{
+            RustValue::Param(_, _) => "Param",
+            RustValue::Data(_) => "Data",
+            RustValue::List(_) => "List",
+            RustValue::Mut(_) => "Mut",
+            RustValue::InnerData(_) => "InnerData",
+            RustValue::InnerList(_) => "InnerList",
+            RustValue::InnerMut(_) => "InnerMut",
+            RustValue::InnerDataDef(_) => "InnerDataDef",
+            RustValue::InnerListDef(_) => "InnerListDef",
+            RustValue::InnerMutDef(_) => "InnerMutDef",
+        };
+        s.to_string()
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum RootValue{
+    Param(RustParam, ValueType),
+    Data(ConstData),
+    List(ConstList),
+    Mut(MutList),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum ListDefValue{
+    Param(RustParam, ValueType),
+    InnerDataDef(ListDefObj),
+    InnerListDef(ListDefObj),
+    InnerMutDef(InnerMutDefObj),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum ListSabValue{
+    Param(RustParam),
+    InnerData(InnerData),
+    InnerList(InnerList),
+    ///InnerMutListだけundefinedになりうる
+    InnerMut(Option<InnerMutList>),
+}
+
 
 pub enum ListType{
     Data, List, Mut, InnerData, InnerList, InnerMut, InnderDataDef, InnerListDef, InnerMutDef,
@@ -54,12 +139,33 @@ impl RustValueKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct RustArray{
-    vec : Box<Vec<RustParam>>,
+    array : Box<RustArrayInternal>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct RustArrayInternal{
+    qv : Qv<Vec<RustParam>>,
+    at : ArrayType,
 }
 
 impl RustArray{
-    pub fn new(v : Vec<RustParam>) -> RustArray{ RustArray{ vec : Box::new(v)} }
-    pub fn vec(&self) -> &[RustParam]{ self.vec.as_ref().as_ref() }
+    pub fn new(qv : Qv<Vec<RustParam>>, at : ArrayType) -> RustArray{
+        RustArray{ array : Box::new(RustArrayInternal{
+            qv, at
+        })}
+    }
+    pub fn null(at : ArrayType) -> RustArray{
+        RustArray{ array : Box::new(RustArrayInternal{
+            qv : Qv::Null, at
+        })}
+    }
+    pub fn undefined(at : ArrayType) -> RustArray{
+        RustArray{ array : Box::new(RustArrayInternal{
+            qv : Qv::Undefined, at
+        })}
+    }
+    pub fn qv(&self) -> &Qv<Vec<RustParam>>{ &self.array.qv }
+    pub fn array_type(&self) -> ArrayType{ self.array.at.clone() }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -85,7 +191,7 @@ impl RustParam{
             RustParam::Bool(b) => b.qv_type(),
             RustParam::Number(n) => n.qv_type(),
             RustParam::String(s) => s.qv_type(),
-            RustParam::Array(a, _) => a.qv_type(),
+            RustParam::Array(a) => a.qv().qv_type(),
         }
     }
 
@@ -94,7 +200,7 @@ impl RustParam{
             RustParam::Bool(_) => 0,
             RustParam::Number(_) => 1,
             RustParam::String(_) => 2,
-            RustParam::Array(_, _) => 3,
+            RustParam::Array(_) => 3,
         }
     }
 
@@ -102,10 +208,10 @@ impl RustParam{
         if self.type_num() != other.type_num() {
             return false;
         }
-        if let RustParam::Array(_, s_at) = self {
-            if let RustParam::Array(_, o_at) = other {
+        if let RustParam::Array(s) = self {
+            if let RustParam::Array(o) = other {
                 //array_typeが一致してるかはここまでしないと調べられないだろうか・・・？
-                if s_at.type_num() != o_at.type_num() {
+                if s.array_type().type_num() != o.array_type().type_num() {
                     return false;
                 }
             } else { unreachable!() }
@@ -119,29 +225,13 @@ impl RustParam{
             RustParam::Bool(_) => RustParam::Bool(Qv::Undefined),
             RustParam::Number(_) => RustParam::Number(Qv::Undefined),
             RustParam::String(_) => RustParam::String(Qv::Undefined),
-            RustParam::Array(_, at) => RustParam::Array(Qv::Undefined, at.clone()),
+            RustParam::Array(a) => RustParam::Array(RustArray::undefined(a.array_type()))
+
         }
     }
 }
 
 impl RustValue{
-    ///この数値は仮
-    pub(crate) fn type_num(&self) -> usize{
-        match self{
-            RustValue::Param(param, _) => match param{
-                RustParam::Bool(_) => 0,
-                RustParam::Number(_) => 1,
-                RustParam::String(_) => 2,
-                RustParam::Array(_, _) => 3,
-            },
-            RustValue::List(_) => 4,
-            RustValue::Data(_) => 5,
-            RustValue::Mut(_) => 6,
-            RustValue::InnerList(_) | RustValue::InnerListDef(_) => 7,
-            RustValue::InnerData(_) | RustValue::InnerDataDef(_) => 8,
-            RustValue::InnerMut(_) | RustValue::InnerMutDef(_) => 9,
-        }
-    }
 
     pub fn is_param(&self) -> bool{
         self.type_num() <= 3
@@ -229,6 +319,41 @@ impl RustValue{
     }
 }
 
+impl ListDefValue{
+    pub fn acceptable(&self, other : &ListSabValue) -> bool{
 
+    }
 
+    ///この数値は仮
+    pub(crate) fn type_num(&self) -> usize{
+        match self{
+            ListDefValue::Param(param, _) => match param{
+                RustParam::Bool(_) => 0,
+                RustParam::Number(_) => 1,
+                RustParam::String(_) => 2,
+                RustParam::Array(_) => 3,
+            },
+            ListDefValue::InnerListDef(_) => 7,
+            ListDefValue::InnerDataDef(_) => 8,
+            ListDefValue::InnerMutDef(_) => 9,
+        }
+    }
+}
+
+impl ListSabValue{
+    ///この数値は仮
+    pub(crate) fn type_num(&self) -> usize{
+        match self{
+            ListSabValue::Param(param) => match param{
+                RustParam::Bool(_) => 0,
+                RustParam::Number(_) => 1,
+                RustParam::String(_) => 2,
+                RustParam::Array(_) => 3,
+            },
+            ListSabValue::InnerList(_) => 7,
+            ListSabValue::InnerData(_) => 8,
+            ListSabValue::InnerMut(_) => 9,
+        }
+    }
+}
 

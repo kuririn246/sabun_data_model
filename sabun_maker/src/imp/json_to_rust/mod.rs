@@ -19,8 +19,7 @@ use json5_parser::JVal;
 use names::Names;
 use crate::error::Result;
 use crate::structs::root_object::{RootObject};
-use std::collections::HashMap;
-use crate::structs::rust_value::RustValue;
+use crate::structs::rust_value::{RustValue};
 use crate::structs::value_type::ValueType;
 
 //
@@ -30,7 +29,7 @@ pub fn json_root_to_rust(json : &str) -> Result<RootObject>{
     return match jval{
         JVal::Map(map, span) =>{
             let tmp = json_obj_to_rust::json_obj_to_rust(&map, false, &span, &Names::new(""))?;
-            Ok(RootObject::new(tmp.default, HashMap::new(), tmp.old))
+            Ok(tmp.to_root_obj()?)
         },
         _ =>{
             Err(format!(r#"root object is not found"#))?

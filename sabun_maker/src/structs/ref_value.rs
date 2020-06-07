@@ -7,12 +7,22 @@ pub struct RefValue{
     value : Qv<String>,
 }
 
+
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct RefSabValue{
+    value : Qv<String>,
+}
+
+
+
 impl RefValue{
     pub fn new(value : Qv<String>, value_type : ValueType) -> RefValue{
         RefValue{ value, value_type }
     }
     pub fn value_type(&self) -> ValueType{ self.value_type }
     pub fn value(&self) -> &Qv<String>{ &self.value }
+    pub fn to_sab_value(self) ->RefSabValue{ RefSabValue{ value : self.value } }
 
     ///nullやundefinedの場合None
     pub fn get_reference(&self) -> Option<&str>{

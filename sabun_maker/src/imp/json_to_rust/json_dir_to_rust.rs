@@ -8,7 +8,7 @@ use crate::imp::json_to_rust::{json_root_to_rust, json_item_str_to_rust};
 use std::collections::HashMap;
 
 use crate::structs::json_file::JsonFile;
-use crate::structs::rust_value::RustValue;
+use crate::structs::rust_value::{ RootValue};
 use crate::structs::root_object::RootObject;
 use crate::imp::json_to_rust::construct_root::construct_root;
 
@@ -49,7 +49,7 @@ pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RootObject
 }
 
 pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>, validation : bool) -> Result<RootObject>{
-    let mut map : HashMap<String, RustValue> = HashMap::new();
+    let mut map : HashMap<String, RootValue> = HashMap::new();
     let mut root= None;
 
     for file in ite{
@@ -62,7 +62,7 @@ pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>, validation : boo
             }
         } else{
             match json_item_str_to_rust(&file.json, name){
-                Ok(val) =>{ map.insert(name.to_string(), val); }
+                Ok(val) =>{ map.insert(name.to_string(), val.to_root_value2(name)?); }
                 Err(e) =>{ Err(format!("filename {}, {}", name, e.message))? }
             }
         }
@@ -71,8 +71,6 @@ pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>, validation : boo
     if root.is_none(){
         Err("root.json5 is needed")?
     }
-
-
 
     return construct_root(root.unwrap(), map, validation);
 }

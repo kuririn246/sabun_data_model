@@ -1,8 +1,8 @@
 
 use crate::structs::root_object::{ListDefObj};
 use std::collections::{HashSet, HashMap};
-use crate::structs::rust_value::RustValue;
-use crate::structs::ref_value::RefValue;
+use crate::structs::rust_value::{ListSabValue};
+use crate::structs::ref_value::{RefSabValue};
 use linked_hash_map::LinkedHashMap;
 
 
@@ -114,17 +114,17 @@ impl InnerMutList{
 #[derive(Debug, PartialEq, Clone)]
 pub struct ListItem{
     ///ListItemの値は常にDefaultからの差分である
-    values : Box<HashMap<String, RustValue>>,
+    values : Box<HashMap<String, ListSabValue>>,
     ///ListItemの値はRefも常にDefaultからの差分である
-    refs : Box<HashMap<String, RefValue>>,
+    refs : Box<HashMap<String, RefSabValue>>,
 }
 
 impl ListItem{
-    pub fn new(values : HashMap<String, RustValue>, refs : HashMap<String, RefValue>) -> ListItem{
+    pub fn new(values : HashMap<String, ListSabValue>, refs : HashMap<String, RefSabValue>) -> ListItem{
         ListItem{ values : Box::new(values), refs : Box::new(refs) }
     }
-    pub fn values(&self) -> &HashMap<String, RustValue>{ self.values.as_ref() }
-    pub fn refs(&self) -> &HashMap<String, RefValue>{ self.refs.as_ref() }
+    pub fn values(&self) -> &HashMap<String, ListSabValue>{ self.values.as_ref() }
+    pub fn refs(&self) -> &HashMap<String, RefSabValue>{ self.refs.as_ref() }
 }
 
 ///たとえばキャラクターAとキャラクターBの間で出来事Cが起こったとする。
@@ -151,17 +151,17 @@ pub struct MutListItem{
     ///アイテムごとにidが振られ、これによって削除や順番の変更を検出できる
     id : u64,
     ///ListItemの値は常にDefaultからの差分である
-    values : Box<HashMap<String, RustValue>>,
+    values : Box<HashMap<String, ListSabValue>>,
     ///ListItemの値はRefでも常にDefaultからの差分である
-    refs : Box<HashMap<String, RefValue>>,
+    refs : Box<HashMap<String, RefSabValue>>,
 }
 
 impl MutListItem{
-    pub fn new(id : u64, values : HashMap<String, RustValue>, refs : HashMap<String, RefValue>) -> MutListItem{
+    pub fn new(id : u64, values : HashMap<String, ListSabValue>, refs : HashMap<String, RefSabValue>) -> MutListItem{
         MutListItem{ id, values : Box::new(values), refs : Box::new(refs) }
     }
-    pub fn deconstruct(self) -> (HashMap<String, RustValue>, HashMap<String, RefValue>){ (*self.values, *self.refs) }
+    pub fn deconstruct(self) -> (HashMap<String, ListSabValue>, HashMap<String, RefSabValue>){ (*self.values, *self.refs) }
     pub fn id(&self) -> u64{ self.id }
-    pub fn values(&self) -> &HashMap<String, RustValue>{ self.values.as_ref() }
-    pub fn refs(&self) -> &HashMap<String, RefValue>{ self.refs.as_ref() }
+    pub fn values(&self) -> &HashMap<String, ListSabValue>{ self.values.as_ref() }
+    pub fn refs(&self) -> &HashMap<String, RefSabValue>{ self.refs.as_ref() }
 }

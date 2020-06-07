@@ -1,11 +1,11 @@
-use crate::structs::rust_value::{RustValue, RustParam};
+use crate::structs::rust_value::{RustValue, RustParam, RootValue, ListDefValue};
 use std::collections::{HashSet, HashMap};
-use crate::structs::ref_value::RefValue;
+use crate::structs::ref_value::{RefValue};
 
 #[derive(Debug, PartialEq)]
 pub struct RootObject{
     ///listのobjectの場合、defaultはlist側にあるが、ここには初期値が入る。
-    default : HashMap<String, RustValue>,
+    default : HashMap<String, RootValue>,
     ///変更されたものを記録
     ///listの変更はMutListが直接上書きされるので、sabunには入らない。よってparamだけ記録される
     sabun : HashMap<String, RustParam>,
@@ -16,20 +16,18 @@ pub struct RootObject{
 }
 
 impl RootObject{
-    pub fn new(default : HashMap<String, RustValue>, sabun : HashMap<String, RustParam>, old : HashSet<String>) -> RootObject{
+    pub fn new(default : HashMap<String, RootValue>, sabun : HashMap<String, RustParam>, old : HashSet<String>) -> RootObject{
         RootObject{ default, sabun, old }
     }
-    pub fn default(&self) -> &HashMap<String, RustValue>{ &self.default }
+    pub fn default(&self) -> &HashMap<String, RootValue>{ &self.default }
     pub fn deconstruct(self) -> (HashMap<String, RustValue>, HashMap<String, RustParam>, HashSet<String>){ (self.default, self.sabun, self.old) }
     pub fn sabun(&self) -> &HashMap<String, RustParam>{ &self.sabun }
     pub fn old(&self) -> &HashSet<String>{ &self.old }
 }
 
-
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct ListDefObj{
-    default : Box<HashMap<String, RustValue>>,
+    default : Box<HashMap<String, ListDefValue>>,
     ///RustValueを巨大にしすぎないためにBoxにしてサイズを削る
     refs: Box<RefDefObj>,
     ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
@@ -37,10 +35,10 @@ pub struct ListDefObj{
 }
 
 impl ListDefObj{
-    pub fn new(default : HashMap<String, RustValue>, refs : RefDefObj, old : HashSet<String>) -> ListDefObj{
+    pub fn new(default : HashMap<String, ListDefValue>, refs : RefDefObj, old : HashSet<String>) -> ListDefObj{
         ListDefObj{ default : Box::new(default), refs : Box::new(refs), old : Box::new(old) }
     }
-    pub fn default(&self) -> &HashMap<String, RustValue>{ self.default.as_ref() }
+    pub fn default(&self) -> &HashMap<String, ListDefValue>{ self.default.as_ref() }
     pub fn refs(&self) -> &RefDefObj{ self.refs.as_ref() }
     pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
 

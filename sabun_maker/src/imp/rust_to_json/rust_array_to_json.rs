@@ -4,15 +4,15 @@ use crate::structs::rust_value::RustArray;
 use crate::structs::my_json::Value;
 use crate::imp::rust_to_json::get_param::get_param;
 
-pub fn rust_array_to_json(qv : &Qv<RustArray>, at : &ArrayType) -> Value{
+pub fn rust_array_to_json(array : &RustArray) -> Value{
     let mut result : Vec<Value> = vec![];
 
 
-    match at{
+    match array.array_type(){
         ArrayType::String =>{ result.push(Value::String("StrArray".to_string())) },
         ArrayType::Num =>{
-            let array_len = if let Qv::Val(v) = qv{
-                v.vec().len()
+            let array_len = if let Qv::Val(v) = array.qv(){
+                v.len()
             } else{ 0 };
             //noisyすぎるので基本省略
             if array_len == 0 {
@@ -21,9 +21,9 @@ pub fn rust_array_to_json(qv : &Qv<RustArray>, at : &ArrayType) -> Value{
         }
         ArrayType::Num2 =>{ result.push(Value::String("Num2Array".to_string())) }
     }
-    match qv{
+    match array.qv(){
         Qv::Val(v) => {
-            for item in v.vec(){
+            for item in v{
                 result.push(get_param(item));
             }
         },

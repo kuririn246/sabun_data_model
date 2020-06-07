@@ -21,13 +21,6 @@ pub fn get_default(array : &[JVal], span : &Span, names : &Names) -> Result<List
 fn get_default_obj(map : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<ListDefObj> {
     let names = &names.append("default");
     let obj = json_obj_to_rust(map, false, span, names)?;
-    if obj.id.is_some() {
-        Err(format!("{} ID is not valid for Default {}", span.line_str(), names))?
-    }
-    if obj.include.len() != 0 {
-        Err(format!("{} Include is not valid for Default {}", span.line_str(), names))?
-    }
 
-
-    return Ok(ListDefObj::new(obj.default, obj.refs.to_ref_def(),obj.old))
+    return obj.to_list_def_obj();
 }

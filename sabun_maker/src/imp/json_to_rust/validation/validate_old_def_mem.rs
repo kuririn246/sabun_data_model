@@ -1,11 +1,10 @@
 use std::collections::{HashSet, HashMap};
-use crate::structs::rust_value::RustValue;
 use crate::imp::json_to_rust::names::Names;
 use crate::structs::ref_value::RefValue;
 use crate::structs::rust_list::ListItem;
 use crate::error::Result;
 
-pub fn validate_old_def_mem(old : &HashSet<String>, map : &HashMap<String, RustValue>, names : &Names) -> Result<()>{
+pub fn validate_old_def_mem<T>(old : &HashSet<String>, map : &HashMap<String, T>, names : &Names) -> Result<()>{
     for name in old{
         if map.contains_key(name) == false{
             Err(format!("{} Old {} does not exist in the Default", names, name))?
