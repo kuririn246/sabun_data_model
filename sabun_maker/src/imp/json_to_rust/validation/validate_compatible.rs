@@ -4,7 +4,7 @@ use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::imp::json_to_rust::json_name::dot_chained_name;
 
-pub fn validate_compatible(def : &ListDefObj, compatible : &HashSet<String>, root : &RootObject, can_use_old : bool, names : &Names) -> Result<()>{
+pub fn validate_compatible(source_def : &ListDefObj, compatible : &HashSet<String>, root : &RootObject, can_use_old : bool, names : &Names) -> Result<()>{
     for dot_chained in compatible{
         match dot_chained_name(dot_chained){
             Some(v) =>{
@@ -18,7 +18,7 @@ pub fn validate_compatible(def : &ListDefObj, compatible : &HashSet<String>, roo
                 }
                 if let Some(value) = root.default().get(name){
                     if let Some(def) = value.list_def() {
-                        search_recursive(def, def, &v[1..], can_use_old, names, &Names::new(name), dot_chained)?
+                        search_recursive(source_def, def, &v[1..], can_use_old, names, &Names::new(name), dot_chained)?
                     } else{
                         Err(format!("{} the root object's {} is not a list {}", names, name, dot_chained))?
                     }

@@ -16,12 +16,12 @@ pub struct ConstData{
 }
 
 impl ConstData{
-    pub fn new(default : ListDefObj, list : HashMap<String, ListItem>, old : HashSet<String>) -> ConstData{
+    pub(crate) fn new(default : ListDefObj, list : HashMap<String, ListItem>, old : HashSet<String>) -> ConstData{
         ConstData{ default : Box::new(default), list : Box::new(list), old : Box::new(old) }
     }
-    pub fn default(&self) -> &ListDefObj{ self.default.as_ref() }
-    pub fn list(&self) -> &HashMap<String, ListItem>{ self.list.as_ref() }
-    pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+    pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
+    pub(crate) fn list(&self) -> &HashMap<String, ListItem>{ self.list.as_ref() }
+    pub(crate) fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
 }
 
 ///IDを持たず、参照できない。MutListの初期値を書くのが主な使い道か。IDは必要ないけど単にデータを書いておきたい場合もあるだろう。
@@ -32,9 +32,9 @@ pub struct ConstList{
 }
 
 impl ConstList{
-    pub fn new(default : ListDefObj, list : Vec<ListItem>) -> ConstList{ ConstList{ default : Box::new(default), list : Box::new(list) } }
-    pub fn default(&self) -> &ListDefObj{ self.default.as_ref() }
-    pub fn list(&self) -> &Vec<ListItem>{ self.list.as_ref() }
+    pub(crate) fn new(default : ListDefObj, list : Vec<ListItem>) -> ConstList{ ConstList{ default : Box::new(default), list : Box::new(list) } }
+    pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
+    pub(crate) fn list(&self) -> &Vec<ListItem>{ self.list.as_ref() }
 }
 
 ///追加、削除、順番の変更等ができるリスト。初期値を持てず最初は必ず空リストである。これはバージョン違いを読み出す時に問題を単純化するために必要。
@@ -58,14 +58,14 @@ pub struct MutListProp{
 }
 
 impl MutList{
-    pub fn new(default : ListDefObj, list : LinkedHashMap<u64, MutListItem>, next_id : u64, compatible : HashSet<String>) -> MutList{
+    pub(crate) fn new(default : ListDefObj, list : LinkedHashMap<u64, MutListItem>, next_id : u64, compatible : HashSet<String>) -> MutList{
         MutList{ default : Box::new(default), list : Box::new(list), prop : Box::new(MutListProp{ next_id, compatible }) }
     }
-    pub fn default(&self) -> &ListDefObj{ self.default.as_ref() }
-    pub fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
-    pub fn next_id(&self) -> u64{ self.prop.next_id }
-    pub fn compatible(&self) -> &HashSet<String>{ &self.prop.compatible }
-    pub fn deconstruct(self) -> (ListDefObj, LinkedHashMap<u64, MutListItem>, u64, HashSet<String>){
+    pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
+    pub(crate) fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
+    pub(crate) fn next_id(&self) -> u64{ self.prop.next_id }
+    pub(crate) fn compatible(&self) -> &HashSet<String>{ &self.prop.compatible }
+    pub(crate) fn deconstruct(self) -> (ListDefObj, LinkedHashMap<u64, MutListItem>, u64, HashSet<String>){
         let prop = *self.prop;
         (*self.default, *self.list, prop.next_id, prop.compatible)
     }
@@ -78,8 +78,8 @@ pub struct InnerList{
 }
 
 impl InnerList{
-    pub fn new(list : Vec<ListItem>) -> InnerList{ InnerList { list }}
-    pub fn list(&self) -> &Vec<ListItem>{ &self.list }
+    pub(crate) fn new(list : Vec<ListItem>) -> InnerList{ InnerList { list }}
+    pub(crate) fn list(&self) -> &Vec<ListItem>{ &self.list }
 }
 
 
@@ -92,9 +92,9 @@ pub struct InnerData{
 }
 
 impl InnerData{
-    pub fn new(list : HashMap<String, ListItem>, old : HashSet<String>) -> InnerData{ InnerData{ list : Box::new(list), old : Box::new(old)} }
-    pub fn list(&self) -> &HashMap<String, ListItem>{ self.list.as_ref() }
-    pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+    pub(crate) fn new(list : HashMap<String, ListItem>, old : HashSet<String>) -> InnerData{ InnerData{ list : Box::new(list), old : Box::new(old)} }
+    pub(crate) fn list(&self) -> &HashMap<String, ListItem>{ self.list.as_ref() }
+    pub(crate) fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -105,10 +105,10 @@ pub struct InnerMutList{
 }
 
 impl InnerMutList{
-    pub fn new(list : LinkedHashMap<u64, MutListItem>, next_id : u64) -> InnerMutList{ InnerMutList{ list : Box::new(list), next_id } }
-    pub fn deconstruct(self) -> (LinkedHashMap<u64, MutListItem>, u64){ (*self.list, self.next_id) }
-    pub fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
-    pub fn next_id(&self) -> u64{ self.next_id }
+    pub(crate) fn new(list : LinkedHashMap<u64, MutListItem>, next_id : u64) -> InnerMutList{ InnerMutList{ list : Box::new(list), next_id } }
+    pub(crate) fn deconstruct(self) -> (LinkedHashMap<u64, MutListItem>, u64){ (*self.list, self.next_id) }
+    pub(crate) fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
+    //pub(crate) fn next_id(&self) -> u64{ self.next_id }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -120,11 +120,11 @@ pub struct ListItem{
 }
 
 impl ListItem{
-    pub fn new(values : HashMap<String, ListSabValue>, refs : HashMap<String, RefSabValue>) -> ListItem{
+    pub(crate) fn new(values : HashMap<String, ListSabValue>, refs : HashMap<String, RefSabValue>) -> ListItem{
         ListItem{ values : Box::new(values), refs : Box::new(refs) }
     }
-    pub fn values(&self) -> &HashMap<String, ListSabValue>{ self.values.as_ref() }
-    pub fn refs(&self) -> &HashMap<String, RefSabValue>{ self.refs.as_ref() }
+    pub(crate) fn values(&self) -> &HashMap<String, ListSabValue>{ self.values.as_ref() }
+    pub(crate) fn refs(&self) -> &HashMap<String, RefSabValue>{ self.refs.as_ref() }
 }
 
 ///たとえばキャラクターAとキャラクターBの間で出来事Cが起こったとする。
@@ -157,11 +157,11 @@ pub struct MutListItem{
 }
 
 impl MutListItem{
-    pub fn new(id : u64, values : HashMap<String, ListSabValue>, refs : HashMap<String, RefSabValue>) -> MutListItem{
+    pub(crate) fn new(id : u64, values : HashMap<String, ListSabValue>, refs : HashMap<String, RefSabValue>) -> MutListItem{
         MutListItem{ id, values : Box::new(values), refs : Box::new(refs) }
     }
-    pub fn deconstruct(self) -> (HashMap<String, ListSabValue>, HashMap<String, RefSabValue>){ (*self.values, *self.refs) }
-    pub fn id(&self) -> u64{ self.id }
-    pub fn values(&self) -> &HashMap<String, ListSabValue>{ self.values.as_ref() }
-    pub fn refs(&self) -> &HashMap<String, RefSabValue>{ self.refs.as_ref() }
+    pub(crate) fn deconstruct(self) -> (HashMap<String, ListSabValue>, HashMap<String, RefSabValue>){ (*self.values, *self.refs) }
+    pub(crate) fn id(&self) -> u64{ self.id }
+    pub(crate) fn values(&self) -> &HashMap<String, ListSabValue>{ self.values.as_ref() }
+    pub(crate) fn refs(&self) -> &HashMap<String, RefSabValue>{ self.refs.as_ref() }
 }

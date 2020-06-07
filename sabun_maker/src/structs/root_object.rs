@@ -1,4 +1,4 @@
-use crate::structs::rust_value::{RustValue, RustParam, RootValue, ListDefValue};
+use crate::structs::rust_value::{RustParam, RootValue, ListDefValue};
 use std::collections::{HashSet, HashMap};
 use crate::structs::ref_value::{RefValue};
 
@@ -16,13 +16,13 @@ pub struct RootObject{
 }
 
 impl RootObject{
-    pub fn new(default : HashMap<String, RootValue>, sabun : HashMap<String, RustParam>, old : HashSet<String>) -> RootObject{
+    pub(crate) fn new(default : HashMap<String, RootValue>, sabun : HashMap<String, RustParam>, old : HashSet<String>) -> RootObject{
         RootObject{ default, sabun, old }
     }
-    pub fn default(&self) -> &HashMap<String, RootValue>{ &self.default }
-    pub fn deconstruct(self) -> (HashMap<String, RustValue>, HashMap<String, RustParam>, HashSet<String>){ (self.default, self.sabun, self.old) }
-    pub fn sabun(&self) -> &HashMap<String, RustParam>{ &self.sabun }
-    pub fn old(&self) -> &HashSet<String>{ &self.old }
+    pub(crate) fn default(&self) -> &HashMap<String, RootValue>{ &self.default }
+    pub(crate) fn deconstruct(self) -> (HashMap<String, RootValue>, HashMap<String, RustParam>, HashSet<String>){ (self.default, self.sabun, self.old) }
+    pub(crate) fn sabun(&self) -> &HashMap<String, RustParam>{ &self.sabun }
+    pub(crate) fn old(&self) -> &HashSet<String>{ &self.old }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -35,18 +35,18 @@ pub struct ListDefObj{
 }
 
 impl ListDefObj{
-    pub fn new(default : HashMap<String, ListDefValue>, refs : RefDefObj, old : HashSet<String>) -> ListDefObj{
+    pub(crate) fn new(default : HashMap<String, ListDefValue>, refs : RefDefObj, old : HashSet<String>) -> ListDefObj{
         ListDefObj{ default : Box::new(default), refs : Box::new(refs), old : Box::new(old) }
     }
-    pub fn default(&self) -> &HashMap<String, ListDefValue>{ self.default.as_ref() }
-    pub fn refs(&self) -> &RefDefObj{ self.refs.as_ref() }
-    pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+    pub(crate) fn default(&self) -> &HashMap<String, ListDefValue>{ self.default.as_ref() }
+    pub(crate) fn refs(&self) -> &RefDefObj{ self.refs.as_ref() }
+    pub(crate) fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
 
-    pub fn compatible(&self, other : &Self) -> bool{
+    pub(crate) fn compatible(&self, other : &Self) -> bool{
         for (k,v) in self.default(){
             match other.default.get(k){
                 Some(v2) =>{
-                    if v.acceptable(v2) == false{
+                    if v.compatible(v2) == false{
                         return false;
                     }
                 },
@@ -68,18 +68,18 @@ pub struct RefDefObj {
 }
 
 impl RefDefObj{
-    pub fn new(refs : HashMap<String, RefValue>, is_enum : bool, old : HashSet<String>) -> RefDefObj{
+    pub(crate) fn new(refs : HashMap<String, RefValue>, is_enum : bool, old : HashSet<String>) -> RefDefObj{
         RefDefObj{ refs : Box::new(refs), is_enum, old : Box::new(old) }
     }
-    pub fn refs(&self) -> &HashMap<String, RefValue>{ self.refs.as_ref() }
-    pub fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
-    pub fn is_enum(&self) -> bool{ self.is_enum }
+    pub(crate) fn refs(&self) -> &HashMap<String, RefValue>{ self.refs.as_ref() }
+    pub(crate) fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+    pub(crate) fn is_enum(&self) -> bool{ self.is_enum }
 
-    pub fn compatible(&self, other : &Self) -> bool{
+    pub(crate) fn compatible(&self, other : &Self) -> bool{
         for (k,v) in self.refs(){
             match other.refs.get(k){
                 Some(v2) =>{
-                    if v.acceptable(v2) == false{
+                    if v.compatible(v2) == false{
                         return false;
                     }
                 },
@@ -99,11 +99,11 @@ pub struct InnerMutDefObj {
 }
 
 impl InnerMutDefObj{
-    pub fn new(list_def : ListDefObj, undefinable : bool, compatible : HashSet<String>) -> InnerMutDefObj{
+    pub(crate) fn new(list_def : ListDefObj, undefinable : bool, compatible : HashSet<String>) -> InnerMutDefObj{
         InnerMutDefObj{ list_def : Box::new(list_def), undefinable, compatible : Box::new(compatible) }
     }
-    pub fn list_def(&self) -> &ListDefObj{ self.list_def.as_ref() }
-    pub fn undefinable(&self) -> bool{ self.undefinable }
-    pub fn compatible(&self) -> &HashSet<String>{ self.compatible.as_ref() }
+    pub(crate) fn list_def(&self) -> &ListDefObj{ self.list_def.as_ref() }
+    pub(crate) fn undefinable(&self) -> bool{ self.undefinable }
+    pub(crate) fn compatible(&self) -> &HashSet<String>{ self.compatible.as_ref() }
 }
 

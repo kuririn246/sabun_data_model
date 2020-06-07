@@ -22,15 +22,19 @@ pub struct TmpJsonObj{
 
 impl TmpJsonObj{
     pub fn from_list_item(l : &ListItem, id : Option<&String>) -> TmpJsonObj{
-        TmpJsonObj{ default : btree_map(l.values()),
-            refs : TmpJsonRefs::from_list_item(l.refs()),
+        let value_map : HashMap<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().to_rust_value())).collect();
+        let ref_map : HashMap<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().to_ref_value())).collect();
+        TmpJsonObj{ default : btree_map(&value_map),
+            refs : TmpJsonRefs::from_list_item(&ref_map),
             id : id.map(|s| IdValue::Str(s.to_string())), old : None }
     }
 
     pub fn from_mut_list_item(l : &MutListItem) -> TmpJsonObj{
+        let value_map : HashMap<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().to_rust_value())).collect();
+        let ref_map : HashMap<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().to_ref_value())).collect();
         TmpJsonObj{
-            default : btree_map(l.values()),
-            refs : TmpJsonRefs::from_list_item(l.refs()),
+            default : btree_map(&value_map),
+            refs : TmpJsonRefs::from_list_item(&ref_map),
             id : Some(IdValue::Num(l.id())), old : None }
     }
 }

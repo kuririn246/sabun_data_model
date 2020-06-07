@@ -4,7 +4,7 @@
 pub enum Qv<T>{ Val(T), Undefined, Null }
 
 impl<T> Qv<T>{
-    pub fn qv_type(&self) -> QvType{
+    pub(crate) fn qv_type(&self) -> QvType{
         match self{
             Qv::Val(_) => QvType::Val,
             Qv::Null => QvType::Null,
@@ -12,7 +12,7 @@ impl<T> Qv<T>{
         }
     }
 
-    pub fn map<U>(&self, f : impl Fn(&T) -> U) -> Qv<U> {
+    pub(crate) fn map<U>(&self, f : impl Fn(&T) -> U) -> Qv<U> {
         match self {
             Qv::Val(v) => Qv::Val(f(v)),
             Qv::Null => Qv::Null,
@@ -27,8 +27,8 @@ pub enum QvType{
 
 impl Qv<String>{
     ///null undefined "value" のどれか
-    pub fn js_string(&self) -> String{
-        match &self.value{
+    pub(crate) fn js_string(&self) -> String{
+        match self{
             Qv::Val(s) => format!(r#""{}""#,s.to_string()),
             Qv::Null => "null".to_string(),
             Qv::Undefined => "undefined".to_string(),

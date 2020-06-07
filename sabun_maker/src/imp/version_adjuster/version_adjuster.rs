@@ -1,5 +1,5 @@
 use crate::structs::root_object::RootObject;
-use crate::structs::rust_value::RustValue;
+use crate::structs::rust_value::{RootValue};
 use crate::imp::json_to_rust::validation::validate_root::validate_root;
 use crate::imp::version_adjuster::adjust_mut_list::adjust_mut_list;
 use std::collections::HashMap;
@@ -14,7 +14,7 @@ pub fn adjust_versions(new : RootObject, old : RootObject, validation : bool) ->
 
     let (def, sabun, old_hash) = new.deconstruct();
     let mut sabun = sabun;
-    let mut new_map :HashMap<String, RustValue> = HashMap::with_capacity(def.len());
+    let mut new_map :HashMap<String, RootValue> = HashMap::with_capacity(def.len());
 
     let (old_def,old_sabun, _) = old.deconstruct();
     let mut old_sabun = old_sabun;
@@ -22,18 +22,18 @@ pub fn adjust_versions(new : RootObject, old : RootObject, validation : bool) ->
 
     for (def_key, def_value) in def{
         match def_value{
-            RustValue::Param(p,v) =>{
+            RootValue::Param(p,v) =>{
                 if let Some(param) = old_sabun.remove(&def_key){
                     sabun.insert(def_key.to_string(), param);
                 }
-                new_map.insert(def_key,RustValue::Param(p,v));
+                new_map.insert(def_key,RootValue::Param(p,v));
             },
-            RustValue::Mut(m) =>{
-                if let Some(RustValue::Mut(old_m)) = old_def.remove(&def_key){
+            RootValue::Mut(m) =>{
+                if let Some(RootValue::Mut(old_m)) = old_def.remove(&def_key){
                     let new_m = adjust_mut_list(m, old_m, &Names::new(&def_key))?;
-                    new_map.insert(def_key, RustValue::Mut(new_m));
+                    new_map.insert(def_key, RootValue::Mut(new_m));
                 } else{
-                    new_map.insert(def_key, RustValue::Mut(m));
+                    new_map.insert(def_key, RootValue::Mut(m));
                 }
             },
             _ =>{

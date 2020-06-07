@@ -9,21 +9,21 @@ pub enum ValueType{
 }
 
 impl ValueType{
-    pub fn is_nullable(&self) -> bool{
-        match self{
-            ValueType::Nullable | ValueType::UndefNullable => true,
-            _ => false,
-        }
-    }
+    // pub(crate) fn is_nullable(&self) -> bool{
+    //     match self{
+    //         ValueType::Nullable | ValueType::UndefNullable => true,
+    //         _ => false,
+    //     }
+    // }
 
-    pub fn undefiable(&self) -> bool{
+    pub(crate) fn undefiable(&self) -> bool{
         match self{
             ValueType::Undefiable | ValueType::UndefNullable => true,
             _ => false,
         }
     }
 
-    pub fn to_suffix(&self) -> String{
+    pub(crate) fn to_suffix(&self) -> String{
         let s = match self{
             ValueType::Normal => "",
             ValueType::Nullable => "?",
@@ -43,7 +43,7 @@ impl ValueType{
     //     }
     // }
 
-    pub fn acceptable(&self, t : &QvType) -> bool {
+    pub(crate) fn acceptable(&self, t : &QvType) -> bool {
         match self{
             ValueType::Normal => {
                 match t {
@@ -67,7 +67,7 @@ impl ValueType{
         }
     }
 
-    pub fn compatible(&self, other : &Self) -> bool{
+    pub(crate) fn compatible(&self, other : &Self) -> bool{
         match self{
             ValueType::Normal => match other{
                 ValueType::Normal => true,

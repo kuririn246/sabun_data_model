@@ -1,11 +1,11 @@
 use crate::structs::root_object::ListDefObj;
-use crate::structs::rust_value::{RustValue};
+use crate::structs::rust_value::{ ListSabValue, ListDefValue};
 use std::collections::HashMap;
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::version_adjuster::adjust_mut_list::adjust_inner_mut_list;
 
-pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String, RustValue>, names : &Names) -> Result<HashMap<String, RustValue>>{
+pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String, ListSabValue>, names : &Names) -> Result<HashMap<String, ListSabValue>>{
     let mut old_sabun = old_sabun;
 
     //デフォルトから変化しない場合はsabunには加わらないが、sabun.len()だと、
@@ -16,21 +16,21 @@ pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String,
     //default.len()でサイズを大きくとって、やたらと無駄が発生することを重く見るべきか？　（そんなに無駄が出るだろうか。書き換えないメンバはそう多くないと思うが・・・)
     //変なユースケースでの最悪を想定するべきで、やたらとdefにメンバを大量に用意して、sabunはちょっとしかないという戦略もありうるので、
     //その場合に無駄で巨大なhashtableを初期化する可能性を重く見るべきではなかろうか
-    let mut result : HashMap<String, RustValue> = HashMap::with_capacity(old_sabun.len());
+    let mut result : HashMap<String, ListSabValue> = HashMap::with_capacity(old_sabun.len());
 
     for (def_key, def_v) in def.default(){
         let sabun_v = if let Some(v) = old_sabun.remove(def_key){ v } else {
             match def_v{
-                RustValue::Param(p, vt) =>{
+                ListDefValue::Param(p, vt) =>{
                     if vt.undefiable(){
-                        RustValue::Param(p.to_undefined(), vt.clone())
+                        ListSabValue::Param(p.to_undefined())
                     } else{
                         continue;
                     }
                 },
-                RustValue::InnerMutDef(mut_def) =>{
+                ListDefValue::InnerMutDef(mut_def) =>{
                     if mut_def.undefinable(){
-                        RustValue::InnerMut(None)
+                        ListSabValue::InnerMut(None)
                     } else{
                         continue;
                     }
@@ -41,18 +41,18 @@ pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String,
             }
         };
         match sabun_v{
-            RustValue::Param(p, v) =>{
+            ListSabValue::Param(p) =>{
                 //型チェックめんどいからなしでいいかな・・・？
-                result.insert(def_key.to_string(), RustValue::Param(p, v));
+                result.insert(def_key.to_string(), ListSabValue::Param(p));
             },
-            RustValue::InnerMut(op) =>{
+            ListSabValue::InnerMut(op) =>{
                 match op{
                     Some(im) =>{
                         let new = adjust_inner_mut_list(def, im, &names.append(def_key))?;
-                        result.insert(def_key.to_string(), RustValue::InnerMut(Some(new)));
+                        result.insert(def_key.to_string(), ListSabValue::InnerMut(Some(new)));
                     },
                     None =>{
-                        result.insert(def_key.to_string(), RustValue::InnerMut(None));
+                        result.insert(def_key.to_string(), ListSabValue::InnerMut(None));
                     }
                 }
             },

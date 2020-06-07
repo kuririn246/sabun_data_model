@@ -14,11 +14,11 @@ pub fn root_to_json_new_default(obj : &RootObject) -> Result<Value> {
     let mut result : HashMap<String,RustValue> = HashMap::with_capacity(obj.default().len());
     let sabun = obj.sabun();
     for (name, val) in obj.default(){
-        if let RootValue::Param(p,v) = val{
+        if let RootValue::Param(_p,v) = val{
             if let Some(ps) = sabun.get(name){
                 result.insert(name.to_string(), RustValue::Param(ps.clone(), v.clone()));
             } else{
-                result.insert(name.to_string(), val.to_rust_value());
+                result.insert(name.to_string(), val.clone().to_rust_value());
             }
         }
     }
