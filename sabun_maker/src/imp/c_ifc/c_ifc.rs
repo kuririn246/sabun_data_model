@@ -1,4 +1,6 @@
 use crate::imp::structs::root_obj::RootObject;
+use crate::imp::c_ifc::c_ifc_type::CifcType;
+use crate::imp::c_ifc::c_ifc_value::CifcValue;
 
 #[repr(C)]
 pub struct CifcSt{
@@ -7,20 +9,11 @@ pub struct CifcSt{
 }
 
 impl CifcSt{
-    pub(crate) fn value(&self) -> &CifcValue { &self.value }
+    pub(crate) fn value(&self) -> &CifcValue { self.value.as_ref() }
 }
 
-#[repr(u64)]
-///this is stabilized
-pub enum CifcType {
-    Root = 0,
+pub extern "C" fn get_type(p : *const CifcSt) -> CifcType{
+    p.cifc_type
 }
 
 
-pub enum CifcValue{
-    Root(RootIfc),
-}
-
-pub struct RootIfc{
-    obj : RootObject
-}
