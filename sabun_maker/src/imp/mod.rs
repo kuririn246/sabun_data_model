@@ -2,4 +2,5 @@ pub mod json_to_rust;
 pub mod rust_to_json;
 pub mod version_adjuster;
 pub mod structs;
-pub mod interface_generator;
+//pub mod interface_generator;
+pub mod c_ifc;
