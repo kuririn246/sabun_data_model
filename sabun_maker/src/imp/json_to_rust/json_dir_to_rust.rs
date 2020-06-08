@@ -20,14 +20,10 @@ pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RootObject
     for dir in dirs{
         match dir{
             Ok(de) =>{
-
                 let path = de.path();
-
                 let oss : &OsStr = path.file_stem().ok_or_else(|| format!("file stem couldn't be read {:?}", &de))?;
                 let file_stem_ref = oss.to_str().ok_or_else(|| format!("os_string couldn't be converted to a rust string {:?}", oss))?;
                 let file_stem = file_stem_ref.to_string();
-
-
 
                 let mut file =  File::open(de.path())?;
                 let mut buf = String::new();

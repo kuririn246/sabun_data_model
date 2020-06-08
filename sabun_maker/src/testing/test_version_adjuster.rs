@@ -20,7 +20,7 @@
 //         let old = match json_dir_to_rust("src/json_dir/version_adjuster/old", true) {
 //             Ok(j) =>{
 //                 match rust_to_json_new_default(&j){
-//                     Ok(b) =>{
+//                     Ok(_b) =>{
 //                         //println!("old pretty {}", b.to_string_pretty());
 //                     },
 //                     Err(e) =>{ println!("old nopretty {}", e.message); }

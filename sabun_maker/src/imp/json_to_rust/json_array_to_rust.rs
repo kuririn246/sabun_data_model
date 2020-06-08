@@ -18,11 +18,11 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
     return match gat{
         AT(array_type) =>{
             let array = get_array( &array[1..], &array_type, names)?;
-            Ok(RustValue::Param(RustParam::Array(array), value_type))
+            Ok(RustValue::Param(RustParam::Array(array, array_type), value_type))
         },
         NoTagNum =>{
             let array = get_array(&array, &ArrayType::Num, names)?;
-            Ok(RustValue::Param(RustParam::Array(array), value_type))
+            Ok(RustValue::Param(RustParam::Array(array, ArrayType::Num), value_type))
         }
         Num | Str | Bool =>{
             array_null_or_undefined(&array[1..], gat, value_type, span, names)
@@ -146,14 +146,14 @@ pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result
             },
             JVal::Null(_) =>{
                 if vec.len() == 0 && a.len() == 1{
-                    return Ok(RustArray::null(array_type.clone()));
+                    return Ok(RustArray::new(Qv::Null));
                 } else{
                     Err(format!(r#"{} null must be ["type", null] {}"#, item.line_str(), names))?
                 }
             },
             JVal::Undefined(_) =>{
                 if vec.len() == 0 && a.len() == 1{
-                    return Ok(RustArray::undefined(array_type.clone()));
+                    return Ok(RustArray::new(Qv::Undefined));
                 } else{
                     Err(format!(r#"{} undefined must be ["type", undefined] {}"#, item.line_str(), names))?
                 }
@@ -163,11 +163,11 @@ pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result
                     ArrayType::Num2 => {
                         let rv = json_array_to_rust(a2, ValueType::Normal, span, names)?;
                         match rv{
-                            RustValue::Param(RustParam::Array(array), _vt) =>{
+                            RustValue::Param(RustParam::Array(array, at), _vt) =>{
                                 match array.qv() {
                                     Qv::Val(_val) => {
-                                        match array.array_type() {
-                                            ArrayType::Num => RustParam::Array(array),
+                                        match at {
+                                            ArrayType::Num => RustParam::Array(array, at),
                                             _ => { Err(format!(r#"{} {} is not a num array {}"#, span.line_str(), span.slice(), names))? }
                                         }
                                     },
@@ -190,5 +190,5 @@ pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result
         };
         vec.push(val);
     }
-    return Ok(RustArray::new(Qv::Val(vec), array_type.clone()));
+    return Ok(RustArray::new(Qv::Val(vec)));
 }

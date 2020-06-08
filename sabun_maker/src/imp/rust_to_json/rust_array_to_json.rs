@@ -4,11 +4,11 @@ use crate::imp::structs::qv::Qv;
 use crate::imp::structs::my_json::Value;
 use crate::imp::structs::rust_array::RustArray;
 
-pub fn rust_array_to_json(array : &RustArray) -> Value{
+pub fn rust_array_to_json(array : &RustArray, at : &ArrayType) -> Value{
     let mut result : Vec<Value> = vec![];
 
 
-    match array.array_type(){
+    match at{
         ArrayType::String =>{ result.push(Value::String("StrArray".to_string())) },
         ArrayType::Num =>{
             let array_len = if let Qv::Val(v) = array.qv(){

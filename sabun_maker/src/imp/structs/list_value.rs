@@ -67,11 +67,9 @@ impl ListDefValue{
                 RustParam::Bool(_) => 0,
                 RustParam::Number(_) => 1,
                 RustParam::String(_) => 2,
-                RustParam::Array(a) => match a.array_type(){
-                    ArrayType::Num => 3,
-                    ArrayType::String => 4,
-                    ArrayType::Num2 => 5,
-                },
+                RustParam::Array(_, ArrayType::Num) => 3,
+                RustParam::Array(_, ArrayType::String) => 4,
+                RustParam::Array(_, ArrayType::Num2) => 5,
             },
             ListDefValue::InnerListDef(_) => 6,
             ListDefValue::InnerDataDef(_) => 7,
@@ -97,7 +95,7 @@ impl ListSabValue{
                 RustParam::Bool(_) => 0,
                 RustParam::Number(_) => 1,
                 RustParam::String(_) => 2,
-                RustParam::Array(a) => match a.array_type(){
+                RustParam::Array(_, at) => match at{
                     ArrayType::Num => 3,
                     ArrayType::String => 4,
                     ArrayType::Num2 => 5,

@@ -7,11 +7,5 @@ pub enum ArrayType{
 }
 
 impl ArrayType{
-    pub(crate) fn type_num(&self) -> usize{
-        match self{
-            ArrayType::Num => 0,
-            ArrayType::String => 1,
-            ArrayType::Num2 => 2,
-        }
-    }
+
 }

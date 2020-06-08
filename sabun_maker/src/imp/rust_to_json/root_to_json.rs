@@ -13,19 +13,24 @@ use crate::imp::structs::root_value::RootValue;
 
 pub fn root_to_json_new_default(obj : &RootObject) -> Result<Value> {
     let mut result : HashMap<String,RustValue> = HashMap::with_capacity(obj.default().len());
-    let sabun = obj.sabun();
-    for (name, val) in obj.default(){
-        if let RootValue::Param(_p,v) = val{
-            if let Some(ps) = sabun.get(name){
-                result.insert(name.to_string(), RustValue::Param(ps.clone(), v.clone()));
+    let default = obj.default().clone();
+    let mut sabun = obj.sabun().clone();
+    let old = obj.old().clone();
+
+    for (name, val) in default{
+        if let RootValue::Param(p,vt) = val{
+            if let Some(sab_param) = sabun.remove(&name){
+                result.insert(name, RustValue::Param(sab_param, vt));
             } else{
-                result.insert(name.to_string(), val.clone().into_rust_value());
+                result.insert(name, RustValue::Param(p, vt));
             }
+        } else{
+            result.insert(name, val.into_rust_value());
         }
     }
 
     let mut map = value_map_to_json(&btree_map(&result));
-    map.insert( "Old".to_string(), string_set_to_json_short(&btree_set(obj.old())));
+    map.insert( "Old".to_string(), string_set_to_json_short(&btree_set(&old)));
 
     return Ok(Value::Map(map));
 }
