@@ -19,6 +19,7 @@ pub struct MemberDesc{
     pub ifc_t : CifcType,
 }
 
+///this enumerator must be destroyed, items must not be destroyed
 #[derive(Debug)]
 pub struct CMemberEnumerator{
     enu : CEnumerator<CMemberDesc>
@@ -33,23 +34,19 @@ impl CMemberEnumerator{
 pub extern "C" fn member_enu_move_next(m : *mut CMemberEnumerator) -> bool{
     m.enu.move_next()
 }
-
-pub extern "C" fn member_enu_current(m : *mut CMemberEnumerator) -> *mut CMemberDesc{
-    m.enu.current()
-}
-
+pub extern "C" fn member_enu_current(m : *mut CMemberEnumerator) -> *mut CMemberDesc{ m.enu.current() }
 pub extern "C" fn member_enu_destroy(m : *mut CMemberEnumerator){
-    unsafe{ Box::from_raw(m) }
+    unsafe{ Box::from_raw(m) };
 }
-
 
 pub extern "C" fn c_get_members(p : *const CifcSt) -> *mut CMemberEnumerator{
-    match p.as_ref(){
+    match unsafe{ p.as_ref() }{
         Some(p) =>{
             let vec = get_members(p.as_ref());
             let b = CMemberEnumerator::new(vec);
             Box::into_raw(b)
-        }
+        },
+        None =>{ 0 as *mut CMemberEnumerator }
     }
 
 }

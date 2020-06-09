@@ -5,7 +5,7 @@ use crate::imp::c_ifc::c_ifc_value::CifcValue;
 #[repr(C)]
 pub struct CifcSt{
     pub cifc_type : CifcType,
-    value : CifcValue,
+    value : Box<CifcValue>,
 }
 
 impl CifcSt{
