@@ -13,7 +13,7 @@ impl CifcSt{
 }
 
 pub extern "C" fn get_type(p : *const CifcSt) -> CifcType{
-    p.cifc_type
+    unsafe{ (*p).cifc_type }
 }
 
 

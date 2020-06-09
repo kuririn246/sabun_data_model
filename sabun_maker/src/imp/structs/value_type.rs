@@ -1,11 +1,12 @@
 use crate::imp::structs::qv::QvType;
 
+#[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ValueType{
-    Normal,
-    Nullable,
-    Undefiable,
-    UndefNullable,
+    Normal = 0,
+    Nullable = 1,
+    Undefiable = 2,
+    UndefNullable = 3,
 }
 
 impl ValueType{
