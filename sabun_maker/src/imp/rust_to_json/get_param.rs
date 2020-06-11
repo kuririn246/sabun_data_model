@@ -13,7 +13,7 @@ pub fn get_param(v : &RustParam) -> Value{
     return r;
 }
 
-fn to<T>(qv : &Qv<T>, type_name : &str, f : impl Fn(&T)->Value) -> Value{
+fn to<T : Clone>(qv : &Qv<T>, type_name : &str, f : impl Fn(&T)->Value) -> Value{
     match qv{
         Qv::Val(v) => f(v),
         Qv::Null => Value::Array(vec![Value::String(type_name.to_string()), Value::Null]),

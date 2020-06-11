@@ -1,9 +1,9 @@
 
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum Qv<T>{ Val(T), Undefined, Null }
+pub enum Qv<T :Clone>{ Val(T), Undefined, Null }
 
-impl<T> Qv<T>{
+impl<T : Clone> Qv<T>{
     pub(crate) fn qv_type(&self) -> QvType{
         match self{
             Qv::Val(_) => QvType::Val,
@@ -12,7 +12,7 @@ impl<T> Qv<T>{
         }
     }
 
-    pub(crate) fn map<U>(&self, f : impl Fn(&T) -> U) -> Qv<U> {
+    pub(crate) fn map<U : Clone>(&self, f : impl Fn(&T) -> U) -> Qv<U> {
         match self {
             Qv::Val(v) => Qv::Val(f(v)),
             Qv::Null => Qv::Null,
