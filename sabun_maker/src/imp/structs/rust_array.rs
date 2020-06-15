@@ -29,4 +29,8 @@ impl RustArray{
     // }
     pub(crate) fn qv(&self) -> &Qv<Vec<RustParam>>{ self.array.as_ref() }
     //pub(crate) fn array_type(&self) -> ArrayType{ self.array.at.clone() }
+
+    pub(crate) fn to_num_array(&self) -> Qv<Vec<f64>>{
+
+    }
 }

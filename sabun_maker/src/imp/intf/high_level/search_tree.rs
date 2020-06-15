@@ -7,6 +7,8 @@ use crate::imp::structs::value_type::ValueType;
 use crate::imp::structs::rust_value::RustValueType;
 use crate::imp::structs::array_type::ArrayType;
 use crate::imp::structs::util::set_sabun::SetSabunError;
+use crate::imp::structs::rust_string::RustString;
+use crate::imp::structs::rust_array::RustArray;
 
 pub enum SearchFromCol{
     ///ListとMutListで、Listの場合はvecのindex, MutListの場合はLinkedHashMapのIDで取得
@@ -26,18 +28,18 @@ pub struct SearchArgs{
 
 pub enum Action{
     GetLen, GetIndexes, GetIDs, GetMemberDesc, GetRefDesc, //未実装 GetUnsafePtr,
-    GetBool(String), GetNum(String), GetStr(String), GetNumArray(String), GetStrArray(String), GetNum2Array(String),
-    Set(String, RustParam)
+    GetBool, GetNum, GetStr, GetNumArray, GetStrArray, GetNum2Array,
+    Set(RustParam)
 }
 
 pub enum ActionType{ GetParam, SetParam, Other }
 
 impl Action{
-    pub fn is_get_param(&self) -> bool{
+    pub(crate) fn is_get_param(&self) -> bool{
         use Action::*;
 
         match self{
-            GetBool(_) | GetNum(_) | GetStr(_) | GetNumArray(_) | GetStrArray(_) | GetNum2Array(_) => true,
+            GetBool | GetNum | GetStr | GetNumArray | GetStrArray | GetNum2Array => true,
             _ => false,
         }
     }
@@ -47,21 +49,22 @@ impl Action{
         use RustValueType::*;
 
         let t = match self{
-            GetBool(_) | Set(_,RustParam::Bool(_))=> Bool,
-            GetNum(_) | Set(_,RustParam::Number(_)) => Num,
-            GetStr(_) | Set(_, RustParam::String(_)) => Str,
-            GetNumArray(_) | Set(_, RustParam::Array(_, ArrayType::Num)) => NumArray,
-            GetStrArray(_) | Set(_, RustParam::Array(_, ArrayType::String)) => StrArray,
-            GetNum2Array(_) | Set(_, RustParam::Array(_,ArrayType::Num2)) => Num2Array,
+            GetBool | Set(RustParam::Bool(_))=> Bool,
+            GetNum | Set(RustParam::Number(_)) => Num,
+            GetStr | Set(RustParam::String(_)) => Str,
+            GetNumArray | Set(RustParam::Array(_, ArrayType::Num)) => NumArray,
+            GetStrArray | Set(RustParam::Array(_, ArrayType::String)) => StrArray,
+            GetNum2Array | Set(RustParam::Array(_,ArrayType::Num2)) => Num2Array,
             _ =>{ return None; }
         };
         return Some(t);
     }
+
 }
 
 pub enum ActionResult{
-    Len(u64), Indexes(Option<Vec<u64>>), IDs(Vec<String>), MemberDesc(Vec<MemberDesc>), RefDesc(Vec<RefDesc>),
-    Bool(Qv<bool>), Num(Qv<f64>), Str(Qv<String>), ArrayNum(Qv<Vec<f64>>), ArrayStr(Qv<Vec<String>>), ArrayNum2(Qv<Vec<Vec<f64>>>),
+    Len(usize), Indexes(Option<Vec<u64>>), IDs(Vec<String>), MemberDesc(Vec<MemberDesc>), RefDesc(Vec<RefDesc>),
+    Bool(Qv<bool>), Num(Qv<f64>), Str(Qv<String>), NumArray(Qv<RustArray>), StrArray(Qv<Vec<String>>), Num2Array(Qv<Vec<Vec<f64>>>),
     SetOk,
 }
 
@@ -126,9 +129,10 @@ pub fn search_from_root(root : &mut RootObject, args : &SearchArgs) -> Result<Ac
     return match val {
         RootValue::Param(p, _vt) => {
             if args.action.is_get_param() {
+
                 return get_param(&args.action, p, root.sabun().get(name));
             }
-            if let Action::Set(name, param) = &args.action {
+            if let Action::Set(param) = &args.action {
                 match root.set_sabun(name.to_string(), param.clone()){
                     Ok(_) =>{ return Ok(ActionResult::SetOk); },
                     Err(e) =>{
@@ -140,6 +144,7 @@ pub fn search_from_root(root : &mut RootObject, args : &SearchArgs) -> Result<Ac
                     }
                 }
             }
+            //Paramに対してはGetかSetしかできましぇん
             return Err(ActionError::action(AET::TypeMismatch))
         },
         RootValue::Data(d) => search_from_data(d, args, 0),
@@ -149,7 +154,26 @@ pub fn search_from_root(root : &mut RootObject, args : &SearchArgs) -> Result<Ac
 }
 
 pub fn get_param(action : &Action, p : &RustParam, sab : Option<&RustParam>) -> Result<ActionResult, ActionError>{
-    todo!()
+    let t = if let Some(t) = action.param_type_num() { t } else{
+        return Err(ActionError::action(AET::TypeMismatch));
+    };
+    if t != p.type_num(){
+        return Err(ActionError::action(AET::ParamTypeMismatch));
+    }
+    if let Some(sab) = sab{
+        if t != sab.type_num(){
+            return Err(ActionError::action(AET::ParamTypeMismatch));
+        }
+    }
+}
+
+pub fn get_action_param_uncheck(action : &Action, p : &RustParam) -> ActionResult{
+    match action{
+        Action::GetBool => if let RustParam::Bool(a) = p{ ActionResult::Bool(a.clone()) } else{ unreachable!() },
+        Action::GetNum => if let RustParam::Number(a) = p{ ActionResult::Num(a.clone()) } else{ unreachable!() },
+        Action::GetStr => if let RustParam::String(a) = p{ ActionResult::Str(a.map(|s| s.str().to_string())) } else{ unreachable!() },
+        Action::GetNumArray => if let RustParam::Array(a, at) = p{ ActionResult::NumArray(a.) } else{ unreachable!() },
+    }
 }
 
 
