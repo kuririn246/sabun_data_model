@@ -21,6 +21,13 @@ pub enum RustValue{
     InnerMutDef(InnerMutDefObj),
 }
 
+#[repr(u64)]
+#[derive(Debug, PartialEq, Clone)]
+pub enum RustValueType{
+    Bool, Num, Str, NumArray, StrArray,Num2Array,
+    Data, List, Mut, InnerData, InnerList, InnerMut
+}
+
 impl RustValue{
     pub(crate) fn into_root_value(self) -> Result<RootValue, String>{
         let v = match self{

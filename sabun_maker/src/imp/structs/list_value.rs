@@ -1,6 +1,6 @@
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_list::{InnerData, InnerList, InnerMutList};
-use crate::imp::structs::rust_value::RustValue;
+use crate::imp::structs::rust_value::{RustValue, RustValueType};
 use crate::imp::structs::value_type::ValueType;
 use crate::imp::structs::array_type::ArrayType;
 use crate::imp::structs::def_obj::{ListDefObj, InnerMutDefObj};
@@ -61,19 +61,20 @@ impl ListDefValue{
     }
 
     ///この数値は仮
-    pub(crate) fn type_num(&self) -> usize{
+    pub(crate) fn type_num(&self) -> RustValueType{
+        use RustValueType::*;
         match self{
             ListDefValue::Param(param, _) => match param{
-                RustParam::Bool(_) => 0,
-                RustParam::Number(_) => 1,
-                RustParam::String(_) => 2,
-                RustParam::Array(_, ArrayType::Num) => 3,
-                RustParam::Array(_, ArrayType::String) => 4,
-                RustParam::Array(_, ArrayType::Num2) => 5,
+                RustParam::Bool(_) => Bool,
+                RustParam::Number(_) => Num,
+                RustParam::String(_) => Str,
+                RustParam::Array(_, ArrayType::Num) => NumArray,
+                RustParam::Array(_, ArrayType::String) => StrArray,
+                RustParam::Array(_, ArrayType::Num2) => Num2Array,
             },
-            ListDefValue::InnerListDef(_) => 6,
-            ListDefValue::InnerDataDef(_) => 7,
-            ListDefValue::InnerMutDef(_) => 8,
+            ListDefValue::InnerDataDef(_) => InnerData,
+            ListDefValue::InnerListDef(_) => InnerList,
+            ListDefValue::InnerMutDef(_) => InnerMut,
         }
     }
 
@@ -89,21 +90,23 @@ impl ListDefValue{
 
 impl ListSabValue{
     ///この数値は仮
-    pub(crate) fn type_num(&self) -> usize{
+    pub(crate) fn type_num(&self) -> RustValueType{
+        use RustValueType::*;
+
         match self{
             ListSabValue::Param(param) => match param{
-                RustParam::Bool(_) => 0,
-                RustParam::Number(_) => 1,
-                RustParam::String(_) => 2,
+                RustParam::Bool(_) => Bool,
+                RustParam::Number(_) => Num,
+                RustParam::String(_) => Str,
                 RustParam::Array(_, at) => match at{
-                    ArrayType::Num => 3,
-                    ArrayType::String => 4,
-                    ArrayType::Num2 => 5,
+                    ArrayType::Num => NumArray,
+                    ArrayType::String => StrArray,
+                    ArrayType::Num2 => Num2Array,
                 },
             },
-            ListSabValue::InnerList(_) => 6,
-            ListSabValue::InnerData(_) => 7,
-            ListSabValue::InnerMut(_) => 8,
+            ListSabValue::InnerData(_) => InnerData,
+            ListSabValue::InnerList(_) => InnerList,
+            ListSabValue::InnerMut(_) => InnerMut,
         }
     }
 

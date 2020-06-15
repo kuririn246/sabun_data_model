@@ -2,6 +2,7 @@ use crate::imp::structs::qv::{Qv, QvType};
 use crate::imp::structs::rust_string::RustString;
 use crate::imp::structs::rust_array::RustArray;
 use crate::imp::structs::array_type::ArrayType;
+use crate::imp::structs::rust_value::RustValueType;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum RustParam{
@@ -22,14 +23,15 @@ impl RustParam{
         }
     }
 
-    pub(crate) fn type_num(&self) -> usize{
+    pub(crate) fn type_num(&self) -> RustValueType{
+        use RustValueType::*;
         match self{
-            RustParam::Bool(_) => 0,
-            RustParam::Number(_) => 1,
-            RustParam::String(_) => 2,
-            RustParam::Array(_,ArrayType::Num) => 3,
-            RustParam::Array(_,ArrayType::String) => 4,
-            RustParam::Array(_,ArrayType::Num2) => 5,
+            RustParam::Bool(_) => Bool,
+            RustParam::Number(_) => Num,
+            RustParam::String(_) => Str,
+            RustParam::Array(_,ArrayType::Num) => NumArray,
+            RustParam::Array(_,ArrayType::String) => StrArray,
+            RustParam::Array(_,ArrayType::Num2) => Num2Array,
         }
     }
 
