@@ -115,11 +115,13 @@ pub struct MemberDesc{
     pub member : String,
     pub qv_type : QvType,
     pub member_type : MemberType,
+    pub is_old : bool,
 }
 
 pub struct RefDesc{
     pub member : String,
     pub qv_type : QvType,
+    pub is_old : bool,
 }
 
 pub enum MemberType{
