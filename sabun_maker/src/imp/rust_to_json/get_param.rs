@@ -8,7 +8,10 @@ pub fn get_param(v : &RustParam) -> Value{
         RustParam::Bool(b) => to(b,  "Bool",|b| Value::Bool(*b)),
         RustParam::String(s) => to(s, "Str", |s| Value::String(s.str().to_string())),
         RustParam::Number(n)=> to(n, "Num", |n| Value::Number(*n)),
-        RustParam::Array(a, at)=>{ rust_array_to_json(a, at) },
+        _ =>{
+            let (array, at) = v.to_rust_array().unwrap();
+            rust_array_to_json(&array, &at)
+        },
     };
     return r;
 }

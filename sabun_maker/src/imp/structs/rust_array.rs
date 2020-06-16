@@ -21,8 +21,8 @@ impl RustArray{
         RustArray::new(qv.map(|a| a.iter().map(|f| RustParam::String(Qv::Val(RustString::new(f.to_string())))).collect()))
     }
     pub(crate) fn from_num2_array(qv : &Qv<Vec<Vec<f64>>>) -> RustArray{
-        RustArray::new(qv.map(|a| a.iter().map(|f| RustParam::Array(
-            RustArray::from_num_array(&Qv::Val(f.clone())), ArrayType::Num)).collect()))
+        RustArray::new(qv.map(|a| a.iter().map(|f| RustParam::NumArray(Qv::Val(f.clone()))).collect()))
+            //RustArray::from_num_array(&Qv::Val(f.clone())), ArrayType::Num)).collect()))
     }
 
     // pub(crate) fn null(at : ArrayType) -> RustArray{
@@ -83,14 +83,20 @@ impl RustArray{
 
         let mut result : Vec<Vec<f64>> = Vec::with_capacity(v.len());
         for p in v {
-            if let RustParam::Array(a, at) = p {
-                if let Ok(Qv::Val(v)) = a.to_num_array() {
-                    result.push(v);
-                } else {
-                    return Err(());
-                }
+            if let RustParam::NumArray(Qv::Val(a)) = p {
+                result.push(a.clone());
+            } else{
+                return Err(());
             }
         }
         return Ok(Qv::Val(result));
+    }
+
+    pub(crate) fn to_param(&self, at : &ArrayType) -> Result<RustParam, ()>{
+        Ok(match at{
+            ArrayType::Num =>{ RustParam::NumArray(self.to_num_array()?) },
+            ArrayType::String =>{ RustParam::StrArray(self.to_str_array()?)}
+            ArrayType::Num2 =>{ RustParam::Num2Array(self.to_num2_array()?)}
+        })
     }
 }

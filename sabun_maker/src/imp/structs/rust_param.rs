@@ -1,8 +1,8 @@
 use crate::imp::structs::qv::{Qv, QvType};
 use crate::imp::structs::rust_string::RustString;
+use crate::imp::structs::rust_value::RustValueType;
 use crate::imp::structs::rust_array::RustArray;
 use crate::imp::structs::array_type::ArrayType;
-use crate::imp::structs::rust_value::RustValueType;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum RustParam{
@@ -57,39 +57,48 @@ impl RustParam {
         }
     }
 
-    pub(crate) fn from_num_array(v: Vec<RustParam>, qv_type: &QvType) -> Option<RustParam> {
-        match qv_type {
-            QvType::Val => {
-                let mut r: Vec<f64> = Vec::with_capacity(v.len());
-                for item in v {
-                    if let RustParam::Number(Qv::Val(f)) = item {
-                        r.push(f);
-                    } else {
-                        return None;
-                    }
-                }
-                Some(RustParam::NumArray(Qv::Val(r)))
-            },
-            QvType::Null => Some(RustParam::NumArray(Qv::Null)),
-            QvType::Undefined => Some(RustParam::NumArray(Qv::Undefined))
+    pub(crate) fn to_rust_array(&self) -> Option<(RustArray, ArrayType)>{
+        match self{
+            RustParam::NumArray(a) => Some((RustArray::from_num_array(a), ArrayType::Num)),
+            RustParam::StrArray(a) => Some((RustArray::from_str_array(a), ArrayType::String)),
+            RustParam::Num2Array(a) => Some((RustArray::from_num2_array(a), ArrayType::Num2)),
+            _ => None,
         }
     }
 
-    pub(crate) fn from_str_array(v: Vec<RustParam>, qv_type: &QvType) -> Option<RustParam> {
-        match qv_type {
-            QvType::Val => {
-                let mut r: Vec<String> = Vec::with_capacity(v.len());
-                for item in v {
-                    if let RustParam::String(Qv::Val(f)) = item {
-                        r.push(f.str().to_string());
-                    } else {
-                        return None;
-                    }
-                }
-                Some(RustParam::NumArray(Qv::Val(r)))
-            },
-            QvType::Null => Some(RustParam::NumArray(Qv::Null)),
-            QvType::Undefined => Some(RustParam::NumArray(Qv::Undefined))
-        }
-    }
+    // pub(crate) fn from_num_array(v: Vec<RustParam>, qv_type: &QvType) -> Option<RustParam> {
+    //     match qv_type {
+    //         QvType::Val => {
+    //             let mut r: Vec<f64> = Vec::with_capacity(v.len());
+    //             for item in v {
+    //                 if let RustParam::Number(Qv::Val(f)) = item {
+    //                     r.push(f);
+    //                 } else {
+    //                     return None;
+    //                 }
+    //             }
+    //             Some(RustParam::NumArray(Qv::Val(r)))
+    //         },
+    //         QvType::Null => Some(RustParam::NumArray(Qv::Null)),
+    //         QvType::Undefined => Some(RustParam::NumArray(Qv::Undefined))
+    //     }
+    // }
+    //
+    // pub(crate) fn from_str_array(v: Vec<RustParam>, qv_type: &QvType) -> Option<RustParam> {
+    //     match qv_type {
+    //         QvType::Val => {
+    //             let mut r: Vec<String> = Vec::with_capacity(v.len());
+    //             for item in v {
+    //                 if let RustParam::String(Qv::Val(f)) = item {
+    //                     r.push(f.str().to_string());
+    //                 } else {
+    //                     return None;
+    //                 }
+    //             }
+    //             Some(RustParam::NumArray(Qv::Val(r)))
+    //         },
+    //         QvType::Null => Some(RustParam::NumArray(Qv::Null)),
+    //         QvType::Undefined => Some(RustParam::NumArray(Qv::Undefined))
+    //     }
+    // }
 }

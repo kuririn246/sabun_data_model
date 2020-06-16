@@ -2,7 +2,6 @@ use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_list::{InnerData, InnerList, InnerMutList};
 use crate::imp::structs::rust_value::{RustValue, RustValueType};
 use crate::imp::structs::value_type::ValueType;
-use crate::imp::structs::array_type::ArrayType;
 use crate::imp::structs::def_obj::{ListDefObj, InnerMutDefObj};
 use crate::imp::structs::qv::QvType;
 
@@ -64,14 +63,7 @@ impl ListDefValue{
     pub(crate) fn type_num(&self) -> RustValueType{
         use RustValueType::*;
         match self{
-            ListDefValue::Param(param, _) => match param{
-                RustParam::Bool(_) => Bool,
-                RustParam::Number(_) => Num,
-                RustParam::String(_) => Str,
-                RustParam::Array(_, ArrayType::Num) => NumArray,
-                RustParam::Array(_, ArrayType::String) => StrArray,
-                RustParam::Array(_, ArrayType::Num2) => Num2Array,
-            },
+            ListDefValue::Param(param, _) => param.type_num(),
             ListDefValue::InnerDataDef(_) => InnerData,
             ListDefValue::InnerListDef(_) => InnerList,
             ListDefValue::InnerMutDef(_) => InnerMut,
@@ -94,16 +86,7 @@ impl ListSabValue{
         use RustValueType::*;
 
         match self{
-            ListSabValue::Param(param) => match param{
-                RustParam::Bool(_) => Bool,
-                RustParam::Number(_) => Num,
-                RustParam::String(_) => Str,
-                RustParam::Array(_, at) => match at{
-                    ArrayType::Num => NumArray,
-                    ArrayType::String => StrArray,
-                    ArrayType::Num2 => Num2Array,
-                },
-            },
+            ListSabValue::Param(param) => param.type_num(),
             ListSabValue::InnerData(_) => InnerData,
             ListSabValue::InnerList(_) => InnerList,
             ListSabValue::InnerMut(_) => InnerMut,

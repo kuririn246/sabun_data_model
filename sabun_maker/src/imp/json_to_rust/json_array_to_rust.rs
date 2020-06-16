@@ -18,11 +18,11 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
     return match gat{
         AT(array_type) =>{
             let array = get_array( &array[1..], &array_type, names)?;
-            Ok(RustValue::Param(RustParam::Array(array, array_type), value_type))
+            Ok(RustValue::Param(array.to_param(&array_type).unwrap(), value_type))
         },
         NoTagNum =>{
             let array = get_array(&array, &ArrayType::Num, names)?;
-            Ok(RustValue::Param(RustParam::Array(array, ArrayType::Num), value_type))
+            Ok(RustValue::Param(array.to_param(&ArrayType::Num).unwrap(), value_type))
         }
         Num | Str | Bool =>{
             array_null_or_undefined(&array[1..], gat, value_type, span, names)
@@ -163,14 +163,9 @@ pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result
                     ArrayType::Num2 => {
                         let rv = json_array_to_rust(a2, ValueType::Normal, span, names)?;
                         match rv{
-                            RustValue::Param(RustParam::Array(array, at), _vt) =>{
-                                match array.qv() {
-                                    Qv::Val(_val) => {
-                                        match at {
-                                            ArrayType::Num => RustParam::Array(array, at),
-                                            _ => { Err(format!(r#"{} {} is not a num array {}"#, span.line_str(), span.slice(), names))? }
-                                        }
-                                    },
+                            RustValue::Param(RustParam::NumArray(array), _vt) =>{
+                                match &array {
+                                    Qv::Val(_val) => RustParam::NumArray(array),
                                     Qv::Null => {
                                         Err(format!(r#"{} null is not a num array {}"#, item.line_str(), names))?
                                     },

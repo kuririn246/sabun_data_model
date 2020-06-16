@@ -3,12 +3,9 @@ use crate::imp::structs::qv::{Qv, QvType};
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::rust_list::{ConstData, ConstList, MutList};
 use crate::imp::structs::rust_param::RustParam;
-use crate::imp::structs::value_type::ValueType;
 use crate::imp::structs::rust_value::RustValueType;
-use crate::imp::structs::array_type::ArrayType;
 use crate::imp::structs::util::set_sabun::SetSabunError;
 use crate::imp::structs::rust_string::RustString;
-use crate::imp::structs::rust_array::RustArray;
 
 pub enum SearchFromCol{
     ///ListとMutListで、Listの場合はvecのindex, MutListの場合はLinkedHashMapのIDで取得
@@ -43,9 +40,9 @@ impl SetParam{
             SetParam::Bool(b) => RustParam::Bool(b.clone()),
             SetParam::Num(b) => RustParam::Number(b.clone()),
             SetParam::Str(b) => RustParam::String(b.map(|s| RustString::new(s.to_string()))),
-            SetParam::NumArray(b) => RustParam::Array(RustArray::from_num_array(b), ArrayType::Num),
-            SetParam::StrArray(b) => RustParam::Array(RustArray::from_str_array(b), ArrayType::String),
-            SetParam::Num2Array(b) => RustParam::Array(RustArray::from_num2_array(b), ArrayType::Num2),
+            SetParam::NumArray(b) => RustParam::NumArray(b.clone()),
+            SetParam::StrArray(b) => RustParam::StrArray(b.clone()),
+            SetParam::Num2Array(b) => RustParam::Num2Array(b.clone()),
         }
     }
 }
@@ -194,9 +191,9 @@ pub fn get_action_param_uncheck(action : &Action, p : &RustParam) -> ActionResul
         Action::GetBool => if let RustParam::Bool(a) = p{ ActionResult::Bool(a.clone()) } else{ unreachable!() },
         Action::GetNum => if let RustParam::Number(a) = p{ ActionResult::Num(a.clone()) } else{ unreachable!() },
         Action::GetStr => if let RustParam::String(a) = p{ ActionResult::Str(a.map(|s| s.str().to_string())) } else{ unreachable!() },
-        Action::GetNumArray => if let RustParam::Array(a, at) = p{ ActionResult::NumArray(a.to_num_array().unwrap()) } else{ unreachable!() },
-        Action::GetStrArray => if let RustParam::Array(a, at) = p{ ActionResult::StrArray(a.to_str_array().unwrap()) } else{ unreachable!() },
-        Action::GetNum2Array => if let RustParam::Array(a, at) = p{ ActionResult::Num2Array(a.to_num2_array().unwrap()) } else{ unreachable!() },
+        Action::GetNumArray => if let RustParam::NumArray(a) = p{ ActionResult::NumArray(a.clone()) } else{ unreachable!() },
+        Action::GetStrArray => if let RustParam::StrArray(a) = p{ ActionResult::StrArray(a.clone()) } else{ unreachable!() },
+        Action::GetNum2Array => if let RustParam::Num2Array(a) = p{ ActionResult::Num2Array(a.clone()) } else{ unreachable!() },
         _ =>{ unreachable!() },
     }
 }
