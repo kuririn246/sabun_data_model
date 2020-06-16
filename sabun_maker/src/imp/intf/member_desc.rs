@@ -30,7 +30,7 @@ impl RefDesc{
     }
 }
 
-pub fn get_mem_desc(def : &ListDefObj) -> Vec<MemberDesc>{
+pub fn get_list_def_desc(def : &ListDefObj) -> Vec<MemberDesc>{
     let mut vec : Vec<MemberDesc> = Vec::with_capacity(def.default().len());
     for (k,val) in def.default(){
         let mem = k.to_string();
@@ -49,7 +49,7 @@ pub fn get_mem_desc(def : &ListDefObj) -> Vec<MemberDesc>{
     vec
 }
 
-pub fn get_ref_desc(def : &RefDefObj) -> Vec<RefDesc>{
+pub fn get_ref_def_desc(def : &RefDefObj) -> Vec<RefDesc>{
     let mut vec : Vec<RefDesc> = Vec::with_capacity(def.refs().len());
     for (k,val) in def.refs(){
         let mem = k.to_string();
