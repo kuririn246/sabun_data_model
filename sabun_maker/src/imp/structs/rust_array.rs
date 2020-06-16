@@ -14,14 +14,14 @@ impl RustArray{
     pub(crate) fn new(qv : Qv<Vec<RustParam>>) -> RustArray{
         RustArray{ array : Box::new(qv) }
     }
-    pub(crate) fn from_num_array(qv : &Qv<Vec<f64>>) -> RustArray{
-        RustArray::new(qv.map(|a| a.iter().map(|f| RustParam::Number(Qv::Val(*f))).collect()))
+    pub(crate) fn from_num_array(qv : &Qv<RustNumArray>) -> RustArray{
+        RustArray::new(qv.map(|a| a.as_ref().iter().map(|f| RustParam::Number(Qv::Val(*f))).collect()))
     }
-    pub(crate) fn from_str_array(qv : &Qv<Vec<String>>) -> RustArray{
-        RustArray::new(qv.map(|a| a.iter().map(|f| RustParam::String(Qv::Val(RustString::new(f.to_string())))).collect()))
+    pub(crate) fn from_str_array(qv : &Qv<RustStrArray>) -> RustArray{
+        RustArray::new(qv.map(|a| a.as_ref().iter().map(|f| RustParam::String(Qv::Val(RustString::new(f.to_string())))).collect()))
     }
-    pub(crate) fn from_num2_array(qv : &Qv<Vec<Vec<f64>>>) -> RustArray{
-        RustArray::new(qv.map(|a| a.iter().map(|f| RustParam::NumArray(Qv::Val(f.clone()))).collect()))
+    pub(crate) fn from_num2_array(qv : &Qv<RustNum2Array>) -> RustArray{
+        RustArray::new(qv.map(|a| a.as_ref().iter().map(|f| RustParam::NumArray(Qv::Val(RustNumArray::new(f.clone())))).collect()))
             //RustArray::from_num_array(&Qv::Val(f.clone())), ArrayType::Num)).collect()))
     }
 
@@ -38,7 +38,7 @@ impl RustArray{
     pub(crate) fn qv(&self) -> &Qv<Vec<RustParam>>{ self.array.as_ref() }
     //pub(crate) fn array_type(&self) -> ArrayType{ self.array.at.clone() }
 
-    pub(crate) fn to_num_array(&self) -> Result<Qv<Vec<f64>>,()>{
+    pub(crate) fn to_num_array(&self) -> Result<Qv<RustNumArray>,()>{
         let v = match self.array.as_ref() {
             Qv::Null => { return Ok(Qv::Null) },
             Qv::Undefined => { return Ok(Qv::Undefined) },
@@ -53,10 +53,10 @@ impl RustArray{
                 return Err(());
             }
         }
-        return Ok(Qv::Val(result));
+        return Ok(Qv::Val(RustNumArray::new(result)));
     }
 
-    pub(crate) fn to_str_array(&self) -> Result<Qv<Vec<String>>,()>{
+    pub(crate) fn to_str_array(&self) -> Result<Qv<RustStrArray>,()>{
         let v = match self.array.as_ref() {
             Qv::Null => { return Ok(Qv::Null) },
             Qv::Undefined => { return Ok(Qv::Undefined) },
@@ -71,10 +71,10 @@ impl RustArray{
                 return Err(());
             }
         }
-        return Ok(Qv::Val(result));
+        return Ok(Qv::Val(RustStrArray::new(result)));
     }
 
-    pub(crate) fn to_num2_array(&self) -> Result<Qv<Vec<Vec<f64>>>,()>{
+    pub(crate) fn to_num2_array(&self) -> Result<Qv<RustNum2Array>,()>{
         let v = match self.array.as_ref() {
             Qv::Null => { return Ok(Qv::Null) },
             Qv::Undefined => { return Ok(Qv::Undefined) },
@@ -84,12 +84,12 @@ impl RustArray{
         let mut result : Vec<Vec<f64>> = Vec::with_capacity(v.len());
         for p in v {
             if let RustParam::NumArray(Qv::Val(a)) = p {
-                result.push(a.clone());
+                result.push(a.as_ref().clone());
             } else{
                 return Err(());
             }
         }
-        return Ok(Qv::Val(result));
+        return Ok(Qv::Val(RustNum2Array::new(result)));
     }
 
     pub(crate) fn to_param(&self, at : &ArrayType) -> Result<RustParam, ()>{
@@ -99,4 +99,34 @@ impl RustArray{
             ArrayType::Num2 =>{ RustParam::Num2Array(self.to_num2_array()?)}
         })
     }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct RustNumArray{
+    b : Box<Vec<f64>>,
+}
+
+impl RustNumArray{
+    pub(crate) fn new(b : Vec<f64>) -> RustNumArray{ RustNumArray{ b : Box::new(b) }}
+    pub(crate) fn as_ref(&self) -> &Vec<f64>{ self.b.as_ref() }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct RustStrArray{
+    b : Box<Vec<String>>,
+}
+
+impl RustStrArray{
+    pub(crate) fn new(b : Vec<String>) -> RustStrArray{ RustStrArray{ b : Box::new(b) }}
+    pub(crate) fn as_ref(&self) -> &Vec<String>{ self.b.as_ref() }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct RustNum2Array{
+    b : Box<Vec<Vec<f64>>>,
+}
+
+impl RustNum2Array{
+    pub(crate) fn new(b : Vec<Vec<f64>>) -> RustNum2Array{ RustNum2Array{ b : Box::new(b) }}
+    pub(crate) fn as_ref(&self) -> &Vec<Vec<f64>>{ self.b.as_ref() }
 }

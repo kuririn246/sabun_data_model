@@ -1,34 +1,30 @@
 // #[cfg(test)]
 // mod tests {
 //     use crate::imp::json_to_rust::json_dir_to_rust::json_dir_to_rust;
-//     //use crate::imp::structs::rust_list::{ConstData, ConstList, MutList, InnerData, InnerList, InnerMutList};
-//     //use crate::imp::structs::def_obj::{ListDefObj, InnerMutDefObj};
-//     //use crate::imp::structs::root_value::RootValue;
-//     //use crate::imp::structs::list_value::{ListDefValue, ListSabValue};
-//     //use crate::imp::structs::ref_value::{RefSabValue, RefValue};
 //     use crate::rust_to_json_new_default;
 //     use crate::imp::json_to_rust::json_root_to_rust;
-//
-//     //     #[test]
-// //     fn it_works() {
-// //         match json_dir_to_rust("src/json_dir/json_siyou", true) {
-// //             Ok(a) => {
-// //                 match root_to_json_new_default(&a){
-// //                     Ok(_json) =>{
-// //                         //println!("{}", json.to_string_pretty());
-// //                     },
-// //                     Err(e) =>{ println!("val 2 {}", e.message); }
-// //                 }
-// //             },
-// //             Err(e) => { println!("val 1 {}", e.message) }
-// //         }
-// //     }
-// //
-// //
-//
+//     use crate::imp::rust_to_json::root_to_json::root_to_json_new_default;
 //
 //     #[test]
 //     fn it_works() {
+//         match json_dir_to_rust("src/json_dir/json_siyou", true) {
+//             Ok(a) => {
+//                 match root_to_json_new_default(&a){
+//                     Ok(_json) =>{
+//                         //println!("{}", _json.to_string_pretty());
+//                     },
+//                     Err(e) =>{ println!("val 2 {}", e.message); }
+//                 }
+//             },
+//             Err(e) => { println!("val 1 {}", e.message) }
+//         }
+//     }
+//
+//
+//
+//
+//     #[test]
+//     fn it_works2() {
 //         match json_dir_to_rust("src/json_dir/json_siyou", true){
 //             Ok(a) => {
 //                 match rust_to_json_new_default(&a) {

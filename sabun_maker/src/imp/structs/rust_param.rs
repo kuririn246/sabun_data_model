@@ -1,7 +1,7 @@
 use crate::imp::structs::qv::{Qv, QvType};
-use crate::imp::structs::rust_string::RustString;
+use crate::imp::structs::rust_string::{RustString };
 use crate::imp::structs::rust_value::RustValueType;
-use crate::imp::structs::rust_array::RustArray;
+use crate::imp::structs::rust_array::{RustArray, RustNumArray, RustStrArray, RustNum2Array};
 use crate::imp::structs::array_type::ArrayType;
 
 #[derive(Debug, PartialEq, Clone)]
@@ -9,9 +9,9 @@ pub enum RustParam{
     Bool(Qv<bool>),
     Number(Qv<f64>),
     String(Qv<RustString>),
-    NumArray(Qv<Vec<f64>>),
-    StrArray(Qv<Vec<String>>),
-    Num2Array(Qv<Vec<Vec<f64>>>)
+    NumArray(Qv<RustNumArray>),
+    StrArray(Qv<RustStrArray>),
+    Num2Array(Qv<RustNum2Array>)
 }
 
 impl RustParam {

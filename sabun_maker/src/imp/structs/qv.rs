@@ -21,6 +21,8 @@ impl<T : Clone> Qv<T>{
     }
 }
 
+
+
 pub enum QvType{
     Val, Undefined, Null
 }
