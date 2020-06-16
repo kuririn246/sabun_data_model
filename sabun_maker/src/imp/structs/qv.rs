@@ -22,7 +22,7 @@ impl<T : Clone> Qv<T>{
 
     pub(crate) fn convert<'a, U : From<&'a T> + Clone>(&'a self) -> Qv<U>{
         match self {
-            Qv::Val(v) => Qv::Val(U::from(v)),
+            Qv::Val(v) => Qv::Val(U::from(v)) ,
             Qv::Null => Qv::Null,
             Qv::Undefined => Qv::Undefined
         }
