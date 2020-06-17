@@ -66,6 +66,18 @@ impl RustParam {
         }
     }
 
+    pub(crate) fn to_num(&self) -> Option<f64>{
+        if let RustParam::Number(Qv::Val(s)) = self { Some(*s) } else{ None }
+    }
+
+    pub(crate) fn to_string(&self) -> Option<String>{
+        if let RustParam::String(Qv::Val(s)) = self { Some(s.to_string()) } else{ None }
+    }
+
+    pub(crate) fn to_num_array(&self) -> Option<Vec<f64>>{
+        if let RustParam::NumArray(Qv::Val(a)) = self { Some(a.as_ref().clone()) } else{ None }
+    }
+
     // pub(crate) fn from_num_array(v: Vec<RustParam>, qv_type: &QvType) -> Option<RustParam> {
     //     match qv_type {
     //         QvType::Val => {

@@ -11,8 +11,16 @@ pub fn get_ref_desc(root : *const ConstData) -> Vec<RefDesc>{
     get_ref_def_desc(root.default().refs())
 }
 
-pub fn get_ids(root : *const ConstData) -> Vec<String>{
+#[repr(C)]
+#[derive(Debug, PartialEq, Clone)]
+pub struct IdItem{
+    pub is_old : bool,
+    pub id : String,
+}
+
+pub fn get_ids(root : *const ConstData) -> Vec<IdItem>{
     let root = unsafe{ root.as_ref().unwrap() };
-    root.list().keys().map(|s| s.to_string()).collect()
+    let old = root.old();
+    root.list().keys().map(|s| IdItem{ is_old : old.contains(s), id : s.to_string()}).collect()
 }
 

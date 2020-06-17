@@ -1,4 +1,3 @@
-use std::convert::TryFrom;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Qv<T :Clone>{ Val(T), Undefined, Null }
@@ -20,22 +19,13 @@ impl<T : Clone> Qv<T>{
         }
     }
 
-    pub(crate) fn convert<'a, U : From<&'a T> + Clone>(&'a self) -> Qv<U>{
+    pub(crate) fn opt_map<U: Clone>(&self, f : impl Fn(&T) -> Option<U>) -> Option<Qv<U>>{
         match self {
-            Qv::Val(v) => Qv::Val(U::from(v)) ,
-            Qv::Null => Qv::Null,
-            Qv::Undefined => Qv::Undefined
+            Qv::Val(v) => f(v).map(|r| Qv::Val(r)),
+            Qv::Null => Some(Qv::Null),
+            Qv::Undefined => Some(Qv::Undefined)
         }
     }
-
-    pub(crate) fn try_convert<'a, U : TryFrom<&'a T, Error=TError> + Clone, TError>(&'a self) -> Result<Qv<U>, TError>{
-        Ok(match self {
-            Qv::Val(v) => Qv::Val(U::try_from(v)?),
-            Qv::Null => Qv::Null,
-            Qv::Undefined => Qv::Undefined
-        })
-    }
-
 }
 
 
