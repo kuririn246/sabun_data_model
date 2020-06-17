@@ -16,7 +16,7 @@ impl MemberDesc{
         MemberDesc{ name, value_type, member_type, is_old }
     }
 
-    pub fn name(&self) -> &str{ &self.member }
+    pub fn name(&self) -> &str{ &self.name }
     pub fn value_type(&self) -> &ValueType{ &self.value_type }
     pub fn member_type(&self) -> &RustValueType{ &self.member_type }
     pub fn is_old(&self) -> bool{ self.is_old }
