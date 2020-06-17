@@ -13,17 +13,28 @@ pub fn get_ref_desc(root : *const ConstData) -> RefDescs{
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct IdItem{
-    pub is_old : bool,
-    pub id : String,
+    is_old : bool,
+    id : String,
 }
 
 impl IdItem{
-    pub fn new()
+    pub fn new(is_old : bool, id : String) -> IdItem{ IdItem{ is_old, id }}
+    pub fn is_old(&self) -> bool { self.is_old }
+    pub fn id(&self) -> &str{ &self.id }
 }
 
-pub fn get_ids(root : *const ConstData) -> Vec<IdItem>{
+#[derive(Debug, PartialEq, Clone)]
+pub struct IdItems{
+    items : Vec<IdItem>
+}
+
+impl IdItems{
+    pub fn new(items : Vec<IdItem>) -> IdItems{ IdItems{ items }}
+}
+
+pub fn get_ids(root : *const ConstData) -> IdItems{
     let root = unsafe{ root.as_ref().unwrap() };
     let old = root.old();
-    root.list().keys().map(|s| IdItem{ is_old : old.contains(s), id : s.to_string()}).collect()
+    IdItems::new(root.list().keys().map(|s| IdItem::new(old.contains(s), s.to_string())).collect())
 }
 

@@ -22,6 +22,7 @@ impl MemberDesc{
     pub fn is_old(&self) -> bool{ self.is_old }
 }
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct MemberDescs{
     items : Vec<MemberDesc>
 }
@@ -31,6 +32,7 @@ impl MemberDescs{
     pub fn items(&self) -> &[MemberDesc]{ &self.items }
 }
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct RefDesc{
     name : String,
     value_type : ValueType,
@@ -46,6 +48,7 @@ impl RefDesc{
     pub fn is_old(&self) -> bool{ self.is_old }
 }
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct RefDescs{
     is_enum : bool,
     items : Vec<RefDesc>,
@@ -57,9 +60,7 @@ impl RefDescs{
     pub fn items(&self) -> &[RefDesc]{ &self.items }
 }
 
-
-
-pub fn get_list_def_desc(def : &ListDefObj) -> Vec<MemberDesc>{
+pub fn get_list_def_desc(def : &ListDefObj) -> MemberDescs{
     let mut vec : Vec<MemberDesc> = Vec::with_capacity(def.default().len());
     for (k,val) in def.default(){
         let mem = k.to_string();
@@ -75,7 +76,7 @@ pub fn get_list_def_desc(def : &ListDefObj) -> Vec<MemberDesc>{
         };
         vec.push(MemberDesc::new(mem, vt, mt, is_old));
     }
-    vec
+    MemberDescs::new(vec)
 }
 
 pub fn get_ref_def_desc(def : &RefDefObj) -> RefDescs{
@@ -86,5 +87,5 @@ pub fn get_ref_def_desc(def : &RefDefObj) -> RefDescs{
         let vt = val.value_type();
         vec.push(RefDesc::new(mem, vt,  is_old));
     }
-    RefDescs{ is_enum : def.is_enum(), vec }
+    RefDescs::new(def.is_enum(), vec)
 }
