@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
+    use std::collections::{HashMap, LinkedList};
 
     use rand::prelude::ThreadRng;
     use rand::Rng;
@@ -69,42 +69,68 @@ mod tests {
     fn bench_init_linked_hash_map(b: &mut Bencher) {
         let (rng, names) = init1();
 
-        b.iter(|| init_linked_hash_map(&names));
+        let mut linked = LinkedList::new();
+        b.iter(|| linked.push_back(init_linked_hash_map(&names)));
     }
+
+
 
     #[bench]
     fn bench_init_hash_map(b: &mut Bencher) {
         let (rng, names) = init1();
 
-        b.iter(|| init_hash_map(&names));
+        let mut linked = LinkedList::new();
+        b.iter(|| linked.push_back(init_hash_map(&names)));
     }
+
+    #[bench]
+    fn bench_init_hash_map2(b: &mut Bencher) {
+        let (rng, names) = init1();
+
+        let mut linked = LinkedList::new();
+        b.iter(|| linked.push_back(init_hash_map(&names)));
+    }
+
 
     #[bench]
     fn bench_init_hash_map_with_box(b: &mut Bencher) {
         let (rng, names) = init1();
 
-        b.iter(|| init_hash_map_with_box(&names));
+        let mut linked = LinkedList::new();
+
+        b.iter(|| linked.push_back(init_hash_map_with_box(&names)));
     }
 
     #[bench]
     fn bench_init_hash_map_string_to_boxed_slice(b: &mut Bencher) {
         let (rng, names) = init1();
 
-        b.iter(|| init_hash_map_string_to_boxed_slice(&names));
+        let mut linked = LinkedList::new();
+        b.iter(|| linked.push_back(init_hash_map_string_to_boxed_slice(&names)));
     }
 
     #[bench]
     fn bench_init_hash_map_boxed_slice(b: &mut Bencher) {
         let (rng, names) = init2();
 
-        b.iter(|| init_hash_map_boxed_slice(&names));
+        let mut linked = LinkedList::new();
+        b.iter(|| linked.push_back(init_hash_map_boxed_slice(&names)));
+    }
+
+    #[bench]
+    fn bench_init_hash_map_2boxes(b: &mut Bencher) {
+        let (rng, names) = init2();
+
+        let mut linked = LinkedList::new();
+        b.iter(|| linked.push_back(init_hash_map_2boxes(&names)));
     }
 
     #[bench]
     fn bench_init_hash_map_boxed_item(b: &mut Bencher) {
         let (rng, names) = init1();
 
-        b.iter(|| init_hash_map_boxed_item(&names));
+        let mut linked = LinkedList::new();
+        b.iter(|| linked.push_back(init_hash_map_boxed_item(&names)));
     }
 
 
@@ -144,6 +170,16 @@ mod tests {
 
         for name in names{
             map.insert(name.clone(), BigItem2{ map1 : make_hash2(names), map2 : make_hash2(names), map3 : make_hash2(names) });
+        }
+
+        return map;
+    }
+
+    fn init_hash_map_2boxes(names : &Vec<Box<str>>) -> HashMap<Box<str>, Box<BigItem2>>{
+        let mut map : HashMap<Box<str>, Box<BigItem2>> = HashMap::with_capacity(names.len());
+
+        for name in names{
+            map.insert(name.clone(), Box::new(BigItem2{ map1 : make_hash2(names), map2 : make_hash2(names), map3 : make_hash2(names) }));
         }
 
         return map;
