@@ -67,3 +67,11 @@ pub fn get_param<'a>(def : &'a HashMap<String, RootValue>, sab : &'a HashMap<Str
         }
     } else { None }
 }
+
+pub fn set_bool(root : *mut RootObject, name : &str, val : Qv<bool>) -> bool{
+    let root = unsafe{ root.as_mut().unwrap() };
+    match root.set_sabun(name.to_string(), RustParam::Bool(val)){
+        Ok(_) => true,
+        Err(_) => false,
+    }
+}

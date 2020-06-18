@@ -3,7 +3,9 @@ use std::collections::{HashSet, HashMap};
 use linked_hash_map::LinkedHashMap;
 use crate::imp::structs::def_obj::ListDefObj;
 use crate::imp::structs::ref_value::RefSabValue;
-use crate::imp::structs::list_value::ListSabValue;
+use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
+use crate::imp::structs::rust_param::RustParam;
+use crate::imp::structs::util::set_sabun::{SetSabunError, verify_set_sabun};
 
 
 ///アイテムごとにIDをもち、Refで参照することが可能である
@@ -63,7 +65,23 @@ impl MutList{
     }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
     pub(crate) fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
+    //pub(crate) fn list_mut(&mut self) -> &mut LinkedHashMap<u64, MutListItem>{ self.list.as_mut() }
     pub(crate) fn next_id(&self) -> u64{ self.prop.next_id }
+    //pub(crate) fn increment_next_id(&mut self){ self.prop.next_id += 1 }
+    pub(crate) fn append_new_item(&mut self) -> u64{
+        let next_id = self.next_id;
+        self.list.insert(next_id, MutListItem::new(next_id, HashMap::new(), HashMap::new()));
+        self.next_id += 1;
+        return next_id;
+    }
+    pub(crate) fn arrange(&mut self, order : &[u64]) -> bool{
+        for id in order{
+            if self.list.get_refresh(id).is_none(){
+                return false;
+            }
+        }
+        true
+    }
     pub(crate) fn compatible(&self) -> &HashSet<String>{ &self.prop.compatible }
     pub(crate) fn deconstruct(self) -> (ListDefObj, LinkedHashMap<u64, MutListItem>, u64, HashSet<String>){
         let prop = *self.prop;
@@ -164,4 +182,18 @@ impl MutListItem{
     pub(crate) fn id(&self) -> u64{ self.id }
     pub(crate) fn values(&self) -> &HashMap<String, ListSabValue>{ self.values.as_ref() }
     pub(crate) fn refs(&self) -> &HashMap<String, RefSabValue>{ self.refs.as_ref() }
+    pub(crate) fn set_sabun(&mut self, def :&ListDefObj, name : String, param : RustParam) -> Result<Option<RustParam>, SetSabunError> {
+        let (p, vt) =
+            if let Some(ListDefValue::Param(p, vt)) = def.default().get(&name) {
+                (p, vt)
+            } else {
+                return Err(SetSabunError::ParamNotFound);
+            };
+        verify_set_sabun(p, vt, &param)?;
+        let op = self.values.insert(name, ListSabValue::Param(param));
+        Ok(op.map(|v| match v{
+            ListSabValue::Param(p) => p,
+            _ => unreachable!(),
+        }))
+    }
 }
