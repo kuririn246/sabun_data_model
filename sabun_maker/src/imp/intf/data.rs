@@ -19,16 +19,15 @@ pub fn get_ref_desc(root : *const ConstData) -> RefDescs{
 #[derive(Debug, PartialEq, Clone)]
 pub struct DataValue {
     is_old : bool,
-    id : CString,
+    id : String,
     item : *const ListItem,
 }
 
 impl DataValue {
     ///utf-8とcstringの相互変換はcheckなしで安全に可能だよね・・・？
-    pub(crate) fn new(is_old : bool, id : String, item : *const ListItem) -> DataValue { DataValue { is_old,
-        id : unsafe{ CString::from_vec_unchecked(id.into_bytes()) }, item }}
+    pub(crate) fn new(is_old : bool, id : String, item : *const ListItem) -> DataValue { DataValue { is_old, id, item }}
     pub fn is_old(&self) -> bool { self.is_old }
-    pub fn id(&self) -> &str{ unsafe{ std::str::from_utf8_unchecked(self.id.as_bytes()) } }
+    pub fn id(&self) -> &str{ self.id.as_str() }
     pub fn item(&self) -> *const ListItem{ self.item }
 }
 

@@ -69,9 +69,9 @@ impl MutList{
     pub(crate) fn next_id(&self) -> u64{ self.prop.next_id }
     //pub(crate) fn increment_next_id(&mut self){ self.prop.next_id += 1 }
     pub(crate) fn append_new_item(&mut self) -> u64{
-        let next_id = self.next_id;
+        let next_id = self.next_id();
         self.list.insert(next_id, MutListItem::new(next_id, HashMap::new(), HashMap::new()));
-        self.next_id += 1;
+        self.prop.next_id += 1;
         return next_id;
     }
     pub(crate) fn arrange(&mut self, order : &[u64]) -> bool{
