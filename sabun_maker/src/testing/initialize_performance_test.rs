@@ -10,6 +10,7 @@ mod tests {
 
     const NAME_LEN : usize = 5;
     const NUM_NAMES : usize = 10;
+    const REPEAT : usize = 100;
 
     ///56バイトだとBoxに入れる価値はない
     /// 168バイトだとBoxに入れる価値大いにある
@@ -69,8 +70,14 @@ mod tests {
     fn bench_init_linked_hash_map(b: &mut Bencher) {
         let (rng, names) = init1();
 
-        let mut linked = LinkedList::new();
-        b.iter(|| linked.push_back(init_linked_hash_map(&names)));
+
+        b.iter(|| {
+            let mut linked = LinkedList::new();
+            for _ in 0..REPEAT {
+                linked.push_back(init_linked_hash_map(&names))
+            }
+            linked
+        });
     }
 
 
@@ -79,16 +86,26 @@ mod tests {
     fn bench_init_hash_map(b: &mut Bencher) {
         let (rng, names) = init1();
 
-        let mut linked = LinkedList::new();
-        b.iter(|| linked.push_back(init_hash_map(&names)));
+        b.iter(|| {
+            let mut linked = LinkedList::new();
+            for _ in 0..REPEAT {
+                linked.push_back(init_hash_map(&names))
+            }
+            linked
+        })
     }
 
     #[bench]
     fn bench_init_hash_map2(b: &mut Bencher) {
         let (rng, names) = init1();
 
-        let mut linked = LinkedList::new();
-        b.iter(|| linked.push_back(init_hash_map(&names)));
+        b.iter(||{
+            let mut linked = LinkedList::new();
+            for _ in 0..REPEAT {
+                linked.push_back(init_hash_map(&names))
+            }
+            linked
+        })
     }
 
 
@@ -96,41 +113,66 @@ mod tests {
     fn bench_init_hash_map_with_box(b: &mut Bencher) {
         let (rng, names) = init1();
 
-        let mut linked = LinkedList::new();
-
-        b.iter(|| linked.push_back(init_hash_map_with_box(&names)));
+        b.iter(||{
+            let mut linked = LinkedList::new();
+            for _ in 0..REPEAT {
+                linked.push_back(init_hash_map_with_box(&names))
+            }
+            linked
+        });
     }
 
     #[bench]
     fn bench_init_hash_map_string_to_boxed_slice(b: &mut Bencher) {
         let (rng, names) = init1();
 
-        let mut linked = LinkedList::new();
-        b.iter(|| linked.push_back(init_hash_map_string_to_boxed_slice(&names)));
+        b.iter(||{
+            let mut linked = LinkedList::new();
+            for _ in 0..REPEAT {
+                linked.push_back(init_hash_map_string_to_boxed_slice(&names))
+            }
+            linked
+        });
     }
 
     #[bench]
     fn bench_init_hash_map_boxed_slice(b: &mut Bencher) {
         let (rng, names) = init2();
 
-        let mut linked = LinkedList::new();
-        b.iter(|| linked.push_back(init_hash_map_boxed_slice(&names)));
+        b.iter(||{
+            let mut linked = LinkedList::new();
+            for _ in 0..REPEAT {
+                linked.push_back(init_hash_map_boxed_slice(&names))
+            }
+            linked
+        });
     }
 
     #[bench]
     fn bench_init_hash_map_2boxes(b: &mut Bencher) {
         let (rng, names) = init2();
 
-        let mut linked = LinkedList::new();
-        b.iter(|| linked.push_back(init_hash_map_2boxes(&names)));
+
+        b.iter(||{
+            let mut linked = LinkedList::new();
+            for _ in 0..REPEAT {
+                linked.push_back(init_hash_map_2boxes(&names))
+            }
+            linked
+        });
     }
 
     #[bench]
     fn bench_init_hash_map_boxed_item(b: &mut Bencher) {
         let (rng, names) = init1();
 
-        let mut linked = LinkedList::new();
-        b.iter(|| linked.push_back(init_hash_map_boxed_item(&names)));
+        b.iter(||{
+            let mut linked = LinkedList::new();
+            for _ in 0..REPEAT {
+                linked.push_back(init_hash_map_boxed_item(&names))
+            }
+            linked
+        });
     }
 
 
