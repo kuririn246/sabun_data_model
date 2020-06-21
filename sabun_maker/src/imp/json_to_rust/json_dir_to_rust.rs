@@ -5,7 +5,7 @@ use std::io::prelude::*;
 use crate::error::Result;
 use std::ffi::{OsStr};
 use crate::imp::json_to_rust::{json_root_to_rust, json_item_str_to_rust};
-use std::collections::HashMap;
+use crate::{HashM, HashMt};
 
 use crate::imp::json_to_rust::construct_root::construct_root;
 use crate::imp::structs::root_obj::RootObject;
@@ -45,7 +45,7 @@ pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RootObject
 }
 
 pub fn json_files_to_rust(ite : impl Iterator<Item = JsonFile>, validation : bool) -> Result<RootObject>{
-    let mut map : HashMap<String, RootValue> = HashMap::new();
+    let mut map : HashM<String, RootValue> = HashMt::new();
     let mut root= None;
 
     for file in ite{

@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use crate::{HashM, HashS};
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::util::set_sabun::{SetSabunError, verify_set_sabun};
@@ -6,24 +6,24 @@ use crate::imp::structs::util::set_sabun::{SetSabunError, verify_set_sabun};
 #[derive(Debug, PartialEq)]
 pub struct RootObject{
     ///listのobjectの場合、defaultはlist側にあるが、ここには初期値が入る。
-    default : Box<HashMap<String, RootValue>>,
+    default : Box<HashM<String, RootValue>>,
     ///変更されたものを記録
     ///listの変更はMutListが直接上書きされるので、sabunには入らない。よってparamだけ記録される
-    sabun : Box<HashMap<String, RustParam>>,
+    sabun : Box<HashM<String, RustParam>>,
 
     ///oldに設定されたメンバは、_Oldを付けなければプログラムから使用できず、
     ///ConstDataである場合、jsonで Refできない
-    old : Box<HashSet<String>>,
+    old : Box<HashS<String>>,
 }
 
 impl RootObject{
-    pub(crate) fn new(default : HashMap<String, RootValue>, sabun : HashMap<String, RustParam>, old : HashSet<String>) -> RootObject{
+    pub(crate) fn new(default : HashM<String, RootValue>, sabun : HashM<String, RustParam>, old : HashS<String>) -> RootObject{
         RootObject{ default: Box::new(default), sabun : Box::new(sabun), old : Box::new(old) }
     }
-    pub(crate) fn default(&self) -> &HashMap<String, RootValue>{ self.default.as_ref() }
-    pub(crate) fn deconstruct(self) -> (HashMap<String, RootValue>, HashMap<String, RustParam>, HashSet<String>){ (*self.default, *self.sabun, *self.old) }
-    pub(crate) fn sabun(&self) -> &HashMap<String, RustParam>{ self.sabun.as_ref() }
-    pub(crate) fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+    pub(crate) fn default(&self) -> &HashM<String, RootValue>{ self.default.as_ref() }
+    pub(crate) fn deconstruct(self) -> (HashM<String, RootValue>, HashM<String, RustParam>, HashS<String>){ (*self.default, *self.sabun, *self.old) }
+    pub(crate) fn sabun(&self) -> &HashM<String, RustParam>{ self.sabun.as_ref() }
+    pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
     pub(crate) fn set_sabun(&mut self, name : String, param : RustParam) -> Result<Option<RustParam>, SetSabunError> {
         let (p, vt) = if let Some(RootValue::Param(p, vt)) = self.default().get(&name) { (p, vt) } else {
             return Err(SetSabunError::ParamNotFound);

@@ -1,5 +1,6 @@
 use crate::imp::json_to_rust::tmp::tmp_obj::{ IdValue};
-use std::collections::{HashSet, HashMap, BTreeSet, BTreeMap};
+use crate::{HashM, HashS};
+use std::collections::{BTreeSet, BTreeMap};
 use crate::imp::structs::rust_value::RustValue;
 use crate::imp::structs::rust_list::{ListItem, MutListItem, ConstData, ConstList, MutList, InnerData, InnerList, InnerMutList};
 use crate::imp::structs::ref_value::RefValue;
@@ -22,16 +23,16 @@ pub struct TmpJsonObj{
 
 impl TmpJsonObj{
     pub fn from_list_item(l : &ListItem, id : Option<&String>) -> TmpJsonObj{
-        let value_map : HashMap<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().into_rust_value_for_json())).collect();
-        let ref_map : HashMap<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().into_ref_value_for_json())).collect();
+        let value_map : HashM<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().into_rust_value_for_json())).collect();
+        let ref_map : HashM<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().into_ref_value_for_json())).collect();
         TmpJsonObj{ default : btree_map(&value_map),
             refs : TmpJsonRefs::from_list_item(&ref_map),
             id : id.map(|s| IdValue::Str(s.to_string())), old : None }
     }
 
     pub fn from_mut_list_item(l : &MutListItem) -> TmpJsonObj{
-        let value_map : HashMap<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().into_rust_value_for_json())).collect();
-        let ref_map : HashMap<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().into_ref_value_for_json())).collect();
+        let value_map : HashM<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().into_rust_value_for_json())).collect();
+        let ref_map : HashM<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().into_ref_value_for_json())).collect();
         TmpJsonObj{
             default : btree_map(&value_map),
             refs : TmpJsonRefs::from_list_item(&ref_map),
@@ -46,20 +47,20 @@ pub struct TmpJsonRefs{
 }
 
 impl TmpJsonRefs{
-    pub fn from_map(map : &HashMap<String, RefValue>, old : Option<&HashSet<String>>, is_enum : bool) -> TmpJsonRefs{
+    pub fn from_map(map : &HashM<String, RefValue>, old : Option<&HashS<String>>, is_enum : bool) -> TmpJsonRefs{
         TmpJsonRefs{
             map : btree_map(map),
             old : old.map(|s| btree_set(s)), is_enum }
     }
 
-    pub fn from_list_item(map : &HashMap<String, RefValue>) -> Option<TmpJsonRefs> {
+    pub fn from_list_item(map : &HashM<String, RefValue>) -> Option<TmpJsonRefs> {
         if map.len() != 0 {
             Some(TmpJsonRefs::from_map(map, None, false))
         } else { None }
     }
 }
 
-fn get_from_set(set : &HashSet<String>) -> Option<BTreeSet<String>>{
+fn get_from_set(set : &HashS<String>) -> Option<BTreeSet<String>>{
     if set.is_empty(){
         None
     } else{
@@ -100,10 +101,10 @@ impl TmpJsonList{
     }
 }
 
-pub fn btree_set(hash : &HashSet<String>) -> BTreeSet<String>{
+pub fn btree_set(hash : &HashS<String>) -> BTreeSet<String>{
     hash.iter().map(|s| s.to_string()).collect()
 }
 
-pub fn btree_map<T : Clone>(hash : &HashMap<String, T>) -> BTreeMap<String, T>{
+pub fn btree_map<T : Clone>(hash : &HashM<String, T>) -> BTreeMap<String, T>{
     hash.iter().map(|(key,val)|(key.to_string(), val.clone())).collect()
 }

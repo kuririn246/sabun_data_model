@@ -1,6 +1,6 @@
 // #[cfg(test)]
 // mod tests {
-//     use std::collections::{HashMap, LinkedList};
+//     use crate::HashM, LinkedList};
 //
 //     use rand::prelude::ThreadRng;
 //     use rand::Rng;

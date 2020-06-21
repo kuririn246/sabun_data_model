@@ -1,7 +1,7 @@
 use crate::imp::structs::rust_list::{ConstData, ListItem};
 use crate::imp::intf::member_desc::{ get_list_def_desc, MemberDescs};
 use crate::imp::intf::ref_desc::{get_ref_def_desc, RefDescs};
-use std::collections::{HashMap, HashSet};
+use crate::{HashM, HashS};
 use crate::imp::intf::list_item::ListItemPtrs;
 use crate::imp::structs::list_def_obj::ListDefObj;
 
@@ -45,7 +45,7 @@ pub fn get_values(data : *const ConstData) -> DataValues {
     get_values_impl(data.default(), data.list(), data.old())
 }
 
-pub fn get_values_impl(list_def : &ListDefObj, data : &HashMap<String, ListItem>, old : &HashSet<String>) -> DataValues {
+pub fn get_values_impl(list_def : &ListDefObj, data : &HashM<String, ListItem>, old : &HashS<String>) -> DataValues {
     DataValues::new(data.iter().map(|(k,v)|
         DataValue::new(old.contains(k), k.to_string(), v)).collect(),
                     list_def)
@@ -56,7 +56,7 @@ pub fn get_value(data : *const ConstData, id : &str) -> Option<ListItemPtrs>{
     get_value_impl(data.list(), data.default(), id)
 }
 
-pub fn get_value_impl(data : &HashMap<String, ListItem>, list_def : &ListDefObj, id : &str) -> Option<ListItemPtrs>{
+pub fn get_value_impl(data : &HashM<String, ListItem>, list_def : &ListDefObj, id : &str) -> Option<ListItemPtrs>{
     data.get(id).map(|i| ListItemPtrs::new(i, list_def))
 }
 

@@ -1,4 +1,4 @@
-// use std::collections::{HashMap};
+// use crate::HashM};
 // use std::hash::{Hash, Hasher};
 // use std::fmt::{Debug, Formatter, Error};
 // use std::slice::from_raw_parts;
@@ -222,7 +222,7 @@
 //
 // // #[cfg(test)]
 // // mod tests {
-// //     use std::collections::HashMap;
+// //     use crate::HashM;
 // //     use crate::indexmap::str_vec_map::StrVecMap;
 // //
 // //     #[test]

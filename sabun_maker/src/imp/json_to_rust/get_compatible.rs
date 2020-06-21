@@ -1,11 +1,11 @@
 use json5_parser::{JVal};
 use crate::imp::json_to_rust::names::Names;
-use std::collections::{HashSet};
 use crate::error::Result;
 use crate::imp::json_to_rust::json_name::{is_dot_chained_name};
+use crate::{HashS, HashSt};
 
-pub fn get_compatible(array : &[JVal], names : &Names) -> Result<HashSet<String>>{
-    let mut result : HashSet<String> = HashSet::with_capacity(array.len());
+pub fn get_compatible(array : &[JVal], names : &Names) -> Result<HashS<String>>{
+    let mut result : HashS<String> = HashSt::with_capacity(array.len());
 
     for item in array{
         match item{

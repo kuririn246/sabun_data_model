@@ -1,4 +1,4 @@
-use std::collections::{HashSet, HashMap};
+use crate::{HashM, HashS};
 use crate::imp::structs::ref_value::RefValue;
 use std::collections::hash_map::Iter;
 
@@ -10,15 +10,15 @@ pub struct RefDefObj {
     /// プログラムからはmatch でアクセス出来る。値があるRefをキャストしてゲットする。
     is_enum : bool,
     ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
-    old : Box<HashSet<String>>,
+    old : Box<HashS<String>>,
 }
 
 impl RefDefObj{
-    pub(crate) fn new(refs : HashMap<String, (usize, RefValue)>, is_enum : bool, old : HashSet<String>) -> RefDefObj{
+    pub(crate) fn new(refs : HashM<String, (usize, RefValue)>, is_enum : bool, old : HashS<String>) -> RefDefObj{
         RefDefObj{ refs : Box::new(RefDefMap::new(refs)), is_enum, old : Box::new(old) }
     }
     pub(crate) fn refs(&self) -> &RefDefMap{ self.refs.as_ref() }
-    pub(crate) fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+    pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
     pub(crate) fn is_enum(&self) -> bool{ self.is_enum }
 
     pub(crate) fn compatible(&self, other : &Self) -> bool{
@@ -38,11 +38,11 @@ impl RefDefObj{
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct RefDefMap{
-    map : HashMap<String, (usize, RefValue)>
+    map : HashM<String, (usize, RefValue)>
 }
 
 impl RefDefMap {
-    pub fn new(map: HashMap<String, (usize, RefValue)>) -> RefDefMap {
+    pub fn new(map: HashM<String, (usize, RefValue)>) -> RefDefMap {
         RefDefMap { map }
     }
 

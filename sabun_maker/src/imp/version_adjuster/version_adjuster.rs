@@ -1,6 +1,6 @@
 use crate::imp::json_to_rust::validation::validate_root::validate_root;
 use crate::imp::version_adjuster::adjust_mut_list::adjust_mut_list;
-use std::collections::HashMap;
+use crate::{HashM, HashMt};
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::structs::root_obj::RootObject;
@@ -14,7 +14,7 @@ pub fn adjust_versions(new : RootObject, old : RootObject, validation : bool) ->
 
     let (def, sabun, old_hash) = new.deconstruct();
     let mut sabun = sabun;
-    let mut new_map :HashMap<String, RootValue> = HashMap::with_capacity(def.len());
+    let mut new_map :HashM<String, RootValue> = HashMt::with_capacity(def.len());
 
     let (old_def,old_sabun, _) = old.deconstruct();
     let mut old_sabun = old_sabun;

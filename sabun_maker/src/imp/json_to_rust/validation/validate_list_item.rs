@@ -1,4 +1,4 @@
-use std::collections::{HashMap};
+use crate::HashM;
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::imp::json_to_rust::validation::validate_data::validate_data;
@@ -10,8 +10,8 @@ use crate::imp::structs::root_obj::RootObject;
 use crate::imp::structs::list_value::{ListDefValue, ListSabValue};
 use crate::imp::structs::list_def_obj::ListDefObj;
 
-pub fn validate_list_item(def : &ListDefObj, sabun_values : &HashMap<String, ListSabValue>,
-                          ref_values : &HashMap<String, RefSabValue>, root : &RootObject,
+pub fn validate_list_item(def : &ListDefObj, sabun_values : &HashM<String, ListSabValue>,
+                          ref_values : &HashM<String, RefSabValue>, root : &RootObject,
                           can_use_old: bool, names : &Names) -> Result<()> {
     validate_refs(def.refs(), ref_values, root, can_use_old, names)?;
 

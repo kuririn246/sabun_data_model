@@ -1,4 +1,4 @@
-// use std::collections::{HashMap};
+// use crate::HashM};
 // use std::hash::{Hash, Hasher};
 // use std::fmt::Debug;
 //
@@ -126,7 +126,7 @@
 // // #[cfg(test)]
 // // mod tests {
 // //     use crate::indexmap::map::{IndexMap, IndexMapKey };
-// //     use std::collections::HashMap;
+// //     use crate::HashM;
 // //
 // //     #[test]
 // //     fn it_works() {

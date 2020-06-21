@@ -1,9 +1,9 @@
 use crate::imp::structs::rust_list::{MutList, MutListItem};
 use crate::imp::intf::member_desc::{MemberDescs, get_list_def_desc};
 use crate::imp::intf::ref_desc::{RefDescs, get_ref_def_desc};
-use linked_hash_map::LinkedHashMap;
 use crate::imp::intf::mut_list_item::MutListItemPtrs;
 use crate::imp::structs::list_def_obj::ListDefObj;
+use crate::HashM;
 
 pub fn get_member_desc(l : *const MutList) -> MemberDescs{
     let l = unsafe{ l.as_ref().unwrap() };
@@ -53,7 +53,7 @@ pub fn get_value(l : *mut MutList, id : u64) -> Option<MutListItemPtrs>{
     get_value_impl(l.list(), l.default(), id)
 }
 
-pub fn get_value_impl(data : &LinkedHashMap<u64, MutListItem>, list_def : &ListDefObj, id : u64) -> Option<MutListItemPtrs>{
+pub fn get_value_impl(data : &HashM<u64, MutListItem>, list_def : &ListDefObj, id : u64) -> Option<MutListItemPtrs>{
     data.get(&id).map(|i| MutListItemPtrs::new(i as *const MutListItem as *mut MutListItem, list_def))
 }
 
@@ -63,7 +63,7 @@ pub fn append_item(l : *mut MutList) -> Option<MutListItemPtrs>{
     get_value(l, id)
 }
 
-pub fn arrange(l : *mut MutList, ids : &[u64]) -> bool{
-    let l = unsafe{l.as_mut().unwrap() };
-    l.arrange(ids)
-}
+// pub fn arrange(l : *mut MutList, ids : &[u64]) -> bool{
+//     let l = unsafe{l.as_mut().unwrap() };
+//     l.arrange(ids)
+// }

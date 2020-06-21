@@ -1,4 +1,4 @@
-use std::collections::{HashSet, HashMap};
+use crate::{HashM, HashS, HashMt, HashSt};
 use json5_parser::Span;
 use crate::error::Result;
 use crate::imp::structs::rust_value::{RustValue};
@@ -11,27 +11,27 @@ use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
 use crate::imp::structs::list_def_obj::ListDefObj;
 
 pub struct TmpObj{
-    pub default : HashMap<String, RustValue>,
+    pub default : HashM<String, RustValue>,
     pub id : Option<IdValue>,
     pub include : Vec<String>,
     pub refs: TmpRefs,
-    pub old : HashSet<String>,
+    pub old : HashS<String>,
     pub span : Span,
 }
 
 pub struct TmpRefs{
-    pub map : HashMap<String, (usize, RefValue)>,
-    pub old : HashSet<String>,
+    pub map : HashM<String, (usize, RefValue)>,
+    pub old : HashS<String>,
     pub is_enum : bool,
     pub span : Span,
 }
 
 impl TmpRefs{
     pub fn new(capacity : usize, span : Span) -> TmpRefs{
-        TmpRefs{ map : HashMap::with_capacity(capacity), old : HashSet::new(), is_enum : false, span }
+        TmpRefs{ map : HashMt::with_capacity(capacity), old : HashSt::new(), is_enum : false, span }
     }
 
-    // pub fn get_hash_map(self) -> HashMap<String, RefValue>{
+    // pub fn get_hash_map(self) -> HashM<String, RefValue>{
     //     self.map.into_iter().collect()
     // }
 
@@ -48,12 +48,12 @@ pub enum IdValue{
 
 impl TmpObj{
     pub fn new(capacity : usize, span : Span) -> TmpObj{
-        TmpObj{ default : HashMap::with_capacity(capacity), id : None, include : vec![], refs : TmpRefs::new(0,span.clone()), old : HashSet::new(), span }
+        TmpObj{ default : HashMt::with_capacity(capacity), id : None, include : vec![], refs : TmpRefs::new(0,span.clone()), old : HashSt::new(), span }
     }
 
     pub fn into_root_obj(self) -> Result<RootObject>{
-        fn to_root_hash(map : HashMap<String, RustValue>) -> Result<HashMap<String, RootValue>>{
-            let mut result : HashMap<String, RootValue> = HashMap::with_capacity(map.len());
+        fn to_root_hash(map : HashM<String, RustValue>) -> Result<HashM<String, RootValue>>{
+            let mut result : HashM<String, RootValue> = HashMt::with_capacity(map.len());
 
             for (key,value) in map{
                 match value.into_root_value(){
@@ -73,7 +73,7 @@ impl TmpObj{
 
         Ok(RootObject::new(
             to_root_hash(self.default)?,
-            HashMap::new(), self.old))
+            HashMt::new(), self.old))
     }
 
     pub fn into_list_def_obj(self) -> Result<ListDefObj>{
@@ -143,8 +143,8 @@ impl TmpObj{
     }
 }
 
-fn to_list_sab_map(map : HashMap<String, RustValue>, span : &Span) -> Result<HashMap<String, ListSabValue>>{
-    let mut result : HashMap<String, ListSabValue> = HashMap::with_capacity(map.len());
+fn to_list_sab_map(map : HashM<String, RustValue>, span : &Span) -> Result<HashM<String, ListSabValue>>{
+    let mut result : HashM<String, ListSabValue> = HashMt::with_capacity(map.len());
     for (k,v) in map{
         let sab = match v.into_list_sab_value(){
             Ok(a) => a,
@@ -157,8 +157,8 @@ fn to_list_sab_map(map : HashMap<String, RustValue>, span : &Span) -> Result<Has
     Ok(result)
 }
 
-fn to_list_def_val_map(map : HashMap<String, RustValue>, span : &Span) -> Result<HashMap<String, (usize, ListDefValue)>>{
-    let mut result : HashMap<String, (usize, ListDefValue)> = HashMap::with_capacity(map.len());
+fn to_list_def_val_map(map : HashM<String, RustValue>, span : &Span) -> Result<HashM<String, (usize, ListDefValue)>>{
+    let mut result : HashM<String, (usize, ListDefValue)> = HashMt::with_capacity(map.len());
     for (idx, (k,v)) in map.into_iter().enumerate(){
         let sab = match v.into_list_def_value(){
             Ok(a) => (idx, a),
@@ -171,8 +171,8 @@ fn to_list_def_val_map(map : HashMap<String, RustValue>, span : &Span) -> Result
     Ok(result)
 }
 
-fn to_ref_sab_map(map : HashMap<String, (usize, RefValue)>) -> HashMap<String, RefSabValue>{
-    let mut result : HashMap<String, RefSabValue> = HashMap::with_capacity(map.len());
+fn to_ref_sab_map(map : HashM<String, (usize, RefValue)>) -> HashM<String, RefSabValue>{
+    let mut result : HashM<String, RefSabValue> = HashMt::with_capacity(map.len());
     for(k,(_,v)) in map{
         result.insert(k, v.into_sab_value());
     }

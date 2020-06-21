@@ -4,12 +4,12 @@ use crate::error::Result;
 use crate::imp::json_to_rust::json_obj_to_rust::json_obj_to_rust;
 use crate::imp::json_to_rust::json_name::json_simple_name;
 use crate::imp::json_to_rust::tmp::tmp_obj::TmpRefs;
-use linked_hash_map::LinkedHashMap;
-use std::collections::HashMap;
+use crate::{HashM, HashMt};
 use crate::imp::structs::ref_value::RefValue;
 use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::qv::Qv;
 use crate::imp::structs::rust_param::RustParam;
+use linked_hash_map::LinkedHashMap;
 
 pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -> Result<TmpRefs> {
     let obj = json_obj_to_rust(v, true, span, names)?;
@@ -24,7 +24,7 @@ pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -
     }
 
 
-    let mut map: HashMap<String, (usize, RefValue)> = HashMap::with_capacity(obj.default.len());
+    let mut map: HashM<String, (usize, RefValue)> = HashMt::with_capacity(obj.default.len());
     for (idx, (k, v)) in obj.default.iter().enumerate() {
         match v {
             RustValue::Param(RustParam::String(v), vt) => {

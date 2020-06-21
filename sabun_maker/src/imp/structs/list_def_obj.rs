@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use crate::{HashM, HashS};
 use crate::imp::structs::list_value::ListDefValue;
 use crate::imp::structs::ref_def_obj::RefDefObj;
 use std::collections::hash_map::Iter;
@@ -9,17 +9,17 @@ pub struct ListDefObj{
     ///RustValueを巨大にしすぎないためにBoxにしてサイズを削る
     refs: Box<RefDefObj>,
     ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
-    old : Box<HashSet<String>>,
+    old : Box<HashS<String>>,
 }
 
 
 impl ListDefObj{
-    pub(crate) fn new(default : HashMap<String, (usize, ListDefValue)>, refs : RefDefObj, old : HashSet<String>) -> ListDefObj{
+    pub(crate) fn new(default : HashM<String, (usize, ListDefValue)>, refs : RefDefObj, old : HashS<String>) -> ListDefObj{
         ListDefObj{ default : Box::new(ListDefMap::new(default)), refs : Box::new(refs), old : Box::new(old) }
     }
     pub(crate) fn default(&self) -> &ListDefMap{ self.default.as_ref() }
     pub(crate) fn refs(&self) -> &RefDefObj{ self.refs.as_ref() }
-    pub(crate) fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+    pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
 
     pub(crate) fn compatible(&self, other : &Self) -> bool{
         for (k,v) in self.default(){
@@ -38,11 +38,11 @@ impl ListDefObj{
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ListDefMap{
-    map : HashMap<String, (usize, ListDefValue)>
+    map : HashM<String, (usize, ListDefValue)>
 }
 
 impl ListDefMap{
-    pub(crate) fn new(map : HashMap<String, (usize, ListDefValue)>) -> ListDefMap{
+    pub(crate) fn new(map : HashM<String, (usize, ListDefValue)>) -> ListDefMap{
         ListDefMap{ map }
     }
 

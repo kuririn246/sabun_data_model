@@ -1,6 +1,5 @@
 
-use std::collections::{HashSet, HashMap};
-use linked_hash_map::LinkedHashMap;
+use crate::{HashM, HashS, HashMt};
 use crate::imp::structs::ref_value::RefSabValue;
 use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
 use crate::imp::structs::rust_param::RustParam;
@@ -12,18 +11,18 @@ use crate::imp::structs::list_def_obj::ListDefObj;
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConstData{
     default : Box<ListDefObj>,
-    list : Box<HashMap<String, ListItem>>,
+    list : Box<HashM<String, ListItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
-    old : Box<HashSet<String>>,
+    old : Box<HashS<String>>,
 }
 
 impl ConstData{
-    pub(crate) fn new(default : ListDefObj, list : HashMap<String, ListItem>, old : HashSet<String>) -> ConstData{
+    pub(crate) fn new(default : ListDefObj, list : HashM<String, ListItem>, old : HashS<String>) -> ConstData{
         ConstData{ default : Box::new(default), list : Box::new(list), old : Box::new(old) }
     }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
-    pub(crate) fn list(&self) -> &HashMap<String, ListItem>{ self.list.as_ref() }
-    pub(crate) fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+    pub(crate) fn list(&self) -> &HashM<String, ListItem>{ self.list.as_ref() }
+    pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
 }
 
 ///IDを持たず、参照できない。MutListの初期値を書くのが主な使い道か。IDは必要ないけど単にデータを書いておきたい場合もあるだろう。
@@ -45,7 +44,7 @@ impl ConstList{
 #[derive(Debug, PartialEq, Clone)]
 pub struct MutList{
     default : Box<ListDefObj>,
-    list : Box<LinkedHashMap<u64, MutListItem>>,
+    list : Box<HashM<u64, MutListItem>>,
     prop : Box<MutListProp>,
 }
 
@@ -56,34 +55,27 @@ pub struct MutListProp{
 
     ///MutListは初期値を持てないのでConstListに初期値を書いておくことになるだろう。
     /// その場合、compatibleを設定しdefaultが同一であることを保証することで、そのままListItemをコピーすることが可能になる
-    compatible : HashSet<String>,
+    compatible : HashS<String>,
 }
 
 impl MutList{
-    pub(crate) fn new(default : ListDefObj, list : LinkedHashMap<u64, MutListItem>, next_id : u64, compatible : HashSet<String>) -> MutList{
+    pub(crate) fn new(default : ListDefObj, list : HashM<u64, MutListItem>, next_id : u64, compatible : HashS<String>) -> MutList{
         MutList{ default : Box::new(default), list : Box::new(list), prop : Box::new(MutListProp{ next_id, compatible }) }
     }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
-    pub(crate) fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
-    //pub(crate) fn list_mut(&mut self) -> &mut LinkedHashMap<u64, MutListItem>{ self.list.as_mut() }
+    pub(crate) fn list(&self) -> &HashM<u64, MutListItem>{ self.list.as_ref() }
+    //pub(crate) fn list_mut(&mut self) -> &mut LinkedHashM<u64, MutListItem>{ self.list.as_mut() }
     pub(crate) fn next_id(&self) -> u64{ self.prop.next_id }
     //pub(crate) fn increment_next_id(&mut self){ self.prop.next_id += 1 }
     pub(crate) fn append_new_item(&mut self) -> u64{
         let next_id = self.next_id();
-        self.list.insert(next_id, MutListItem::new(next_id, HashMap::new(), HashMap::new()));
+        self.list.insert(next_id, MutListItem::new(next_id, HashMt::new(), HashMt::new()));
         self.prop.next_id += 1;
         return next_id;
     }
-    pub(crate) fn arrange(&mut self, order : &[u64]) -> bool{
-        for id in order{
-            if self.list.get_refresh(id).is_none(){
-                return false;
-            }
-        }
-        true
-    }
-    pub(crate) fn compatible(&self) -> &HashSet<String>{ &self.prop.compatible }
-    pub(crate) fn deconstruct(self) -> (ListDefObj, LinkedHashMap<u64, MutListItem>, u64, HashSet<String>){
+
+    pub(crate) fn compatible(&self) -> &HashS<String>{ &self.prop.compatible }
+    pub(crate) fn deconstruct(self) -> (ListDefObj, HashM<u64, MutListItem>, u64, HashS<String>){
         let prop = *self.prop;
         (*self.default, *self.list, prop.next_id, prop.compatible)
     }
@@ -104,45 +96,45 @@ impl InnerList{
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq, Clone)]
 pub struct InnerData{
-    list : Box<HashMap<String, ListItem>>,
+    list : Box<HashM<String, ListItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
-    old : Box<HashSet<String>>,
+    old : Box<HashS<String>>,
 }
 
 impl InnerData{
-    pub(crate) fn new(list : HashMap<String, ListItem>, old : HashSet<String>) -> InnerData{ InnerData{ list : Box::new(list), old : Box::new(old)} }
-    pub(crate) fn list(&self) -> &HashMap<String, ListItem>{ self.list.as_ref() }
-    pub(crate) fn old(&self) -> &HashSet<String>{ self.old.as_ref() }
+    pub(crate) fn new(list : HashM<String, ListItem>, old : HashS<String>) -> InnerData{ InnerData{ list : Box::new(list), old : Box::new(old)} }
+    pub(crate) fn list(&self) -> &HashM<String, ListItem>{ self.list.as_ref() }
+    pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct InnerMutList{
-    list : Box<LinkedHashMap<u64, MutListItem>>,
+    list : Box<HashM<u64, MutListItem>>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
     next_id : u64,
 }
 
 impl InnerMutList{
-    pub(crate) fn new(list : LinkedHashMap<u64, MutListItem>, next_id : u64) -> InnerMutList{ InnerMutList{ list : Box::new(list), next_id } }
-    pub(crate) fn deconstruct(self) -> (LinkedHashMap<u64, MutListItem>, u64){ (*self.list, self.next_id) }
-    pub(crate) fn list(&self) -> &LinkedHashMap<u64, MutListItem>{ self.list.as_ref() }
+    pub(crate) fn new(list : HashM<u64, MutListItem>, next_id : u64) -> InnerMutList{ InnerMutList{ list : Box::new(list), next_id } }
+    pub(crate) fn deconstruct(self) -> (HashM<u64, MutListItem>, u64){ (*self.list, self.next_id) }
+    pub(crate) fn list(&self) -> &HashM<u64, MutListItem>{ self.list.as_ref() }
     //pub(crate) fn next_id(&self) -> u64{ self.next_id }
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ListItem{
     ///ListItemの値は常にDefaultからの差分である
-    values : Box<HashMap<String, ListSabValue>>,
+    values : Box<HashM<String, ListSabValue>>,
     ///ListItemの値はRefも常にDefaultからの差分である
-    refs : Box<HashMap<String, RefSabValue>>,
+    refs : Box<HashM<String, RefSabValue>>,
 }
 
 impl ListItem{
-    pub(crate) fn new(values : HashMap<String, ListSabValue>, refs : HashMap<String, RefSabValue>) -> ListItem{
+    pub(crate) fn new(values : HashM<String, ListSabValue>, refs : HashM<String, RefSabValue>) -> ListItem{
         ListItem{ values : Box::new(values), refs : Box::new(refs) }
     }
-    pub(crate) fn values(&self) -> &HashMap<String, ListSabValue>{ self.values.as_ref() }
-    pub(crate) fn refs(&self) -> &HashMap<String, RefSabValue>{ self.refs.as_ref() }
+    pub(crate) fn values(&self) -> &HashM<String, ListSabValue>{ self.values.as_ref() }
+    pub(crate) fn refs(&self) -> &HashM<String, RefSabValue>{ self.refs.as_ref() }
 }
 
 ///たとえばキャラクターAとキャラクターBの間で出来事Cが起こったとする。
@@ -158,30 +150,30 @@ impl ListItem{
 /// キャラクターBを削除したい場合、他のキャラクターのRelationリストのbの部分を全部消し、BのRelationリストから取れる出来事IDを全部調べて
 /// 出来事リストから全部消す、といった感じで消していくことが可能だ。
 ///
-/// こういったユースケース（あるのか？）のためにLinkedHashMap(u64,MutListItem)を使うとRelationを効率的に処理できるだろう。
+/// こういったユースケース（あるのか？）のためにLinkedHashM(u64,MutListItem)を使うとRelationを効率的に処理できるだろう。
 /// あるいはBTreeMap(index_value, u64)でindex_valueでソートされたMapを作り、「index_valueがAからBの間にあるアイテム」といった条件で検索が可能になる。
 /// そういったシステムを、出来事リストを読み出して外部にRelationを構築したり、パラメータをindex-keyとしてBTreeを構築したりすることで
 /// （パラメータは上書きされうるので、その場合(item_id, BTreeのid)のRelationも使って、上書き時にBTreeをアップデートできるようにしておく必要もあり大変だが)
 /// Relationとパラメータ範囲での検索が効率的にできるシステムが作れる。ただそれは外部に作ればいいので、このシステム自体の守備範囲ではない
-/// それが出来る土台として、idとLinkedHashMapで出来たMutListがある
+/// それが出来る土台として、idとLinkedHashMで出来たMutListがある
 #[derive(Debug, PartialEq, Clone)]
 pub struct MutListItem{
     ///アイテムごとにidが振られ、これによって削除や順番の変更を検出できる
     id : u64,
     ///ListItemの値は常にDefaultからの差分である
-    values : Box<HashMap<String, ListSabValue>>,
+    values : Box<HashM<String, ListSabValue>>,
     ///ListItemの値はRefでも常にDefaultからの差分である
-    refs : Box<HashMap<String, RefSabValue>>,
+    refs : Box<HashM<String, RefSabValue>>,
 }
 
 impl MutListItem{
-    pub(crate) fn new(id : u64, values : HashMap<String, ListSabValue>, refs : HashMap<String, RefSabValue>) -> MutListItem{
+    pub(crate) fn new(id : u64, values : HashM<String, ListSabValue>, refs : HashM<String, RefSabValue>) -> MutListItem{
         MutListItem{ id, values : Box::new(values), refs : Box::new(refs) }
     }
-    pub(crate) fn deconstruct(self) -> (HashMap<String, ListSabValue>, HashMap<String, RefSabValue>){ (*self.values, *self.refs) }
+    pub(crate) fn deconstruct(self) -> (HashM<String, ListSabValue>, HashM<String, RefSabValue>){ (*self.values, *self.refs) }
     pub(crate) fn id(&self) -> u64{ self.id }
-    pub(crate) fn values(&self) -> &HashMap<String, ListSabValue>{ self.values.as_ref() }
-    pub(crate) fn refs(&self) -> &HashMap<String, RefSabValue>{ self.refs.as_ref() }
+    pub(crate) fn values(&self) -> &HashM<String, ListSabValue>{ self.values.as_ref() }
+    pub(crate) fn refs(&self) -> &HashM<String, RefSabValue>{ self.refs.as_ref() }
     pub(crate) fn set_sabun(&mut self, def :&ListDefObj, name : String, param : RustParam) -> Result<Option<RustParam>, SetSabunError> {
         let (p, vt) =
             if let Some(ListDefValue::Param(p, vt)) = def.default().get(&name) {

@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::imp::rust_to_json::list::value_map_to_json::value_map_to_json;
 use crate::imp::rust_to_json::list::tmp_json_list::{btree_map, btree_set};
 use crate::imp::rust_to_json::string_set_to_json::{string_set_to_json_short};
-use std::collections::HashMap;
+use crate::{HashM, HashMt};
 use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::structs::my_json::Value;
@@ -12,7 +12,7 @@ use crate::imp::structs::root_value::RootValue;
 ///デフォルト値も差分も全部Json化したいユースケースもあるかもしれない・・・？
 
 pub fn root_to_json_new_default(obj : &RootObject) -> Result<Value> {
-    let mut result : HashMap<String,RustValue> = HashMap::with_capacity(obj.default().len());
+    let mut result : HashM<String,RustValue> = HashMt::with_capacity(obj.default().len());
     let default = obj.default().clone();
     let mut sabun = obj.sabun().clone();
     let old = obj.old().clone();

@@ -1,11 +1,11 @@
-use std::collections::HashMap;
+use crate::{HashM, HashMt};
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::version_adjuster::adjust_mut_list::adjust_inner_mut_list;
 use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
 use crate::imp::structs::list_def_obj::ListDefObj;
 
-pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String, ListSabValue>, names : &Names) -> Result<HashMap<String, ListSabValue>>{
+pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashM<String, ListSabValue>, names : &Names) -> Result<HashM<String, ListSabValue>>{
     let mut old_sabun = old_sabun;
 
     //デフォルトから変化しない場合はsabunには加わらないが、sabun.len()だと、
@@ -16,7 +16,7 @@ pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashMap<String,
     //default.len()でサイズを大きくとって、やたらと無駄が発生することを重く見るべきか？　（そんなに無駄が出るだろうか。書き換えないメンバはそう多くないと思うが・・・)
     //変なユースケースでの最悪を想定するべきで、やたらとdefにメンバを大量に用意して、sabunはちょっとしかないという戦略もありうるので、
     //その場合に無駄で巨大なhashtableを初期化する可能性を重く見るべきではなかろうか
-    let mut result : HashMap<String, ListSabValue> = HashMap::with_capacity(old_sabun.len());
+    let mut result : HashM<String, ListSabValue> = HashMt::with_capacity(old_sabun.len());
 
     for (def_key, def_v) in def.default(){
         let sabun_v = if let Some(v) = old_sabun.remove(def_key){ v } else {

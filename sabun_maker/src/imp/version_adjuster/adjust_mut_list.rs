@@ -1,15 +1,15 @@
-use linked_hash_map::LinkedHashMap;
 use crate::error::Result;
 use crate::imp::version_adjuster::adjust_mut_list_item_sabun::adjust_mut_list_item_sabun;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::version_adjuster::adjust_mut_list_item_ref::adjust_mut_list_item_ref;
 use crate::imp::structs::rust_list::{MutListItem, MutList, InnerMutList};
 use crate::imp::structs::list_def_obj::ListDefObj;
+use crate::{HashM, HashMt};
 
 
-pub fn adjust_mut(def : &ListDefObj, old_list : LinkedHashMap<u64, MutListItem>, names : &Names) -> Result<LinkedHashMap<u64, MutListItem>>{
+pub fn adjust_mut(def : &ListDefObj, old_list : HashM<u64, MutListItem>, names : &Names) -> Result<HashM<u64, MutListItem>>{
     let mut counter : u64 = 0;
-    let mut result = LinkedHashMap::with_capacity(old_list.len());
+    let mut result = HashMt::with_capacity(old_list.len());
     for (_, value) in old_list{
         let (sabun, refs) = value.deconstruct();
         let new_sabun = adjust_mut_list_item_sabun(def, sabun, names)?;

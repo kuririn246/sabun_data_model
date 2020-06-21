@@ -1,6 +1,6 @@
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::structs::qv::Qv;
-use std::collections::HashMap;
+use crate::HashM;
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_list::{ConstData, ConstList, MutList};
@@ -58,7 +58,7 @@ pub fn get_member_desc(root : *const RootObject) -> Vec<MemberDesc>{
     vec
 }
 
-pub fn get_param<'a>(def : &'a HashMap<String, RootValue>, sab : &'a HashMap<String, RustParam>, name : &str) -> Option<&'a RustParam>{
+pub fn get_param<'a>(def : &'a HashM<String, RootValue>, sab : &'a HashM<String, RustParam>, name : &str) -> Option<&'a RustParam>{
     if let Some(RootValue::Param(p,_v)) = def.get(name){
         if let Some(p) = sab.get(name){
             Some(p)

@@ -2,15 +2,15 @@ use json5_parser::{JVal, Span};
 use super::super::names::Names;
 use super::get_default::get_default;
 use crate::error::Result;
-use std::collections::{ HashSet};
 use crate::imp::json_to_rust::get_old::get_old;
 use crate::imp::json_to_rust::get_compatible::get_compatible;
 use crate::imp::structs::list_def_obj::ListDefObj;
+use crate::HashS;
 
 pub enum ListAttribute{
     Default(ListDefObj),
-    Old(HashSet<String>),
-    Compatible(HashSet<String>),
+    Old(HashS<String>),
+    Compatible(HashS<String>),
     NextID(u64),
 }
 
