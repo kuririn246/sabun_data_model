@@ -5,6 +5,7 @@ use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::util::set_sabun::{SetSabunError, verify_set_sabun};
 use crate::imp::structs::list_def_obj::ListDefObj;
+use crate::imp::structs::mut_list_hash::MutListHash;
 
 
 ///アイテムごとにIDをもち、Refで参照することが可能である
@@ -44,9 +45,11 @@ impl ConstList{
 #[derive(Debug, PartialEq, Clone)]
 pub struct MutList{
     default : Box<ListDefObj>,
-    list : Box<HashM<u64, MutListItem>>,
+    list : Box<MutListHash>,
     prop : Box<MutListProp>,
 }
+
+
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct MutListProp{
@@ -59,23 +62,23 @@ pub struct MutListProp{
 }
 
 impl MutList{
-    pub(crate) fn new(default : ListDefObj, list : HashM<u64, MutListItem>, next_id : u64, compatible : HashS<String>) -> MutList{
+    pub(crate) fn new(default : ListDefObj, list : MutListHash, next_id : u64, compatible : HashS<String>) -> MutList{
         MutList{ default : Box::new(default), list : Box::new(list), prop : Box::new(MutListProp{ next_id, compatible }) }
     }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
-    pub(crate) fn list(&self) -> &HashM<u64, MutListItem>{ self.list.as_ref() }
+    pub(crate) fn list(&self) -> &MutListHash{ self.list.as_ref() }
     //pub(crate) fn list_mut(&mut self) -> &mut LinkedHashM<u64, MutListItem>{ self.list.as_mut() }
     pub(crate) fn next_id(&self) -> u64{ self.prop.next_id }
     //pub(crate) fn increment_next_id(&mut self){ self.prop.next_id += 1 }
     pub(crate) fn append_new_item(&mut self) -> u64{
         let next_id = self.next_id();
-        self.list.insert(next_id, MutListItem::new(next_id, HashMt::new(), HashMt::new()));
+        self.list.insert(next_id, Box::new(MutListItem::new(next_id, HashMt::new(), HashMt::new())));
         self.prop.next_id += 1;
         return next_id;
     }
 
     pub(crate) fn compatible(&self) -> &HashS<String>{ &self.prop.compatible }
-    pub(crate) fn deconstruct(self) -> (ListDefObj, HashM<u64, MutListItem>, u64, HashS<String>){
+    pub(crate) fn deconstruct(self) -> (ListDefObj, MutListHash, u64, HashS<String>){
         let prop = *self.prop;
         (*self.default, *self.list, prop.next_id, prop.compatible)
     }
@@ -109,15 +112,15 @@ impl InnerData{
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct InnerMutList{
-    list : Box<HashM<u64, MutListItem>>,
+    list : Box<MutListHash>,
     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
     next_id : u64,
 }
 
 impl InnerMutList{
-    pub(crate) fn new(list : HashM<u64, MutListItem>, next_id : u64) -> InnerMutList{ InnerMutList{ list : Box::new(list), next_id } }
-    pub(crate) fn deconstruct(self) -> (HashM<u64, MutListItem>, u64){ (*self.list, self.next_id) }
-    pub(crate) fn list(&self) -> &HashM<u64, MutListItem>{ self.list.as_ref() }
+    pub(crate) fn new(list : MutListHash, next_id : u64) -> InnerMutList{ InnerMutList{ list : Box::new(list), next_id } }
+    pub(crate) fn deconstruct(self) -> (MutListHash, u64){ (*self.list, self.next_id) }
+    pub(crate) fn list(&self) -> &MutListHash{ self.list.as_ref() }
     //pub(crate) fn next_id(&self) -> u64{ self.next_id }
 }
 

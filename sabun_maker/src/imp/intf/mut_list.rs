@@ -3,7 +3,7 @@ use crate::imp::intf::member_desc::{MemberDescs, get_list_def_desc};
 use crate::imp::intf::ref_desc::{RefDescs, get_ref_def_desc};
 use crate::imp::intf::mut_list_item::MutListItemPtrs;
 use crate::imp::structs::list_def_obj::ListDefObj;
-use crate::HashM;
+use crate::imp::structs::mut_list_hash::MutListHash;
 
 pub fn get_member_desc(l : *const MutList) -> MemberDescs{
     let l = unsafe{ l.as_ref().unwrap() };
@@ -53,7 +53,7 @@ pub fn get_value(l : *mut MutList, id : u64) -> Option<MutListItemPtrs>{
     get_value_impl(l.list(), l.default(), id)
 }
 
-pub fn get_value_impl(data : &HashM<u64, MutListItem>, list_def : &ListDefObj, id : u64) -> Option<MutListItemPtrs>{
+pub fn get_value_impl(data : &MutListHash, list_def : &ListDefObj, id : u64) -> Option<MutListItemPtrs>{
     data.get(&id).map(|i| MutListItemPtrs::new(i as *const MutListItem as *mut MutListItem, list_def))
 }
 

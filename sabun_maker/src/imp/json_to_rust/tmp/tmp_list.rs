@@ -5,6 +5,7 @@ use crate::error::Result;
 use crate::imp::structs::rust_list::{ConstList, InnerList, ConstData, InnerData, MutList, InnerMutList, ListItem, MutListItem};
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
+use crate::imp::structs::mut_list_hash::MutListHash;
 
 pub struct TmpList{
     pub vec : Vec<TmpObj>,
@@ -101,7 +102,7 @@ impl TmpList{
             Err(format!("{} MutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
         let compatible = self.compatible.unwrap_or_else(|| HashSt::new());
-        Ok(MutList::new(self.default.unwrap(),HashMt::new(),0, compatible))
+        Ok(MutList::new(self.default.unwrap(),MutListHash::new(HashMt::new()),0, compatible))
     }
 
     pub fn into_inner_mut_list(self) -> Result<InnerMutList>{
@@ -120,7 +121,7 @@ impl TmpList{
         if self.vec.len() != 0{
             Err(format!("{} InnerMutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
-        Ok(InnerMutList::new(HashMt::new(), 0))
+        Ok(InnerMutList::new(MutListHash::new(HashMt::new()), 0))
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
@@ -214,17 +215,17 @@ fn to_data_items(vec : Vec<TmpObj>) -> Result<HashM<String, ListItem>>{
     return Ok(result);
 }
 
-fn to_violated_list_items(vec : Vec<TmpObj>) -> Result<HashM<u64, MutListItem>>{
-    let mut result : HashM<u64, MutListItem> = HashMt::with_capacity(vec.len());
+fn to_violated_list_items(vec : Vec<TmpObj>) -> Result<MutListHash>{
+    let mut result : HashM<u64, Box<MutListItem>> = HashMt::with_capacity(vec.len());
     for (idx, tmp_item) in vec.into_iter().enumerate(){
         let span = tmp_item.span.clone();
         let item = tmp_item.into_violated_list_item(idx)?;
-        match result.insert(item.id(), item){
+        match result.insert(item.id(), Box::new(item)){
             Some(_) =>{
                 Err(format!("{} Item's ID is invalid. Maybe all list items should have IDs, or all IDs should be elided. {}", span.line_str(), span.slice()))?
             }
             None =>{},
         }
     }
-    return Ok(result);
+    return Ok(MutListHash::new(result));
 }

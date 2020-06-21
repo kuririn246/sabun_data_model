@@ -5,19 +5,20 @@ use crate::imp::version_adjuster::adjust_mut_list_item_ref::adjust_mut_list_item
 use crate::imp::structs::rust_list::{MutListItem, MutList, InnerMutList};
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::{HashM, HashMt};
+use crate::imp::structs::mut_list_hash::MutListHash;
 
 
-pub fn adjust_mut(def : &ListDefObj, old_list : HashM<u64, MutListItem>, names : &Names) -> Result<HashM<u64, MutListItem>>{
+pub fn adjust_mut(def : &ListDefObj, old_list : MutListHash, names : &Names) -> Result<MutListHash>{
     let mut counter : u64 = 0;
-    let mut result = HashMt::with_capacity(old_list.len());
+    let mut result : HashM<u64, Box<MutListItem>> = HashMt::with_capacity(old_list.len());
     for (_, value) in old_list{
         let (sabun, refs) = value.deconstruct();
         let new_sabun = adjust_mut_list_item_sabun(def, sabun, names)?;
         let new_refs = adjust_mut_list_item_ref(def.refs(), refs, names)?;
-        result.insert(counter, MutListItem::new(counter, new_sabun, new_refs));
+        result.insert(counter, Box::new(MutListItem::new(counter, new_sabun, new_refs)));
         counter += 1;
     }
-    return Ok(result);
+    return Ok(MutListHash::new(result));
 }
 
 pub fn adjust_mut_list(new : MutList, old : MutList, names : &Names) -> Result<MutList>{
