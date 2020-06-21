@@ -2,7 +2,7 @@ use std::collections::{HashMap};
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::rust_to_json::name_with_suffix::name_with_suffix;
-use crate::imp::structs::def_obj::RefDefObj;
+use crate::imp::structs::ref_def_obj::RefDefObj;
 use crate::imp::structs::ref_value::RefSabValue;
 use crate::imp::structs::qv::Qv;
 use crate::imp::structs::root_obj::RootObject;

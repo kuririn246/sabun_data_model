@@ -3,11 +3,12 @@ use json5_parser::Span;
 use crate::error::Result;
 use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::ref_value::{RefValue, RefSabValue};
-use crate::imp::structs::def_obj::{RefDefObj, ListDefObj};
+use crate::imp::structs::ref_def_obj::{RefDefObj};
 use crate::imp::structs::rust_list::{ListItem, MutListItem};
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
+use crate::imp::structs::list_def_obj::ListDefObj;
 
 pub struct TmpObj{
     pub default : HashMap<String, RustValue>,
@@ -19,7 +20,7 @@ pub struct TmpObj{
 }
 
 pub struct TmpRefs{
-    pub map : HashMap<String, RefValue>,
+    pub map : HashMap<String, (usize, RefValue)>,
     pub old : HashSet<String>,
     pub is_enum : bool,
     pub span : Span,
@@ -156,11 +157,11 @@ fn to_list_sab_map(map : HashMap<String, RustValue>, span : &Span) -> Result<Has
     Ok(result)
 }
 
-fn to_list_def_val_map(map : HashMap<String, RustValue>, span : &Span) -> Result<HashMap<String, ListDefValue>>{
-    let mut result : HashMap<String, ListDefValue> = HashMap::with_capacity(map.len());
-    for (k,v) in map{
+fn to_list_def_val_map(map : HashMap<String, RustValue>, span : &Span) -> Result<HashMap<String, (usize, ListDefValue)>>{
+    let mut result : HashMap<String, (usize, ListDefValue)> = HashMap::with_capacity(map.len());
+    for (idx, (k,v)) in map.into_iter().enumerate(){
         let sab = match v.into_list_def_value(){
-            Ok(a) => a,
+            Ok(a) => (idx, a),
             Err(s) =>{
                 Err(format!("{} {} list def can't have {}", span.line_str(), k, s))?
             }
@@ -170,9 +171,9 @@ fn to_list_def_val_map(map : HashMap<String, RustValue>, span : &Span) -> Result
     Ok(result)
 }
 
-fn to_ref_sab_map(map : HashMap<String, RefValue>) -> HashMap<String, RefSabValue>{
+fn to_ref_sab_map(map : HashMap<String, (usize, RefValue)>) -> HashMap<String, RefSabValue>{
     let mut result : HashMap<String, RefSabValue> = HashMap::with_capacity(map.len());
-    for(k,v) in map{
+    for(k,(_,v)) in map{
         result.insert(k, v.into_sab_value());
     }
     return result;

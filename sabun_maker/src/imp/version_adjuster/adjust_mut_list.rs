@@ -3,8 +3,8 @@ use crate::error::Result;
 use crate::imp::version_adjuster::adjust_mut_list_item_sabun::adjust_mut_list_item_sabun;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::version_adjuster::adjust_mut_list_item_ref::adjust_mut_list_item_ref;
-use crate::imp::structs::def_obj::ListDefObj;
 use crate::imp::structs::rust_list::{MutListItem, MutList, InnerMutList};
+use crate::imp::structs::list_def_obj::ListDefObj;
 
 
 pub fn adjust_mut(def : &ListDefObj, old_list : LinkedHashMap<u64, MutListItem>, names : &Names) -> Result<LinkedHashMap<u64, MutListItem>>{

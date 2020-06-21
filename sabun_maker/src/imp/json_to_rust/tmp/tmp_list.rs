@@ -3,8 +3,9 @@ use std::collections::{HashSet, HashMap};
 use json5_parser::Span;
 use crate::error::Result;
 use linked_hash_map::LinkedHashMap;
-use crate::imp::structs::def_obj::{ListDefObj, InnerMutDefObj};
 use crate::imp::structs::rust_list::{ConstList, InnerList, ConstData, InnerData, MutList, InnerMutList, ListItem, MutListItem};
+use crate::imp::structs::list_def_obj::ListDefObj;
+use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
 
 pub struct TmpList{
     pub vec : Vec<TmpObj>,

@@ -1,10 +1,12 @@
 use std::collections::{HashSet, HashMap};
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
-use crate::imp::structs::ref_value::RefValue;
 use crate::imp::structs::rust_list::ListItem;
+use crate::imp::structs::root_value::RootValue;
+use crate::imp::structs::list_def_obj::ListDefMap;
+use crate::imp::structs::ref_def_obj::RefDefMap;
 
-pub fn validate_old_def_mem<T>(old : &HashSet<String>, map : &HashMap<String, T>, names : &Names) -> Result<()>{
+pub fn validate_old_root_def_mem(old : &HashSet<String>, map : &HashMap<String, RootValue>, names : &Names) -> Result<()>{
     for name in old{
         if map.contains_key(name) == false{
             Err(format!("{} Old {} does not exist in the Default", names, name))?
@@ -13,7 +15,16 @@ pub fn validate_old_def_mem<T>(old : &HashSet<String>, map : &HashMap<String, T>
     Ok(())
 }
 
-pub fn validate_old_ref_def(old : &HashSet<String>, ref_def : &HashMap<String, RefValue>, names : &Names) -> Result<()>{
+pub fn validate_old_list_def_mem(old : &HashSet<String>, map : &ListDefMap, names : &Names) -> Result<()>{
+    for name in old{
+        if map.contains_key(name) == false{
+            Err(format!("{} Old {} does not exist in the Default", names, name))?
+        }
+    }
+    Ok(())
+}
+
+pub fn validate_old_ref_def(old : &HashSet<String>, ref_def : &RefDefMap, names : &Names) -> Result<()>{
     for name in old{
         if ref_def.contains_key(name) == false{
             Err(format!("{} Old {} does not exist in the Ref", names, name))?

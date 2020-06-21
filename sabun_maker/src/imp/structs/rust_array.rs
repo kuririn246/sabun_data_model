@@ -70,7 +70,7 @@ pub struct RustStrArray{
 
 impl RustStrArray{
     pub(crate) fn new(b : Vec<String>) -> RustStrArray{ RustStrArray{ b : Box::new(b) }}
-    pub(crate) fn as_ref(&self) -> &Vec<String>{ self.b.as_ref() }
+    //pub(crate) fn as_ref(&self) -> &Vec<String>{ self.b.as_ref() }
     pub(crate) fn to_params(&self) -> Vec<RustParam>{
         self.b.iter().map(|a| RustParam::String(Qv::Val(RustString::new(a.to_string())))).collect()
     }
@@ -87,7 +87,7 @@ pub struct RustNum2Array{
 
 impl RustNum2Array{
     pub(crate) fn new(b : Vec<Vec<f64>>) -> RustNum2Array{ RustNum2Array{ b : Box::new(b) }}
-    pub(crate) fn as_ref(&self) -> &Vec<Vec<f64>>{ self.b.as_ref() }
+    //pub(crate) fn as_ref(&self) -> &Vec<Vec<f64>>{ self.b.as_ref() }
     pub(crate) fn to_params(&self) -> Vec<RustParam>{
         self.b.iter().map(|a| RustParam::NumArray(Qv::Val(RustNumArray::new(a.clone())))).collect()
     }

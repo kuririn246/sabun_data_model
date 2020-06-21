@@ -1,5 +1,5 @@
 use crate::imp::structs::value_type::ValueType;
-use crate::imp::structs::def_obj::RefDefObj;
+use crate::imp::structs::ref_def_obj::RefDefObj;
 
 impl RefDesc{
     pub(crate) fn new(name : String, value_type : ValueType, is_old : bool) -> RefDesc{

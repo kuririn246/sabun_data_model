@@ -2,8 +2,8 @@ use crate::imp::intf::data::{DataValues, get_values_impl, get_value_impl};
 use crate::imp::intf::member_desc::{MemberDescs, get_list_def_desc};
 use crate::imp::intf::ref_desc::{get_ref_def_desc, RefDescs};
 use crate::imp::structs::rust_list::InnerData;
-use crate::imp::structs::def_obj::ListDefObj;
 use crate::imp::intf::list_item::ListItemPtrs;
+use crate::imp::structs::list_def_obj::ListDefObj;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]

@@ -1,7 +1,7 @@
 use crate::imp::structs::value_type::ValueType;
 use crate::imp::structs::rust_value::RustValueType;
-use crate::imp::structs::def_obj::{ListDefObj};
 use crate::imp::structs::list_value::ListDefValue;
+use crate::imp::structs::list_def_obj::ListDefObj;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct MemberDesc{

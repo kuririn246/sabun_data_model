@@ -24,8 +24,8 @@ pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -
     }
 
 
-    let mut map: HashMap<String, RefValue> = HashMap::with_capacity(obj.default.len());
-    for (k, v) in &obj.default {
+    let mut map: HashMap<String, (usize, RefValue)> = HashMap::with_capacity(obj.default.len());
+    for (idx, (k, v)) in obj.default.iter().enumerate() {
         match v {
             RustValue::Param(RustParam::String(v), vt) => {
                 match v {
@@ -37,7 +37,7 @@ pub fn get_ref(v : &LinkedHashMap<String, JVal>, span : &Span, names : &Names) -
                     },
                     _ =>{},
                 }
-                map.insert(k.to_string(), RefValue::new(v.map(|s| s.str().to_string()), vt.clone()));
+                map.insert(k.to_string(), (idx, RefValue::new(v.map(|s| s.str().to_string()), vt.clone())));
             },
             _ => {
                 Err(format!(r#"{} {} Ref's value must be a string or null {}"#, span.line_str(), k, names))?

@@ -5,9 +5,9 @@ use crate::imp::json_to_rust::validation::validate_list::validate_list;
 use crate::imp::json_to_rust::validation::validate_mut_list::validate_mut_list;
 use crate::imp::json_to_rust::validation::validate_compatible::validate_compatible;
 use crate::imp::json_to_rust::validation::validate_list_def::validate_list_def;
-use crate::imp::json_to_rust::validation::validate_old_def_mem::validate_old_def_mem;
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::structs::root_value::RootValue;
+use crate::imp::json_to_rust::validation::validate_old_def_mem::validate_old_root_def_mem;
 
 /// json読み出し時のチェックがあり、adjust時のチェックもあり、modifyインターフェース上のチェックもある。
 /// それらでは補足しきれないチェックをするのがこれの役割。
@@ -26,7 +26,7 @@ use crate::imp::structs::root_value::RootValue;
 /// can_use_oldがあるとoldでも気にしなくなる。Jsonで初期値を読み込んだ後はcan_use_old=false,
 /// 旧バージョンから以降した場合はcan_use_old=trueでやるとよかろうと思う
 pub fn validate_root(root : &RootObject, can_use_old: bool) -> Result<()>{
-    validate_old_def_mem(root.old(), root.default(), &Names::new("."))?;
+    validate_old_root_def_mem(root.old(), root.default(), &Names::new("."))?;
 
     for (name, val) in root.default(){
         let names = &Names::new(name);

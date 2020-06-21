@@ -2,9 +2,9 @@ use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::json_to_rust::validation::validate_list_item::validate_list_item;
 use linked_hash_map::LinkedHashMap;
-use crate::imp::structs::def_obj::ListDefObj;
 use crate::imp::structs::rust_list::MutListItem;
 use crate::imp::structs::root_obj::RootObject;
+use crate::imp::structs::list_def_obj::ListDefObj;
 
 pub fn validate_mut_list(def : &ListDefObj, map : &LinkedHashMap<u64, MutListItem>, root : &RootObject,
                          can_use_old: bool, names : &Names) -> Result<()>{

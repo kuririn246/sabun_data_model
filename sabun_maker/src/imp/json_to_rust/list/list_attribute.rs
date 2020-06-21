@@ -5,7 +5,7 @@ use crate::error::Result;
 use std::collections::{ HashSet};
 use crate::imp::json_to_rust::get_old::get_old;
 use crate::imp::json_to_rust::get_compatible::get_compatible;
-use crate::imp::structs::def_obj::ListDefObj;
+use crate::imp::structs::list_def_obj::ListDefObj;
 
 pub enum ListAttribute{
     Default(ListDefObj),

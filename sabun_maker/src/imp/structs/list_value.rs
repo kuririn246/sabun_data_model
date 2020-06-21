@@ -2,8 +2,9 @@ use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_list::{InnerData, InnerList, InnerMutList};
 use crate::imp::structs::rust_value::{RustValue, RustValueType};
 use crate::imp::structs::value_type::ValueType;
-use crate::imp::structs::def_obj::{ListDefObj, InnerMutDefObj};
 use crate::imp::structs::qv::QvType;
+use crate::imp::structs::list_def_obj::ListDefObj;
+use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ListDefValue{

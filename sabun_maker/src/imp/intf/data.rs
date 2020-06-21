@@ -1,10 +1,9 @@
 use crate::imp::structs::rust_list::{ConstData, ListItem};
 use crate::imp::intf::member_desc::{ get_list_def_desc, MemberDescs};
-use crate::imp::structs::def_obj::{ListDefObj};
 use crate::imp::intf::ref_desc::{get_ref_def_desc, RefDescs};
 use std::collections::{HashMap, HashSet};
 use crate::imp::intf::list_item::ListItemPtrs;
-use std::ffi::CString;
+use crate::imp::structs::list_def_obj::ListDefObj;
 
 pub fn get_member_desc(root : *const ConstData) -> MemberDescs{
     let root = unsafe{ root.as_ref().unwrap() };
