@@ -1,6 +1,6 @@
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_list::{InnerData, InnerList, InnerMutList};
-use crate::imp::structs::rust_value::{RustValue, RustValueType};
+use crate::imp::structs::rust_value::{RustValue, RustMemberType};
 use crate::imp::structs::value_type::ValueType;
 use crate::imp::structs::qv::QvType;
 use crate::imp::structs::list_def_obj::ListDefObj;
@@ -61,8 +61,8 @@ impl ListDefValue{
     }
 
     ///この数値は仮
-    pub(crate) fn type_num(&self) -> RustValueType{
-        use RustValueType::*;
+    pub(crate) fn type_num(&self) -> RustMemberType {
+        use RustMemberType::*;
         match self{
             ListDefValue::Param(param, _) => param.type_num(),
             ListDefValue::InnerDataDef(_) => InnerData,
@@ -83,8 +83,8 @@ impl ListDefValue{
 
 impl ListSabValue{
     ///この数値は仮
-    pub(crate) fn type_num(&self) -> RustValueType{
-        use RustValueType::*;
+    pub(crate) fn type_num(&self) -> RustMemberType {
+        use RustMemberType::*;
 
         match self{
             ListSabValue::Param(param) => param.type_num(),

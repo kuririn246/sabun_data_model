@@ -24,7 +24,7 @@ pub enum RustValue{
 
 #[repr(u64)]
 #[derive(Debug, PartialEq, Clone)]
-pub enum RustValueType{
+pub enum RustMemberType {
     Bool, Num, Str, NumArray, StrArray,Num2Array,
     Data, List, Mut, InnerData, InnerList, InnerMut
 }

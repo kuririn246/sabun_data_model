@@ -1,7 +1,4 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+mod test;
+mod imp;
+
+pub use imp::generate_interface::generate_interface as generate_interface;

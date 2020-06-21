@@ -5,7 +5,7 @@ use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_list::{ConstData, ConstList, MutList};
 use crate::imp::intf::member_desc::MemberDesc;
-use crate::imp::structs::rust_value::RustValueType;
+use crate::imp::structs::rust_value::RustMemberType;
 use crate::imp::structs::value_type::ValueType;
 
 pub fn get_bool(root : *const RootObject, name : &str) -> Option<Qv<bool>>{
@@ -49,9 +49,9 @@ pub fn get_member_desc(root : *const RootObject) -> Vec<MemberDesc>{
                 vec.push(MemberDesc::new(mem, vt.clone(), p.type_num(), is_old));
                 continue;
             },
-            RootValue::Data(_) => RustValueType::Data,
-            RootValue::List(_) => RustValueType::List,
-            RootValue::Mut(_) => RustValueType::Mut,
+            RootValue::Data(_) => RustMemberType::Data,
+            RootValue::List(_) => RustMemberType::List,
+            RootValue::Mut(_) => RustMemberType::Mut,
         };
         vec.push(MemberDesc::new(mem, ValueType::Normal, mt, is_old));
     }

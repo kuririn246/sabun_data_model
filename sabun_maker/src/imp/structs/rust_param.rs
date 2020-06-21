@@ -1,6 +1,6 @@
 use crate::imp::structs::qv::{Qv, QvType};
 use crate::imp::structs::rust_string::{RustString };
-use crate::imp::structs::rust_value::RustValueType;
+use crate::imp::structs::rust_value::RustMemberType;
 use crate::imp::structs::rust_array::{RustArray, RustNumArray, RustStrArray, RustNum2Array};
 use crate::imp::structs::array_type::ArrayType;
 
@@ -26,8 +26,8 @@ impl RustParam {
         }
     }
 
-    pub(crate) fn type_num(&self) -> RustValueType {
-        use RustValueType::*;
+    pub(crate) fn type_num(&self) -> RustMemberType {
+        use RustMemberType::*;
         match self {
             RustParam::Bool(_) => Bool,
             RustParam::Number(_) => Num,
