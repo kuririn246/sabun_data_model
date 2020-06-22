@@ -1,4 +1,4 @@
-use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::value_type::VarType;
 use crate::imp::structs::qv::Qv;
 
 #[derive(Debug, PartialEq, Clone)]
@@ -9,7 +9,7 @@ pub struct RefValue{
 #[derive(Debug, PartialEq, Clone)]
 struct RefValueInternal{
     value : Qv<String>,
-    value_type : ValueType,
+    value_type : VarType,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -18,10 +18,10 @@ pub struct RefSabValue{
 }
 
 impl RefValue{
-    pub(crate) fn new(value : Qv<String>, value_type : ValueType) -> RefValue{
+    pub(crate) fn new(value : Qv<String>, value_type : VarType) -> RefValue{
         RefValue{ v : Box::new(RefValueInternal{value, value_type }) }
     }
-    pub(crate) fn value_type(&self) -> ValueType{ self.v.value_type }
+    pub(crate) fn value_type(&self) -> VarType { self.v.value_type }
     pub(crate) fn value(&self) -> &Qv<String>{ &self.v.value }
     pub(crate) fn into_sab_value(self) ->RefSabValue{ RefSabValue::new(self.value().clone()) }
 
@@ -42,6 +42,6 @@ impl RefSabValue{
     pub(crate) fn value(&self) -> &Qv<String>{ &self.value }
     pub(crate) fn into_ref_value_for_json(self) -> RefValue{
         //sabun側は?とか!とかなくていいのでNormalでよい
-        RefValue::new(self.value().clone(), ValueType::Normal)
+        RefValue::new(self.value().clone(), VarType::Normal)
     }
 }

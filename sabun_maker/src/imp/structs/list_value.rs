@@ -1,14 +1,14 @@
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_list::{InnerData, InnerList, InnerMutList};
 use crate::imp::structs::rust_value::{RustValue, RustMemberType};
-use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::value_type::VarType;
 use crate::imp::structs::qv::QvType;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ListDefValue{
-    Param(RustParam, ValueType),
+    Param(RustParam, VarType),
     InnerDataDef(ListDefObj),
     InnerListDef(ListDefObj),
     InnerMutDef(InnerMutDefObj),
@@ -52,11 +52,11 @@ impl ListDefValue{
     }
 
 
-    pub(crate) fn value_type(&self) -> ValueType{
+    pub(crate) fn value_type(&self) -> VarType {
         match self{
             ListDefValue::Param(_param, vt) => vt.clone(),
-            ListDefValue::InnerMutDef(obj) => if obj.undefinable() { ValueType::Undefiable } else{ ValueType::Normal }
-            _ => ValueType::Normal,
+            ListDefValue::InnerMutDef(obj) => if obj.undefinable() { VarType::Undefiable } else{ VarType::Normal }
+            _ => VarType::Normal,
         }
     }
 
@@ -100,7 +100,7 @@ impl ListSabValue{
     pub(crate) fn into_rust_value_for_json(self) -> RustValue{
         match self{
             //value側は名前に?とか!とかつけなくてよいのでValueType::Normal
-            ListSabValue::Param(p) => RustValue::Param(p, ValueType::Normal),
+            ListSabValue::Param(p) => RustValue::Param(p, VarType::Normal),
             ListSabValue::InnerData(d) => RustValue::InnerData(d),
             ListSabValue::InnerList(l) => RustValue::InnerList(l),
             ListSabValue::InnerMut(m) => RustValue::InnerMut(m),

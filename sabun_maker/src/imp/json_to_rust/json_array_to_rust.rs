@@ -4,7 +4,7 @@ use super::names::Names;
 use json5_parser::{JVal, Span};
 use super::list::json_list_to_rust::json_list_to_rust;
 use crate::imp::json_to_rust::array_null::array_null_or_undefined;
-use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::value_type::VarType;
 use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::array_type::ArrayType;
 use crate::imp::structs::qv::Qv;
@@ -12,7 +12,7 @@ use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_array::RustArray;
 use crate::imp::structs::rust_string::RustString;
 
-pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue>{
+pub fn json_array_to_rust(array : &Vec<JVal>, value_type : VarType, span : &Span, names : &Names) -> Result<RustValue>{
     use GatResult::*;
     let gat = get_array_type(array);
     return match gat{
@@ -34,7 +34,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
         List | Data | MutList | InnerList | InnerData | InnerMut | InnerListDef | InnerDataDef | InnerMutDef |
         ViolatedList | InnerViolatedList | InnerViolatedListDef =>{
             match value_type{
-                ValueType::Normal =>{
+                VarType::Normal =>{
                     let tmp = json_list_to_rust(&array[1..], span, names)?;
                     match gat{
                         List => Ok(RustValue::List(tmp.into_const_list()?)),
@@ -52,7 +52,7 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : ValueType, span : &Sp
                         _ => unreachable!() ,
                     }
                 },
-                ValueType::Undefiable =>{
+                VarType::Undefiable =>{
                     let tmp = json_list_to_rust(&array[1..], span, names)?;
                     match gat {
                         InnerMutDef => Ok(RustValue::InnerMutDef(tmp.into_inner_mut_def(true)?)),
@@ -161,7 +161,7 @@ pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result
             JVal::Array(a2, span) =>{
                 match array_type{
                     ArrayType::Num2 => {
-                        let rv = json_array_to_rust(a2, ValueType::Normal, span, names)?;
+                        let rv = json_array_to_rust(a2, VarType::Normal, span, names)?;
                         match rv{
                             RustValue::Param(RustParam::NumArray(array), _vt) =>{
                                 match &array {

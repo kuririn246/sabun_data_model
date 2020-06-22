@@ -1,12 +1,12 @@
 use crate::imp::structs::rust_param::RustParam;
-use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::value_type::VarType;
 use crate::imp::structs::rust_list::{ConstData, ConstList, MutList};
 use crate::imp::structs::rust_value::RustValue;
 use crate::imp::structs::list_def_obj::ListDefObj;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum RootValue{
-    Param(RustParam, ValueType),
+    Param(RustParam, VarType),
     Data(ConstData),
     List(ConstList),
     Mut(MutList),

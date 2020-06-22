@@ -1,7 +1,7 @@
 use regex::Regex;
 use regex::Captures;
 use lazy_static::lazy_static;
-use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::value_type::VarType;
 
 pub enum SystemNames{
     Old,
@@ -11,7 +11,7 @@ pub enum SystemNames{
 }
 
 pub enum NameType{
-    Name(String, ValueType),
+    Name(String, VarType),
     SystemName(SystemNames)
 }
 
@@ -36,7 +36,7 @@ pub fn json_name(s : &str) -> Option<NameType>{
 ///?とか！がついておらず大文字で始まらない普通の名前
 pub fn json_simple_name(s : &str) -> Option<String> {
     match json_name(s) {
-        Some(NameType::Name(name, ValueType::Normal)) => {
+        Some(NameType::Name(name, VarType::Normal)) => {
             Some(name)
         },
         _ => { None }
@@ -80,18 +80,18 @@ pub fn analyze_name(s : &str) -> Option<Captures>{
     RE.captures(s)
 }
 
-pub fn value_type_and_name(s : &str) -> Option<(ValueType, String)>{
+pub fn value_type_and_name(s : &str) -> Option<(VarType, String)>{
     if let Some(cap) = analyze_name(s){
         let name = cap[1].to_string();
         let suffix = &cap[2];
         let value_type = if suffix == "!?" || suffix == "?!"{
-            ValueType::UndefNullable
+            VarType::UndefNullable
         } else if suffix == "!"{
-            ValueType::Undefiable
+            VarType::Undefiable
         } else if suffix == "?"{
-            ValueType::Nullable
+            VarType::Nullable
         } else if suffix == ""{
-            ValueType::Normal
+            VarType::Normal
         } else{
             return None;
         };

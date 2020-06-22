@@ -2,12 +2,12 @@ use json5_parser::{JVal, Span};
 use super::names::Names;
 use crate::error::Result;
 use super::json_array_to_rust::GatResult;
-use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::value_type::VarType;
 use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::qv::Qv;
 use crate::imp::structs::rust_param::RustParam;
 
-pub fn array_null_or_undefined(a : &[JVal], gat : GatResult, value_type : ValueType, span : &Span, names : &Names) -> Result<RustValue> {
+pub fn array_null_or_undefined(a : &[JVal], gat : GatResult, value_type : VarType, span : &Span, names : &Names) -> Result<RustValue> {
     if a.len() != 1 {
         Err(format!(r#"{} {} null must be ["type", null] {}"#, span.line_str(), span.slice(), names))?
     }

@@ -1,4 +1,4 @@
-use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::value_type::VarType;
 use crate::imp::structs::rust_list::{ConstData, ConstList, MutList, InnerData, InnerList, InnerMutList};
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::list_value::{ListDefValue, ListSabValue};
@@ -9,7 +9,7 @@ use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum RustValue{
-    Param(RustParam, ValueType),
+    Param(RustParam, VarType),
     Data(ConstData),
     List(ConstList),
     Mut(MutList),

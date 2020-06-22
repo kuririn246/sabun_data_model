@@ -17,7 +17,7 @@ use json5_parser::JVal;
 use names::Names;
 use crate::error::Result;
 use crate::imp::structs::rust_value::RustValue;
-use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::value_type::VarType;
 use crate::imp::structs::root_obj::RootObject;
 
 pub fn json_root_to_rust(json : &str) -> Result<RootObject>{
@@ -37,5 +37,5 @@ pub fn json_root_to_rust(json : &str) -> Result<RootObject>{
 pub fn json_item_str_to_rust(json : &str, item_name : &str) -> Result<RustValue>{
     let jval = json5_parser::from_str(json)?;
 
-    json_item_to_rust::json_item_to_rust(item_name, ValueType::Normal, &jval, &Names::new(""))
+    json_item_to_rust::json_item_to_rust(item_name, VarType::Normal, &jval, &Names::new(""))
 }

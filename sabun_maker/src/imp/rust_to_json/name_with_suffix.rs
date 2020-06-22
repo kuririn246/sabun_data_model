@@ -1,5 +1,5 @@
-use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::value_type::VarType;
 
-pub fn name_with_suffix(name : &str, vt : ValueType) -> String{
+pub fn name_with_suffix(name : &str, vt : VarType) -> String{
     format!("{}{}", name, vt.to_suffix())
 }

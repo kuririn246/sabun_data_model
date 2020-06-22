@@ -1,3 +1,4 @@
+use sabun_maker::structs::VarType;
 
 pub struct Impl{
     pub(crate) funs : Vec<Fun>,
@@ -41,15 +42,18 @@ pub enum Contents{
 
 pub struct GetC{
     pub(crate) type_name_small: String,
+    pub(crate) vt : VarType,
 }
 impl GetC{
-    pub fn new(type_name_small: &str) -> GetC{ GetC{ type_name_small: type_name_small.to_string() }}
+    pub fn new(type_name_small: &str, vt : VarType) -> GetC{ GetC{ type_name_small: type_name_small.to_string(), vt }}
 }
 
 pub struct SetC{
     pub(crate) type_name_small : String,
     pub(crate) param_name : String,
+    pub(crate) vt : VarType,
 }
 impl SetC{
-    pub fn new(type_name_small : &str, param_name : &str) -> SetC{ SetC{ type_name_small : type_name_small.to_string(), param_name : param_name.to_string() }}
+    pub fn new(type_name_small : &str, param_name : &str, vt : VarType) -> SetC{
+        SetC{ type_name_small : type_name_small.to_string(), param_name : param_name.to_string(), vt }}
 }

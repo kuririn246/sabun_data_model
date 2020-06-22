@@ -5,7 +5,7 @@ use crate::imp::rust_to_json::name_with_suffix::name_with_suffix;
 use crate::imp::rust_to_json::list::default_to_json::{ inner_def_to_json};
 use crate::imp::rust_to_json::list::inner_mut_def_to_json::inner_mut_def_to_json;
 use crate::imp::structs::rust_value::{RustValue};
-use crate::imp::structs::value_type::ValueType;
+use crate::imp::structs::value_type::VarType;
 use crate::imp::structs::my_json::Value;
 use crate::imp::structs::list_type::ListType;
 
@@ -30,7 +30,7 @@ pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> (String, Value){
         RustValue::InnerMutDef(obj) =>{
             let val = inner_mut_def_to_json(obj);
             if obj.undefinable(){
-                return (name_with_suffix(name, ValueType::Undefiable), val);
+                return (name_with_suffix(name, VarType::Undefiable), val);
             } else{
                 val
             }

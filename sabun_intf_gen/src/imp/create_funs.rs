@@ -1,5 +1,5 @@
 use sabun_maker::intf::member_desc::{MemberDesc};
-use sabun_maker::structs::RustMemberType;
+use sabun_maker::structs::{RustMemberType, VarType};
 
 use crate::imp::fun::{Arg, Contents, Fun, GetC, SetC};
 
@@ -8,9 +8,9 @@ pub fn create_funs(mems : &[MemberDesc], is_mut : bool) -> Vec<Fun> {
     for mem in mems {
         match mem.member_type() {
             RustMemberType::Bool => {
-                funs.push(fun_get(mem.name(), "bool", "bool"));
+                funs.push(fun_get(mem.name(), "bool", "bool", mem.var_type()));
                 if is_mut{
-                    funs.push(fun_set(mem.name(), "Qv<bool>", "bool"))
+                    funs.push(fun_set(mem.name(), "Qv<bool>", "bool", mem.var_type()))
                 }
             },
             _=>{},
@@ -20,14 +20,14 @@ pub fn create_funs(mems : &[MemberDesc], is_mut : bool) -> Vec<Fun> {
     funs
 }
 
-fn fun_get(mem_name : &str, result_type : &str, type_name_small : &str) -> Fun{
-    Fun::new(mem_name, vec![], result_type, false, Contents::Get(GetC::new(type_name_small)))
+fn fun_get(mem_name : &str, result_type : &str, type_name_small : &str, vt : &VarType) -> Fun{
+    Fun::new(mem_name, vec![], result_type, false, Contents::Get(GetC::new(type_name_small, vt.clone())))
 }
 
-fn fun_set(mem_name : &str, arg_type : &str, type_name_small : &str) -> Fun{
+fn fun_set(mem_name : &str, arg_type : &str, type_name_small : &str, vt : &VarType) -> Fun{
     Fun::new(
         &format!("set_{}", mem_name),
         vec![Arg::new(mem_name, arg_type)],
         "", true, Contents::Set(
-            SetC::new(type_name_small, mem_name)))
+            SetC::new(type_name_small, mem_name, vt.clone())))
 }
