@@ -8,8 +8,9 @@ mod tests {
 
     #[test]
     fn it_works() {
-        match json_dir_to_rust("../sabun_maker/src/json_dir/json_siyou", true) {
+        match json_dir_to_rust("src/json_dir/test", true) {
             Ok(a) => {
+                println!("{:?}", &a);
                 let ans = generate_interface(&a);
                 println!("{}", ans);
             },
