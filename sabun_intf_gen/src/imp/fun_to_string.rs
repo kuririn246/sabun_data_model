@@ -24,22 +24,36 @@ pub(crate) fn fun_to_string(fun : &Fun, self_mod_name : &str) -> Vec<StrAndTab>{
     match &fun.contents{
         Contents::Get(g) =>{
             result.push(StrAndTab::new(
-                format!("let qv = {}::get_{}(unsafe{{ self.ptr.as_ref().unwrap() }}, \"{}\");", self_mod_name, &g.type_name_small, &fun.name), 1));
+                format!("let qv = {}::get_{}(unsafe{{ self.ptr.as_ref().unwrap() }}, \"{}\").unwrap();", self_mod_name, &g.type_name_small, &fun.name), 1));
             match &g.vt {
                 VarType::Normal => {
                     result.push(StrAndTab::new(
                             format!("qv.into_value().unwrap()"), 1));
                 },
-                VarType::Undefiable
+                VarType::Undefiable =>{
+                    result.push(StrAndTab::new(
+                        format!("UndefOr.from_qv(qv).unwrap()"), 1));
+                },
+                VarType::Nullable =>{
+                    result.push(StrAndTab::new(
+                        format!("NullOr.from_qv(qv).unwrap()"), 1));
+                },
+                VarType::UndefNullable =>{
+                    result.push(StrAndTab::new(
+                        format!("qv"), 1));
+                },
             }
-            result.push(StrAndTab::new("}".to_string(), 0));
+
         },
         Contents::Set(g) =>{
+            let param = if g.vt == VarType::Normal{ format!("Qv::Val({})", &g.param_name)} else{ format!("{}.into_qv()", &g.param_name)};
             result.push(StrAndTab::new(
-                format!("{}::set_{}(unsafe{{ self.ptr.as_mut().unwrap() }}, \"{}\", {});", self_mod_name, &g.type_name_small, &g.param_name, &g.param_name), 1));
-            result.push(StrAndTab::new("}".to_string(), 0));
+                format!("{}::set_{}(unsafe{{ self.ptr.as_mut().unwrap() }}, \"{}\", {});", self_mod_name, &g.type_name_small, &g.param_name, &param), 1));
+
         },
     }
+    result.push(StrAndTab::new("}".to_string(), 0));
 
     result
 }
+

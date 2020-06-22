@@ -33,6 +33,8 @@ impl<T> Qv<T>{
             _ => None,
         }
     }
+
+    pub fn into_qv(self) -> Qv<T>{ self }
 }
 
 impl<T : Clone> Clone for Qv<T>{
