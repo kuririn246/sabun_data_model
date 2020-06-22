@@ -1,3 +1,4 @@
+mod compile_test;
 mod test;
 mod imp;
 

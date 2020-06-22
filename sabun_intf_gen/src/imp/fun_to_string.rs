@@ -1,5 +1,5 @@
-use crate::imp::fun::Fun;
 use crate::imp::fun::Contents;
+use crate::imp::fun::Fun;
 use crate::imp::str_and_tab::StrAndTab;
 
 pub(crate) fn fun_to_string(fun : &Fun, self_mod_name : &str) -> Vec<StrAndTab>{
@@ -12,17 +12,26 @@ pub(crate) fn fun_to_string(fun : &Fun, self_mod_name : &str) -> Vec<StrAndTab>{
     }
     s.pop(); s.pop();
 
-    s.push_str(&format!(") -> {} {{", &fun.result_type));
+    match &fun.result_type{
+        Some(t) =>{ s.push_str(&format!(") -> {} {{", t)); }
+        None =>{ s.push_str("){") }
+    }
+
     result.push(StrAndTab::new(s, 0));
 
 
     match &fun.contents{
         Contents::Get(g) =>{
-            let mut s = String::new();
-            s.push_str(&format!("{}::get_{}(self, \"{}\"", self_mod_name, &g.result_type_name_small, &fun.name));
-            result.push(StrAndTab::new(s, 1));
+
+            result.push(StrAndTab::new(
+                format!("{}::get_{}(unsafe{{ self.ptr.as_ref().unwrap() }}, \"{}\");", self_mod_name, &g.type_name_small, &fun.name), 1));
             result.push(StrAndTab::new("}".to_string(), 0));
-        }
+        },
+        Contents::Set(g) =>{
+            result.push(StrAndTab::new(
+                format!("{}::set_{}(unsafe{{ self.ptr.as_mut_ref().unwrap() }}, \"{}\", {});", self_mod_name, &g.type_name_small, &g.param_name, &g.param_name), 1));
+            result.push(StrAndTab::new("}".to_string(), 0));
+        },
     }
 
     result
