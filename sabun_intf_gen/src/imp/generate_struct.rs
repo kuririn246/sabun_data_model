@@ -1,12 +1,10 @@
-use crate::imp::fun::Impl;
 use crate::imp::fun_to_string::fun_to_string;
-use crate::imp::str_and_tab::StrAndTab;
+use crate::imp::structs::fun::Impl;
+use crate::imp::structs::sources::StructSource;
+use crate::imp::structs::str_and_tab::{str_and_tabs_to_string, StrAndTab};
 
-pub fn generate_struct(imp : &Impl) -> Vec<StrAndTab>{
-    let mut result : Vec<StrAndTab> = vec![];
-    result.push(StrAndTab::new("use sabun_maker::intf::*;".to_string(), 0));
-    result.push(StrAndTab::new("use sabun_maker::structs::*;".to_string(), 0));
-
+pub fn generate_struct(imp : &Impl) -> StructSource {
+    let mut result: Vec<StrAndTab> = vec![];
 
     result.push(StrAndTab::new(format!("pub struct {} {{", &imp.struct_name), 0));
     result.push(StrAndTab::new(format!("pub ptr : *mut {},", &imp.ptr_type), 1));
@@ -17,14 +15,16 @@ pub fn generate_struct(imp : &Impl) -> Vec<StrAndTab>{
 
     let s = format!("impl {} {{", &imp.struct_name);
     result.push(StrAndTab::new(s, 0));
-    for fun in &imp.funs{
+    for fun in &imp.funs {
         let fun_str_vec = fun_to_string(fun, &imp.self_mod_name);
-        for mut f in fun_str_vec{
+        for mut f in fun_str_vec {
             f.tab += 1;
             result.push(f);
         }
     }
     result.push(StrAndTab::new("}".to_string(), 0));
 
-    result
+    StructSource::new(
+        str_and_tabs_to_string(&result),
+       imp.struct_name.to_string())
 }

@@ -1,11 +1,13 @@
 use sabun_maker::intf::member_desc::{MemberDesc};
 use sabun_maker::structs::{RustMemberType, VarType};
+use crate::imp::structs::fun::{Fun, Proxy, Contents, GetC, Arg, SetC};
+use crate::imp::structs::struct_desc::StructDesc;
 
-use crate::imp::fun::{Arg, Contents, Fun, GetC, SetC, Proxy};
 
-pub fn create_funs(mems : &[MemberDesc], is_mut : bool) -> (Vec<Fun>, Vec<Proxy>) {
+pub fn create_funs(mems : &[MemberDesc], is_mut : bool) -> (Vec<Fun>, Vec<Proxy>, Vec<StructDesc>) {
     let mut funs : Vec<Fun> = vec![];
     let mut proxies : Vec<Proxy> = vec![];
+    let mut str_descs : Vec<StructDesc> = vec![];
 
     for mem in mems {
         match mem.member_type() {
@@ -21,7 +23,7 @@ pub fn create_funs(mems : &[MemberDesc], is_mut : bool) -> (Vec<Fun>, Vec<Proxy>
         }
     }
 
-    (funs,proxies)
+    (funs,proxies, str_descs)
 }
 
 fn fun_get(mem_name : &str, result_type : &str, type_name_small : &str, vt : &VarType, proxy_name : &str) -> Fun{

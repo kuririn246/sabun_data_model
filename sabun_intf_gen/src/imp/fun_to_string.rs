@@ -1,7 +1,6 @@
-use crate::imp::fun::Contents;
-use crate::imp::fun::Fun;
-use crate::imp::str_and_tab::StrAndTab;
 use sabun_maker::structs::VarType;
+use crate::imp::structs::fun::{Fun, Contents};
+use crate::imp::structs::str_and_tab::StrAndTab;
 
 pub(crate) fn fun_to_string(fun : &Fun, self_mod_name : &str) -> Vec<StrAndTab>{
     let mut result = Vec::new();
