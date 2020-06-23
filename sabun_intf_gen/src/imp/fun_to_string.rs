@@ -6,8 +6,8 @@ use sabun_maker::structs::VarType;
 pub(crate) fn fun_to_string(fun : &Fun, self_mod_name : &str) -> Vec<StrAndTab>{
     let mut result = Vec::new();
     let mut s = String::new();
-    let self_ = if fun.is_mut{ format!("&mut self") } else{ format!("&self") };
-    s.push_str(&format!("pub fn {}({}, ", &fun.name, self_));
+    //let self_ = if fun.is_mut{ format!("&mut self") } else{ format!("&self") };
+    s.push_str(&format!("pub fn {}(&mut self, ", &fun.name));
     for arg in &fun.args{
         s.push_str(&format!("{} : {}, ", &arg.name, &arg.arg_type));
     }
@@ -24,31 +24,45 @@ pub(crate) fn fun_to_string(fun : &Fun, self_mod_name : &str) -> Vec<StrAndTab>{
     match &fun.contents{
         Contents::Get(g) =>{
             result.push(StrAndTab::new(
+                format!("if let Some(v) = &self.{}{{", &g.proxy_name), 1));
+            result.push(StrAndTab::new(
+                format!("return v.clone();"), 2));
+            result.push(StrAndTab::new(
+                format!("}}"), 1));
+            result.push(StrAndTab::new(
                 format!("let qv = {}::get_{}(unsafe{{ self.ptr.as_ref().unwrap() }}, \"{}\").unwrap();", self_mod_name, &g.type_name_small, &fun.name), 1));
             match &g.vt {
                 VarType::Normal => {
                     result.push(StrAndTab::new(
-                            format!("qv.into_value().unwrap()"), 1));
+                            format!("let ans = qv.into_value().unwrap();"), 1));
                 },
                 VarType::Undefiable =>{
                     result.push(StrAndTab::new(
-                        format!("UndefOr.from_qv(qv).unwrap()"), 1));
+                        format!("let ans = UndefOr.from_qv(qv).unwrap();"), 1));
                 },
                 VarType::Nullable =>{
                     result.push(StrAndTab::new(
-                        format!("NullOr.from_qv(qv).unwrap()"), 1));
+                        format!("let ans = NullOr.from_qv(qv).unwrap();"), 1));
                 },
                 VarType::UndefNullable =>{
                     result.push(StrAndTab::new(
-                        format!("qv"), 1));
+                        format!("let ans = qv;"), 1));
                 },
             }
+            result.push(StrAndTab::new(
+                format!("self.{} = Some(ans);", &g.proxy_name), 1));
+            result.push(StrAndTab::new(
+                format!("return self.{}.clone().unwrap();", &g.proxy_name), 1));
 
         },
         Contents::Set(g) =>{
-            let param = if g.vt == VarType::Normal{ format!("Qv::Val({})", &g.param_name)} else{ format!("{}.into_qv()", &g.param_name)};
             result.push(StrAndTab::new(
-                format!("{}::set_{}(unsafe{{ self.ptr.as_mut().unwrap() }}, \"{}\", {});", self_mod_name, &g.type_name_small, &g.param_name, &param), 1));
+                format!("self.{} = Some({}.clone());", &g.proxy_name, &g.param_name), 1));
+            let param = if g.vt == VarType::Normal{ format!("Qv::Val({})", &g.param_name)} else{ format!("{}.into_qv()", &g.param_name)};
+
+            result.push(StrAndTab::new(
+                format!("{}::set_{}(unsafe{{ self.ptr.as_mut().unwrap() }}, \"{}\", {});",
+                        self_mod_name, &g.type_name_small, &g.param_name, &param), 1));
 
         },
     }

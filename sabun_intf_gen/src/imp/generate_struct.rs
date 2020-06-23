@@ -7,8 +7,14 @@ pub fn generate_struct(imp : &Impl) -> Vec<StrAndTab>{
     result.push(StrAndTab::new("use sabun_maker::intf::*;".to_string(), 0));
     result.push(StrAndTab::new("use sabun_maker::structs::*;".to_string(), 0));
 
-    let s = format!("pub struct {} {{ pub ptr : *mut {} }}", &imp.struct_name, &imp.ptr_type);
-    result.push(StrAndTab::new(s, 0));
+
+    result.push(StrAndTab::new(format!("pub struct {} {{", &imp.struct_name), 0));
+    result.push(StrAndTab::new(format!("pub ptr : *mut {},", &imp.ptr_type), 1));
+    for proxy in &imp.proxies {
+        result.push(StrAndTab::new(format!("{} : Option<{}>,", &proxy.name, &proxy.value_type), 1));
+    }
+    result.push(StrAndTab::new("}".to_string(), 0));
+
     let s = format!("impl {} {{", &imp.struct_name);
     result.push(StrAndTab::new(s, 0));
     for fun in &imp.funs{

@@ -8,10 +8,11 @@ use crate::imp::str_and_tab::str_and_tabs_to_string;
 
 pub fn generate_interface(root : &RootObject) -> String{
     let mem_descs = root::get_member_desc(root);
-    let funs = create_funs(&mem_descs, true);
+    let (funs, proxies) = create_funs(&mem_descs, true);
     let vec = generate_struct(&Impl{
         self_mod_name : "root".to_string(),
         funs,
+        proxies,
         struct_name : "Root".to_string(),
         ptr_type : "RootObject".to_string(),
     });
