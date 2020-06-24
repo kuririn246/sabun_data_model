@@ -35,6 +35,7 @@ impl MemberDescs{
     pub(crate) fn new(items : Vec<MemberDesc>) -> MemberDescs{ MemberDescs{ items, keys : None }}
     pub(crate) fn with_keys(items : Vec<MemberDesc>, keys : Vec<KeyItem>) -> MemberDescs{ MemberDescs{ items, keys : Some(keys) }}
     pub fn items(&self) -> &[MemberDesc]{ &self.items }
+    pub fn keys(&self) -> Option<&[KeyItem]>{ self.keys.as_ref().map(|a| a.as_slice()) }
 }
 
 #[derive(Debug, PartialEq, Clone)]

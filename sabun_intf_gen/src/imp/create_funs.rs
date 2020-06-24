@@ -24,11 +24,13 @@ pub fn create_funs(mems : &[MemberDesc], is_mut : bool) -> (Vec<Fun>, Vec<Proxy>
                 let type_name = to_type_name(mem.name());
                 let children = mem.child_descs().unwrap();
                 str_descs.push(StructDesc{
-                    struct_name : type_name.to_string(),
+                    item_struct_name : format!("{}Item", type_name),
+                    col_struct_name : format!("{}Data", type_name),
                     ptr_type : "*const ConstData".to_string(),
                     self_mod_name : "data".to_string(),
                     is_mut : false,
                     mem_descs : children.items().iter().map(|m|m.clone()).collect(),
+                    keys: children.keys().unwrap().iter().map(|k| k.clone()).collect(),
                 });
                 proxies.push(Proxy::new(&proxy_name, &type_name));
             }
