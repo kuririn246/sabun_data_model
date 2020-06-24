@@ -8,7 +8,7 @@ use crate::imp::structs::sources::{Sources, StructSource};
 use crate::imp::structs::struct_desc::StructDesc;
 
 pub fn generate_interface(root : &RootObject) -> Sources{
-    let mem_descs = root::get_member_desc(root);
+    let mem_descs = member_desc::get_member_desc(root);
     let (funs, proxies, descs) = create_funs(&mem_descs, true);
     let root : StructSource = generate_struct(&Impl{
         self_mod_name : "root".to_string(),

@@ -1,19 +1,17 @@
 use crate::imp::structs::rust_list::{MutList, MutListItem};
-use crate::imp::intf::member_desc::{MemberDescs, get_list_def_desc};
-use crate::imp::intf::ref_desc::{RefDescs, get_ref_def_desc};
 use crate::imp::intf::mut_list_item::MutListItemPtrs;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::mut_list_hash::MutListHash;
 
-pub fn get_member_desc(l : *const MutList) -> MemberDescs{
-    let l = unsafe{ l.as_ref().unwrap() };
-    get_list_def_desc(l.default())
-}
-
-pub fn get_ref_desc(l : *const MutList) -> RefDescs{
-    let l = unsafe{ l.as_ref().unwrap() };
-    get_ref_def_desc(l.default().refs())
-}
+// pub fn get_member_desc(l : *const MutList) -> MemberDescs{
+//     let l = unsafe{ l.as_ref().unwrap() };
+//     get_list_def_desc(l.default())
+// }
+//
+// pub fn get_ref_desc(l : *const MutList) -> RefDescs{
+//     let l = unsafe{ l.as_ref().unwrap() };
+//     get_ref_def_desc(l.default().refs())
+// }
 //
 // #[repr(C)]
 // #[derive(Debug, PartialEq, Clone, Copy)]

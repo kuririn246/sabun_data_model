@@ -1,54 +1,54 @@
 use crate::imp::structs::rust_list::{ConstData, ListItem};
-use crate::imp::intf::member_desc::{ get_list_def_desc, MemberDescs};
-use crate::imp::intf::ref_desc::{get_ref_def_desc, RefDescs};
 use crate::{HashM, HashS};
 use crate::imp::intf::list_item::ListItemPtrs;
 use crate::imp::structs::list_def_obj::ListDefObj;
 
-pub fn get_member_desc(root : *const ConstData) -> MemberDescs{
-    let root = unsafe{ root.as_ref().unwrap() };
-    get_list_def_desc(root.default())
-}
+// pub fn get_member_desc(root : *const ConstData) -> MemberDescs{
+//     let root = unsafe{ root.as_ref().unwrap() };
+//     get_list_def_desc(root.default())
+// }
 
-pub fn get_ref_desc(root : *const ConstData) -> RefDescs{
-    let root = unsafe{ root.as_ref().unwrap() };
-    get_ref_def_desc(root.default().refs())
-}
+// pub fn get_ref_desc(root : *const ConstData) -> RefDescs{
+//     let root = unsafe{ root.as_ref().unwrap() };
+//     get_ref_def_desc(root.default().refs())
+// }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct DataValue {
+pub struct DataKV {
     is_old : bool,
     id : String,
     item : *const ListItem,
 }
 
-impl DataValue {
+impl DataKV {
     ///utf-8とcstringの相互変換はcheckなしで安全に可能だよね・・・？
-    pub(crate) fn new(is_old : bool, id : String, item : *const ListItem) -> DataValue { DataValue { is_old, id, item }}
+    pub(crate) fn new(is_old : bool, id : String, item : *const ListItem) -> DataKV { DataKV { is_old, id, item }}
     pub fn is_old(&self) -> bool { self.is_old }
     pub fn id(&self) -> &str{ self.id.as_str() }
     pub fn item(&self) -> *const ListItem{ self.item }
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct DataValues {
-    items : Vec<DataValue>,
+pub struct DataKVs {
+    items : Vec<DataKV>,
     list_def : *const ListDefObj,
 }
 
-impl DataValues {
-    pub(crate) fn new(items : Vec<DataValue>, list_def : *const ListDefObj) -> DataValues { DataValues { items, list_def }}
+impl DataKVs {
+    pub(crate) fn new(items : Vec<DataKV>, list_def : *const ListDefObj) -> DataKVs { DataKVs { items, list_def }}
+    pub fn items(&self) -> &[DataKV]{ &self.items }
+    pub fn def(&self) -> *const ListDefObj{ self.list_def }
 }
 
-pub fn get_values(data : *const ConstData) -> DataValues {
+pub fn get_kvs(data : *const ConstData) -> DataKVs {
     let data = unsafe{ data.as_ref().unwrap() };
-    get_values_impl(data.default(), data.list(), data.old())
+    get_kvs_impl(data.default(), data.list(), data.old())
 }
 
-pub fn get_values_impl(list_def : &ListDefObj, data : &HashM<String, ListItem>, old : &HashS<String>) -> DataValues {
-    DataValues::new(data.iter().map(|(k,v)|
-        DataValue::new(old.contains(k), k.to_string(), v)).collect(),
-                    list_def)
+pub fn get_kvs_impl(list_def : &ListDefObj, data : &HashM<String, ListItem>, old : &HashS<String>) -> DataKVs {
+    DataKVs::new(data.iter().map(|(k,v)|
+        DataKV::new(old.contains(k), k.to_string(), v)).collect(),
+                 list_def)
 }
 
 pub fn get_value(data : *const ConstData, id : &str) -> Option<ListItemPtrs>{

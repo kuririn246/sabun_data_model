@@ -13,8 +13,8 @@ pub fn generate_struct(imp : &Impl) -> StructSource {
     }
     result.push(StrAndTab::new("}".to_string(), 0));
 
-    let s = format!("impl {} {{", &imp.struct_name);
-    result.push(StrAndTab::new(s, 0));
+    result.push(StrAndTab::new(
+        format!("impl {} {{", &imp.struct_name), 0));
     for fun in &imp.funs {
         let fun_str_vec = fun_to_string(fun, &imp.self_mod_name);
         for mut f in fun_str_vec {
@@ -22,7 +22,8 @@ pub fn generate_struct(imp : &Impl) -> StructSource {
             result.push(f);
         }
     }
-    result.push(StrAndTab::new("}".to_string(), 0));
+    result.push(StrAndTab::new(
+        "}".to_string(), 0));
 
     StructSource::new(
         str_and_tabs_to_string(&result),

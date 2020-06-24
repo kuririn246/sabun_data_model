@@ -2,7 +2,6 @@ use sabun_maker::intf::member_desc::{MemberDesc};
 use sabun_maker::structs::{RustMemberType, VarType};
 use crate::imp::structs::fun::{Fun, Proxy, Contents, GetC, Arg, SetC};
 use crate::imp::structs::struct_desc::StructDesc;
-use std::ops::Index;
 
 
 pub fn create_funs(mems : &[MemberDesc], is_mut : bool) -> (Vec<Fun>, Vec<Proxy>, Vec<StructDesc>) {
@@ -23,12 +22,13 @@ pub fn create_funs(mems : &[MemberDesc], is_mut : bool) -> (Vec<Fun>, Vec<Proxy>
             RustMemberType::Data =>{
                 let proxy_name = format!("p_{}", mem.name());
                 let type_name = to_type_name(mem.name());
+                let children = mem.child_descs().unwrap();
                 str_descs.push(StructDesc{
                     struct_name : type_name.to_string(),
-                    ptr_type : "ConstData".to_string(),
+                    ptr_type : "*const ConstData".to_string(),
                     self_mod_name : "data".to_string(),
                     is_mut : false,
-                    mem_descs :
+                    mem_descs : children.items().iter().map(|m|m.clone()).collect(),
                 });
                 proxies.push(Proxy::new(&proxy_name, &type_name));
             }
@@ -40,15 +40,15 @@ pub fn create_funs(mems : &[MemberDesc], is_mut : bool) -> (Vec<Fun>, Vec<Proxy>
 }
 
 fn to_type_name(s : &str) -> String{
-    let mut s = String::with_capacity(s.len());
+    let mut r = String::with_capacity(s.len());
     for (i,c) in s.chars().enumerate(){
         if i == 0{
-            s.push(c.to_ascii_uppercase());
+            r.push(c.to_ascii_uppercase());
         } else{
-            s.push(c)
+            r.push(c)
         }
     }
-    s
+    r
 }
 
 fn fun_get(mem_name : &str, result_type : &str, type_name_small : &str, vt : &VarType, proxy_name : &str) -> Fun{
