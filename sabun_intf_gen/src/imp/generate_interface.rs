@@ -6,22 +6,30 @@ use crate::imp::generate_struct::generate_struct;
 use crate::imp::structs::fun::Impl;
 use crate::imp::structs::sources::{Sources, StructSource};
 use crate::imp::structs::struct_desc::StructDesc;
+use crate::imp::create_desc_tree::create_desc_tree;
 
 pub fn generate_interface(root : &RootObject) -> Sources{
     let mem_descs = member_desc::get_member_desc(root);
-    let (funs, proxies, descs) = create_funs(&mem_descs, true);
-    let root : StructSource = generate_struct(&Impl{
-        self_mod_name : "root".to_string(),
-        funs,
-        proxies,
-        struct_name : "RootPtr".to_string(),
-        ptr_type : "RootObject".to_string(),
-    });
+    let ans = create_desc_tree(&mem_descs);
+    let root_desc = StructDesc{
+        mem_descs,
+        keys
+    };
 
-    let mut vec : Vec<StructSource> = vec![];
-    for desc in &descs {
-        vec.append(&mut generate_str_source(desc));
-    }
+
+    // let (funs, proxies, descs) = create_funs(&mem_descs, true);
+    // let root : StructSource = generate_struct(&Impl{
+    //     self_mod_name : "root".to_string(),
+    //     funs,
+    //     proxies,
+    //     struct_name : "RootPtr".to_string(),
+    //     ptr_type : "RootObject".to_string(),
+    // });
+    //
+    // let mut vec : Vec<StructSource> = vec![];
+    // for desc in &descs {
+    //     vec.append(&mut generate_str_source(desc));
+    // }
 
     let usings = "use sabun_maker::intf::*;\nuse sabun_maker::structs::*;".to_string();
     Sources::new(usings, root.source, vec)

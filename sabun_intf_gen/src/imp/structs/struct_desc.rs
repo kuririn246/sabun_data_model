@@ -7,5 +7,5 @@ pub struct StructDesc{
     pub(crate) ptr_type : String,
     pub(crate) mem_descs : Vec<MemberDesc>,
     pub(crate) is_mut : bool,
-    pub(crate) keys : Vec<KeyItem>,
+    pub(crate) keys : Option<Vec<KeyItem>>,
 }

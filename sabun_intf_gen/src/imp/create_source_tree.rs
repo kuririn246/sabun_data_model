@@ -2,9 +2,10 @@ use sabun_maker::intf::member_desc::{MemberDesc};
 use sabun_maker::structs::{RustMemberType, VarType};
 use crate::imp::structs::fun::{Fun, Proxy, Contents, GetC, Arg, SetC};
 use crate::imp::structs::struct_desc::StructDesc;
+use crate::imp::structs::source_tree::SourceTree;
 
 
-pub fn create_source_tree(mems : &StructDesc) -> (Vec<Fun>, Vec<Proxy>, Vec<StructDesc>) {
+pub fn create_source_tree(mems : &StructDesc) -> SourceTree {
     let mut funs : Vec<Fun> = vec![];
     let mut proxies : Vec<Proxy> = vec![];
     let mut str_descs : Vec<StructDesc> = vec![];

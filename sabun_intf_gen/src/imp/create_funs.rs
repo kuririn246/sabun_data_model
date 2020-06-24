@@ -41,17 +41,7 @@ pub fn create_funs(mems : &[MemberDesc], is_mut : bool) -> (Vec<Fun>, Vec<Proxy>
     (funs,proxies, str_descs)
 }
 
-fn to_type_name(s : &str) -> String{
-    let mut r = String::with_capacity(s.len());
-    for (i,c) in s.chars().enumerate(){
-        if i == 0{
-            r.push(c.to_ascii_uppercase());
-        } else{
-            r.push(c)
-        }
-    }
-    r
-}
+
 
 fn fun_get(mem_name : &str, result_type : &str, type_name_small : &str, vt : &VarType, proxy_name : &str) -> Fun{
     Fun::new(mem_name, vec![], &with_var(result_type, vt),
