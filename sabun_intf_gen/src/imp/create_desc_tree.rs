@@ -4,12 +4,20 @@ use crate::imp::structs::fun::{Fun, Proxy, Contents, GetC, Arg, SetC};
 use crate::imp::structs::struct_desc::StructDesc;
 use crate::imp::structs::source_tree::SourceTree;
 use crate::imp::util::to_type_name::to_type_name;
+use crate::imp::structs::struct_desc_tree::StructDescTree;
+
+pub fn create_desc_tree_root(mems : &[MemberDesc]) -> StructDescTree{
+
+}
 
 pub fn create_desc_tree(mems : &[MemberDesc]) -> Vec<StructDesc> {
     let mut r :Vec<StructDesc> = vec![];
 
     for mem in mems {
         match mem.member_type() {
+            RustMemberType::Bool =>{
+
+            },
             RustMemberType::Data =>{
                 let type_name = to_type_name(mem.name());
                 let children = mem.child_descs().unwrap();

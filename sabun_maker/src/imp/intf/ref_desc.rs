@@ -29,7 +29,7 @@ impl RefDescs{
     pub fn items(&self) -> &[RefDesc]{ &self.items }
 }
 
-pub fn get_ref_def_desc(def : *const RefDefObj) -> RefDescs{
+pub fn get_ref_def_desc(def : *const RefDefObj) -> Option<RefDescs>{
     let def = unsafe{ def.as_ref().unwrap() };
     let mut vec : Vec<RefDesc> = Vec::with_capacity(def.refs().len());
     for (k,val) in def.refs(){
