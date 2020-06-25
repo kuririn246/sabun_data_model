@@ -30,14 +30,17 @@ impl MemberDesc{
 #[derive(Debug, PartialEq, Clone)]
 pub struct MemberDescs{
     items : Vec<MemberDesc>,
-    keys : Option<Vec<KeyItem>>,
-    refs : Option<RefDescs>,
+    keys : Vec<KeyItem>,
+    refs : RefDescs,
 }
 impl MemberDescs{
-    pub(crate) fn new(items : Vec<MemberDesc>, refs : Option<RefDescs>) -> MemberDescs{ MemberDescs{ items, keys : None, refs }}
-    pub(crate) fn with_keys(items : Vec<MemberDesc>, refs : Option<RefDescs>, keys : Vec<KeyItem>) -> MemberDescs{ MemberDescs{ items, refs, keys : Some(keys) }}
+    pub(crate) fn new(items : Vec<MemberDesc>, refs : RefDescs) -> MemberDescs{ MemberDescs{ items, keys : vec![], refs }}
+    pub(crate) fn with_keys(items : Vec<MemberDesc>, refs : RefDescs, keys : Vec<KeyItem>) -> MemberDescs{
+        MemberDescs{ items, refs, keys }
+    }
     pub fn items(&self) -> &[MemberDesc]{ &self.items }
-    pub fn keys(&self) -> Option<&[KeyItem]>{ self.keys.as_ref().map(|a| a.as_slice()) }
+    pub fn keys(&self) -> &[KeyItem]{ &self.keys }
+    pub fn refs(&self) -> &RefDescs{ &self.refs }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -74,12 +77,14 @@ pub fn get_member_desc(root : *const RootObject) -> Vec<MemberDesc>{
             },
             RootValue::List(l) =>{
                 let children = get_list_def_desc(l.default());
-                let descs = MemberDescs::new(children);
+                let refs = get_ref_def_desc(l.default().refs());
+                let descs = MemberDescs::new(children, refs);
                 vec.push(MemberDesc::new(mem, VarType::Normal, RustMemberType::List, is_old, Some(descs)))
             },
             RootValue::Mut(m) =>{
                 let children = get_list_def_desc(m.default());
-                let descs = MemberDescs::new(children);
+                let refs = get_ref_def_desc(m.default().refs());
+                let descs = MemberDescs::new(children, refs);
                 vec.push(MemberDesc::new(mem, VarType::Normal, RustMemberType::Mut, is_old, Some(descs)))
             },
         };
@@ -92,18 +97,34 @@ pub fn get_list_def_desc(def : &ListDefObj) -> Vec<MemberDesc>{
     for (k,val) in def.default(){
         let mem = k.to_string();
         let is_old = def.old().contains(k);
-        let (mt, vt, def) = match val{
+        match val{
             ListDefValue::Param(p, vt) =>{
-                (p.type_num(), vt.clone(), None)
+                vec.push(MemberDesc::new(mem, vt.clone(), p.type_num(),
+                                         is_old, None));
             },
-            ListDefValue::InnerDataDef(d) => (RustMemberType::InnerData, VarType::Normal, Some(get_list_def_desc(&d))),
-            ListDefValue::InnerListDef(d) => (RustMemberType::InnerList, VarType::Normal, Some(get_list_def_desc(&d))),
-            ListDefValue::InnerMutDef(d) =>
-                (RustMemberType::InnerMut,
-                 if d.undefinable(){ VarType::Undefiable } else{ VarType::Normal },
-                 Some(get_list_def_desc(d.list_def()))),
-        };
-        vec.push(MemberDesc::new(mem, vt, mt, is_old, def.map(|d| MemberDescs::new(d))));
+            ListDefValue::InnerDataDef(d) =>{
+                let ld = get_list_def_desc(d);
+                let rd = get_ref_def_desc(d.refs());
+                vec.push(MemberDesc::new(
+                    mem, VarType::Normal, RustMemberType::InnerData,
+                    is_old,Some(MemberDescs::new(ld, rd))));
+            },
+            ListDefValue::InnerListDef(d) =>{
+                let ld = get_list_def_desc(d);
+                let rd = get_ref_def_desc(d.refs());
+                vec.push(MemberDesc::new(
+                    mem, VarType::Normal, RustMemberType::InnerList,
+                    is_old,Some(MemberDescs::new(ld, rd))));
+            },
+            ListDefValue::InnerMutDef(d) =>{
+                let ld = get_list_def_desc(d.list_def());
+                let rd = get_ref_def_desc(d.list_def().refs());
+                let vt = if d.undefinable(){ VarType::Undefiable } else{ VarType::Normal };
+                vec.push(MemberDesc::new(
+                    mem, vt, RustMemberType::InnerMut,
+                         is_old,Some(MemberDescs::new(ld, rd))));
+            }
+        }
     }
     vec
 }

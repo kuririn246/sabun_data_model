@@ -11,7 +11,7 @@ mod tests {
         match json_dir_to_rust("src/json_dir/test", true) {
             Ok(a) => {
                 let ans = generate_interface(&a);
-                println!("{}", ans.to_string());
+                //println!("{}", ans.to_string());
             },
             Err(e) => { println!("val 1 {}", e.message) }
         }

@@ -1,13 +1,5 @@
 use sabun_maker::structs::VarType;
 
-pub struct Impl{
-    pub(crate) funs : Vec<Fun>,
-    pub(crate) self_mod_name : String,
-    pub(crate) struct_name : String,
-    pub(crate) ptr_type : String,
-    pub(crate) proxies : Vec<Proxy>,
-}
-
 pub struct Fun{
     pub(crate) name : String,
     pub(crate) args : Vec<Arg>,
@@ -33,16 +25,6 @@ pub struct Arg{
 impl Arg{
     pub fn new(name : &str, arg_type : &str) -> Arg{
         Arg{ name : name.to_string(), arg_type : arg_type.to_string() }
-    }
-}
-
-pub struct Proxy{
-    pub(crate) name : String,
-    pub(crate) value_type : String,
-}
-impl Proxy{
-    pub fn new(name : &str, value_type : &str) -> Proxy{
-        Proxy{ name : name.to_string(), value_type : value_type.to_string() }
     }
 }
 

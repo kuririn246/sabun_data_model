@@ -1,37 +1,43 @@
-use sabun_maker::intf::member_desc::{MemberDesc, KeyItem};
-use sabun_maker::structs::{VarType, RustMemberType};
+use sabun_maker::intf::member_desc::{KeyItem};
+use sabun_maker::structs::{VarType};
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct StructDesc{
     pub(crate) col_mod_name : String,
     pub(crate) item_mod_name : String,
     pub(crate) col_struct_name : String,
     pub(crate) item_struct_name : String,
     pub(crate) col_type : ColType,
-    pub(crate) ptr_type : String,
-    pub(crate) param_descs : Vec<ParamDesc>,
+    pub(crate) col_ptr_type : String,
+    pub(crate) item_ptr_type : String,
+    pub(crate) params : Vec<ParamItem>,
+    pub(crate) refs : Vec<RefItem>,
+    pub(crate) ref_is_enum : bool,
     pub(crate) is_mut : bool,
-    pub(crate) keys : Option<Vec<KeyItem>>,
-    pub(crate) col_undefiable : bool
+    pub(crate) keys : Vec<KeyItem>,
+    pub(crate) col_undefiable : bool,
+    pub(crate) children : Vec<StructDesc>,
 }
 
-pub enum ColType{ Data, List }
+#[derive(Debug, Clone, PartialEq)]
+pub enum ColType{ Data, List, Root }
 
-pub struct ParamDesc{
+#[derive(Debug, Clone, PartialEq)]
+pub struct ParamItem{
     pub(crate) is_old : bool,
     pub(crate) name : String,
     pub(crate) var_type : VarType,
     pub(crate) param_type : ParamType
 }
-impl ParamDesc {
-    pub fn new(mem: &MemberDesc) -> ParamDesc {
 
-    }
-}
+#[derive(Debug, Clone, PartialEq)]
 pub enum ParamType{
-    Bool, Num, Str, NumArray, StrArray, NumArray2
+    Bool, //Num, Str, NumArray, StrArray, NumArray2
 }
-impl ParamType{
-    pub fn new(t : &RustMemberType){
-        RustMemberType::
-    }
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct RefItem{
+    pub(crate) is_old : bool,
+    pub(crate) name : String,
+    pub(crate) var_type : VarType,
 }

@@ -1,13 +1,13 @@
 use crate::imp::fun_to_string::fun_to_string;
-use crate::imp::structs::fun::Impl;
 use crate::imp::structs::sources::StructSource;
 use crate::imp::structs::str_and_tab::{str_and_tabs_to_string, StrAndTab};
+use crate::imp::structs::struct_temp::StructTemp;
 
-pub fn generate_struct(imp : &Impl) -> StructSource {
+pub fn to_source_from_struct_temp(imp : &StructTemp) -> StructSource {
     let mut result: Vec<StrAndTab> = vec![];
 
     result.push(StrAndTab::new(format!("pub struct {} {{", &imp.struct_name), 0));
-    result.push(StrAndTab::new(format!("pub ptr : *mut {},", &imp.ptr_type), 1));
+    result.push(StrAndTab::new(format!("pub ptr : {},", &imp.ptr_type), 1));
     for proxy in &imp.proxies {
         result.push(StrAndTab::new(format!("{} : Option<{}>,", &proxy.name, &proxy.value_type), 1));
     }

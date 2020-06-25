@@ -6,7 +6,7 @@ impl RefDesc{
         RefDesc{ name, value_type, is_old }
     }
     pub fn name(&self) -> &str{ &self.name }
-    pub fn value_type(&self) -> &VarType { &self.value_type }
+    pub fn var_type(&self) -> &VarType { &self.value_type }
     pub fn is_old(&self) -> bool{ self.is_old }
 }
 
@@ -29,7 +29,7 @@ impl RefDescs{
     pub fn items(&self) -> &[RefDesc]{ &self.items }
 }
 
-pub fn get_ref_def_desc(def : *const RefDefObj) -> Option<RefDescs>{
+pub fn get_ref_def_desc(def : *const RefDefObj) -> RefDescs{
     let def = unsafe{ def.as_ref().unwrap() };
     let mut vec : Vec<RefDesc> = Vec::with_capacity(def.refs().len());
     for (k,val) in def.refs(){
