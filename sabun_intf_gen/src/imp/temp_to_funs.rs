@@ -1,11 +1,15 @@
-// use sabun_maker::structs::VarType;
-// use crate::imp::structs::fun::{Fun, Contents};
-// use crate::imp::structs::str_and_tab::StrAndTab;
+// use crate::imp::structs::struct_temp::StructTemp;
 //
-// pub(crate) fn fun_to_string(fun : &Fun, self_mod_name : &str) -> Vec<StrAndTab>{
+// pub struct Ret{
+//     pub(crate) proxy : String,
+//     pub(crate) fun_srouce : String,
+// }
+//
+// pub fn temp_to_funs(temp : &StructTemp) -> Vec<Ret>{
 //     let mut result = Vec::new();
 //     let mut s = String::new();
-//     //let self_ = if fun.is_mut{ format!("&mut self") } else{ format!("&self") };
+//
+//     for param in temp.
 //     s.push_str(&format!("pub fn {}(&mut self, ", &fun.name));
 //     for arg in &fun.args{
 //         s.push_str(&format!("{} : {}, ", &arg.name, &arg.arg_type));
@@ -33,7 +37,7 @@
 //             match &g.vt {
 //                 VarType::Normal => {
 //                     result.push(StrAndTab::new(
-//                             format!("let ans = qv.into_value().unwrap();"), 1));
+//                         format!("let ans = qv.into_value().unwrap();"), 1));
 //                 },
 //                 VarType::Undefiable =>{
 //                     result.push(StrAndTab::new(

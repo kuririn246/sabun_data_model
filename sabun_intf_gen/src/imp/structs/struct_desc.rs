@@ -9,6 +9,7 @@ pub struct StructDesc{
     pub(crate) item_struct_name : String,
     pub(crate) col_type : ColType,
     pub(crate) col_ptr_type : String,
+    pub(crate) col_is_old : bool,
     pub(crate) item_ptr_type : String,
     pub(crate) params : Vec<ParamItem>,
     pub(crate) refs : Vec<RefItem>,

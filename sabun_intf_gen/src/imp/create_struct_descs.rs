@@ -16,6 +16,7 @@ pub fn create_struct_desc_root(mems : &[MemberDesc]) -> StructDesc{
         col_mod_name : String::new(),
         col_type : ColType::Root,
         col_undefiable : false,
+        col_is_old : false,
         item_mod_name : "root".to_string(),
         params,
         ref_is_enum : false,
@@ -56,6 +57,7 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     item_ptr_type: "*const ListItem".to_string(),
                     col_undefiable : false,
                     col_type: ColType::Data,
+                    col_is_old : mem.is_old(),
                     ref_is_enum : children.refs().is_enum(),
                     is_mut : false,
 
