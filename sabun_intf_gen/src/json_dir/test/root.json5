@@ -1,3 +1,10 @@
 {
-	bu : false
+	bu : false,
+	col : ["Data",
+		[{ nakabu : true }],
+		{
+			ID : "huga",
+			nakabu : false
+		}
+	],
 }

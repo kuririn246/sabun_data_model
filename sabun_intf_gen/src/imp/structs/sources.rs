@@ -28,12 +28,20 @@ impl Sources{
 }
 
 pub struct StructSource{
-    pub(crate) source : String,
-    pub(crate) struct_name : String,
+    source : String,
+    struct_name : String,
 }
 
 impl StructSource{
-    pub fn new(source : String, struct_name : String) -> StructSource{ StructSource{ source, struct_name } }
+    pub(crate) fn new(source : String, struct_name : String) -> StructSource{ StructSource{ source, struct_name } }
     pub fn source(&self) -> &str{ &self.source }
     pub fn struct_name(&self) -> &str{ &self.struct_name }
 }
+
+pub struct SourceTree{
+    pub(crate) item_source : StructSource,
+    pub(crate) col_source : StructSource,
+    pub(crate) children : Vec<SourceTree>
+}
+
+

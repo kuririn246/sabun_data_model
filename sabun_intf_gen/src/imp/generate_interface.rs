@@ -2,47 +2,53 @@ use sabun_maker::intf::*;
 use sabun_maker::structs::RootObject;
 
 use crate::imp::create_struct_descs::create_struct_desc_root;
+use crate::imp::structs::struct_desc::StructDesc;
+use crate::imp::structs::sources::{SourceTree, StructSource, Sources};
+use crate::imp::to_source_from_col_temp::to_source_from_col_temp;
+use crate::imp::to_col_temp_from_struct_desc::{to_col_temp_from_struct_desc};
+use crate::imp::to_struct_temp_from_struct_desc::to_struct_temp_from_struct_desc;
+use crate::imp::to_source_from_struct_temp::to_source_from_struct_temp;
 
-pub fn generate_interface(root : &RootObject) {//-> Sources{
+pub fn generate_interface(root : &RootObject) -> Sources{
     let mem_descs = member_desc::get_member_desc(root);
-    let ans = create_struct_desc_root(&mem_descs);
+    let desc = create_struct_desc_root(&mem_descs);
 
+    let st = to_struct_temp_from_struct_desc(&desc);
+    let root= to_source_from_struct_temp(&st);
 
-
-    // let (funs, proxies, descs) = create_funs(&mem_descs, true);
-    // let root : StructSource = generate_struct(&Impl{
-    //     self_mod_name : "root".to_string(),
-    //     funs,
-    //     proxies,
-    //     struct_name : "RootPtr".to_string(),
-    //     ptr_type : "RootObject".to_string(),
-    // });
-    //
-    // let mut vec : Vec<StructSource> = vec![];
-    // for desc in &descs {
-    //     vec.append(&mut generate_str_source(desc));
-    // }
+    let mut vec : Vec<StructSource> = vec![];
+    for child in &desc.children{
+        let tree = generate_source_tree(child);
+        flatten(&mut vec, tree);
+    }
 
     let usings = "use sabun_maker::intf::*;\nuse sabun_maker::structs::*;".to_string();
-    //Sources::new(usings, root.source, vec)
+    Sources::new(usings, root.source().to_string(), vec)
 }
 
-// fn generate_str_source(desc : &StructDesc) -> Vec<StructSource>{
-//     let (funs, proxies, descs) =
-//         create_funs(&desc.mem_descs, desc.is_mut);
-//
-//     let s : StructSource = generate_struct(&Impl{
-//         self_mod_name : desc.self_mod_name.to_string(),
-//         funs,
-//         proxies,
-//         struct_name : desc.struct_name.to_string(),
-//         ptr_type : desc.ptr_type.to_string(),
-//     });
-//     let mut result = vec![s];
-//
-//     for desc in &descs{
-//         result.append(&mut generate_str_source(desc));
-//     }
-//
-//     result
-// }
+fn generate_source_tree(desc : &StructDesc) -> SourceTree{
+    let col_temp = to_col_temp_from_struct_desc(desc);
+    let struct_temp = to_struct_temp_from_struct_desc(desc);
+
+    let col_source = to_source_from_col_temp(&col_temp);
+    let item_source = to_source_from_struct_temp(&struct_temp);
+
+    let mut vec : Vec<SourceTree> = vec![];
+    for child in &desc.children{
+        vec.push(generate_source_tree(child));
+    }
+
+    SourceTree{
+        item_source,
+        col_source,
+        children : vec
+    }
+}
+
+fn flatten(vec : &mut Vec<StructSource>, tree : SourceTree){
+    vec.push(tree.col_source);
+    vec.push(tree.item_source);
+    for child in tree.children{
+        flatten(vec, child);
+    }
+}

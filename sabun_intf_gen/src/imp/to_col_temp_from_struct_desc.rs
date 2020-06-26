@@ -1,7 +1,7 @@
 use crate::imp::structs::struct_desc::StructDesc;
 use crate::imp::structs::struct_temp::ColTemp;
 
-pub fn from_struct_desc(d : &StructDesc) -> ColTemp{
+pub fn to_col_temp_from_struct_desc(d : &StructDesc) -> ColTemp{
     ColTemp{
         self_mod_name: d.col_mod_name.to_string(),
         struct_name: d.col_struct_name.to_string(),
