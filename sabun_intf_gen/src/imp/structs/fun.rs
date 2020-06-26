@@ -2,8 +2,8 @@ use sabun_maker::structs::VarType;
 
 pub struct Fun{
     pub(crate) name : String,
-    pub(crate) args : Vec<Arg>,
-    pub(crate) result_type : Option<String>,
+    //pub(crate) args : Vec<Arg>,
+    //pub(crate) result_type : Option<String>,
     //pub(crate) is_mut : bool,
     pub(crate) contents : Contents,
 }
@@ -13,8 +13,9 @@ impl Fun{
     //pub(crate) fn new_c(name : String, args : Vec<Arg>, result_type : Option<String>, is_mut : bool, contents : Contents) -> Fun{
       //  Fun{ name, args, result_type, is_mut, contents }
     //}
-    pub(crate) fn new(name : &str, args : Vec<Arg>, result_type : &str, contents : Contents) -> Fun{
-        Fun{ name : name.to_string(), args, result_type : to_opt_string(result_type), contents }
+    //pub(crate) fn new(name : &str, args : Vec<Arg>, result_type : &str, contents : Contents) -> Fun{
+    pub(crate) fn new(name : &str, contents : Contents) -> Fun{
+        Fun{ name : name.to_string(),  contents }
     }
 }
 
