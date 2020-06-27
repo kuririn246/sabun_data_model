@@ -5,8 +5,14 @@ use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_list::{ConstData, ConstList, MutList};
 
-pub fn get_bool(root : *const RootObject, name : &str) -> Option<Qv<bool>>{
-    let root = unsafe{ root.as_ref().unwrap() };
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub struct RootObjectPtr{
+    ptr : *mut RootObject
+}
+pub fn new(ptr : *mut RootObject) -> RootObjectPtr{ RootObjectPtr{ ptr } }
+
+pub fn get_bool(root : RootObjectPtr, name : &str) -> Option<Qv<bool>>{
+    let root = unsafe{ root.ptr.as_ref().unwrap() };
     if let Some(RustParam::Bool(b)) = get_param(root.default(), root.sabun(), name){
         Some(b.clone())
     } else{
@@ -14,8 +20,8 @@ pub fn get_bool(root : *const RootObject, name : &str) -> Option<Qv<bool>>{
     }
 }
 
-pub fn get_data(root : *const RootObject, name : &str) -> Option<*const ConstData>{
-    let root = unsafe{ root.as_ref().unwrap() };
+pub fn get_data(root : RootObjectPtr, name : &str) -> Option<*const ConstData>{
+    let root = unsafe{ root.ptr.as_ref().unwrap() };
     if let Some(RootValue::Data(d)) = root.default().get(name){
         Some(d as *const ConstData)
     } else{ None }

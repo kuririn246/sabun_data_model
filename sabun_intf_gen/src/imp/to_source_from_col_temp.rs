@@ -1,12 +1,13 @@
 use crate::imp::structs::sources::StructSource;
 use crate::imp::structs::str_and_tab::{str_and_tabs_to_string, StrAndTab};
 use crate::imp::structs::struct_temp::ColTemp;
+use crate::imp::structs::struct_desc::StructDesc;
 
-pub fn to_source_from_col_temp(imp : &ColTemp) -> StructSource {
+pub fn to_source_from_col_temp(imp : &StructDesc) -> StructSource {
     let mut result: Vec<StrAndTab> = vec![];
 
-    result.push(StrAndTab::new(format!("pub struct {} {{", &imp.struct_name), 0));
-    result.push(StrAndTab::new(format!("pub ptr : {},", &imp.ptr_type), 1));
+    result.push(StrAndTab::new(format!("pub struct {} {{", &imp.col_struct_name), 0));
+    result.push(StrAndTab::new(format!("pub ptr : {},", &imp.col_ptr_type), 1));
     result.push(StrAndTab::new("}".to_string(), 0));
 
     result.push(StrAndTab::new(

@@ -12,7 +12,7 @@ pub fn create_struct_desc_root(mems : &[MemberDesc]) -> StructDesc{
         keys : vec![],
         col_struct_name : String::new(),
         is_mut : true,
-        item_ptr_type : format!("*mut RootObject"),
+        item_ptr_type : format!("RootObjectPtr"),
         col_mod_name : String::new(),
         col_type : ColType::Root,
         col_undefiable : false,
@@ -53,14 +53,13 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     col_mod_name : "data".to_string(),
                     item_struct_name : format!("{}Item", type_name),
                     col_struct_name : format!("{}Data", type_name),
-                    col_ptr_type : "*const ConstData".to_string(),
-                    item_ptr_type: "*const ListItem".to_string(),
+                    col_ptr_type : "ConstDataPtr".to_string(),
+                    item_ptr_type: "ListItemPtr".to_string(),
                     col_undefiable : false,
                     col_type: ColType::Data,
                     col_is_old : mem.is_old(),
                     ref_is_enum : children.refs().is_enum(),
                     is_mut : false,
-
                 });
             }
             _=>{},

@@ -1,6 +1,6 @@
 use crate::imp::intf::data::{DataKVs, get_kvs_impl, get_value_impl};
 use crate::imp::structs::rust_list::InnerData;
-use crate::imp::intf::list_item::ListItemPtrs;
+use crate::imp::intf::list_item::ListItemPtr;
 use crate::imp::structs::list_def_obj::ListDefObj;
 
 #[repr(C)]
@@ -21,7 +21,7 @@ pub fn get_values(ps: InnerDataPtrs) -> DataKVs {
     get_kvs_impl(list_def, data.list(), data.old())
 }
 
-pub fn get_value(ps : InnerDataPtrs, id : &str) -> Option<ListItemPtrs>{
+pub fn get_value(ps : InnerDataPtrs, id : &str) -> Option<ListItemPtr>{
     let (data, list_def) = unsafe{ (ps.data.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     get_value_impl(data.list(), list_def, id)
 }
