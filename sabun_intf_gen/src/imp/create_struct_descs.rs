@@ -48,7 +48,7 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     children : descs,
                     refs,
                     params,
-                    keys : vec![],
+                    keys : children.keys().iter().map(|k| k.clone()).collect(),
                     item_mod_name : "list_item".to_string(),
                     col_mod_name : "data".to_string(),
                     item_struct_name : format!("{}Item", type_name),

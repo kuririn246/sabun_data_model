@@ -1,7 +1,6 @@
-use sabun_maker::intf::member_desc::KeyItem;
-use crate::imp::structs::struct_desc::{ColType};
 
 pub struct StructTemp {
+    pub(crate) new : String,
     pub(crate) funs : Vec<String>,
     pub(crate) proxies : Vec<String>,
     pub(crate) self_mod_name : String,

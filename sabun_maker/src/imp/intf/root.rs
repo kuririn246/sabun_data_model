@@ -3,7 +3,8 @@ use crate::imp::structs::qv::Qv;
 use crate::HashM;
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::rust_param::RustParam;
-use crate::imp::structs::rust_list::{ConstData, ConstList, MutList};
+use crate::imp::structs::rust_list::{ConstList, MutList};
+use crate::imp::intf::ConstDataPtr;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct RootObjectPtr{
@@ -20,10 +21,10 @@ pub fn get_bool(root : RootObjectPtr, name : &str) -> Option<Qv<bool>>{
     }
 }
 
-pub fn get_data(root : RootObjectPtr, name : &str) -> Option<*const ConstData>{
+pub fn get_data(root : RootObjectPtr, name : &str) -> Option<ConstDataPtr>{
     let root = unsafe{ root.ptr.as_ref().unwrap() };
     if let Some(RootValue::Data(d)) = root.default().get(name){
-        Some(d as *const ConstData)
+        Some(ConstDataPtr::new(d))
     } else{ None }
 }
 
@@ -53,8 +54,8 @@ pub fn get_param<'a>(def : &'a HashM<String, RootValue>, sab : &'a HashM<String,
     } else { None }
 }
 
-pub fn set_bool(root : *mut RootObject, name : &str, val : Qv<bool>) -> bool{
-    let root = unsafe{ root.as_mut().unwrap() };
+pub fn set_bool(root : RootObjectPtr, name : &str, val : Qv<bool>) -> bool{
+    let root = unsafe{ root.ptr.as_mut().unwrap() };
     match root.set_sabun(name.to_string(), RustParam::Bool(val)){
         Ok(_) => true,
         Err(_) => false,

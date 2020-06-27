@@ -5,7 +5,6 @@ use crate::imp::create_struct_descs::create_struct_desc_root;
 use crate::imp::structs::struct_desc::StructDesc;
 use crate::imp::structs::sources::{SourceTree, StructSource, Sources};
 use crate::imp::to_source_from_col_temp::to_source_from_col_temp;
-use crate::imp::to_col_temp_from_struct_desc::{to_col_temp_from_struct_desc};
 use crate::imp::to_struct_temp_from_struct_desc::to_struct_temp_from_struct_desc;
 use crate::imp::to_source_from_struct_temp::to_source_from_struct_temp;
 
@@ -27,10 +26,9 @@ pub fn generate_interface(root : &RootObject) -> Sources{
 }
 
 fn generate_source_tree(desc : &StructDesc) -> SourceTree{
-    let col_temp = to_col_temp_from_struct_desc(desc);
     let struct_temp = to_struct_temp_from_struct_desc(desc);
 
-    let col_source = to_source_from_col_temp(&col_temp);
+    let col_source = to_source_from_col_temp(&desc);
     let item_source = to_source_from_struct_temp(&struct_temp);
 
     let mut vec : Vec<SourceTree> = vec![];

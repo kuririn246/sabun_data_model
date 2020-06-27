@@ -7,3 +7,7 @@ pub mod list_item;
 pub mod data;
 pub mod member_desc;
 pub mod root;
+
+pub use root::RootObjectPtr as RootObjectPtr;
+pub use data::ConstDataPtr as ConstDataPtr;
+pub use list_item::ListItemPtr as ListItemPtr;
