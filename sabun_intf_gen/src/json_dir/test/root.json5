@@ -1,10 +1,30 @@
 {
 	bu : false,
 	col : ["Data",
-		[{ nakabu : true }],
+		[{
+			nakabu : true,
+			Ref : {
+				refed : "",
+			}
+		}],
 		{
 			ID : "huga",
-			nakabu : false
+			nakabu : false,
+			Ref : {
+				refed : "second",
+			}
 		}
 	],
+	refed : ["Data",
+	[{
+		mem : 0
+	}],
+		{
+			ID : "first",
+			mem : 1,
+		},
+		{
+			ID : "second",
+			mem : 2
+		}]
 }
