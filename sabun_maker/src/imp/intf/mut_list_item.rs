@@ -4,16 +4,20 @@ use crate::imp::structs::list_value::{ListDefValue, ListSabValue};
 use crate::imp::structs::qv::Qv;
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::list_def_obj::ListDefObj;
+use crate::imp::structs::root_obj::RootObject;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct MutListItemPtrs {
     item : *mut MutListItem,
     list_def : *const ListDefObj,
+    root : *mut RootObject,
 }
 
 impl MutListItemPtrs {
-    pub fn new(item : *mut MutListItem, list_def : *const ListDefObj) -> MutListItemPtrs { MutListItemPtrs { item, list_def }}
+    pub fn new(item : *mut MutListItem, list_def : *const ListDefObj, root : *mut RootObject) -> MutListItemPtrs {
+        MutListItemPtrs { item, list_def, root }
+    }
     pub fn item(&self) -> *const MutListItem{ self.item }
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
 }
@@ -22,7 +26,7 @@ pub fn get_inner_data(ps : MutListItemPtrs, name : &str) -> Option<InnerDataPtrs
     let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     if let Some(ListDefValue::InnerDataDef(def)) = list_def.default().get(name){
         if let Some(ListSabValue::InnerData(data)) = item.values().get(name){
-            return Some(InnerDataPtrs::new(data, def))
+            return Some(InnerDataPtrs::new(data, def, ps.root))
         }
     }
     None

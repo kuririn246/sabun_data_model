@@ -71,7 +71,7 @@ pub fn get_member_desc(root : *const RootObject) -> Vec<MemberDesc>{
             RootValue::Data(d) =>{
                 let children = get_list_def_desc(d.default());
                 let refs = get_ref_def_desc(d.default().refs());
-                let kvs = get_kvs(ConstDataPtr::new(d));
+                let kvs = get_kvs(ConstDataPtr::new(d, root));
                 let descs = MemberDescs::with_keys(children, refs, to_key_items(&kvs));
                 vec.push(MemberDesc::new(mem, VarType::Normal, RustMemberType::Data, is_old, Some(descs)))
             },

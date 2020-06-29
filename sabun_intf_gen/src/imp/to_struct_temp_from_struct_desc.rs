@@ -4,7 +4,7 @@ use sabun_maker::structs::VarType;
 use crate::imp::util::to_type_name::to_item_name;
 
 pub fn to_struct_temp_from_struct_desc(d : &StructDesc) -> StructTemp{
-    let mut ref_funs = refs_to_funs(&d.refs, d.ref_is_enum);
+    let mut ref_funs = refs_to_funs(&d.refs, d.ref_is_enum, &d.item_mod_name, d.is_mut);
     let mut param_funs = params_to_funs(&d.params, &d.item_mod_name, d.is_mut);
     let mut col_funs = cols_to_funs(d);
     param_funs.append(&mut col_funs);
@@ -187,12 +187,12 @@ fn get_col_fun_string(name : &str, is_old : bool, item_mod_name : &str, value_mo
     s
 }
 
-fn refs_to_funs(items : &[RefItem], ref_is_enum : bool, self_mod_name : &str) -> Vec<Ret>{
+fn refs_to_funs(items : &[RefItem], ref_is_enum : bool, self_mod_name : &str, is_mut : bool) -> Vec<Ret>{
     let mut vec : Vec<Ret> = Vec::with_capacity(items.len());
     for item in items{
         vec.push(ref_to_fun_get(item, self_mod_name));
         if is_mut{
-            vec.push(ref_to_fun_set(item, self_mod_name))
+            //vec.push(ref_to_fun_set(item, self_mod_name))
         }
     }
     vec
@@ -205,12 +205,12 @@ fn ref_proxy_name(s : &str) -> String{
 fn ref_to_fun_get(item : &RefItem, item_mod_name : &str) -> Ret {
     let p = ref_proxy_name(&item.name);
 
-    let s = get_fun_string(&item.name, item.is_old, item.var_type,
+    let s = get_ref_fun_string(&item.name, item.is_old, item.var_type,
                            item_mod_name, "bool", &p, "bool");
     Ret { proxy: Some(Proxy { name: p, type_without_option: with_var("bool", item.var_type) }), fun: s }
 }
 
-fn get_fun_string(name : &str, is_old : bool, var_type : VarType, item_mod_name : &str, value_mod_name : &str, proxy_name : &str, type_name : &str) -> String{
+fn get_ref_fun_string(name : &str, is_old : bool, var_type : VarType, item_mod_name : &str, value_mod_name : &str, proxy_name : &str, type_name : &str) -> String{
     let mut s = String::new();
     push(&mut s, 0, &format!("pub fn {}(&mut self) -> {}{{\n", with_old(name, is_old), with_var(type_name, var_type)));
     push(&mut s, 1,&format!("if let Some(v) = &self.{}{{\n", proxy_name));

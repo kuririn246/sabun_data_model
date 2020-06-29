@@ -2,6 +2,7 @@ use crate::imp::structs::rust_list::{ConstData, ListItem};
 use crate::{HashM, HashS};
 use crate::imp::intf::list_item::ListItemPtr;
 use crate::imp::structs::list_def_obj::ListDefObj;
+use crate::imp::structs::root_obj::RootObject;
 
 // pub fn get_member_desc(root : *const ConstData) -> MemberDescs{
 //     let root = unsafe{ root.as_ref().unwrap() };
@@ -16,9 +17,10 @@ use crate::imp::structs::list_def_obj::ListDefObj;
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct ConstDataPtr{
     ptr : *const ConstData,
+    root : *const RootObject,
 }
 impl ConstDataPtr{
-    pub fn new(ptr : *const ConstData) -> ConstDataPtr{ ConstDataPtr{ ptr } }
+    pub fn new(ptr : *const ConstData, root : *const RootObject) -> ConstDataPtr{ ConstDataPtr{ ptr, root } }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -60,11 +62,11 @@ pub fn get_kvs_impl(list_def : &ListDefObj, data : &HashM<String, ListItem>, old
 }
 
 pub fn get_value(data : ConstDataPtr, id : &str) -> Option<ListItemPtr>{
-    let data = unsafe{data.ptr.as_ref().unwrap()};
-    get_value_impl(data.list(), data.default(), id)
+    let d = unsafe{data.ptr.as_ref().unwrap()};
+    get_value_impl(d.list(), d.default(), id, data.root)
 }
 
-pub fn get_value_impl(data : &HashM<String, ListItem>, list_def : &ListDefObj, id : &str) -> Option<ListItemPtr>{
-    data.get(id).map(|i| ListItemPtr::new(i, list_def))
+pub fn get_value_impl(data : &HashM<String, ListItem>, list_def : &ListDefObj, id : &str, root : *const RootObject) -> Option<ListItemPtr>{
+    data.get(id).map(|i| ListItemPtr::new(i, list_def, root))
 }
 

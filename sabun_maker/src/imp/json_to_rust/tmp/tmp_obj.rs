@@ -11,19 +11,19 @@ use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
 use crate::imp::structs::list_def_obj::ListDefObj;
 
 pub struct TmpObj{
-    pub default : HashM<String, RustValue>,
-    pub id : Option<IdValue>,
-    pub include : Vec<String>,
-    pub refs: TmpRefs,
-    pub old : HashS<String>,
-    pub span : Span,
+    pub(crate) default : HashM<String, RustValue>,
+    pub(crate) id : Option<IdValue>,
+    pub(crate) include : Vec<String>,
+    pub(crate) refs: TmpRefs,
+    pub(crate) old : HashS<String>,
+    pub(crate) span : Span,
 }
 
 pub struct TmpRefs{
-    pub map : HashM<String, (usize, RefValue)>,
-    pub old : HashS<String>,
-    pub is_enum : bool,
-    pub span : Span,
+    pub(crate) map : HashM<String, (usize, RefValue)>,
+    pub(crate) old : HashS<String>,
+    pub(crate) is_enum : bool,
+    pub(crate) span : Span,
 }
 
 impl TmpRefs{

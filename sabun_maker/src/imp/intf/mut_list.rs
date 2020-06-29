@@ -2,6 +2,7 @@ use crate::imp::structs::rust_list::{MutList, MutListItem};
 use crate::imp::intf::mut_list_item::MutListItemPtrs;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::mut_list_hash::MutListHash;
+use crate::imp::structs::root_obj::RootObject;
 
 // pub fn get_member_desc(l : *const MutList) -> MemberDescs{
 //     let l = unsafe{ l.as_ref().unwrap() };
@@ -46,19 +47,29 @@ use crate::imp::structs::mut_list_hash::MutListHash;
 //         MutValue::new(*k, v as *const MutListItem as *mut MutListItem)).collect(), list_def)
 // }
 
-pub fn get_value(l : *mut MutList, id : u64) -> Option<MutListItemPtrs>{
-    let l = unsafe{ l.as_ref().unwrap() };
-    get_value_impl(l.list(), l.default(), id)
+#[repr(C)]
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub struct MutListPtr{
+    ptr : *mut MutList,
+    root : *mut RootObject,
+}
+impl MutListPtr {
+    pub fn new(ptr: *mut MutList, root: *mut RootObject) -> MutListPtr { MutListPtr { ptr, root } }
 }
 
-pub fn get_value_impl(data : &MutListHash, list_def : &ListDefObj, id : u64) -> Option<MutListItemPtrs>{
-    data.get(&id).map(|i| MutListItemPtrs::new(i as *const MutListItem as *mut MutListItem, list_def))
+pub fn get_value(lp : MutListPtr, id : u64) -> Option<MutListItemPtrs>{
+    let l = unsafe{ lp.ptr.as_ref().unwrap() };
+    get_value_impl(l.list(), l.default(), id, lp.root)
 }
 
-pub fn append_item(l : *mut MutList) -> Option<MutListItemPtrs>{
-    let l = unsafe{ l.as_mut().unwrap() };
+pub fn get_value_impl(data : &MutListHash, list_def : &ListDefObj, id : u64, root : *mut RootObject) -> Option<MutListItemPtrs>{
+    data.get(&id).map(|i| MutListItemPtrs::new(i as *const MutListItem as *mut MutListItem, list_def, root))
+}
+
+pub fn append_item(lp : MutListPtr) -> Option<MutListItemPtrs>{
+    let l = unsafe{ lp.ptr.as_mut().unwrap() };
     let id = l.append_new_item();
-    get_value(l, id)
+    get_value(lp, id)
 }
 
 // pub fn arrange(l : *mut MutList, ids : &[u64]) -> bool{

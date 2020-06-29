@@ -24,7 +24,7 @@ pub fn get_bool(root : RootObjectPtr, name : &str) -> Option<Qv<bool>>{
 pub fn get_data(root : RootObjectPtr, name : &str) -> Option<ConstDataPtr>{
     let root = unsafe{ root.ptr.as_ref().unwrap() };
     if let Some(RootValue::Data(d)) = root.default().get(name){
-        Some(ConstDataPtr::new(d))
+        Some(ConstDataPtr::new(d, root))
     } else{ None }
 }
 
