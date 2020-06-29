@@ -10,7 +10,9 @@ use crate::imp::intf::ConstDataPtr;
 pub struct RootObjectPtr{
     ptr : *mut RootObject
 }
-pub fn new(ptr : *mut RootObject) -> RootObjectPtr{ RootObjectPtr{ ptr } }
+impl RootObjectPtr {
+    pub fn new(ptr: *mut RootObject) -> RootObjectPtr { RootObjectPtr { ptr } }
+}
 
 pub fn get_bool(root : RootObjectPtr, name : &str) -> Option<Qv<bool>>{
     let root = unsafe{ root.ptr.as_ref().unwrap() };
@@ -26,6 +28,9 @@ pub fn get_data(root : RootObjectPtr, name : &str) -> Option<ConstDataPtr>{
     if let Some(RootValue::Data(d)) = root.default().get(name){
         Some(ConstDataPtr::new(d, root))
     } else{ None }
+}
+pub fn get_data2(root : *const RootObject, name : &str) -> Option<ConstDataPtr>{
+    get_data(RootObjectPtr::new(root as *mut RootObject), name)
 }
 
 pub fn get_list(root : *const RootObject, name : &str) -> Option<*const ConstList>{
