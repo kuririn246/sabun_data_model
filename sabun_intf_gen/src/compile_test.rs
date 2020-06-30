@@ -103,7 +103,7 @@ impl ColItem {
         }
         let qv = list_item::get_ref(self.ptr, "refed").unwrap();
         let ans = qv.into_value().unwrap();
-        self.ref_refed = Some(ans);
+        self.ref_refed = Some(RefedItem::new(ans));
         return self.ref_refed.clone().unwrap();
     }
 }

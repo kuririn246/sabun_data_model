@@ -33,7 +33,7 @@ pub struct ParamItem{
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParamType{
-    Bool, //Num, Str, NumArray, StrArray, NumArray2
+    Bool, Num, //Str, NumArray, StrArray, NumArray2
 }
 
 #[derive(Debug, Clone, PartialEq)]

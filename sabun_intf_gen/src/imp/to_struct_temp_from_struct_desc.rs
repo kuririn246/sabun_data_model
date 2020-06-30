@@ -99,6 +99,11 @@ fn param_to_fun_get(item : &ParamItem, item_mod_name : &str) -> Ret{
                                    item_mod_name, "bool", &p, "bool");
             Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("bool", item.var_type) }), fun : s }
         },
+        ParamType::Num =>{
+            let s = get_fun_string(&item.name, item.is_old, item.var_type,
+                                   item_mod_name, "num", &p, "num");
+            Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("num", item.var_type) }), fun : s }
+        },
         _ =>{ unimplemented!() }
     }
 }
@@ -110,13 +115,13 @@ fn push(s : &mut String, tabs : usize, text : &str) {
     s.push_str(text);
 }
 
-fn get_fun_string(name : &str, is_old : bool, var_type : VarType, item_mod_name : &str, value_mod_name : &str, proxy_name : &str, type_name : &str) -> String{
+fn get_fun_string(name : &str, is_old : bool, var_type : VarType, item_mod_name : &str, value_type_name: &str, proxy_name : &str, type_name : &str) -> String{
     let mut s = String::new();
     push(&mut s, 0, &format!("pub fn {}(&mut self) -> {}{{\n", with_old(name, is_old), with_var(type_name, var_type)));
     push(&mut s, 1,&format!("if let Some(v) = &self.{}{{\n", proxy_name));
     push(&mut s, 2,&format!("return v.clone();\n"));
     push(&mut s, 1,&format!("}}\n"));
-    push(&mut s, 1,&format!("let qv = {}::get_{}(self.ptr, \"{}\").unwrap();\n",item_mod_name, value_mod_name, name));
+    push(&mut s, 1,&format!("let qv = {}::get_{}(self.ptr, \"{}\").unwrap();\n", item_mod_name, value_type_name, name));
     match &var_type {
         VarType::Normal => {
             push(&mut s, 1,&format!("let ans = qv.into_value().unwrap();\n"));
@@ -213,7 +218,7 @@ fn ref_to_fun_get(item : &RefItem, item_mod_name : &str) -> Ret {
 
 fn get_ref_fun_string(name : &str, is_old : bool, var_type : VarType, item_mod_name : &str, proxy_name : &str, type_name : &str) -> String{
     let mut s = String::new();
-    push(&mut s, 0, &format!("pub fn ref_{}_{}(&mut self) -> {}{{\n", with_old(name, is_old), with_old(id, id_is_old), with_var(type_name, var_type)));
+    push(&mut s, 0, &format!("pub fn ref_{}(&mut self) -> {}{{\n", with_old(name, is_old), with_var(type_name, var_type)));
     push(&mut s, 1,&format!("if let Some(v) = &self.{}{{\n", proxy_name));
     push(&mut s, 2,&format!("return v.clone();\n"));
     push(&mut s, 1,&format!("}}\n"));
@@ -232,7 +237,7 @@ fn get_ref_fun_string(name : &str, is_old : bool, var_type : VarType, item_mod_n
             push(&mut s, 1,&format!("let ans = qv;\n"));
         },
     }
-    push(&mut s, 1,&format!("self.{} = Some(ans);\n", proxy_name));
+    push(&mut s, 1,&format!("self.{} = Some({}::new(ans));\n", proxy_name, type_name));
     push(&mut s, 1,&format!("return self.{}.clone().unwrap();\n", proxy_name));
     push(&mut s, 0,"}");
     s

@@ -16,9 +16,9 @@
 		}
 	],
 	refed : ["Data",
-	[{
-		mem : 0
-	}],
+		[{
+			mem : 0
+		}],
 		{
 			ID : "first",
 			mem : 1,

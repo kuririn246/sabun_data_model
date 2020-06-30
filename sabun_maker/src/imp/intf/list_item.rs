@@ -47,8 +47,24 @@ pub fn get_param<'a>(item : &'a ListItem, def : &'a ListDefObj, name : &str) -> 
     }
 }
 
-pub fn get_ref(ps : ListItemPtr, list_name : &str) -> Option<ListItemPtr>{
-    ps.item.refs()
+pub fn get_ref(ps : ListItemPtr, list_name : &str) -> Option<Qv<ListItemPtr>>{
+    let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
+    let qv = if let Some(sab) = item.refs().get(list_name){
+        sab.value()
+    } else{
+        if let Some(d) = list_def.refs().refs().get(list_name){
+            d.value()
+        } else{ return None; }
+    };
+    let id = match qv{
+        Qv::Val(s) => s,
+        Qv::Null =>{return Some(Qv::Null) },
+        Qv::Undefined =>{ return Some(Qv::Undefined) },
+    };
     let data = super::root::get_data2(ps.root, list_name)?;
-    super::data::get_value(data, id)
+    if let Some(val) = super::data::get_value(data, id){
+        return Some(Qv::Val(val));
+    } else{
+        return None;
+    }
 }
