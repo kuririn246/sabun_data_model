@@ -47,7 +47,8 @@ pub fn get_param<'a>(item : &'a ListItem, def : &'a ListDefObj, name : &str) -> 
     }
 }
 
-pub fn get_ref(ps : ListItemPtr, list_name : &str, id : &str) -> Option<ListItemPtr>{
+pub fn get_ref(ps : ListItemPtr, list_name : &str) -> Option<ListItemPtr>{
+    ps.item.refs()
     let data = super::root::get_data2(ps.root, list_name)?;
     super::data::get_value(data, id)
 }

@@ -1,7 +1,7 @@
 use sabun_maker::intf::member_desc::{MemberDesc};
 use sabun_maker::structs::{RustMemberType};
 use crate::imp::structs::struct_desc::{StructDesc, ParamItem, ColType, ParamType};
-use crate::imp::util::to_type_name::to_type_name;
+use crate::imp::util::to_type_name::{to_type_name, to_item_type_name};
 use crate::imp::create_ref_items::create_ref_items;
 
 pub fn create_struct_desc_root(mems : &[MemberDesc]) -> StructDesc{
@@ -51,7 +51,7 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     keys : children.keys().iter().map(|k| k.clone()).collect(),
                     item_mod_name : "list_item".to_string(),
                     col_mod_name : "data".to_string(),
-                    item_struct_name : format!("{}Item", type_name),
+                    item_struct_name : to_item_type_name(mem.name()),
                     col_struct_name : format!("{}Data", type_name),
                     col_ptr_type : "ConstDataPtr".to_string(),
                     item_ptr_type: "ListItemPtr".to_string(),

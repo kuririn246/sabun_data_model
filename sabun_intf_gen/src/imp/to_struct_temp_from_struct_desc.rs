@@ -1,7 +1,7 @@
 use crate::imp::structs::struct_desc::{StructDesc, RefItem, ParamItem, ParamType};
 use crate::imp::structs::struct_temp::{StructTemp};
 use sabun_maker::structs::VarType;
-use crate::imp::util::to_type_name::to_item_name;
+use crate::imp::util::to_type_name::{to_item_name, to_type_name, to_item_type_name};
 
 pub fn to_struct_temp_from_struct_desc(d : &StructDesc) -> StructTemp{
     let mut ref_funs = refs_to_funs(&d.refs, d.ref_is_enum, &d.item_mod_name, d.is_mut);
@@ -204,19 +204,20 @@ fn ref_proxy_name(s : &str) -> String{
 
 fn ref_to_fun_get(item : &RefItem, item_mod_name : &str) -> Ret {
     let p = ref_proxy_name(&item.name);
+    let item_type = to_item_type_name(&item.name);
 
     let s = get_ref_fun_string(&item.name, item.is_old, item.var_type,
-                           item_mod_name, "bool", &p, "bool");
-    Ret { proxy: Some(Proxy { name: p, type_without_option: with_var("bool", item.var_type) }), fun: s }
+                           item_mod_name,  &p, &item_type);
+    Ret { proxy: Some(Proxy { name: p, type_without_option: with_var(&item_type, item.var_type) }), fun: s }
 }
 
-fn get_ref_fun_string(name : &str, is_old : bool, var_type : VarType, item_mod_name : &str, value_mod_name : &str, proxy_name : &str, type_name : &str) -> String{
+fn get_ref_fun_string(name : &str, is_old : bool, var_type : VarType, item_mod_name : &str, proxy_name : &str, type_name : &str) -> String{
     let mut s = String::new();
-    push(&mut s, 0, &format!("pub fn {}(&mut self) -> {}{{\n", with_old(name, is_old), with_var(type_name, var_type)));
+    push(&mut s, 0, &format!("pub fn ref_{}_{}(&mut self) -> {}{{\n", with_old(name, is_old), with_old(id, id_is_old), with_var(type_name, var_type)));
     push(&mut s, 1,&format!("if let Some(v) = &self.{}{{\n", proxy_name));
     push(&mut s, 2,&format!("return v.clone();\n"));
     push(&mut s, 1,&format!("}}\n"));
-    push(&mut s, 1,&format!("let qv = {}::get_{}(self.ptr, \"{}\").unwrap();\n",item_mod_name, value_mod_name, name));
+    push(&mut s, 1,&format!("let qv = {}::get_ref(self.ptr, \"{}\").unwrap();\n",item_mod_name, name));
     match &var_type {
         VarType::Normal => {
             push(&mut s, 1,&format!("let ans = qv.into_value().unwrap();\n"));
