@@ -7,7 +7,7 @@ pub fn create_ref_items(descs : &[RefDesc]) -> Vec<RefItem>{
     for d in descs{
         r.push(RefItem{
            is_old : d.is_old(),
-            snake_name: to_snake_name(d.name()),
+
             id : d.name().to_string(),
             var_type : d.var_type().clone(),
         });

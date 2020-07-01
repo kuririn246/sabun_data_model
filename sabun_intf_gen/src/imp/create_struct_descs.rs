@@ -11,6 +11,7 @@ pub fn create_struct_desc_root(mems : &[MemberDesc]) -> StructDesc{
         children : descs,
         keys : vec![],
         col_struct_name : String::new(),
+        col_id : String::new(),
         is_mut : true,
         item_ptr_type : format!("RootObjectPtr"),
         col_mod_name : String::new(),
@@ -34,7 +35,7 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
             RustMemberType::Bool =>{
                 params.push(ParamItem{
                     is_old: mem.is_old(),
-                    name: mem.name().to_string(),
+                    id: mem.name().to_string(),
                     var_type: mem.var_type().clone(),
                     param_type: ParamType::Bool,
                 });
@@ -42,7 +43,7 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
             RustMemberType::Num =>{
                 params.push(ParamItem{
                     is_old: mem.is_old(),
-                    name: mem.name().to_string(),
+                    id: mem.name().to_string(),
                     var_type: mem.var_type().clone(),
                     param_type: ParamType::Num,
                 });
