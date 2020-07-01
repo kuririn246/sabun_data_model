@@ -23,6 +23,15 @@ pub fn get_bool(root : RootObjectPtr, name : &str) -> Option<Qv<bool>>{
     }
 }
 
+pub fn get_num(root : RootObjectPtr, name : &str) -> Option<Qv<f64>>{
+    let root = unsafe{ root.ptr.as_ref().unwrap() };
+    if let Some(RustParam::Number(b)) = get_param(root.default(), root.sabun(), name){
+        Some(b.clone())
+    } else{
+        None
+    }
+}
+
 pub fn get_data(root : RootObjectPtr, name : &str) -> Option<ConstDataPtr>{
     let root = unsafe{ root.ptr.as_ref().unwrap() };
     if let Some(RootValue::Data(d)) = root.default().get(name){
@@ -47,8 +56,6 @@ pub fn get_mut(root : *mut RootObject, name : &str) -> Option<*mut MutList>{
     } else{ None }
 }
 
-
-
 pub fn get_param<'a>(def : &'a HashM<String, RootValue>, sab : &'a HashM<String, RustParam>, name : &str) -> Option<&'a RustParam>{
     if let Some(RootValue::Param(p,_v)) = def.get(name){
         if let Some(p) = sab.get(name){
@@ -62,6 +69,13 @@ pub fn get_param<'a>(def : &'a HashM<String, RootValue>, sab : &'a HashM<String,
 pub fn set_bool(root : RootObjectPtr, name : &str, val : Qv<bool>) -> bool{
     let root = unsafe{ root.ptr.as_mut().unwrap() };
     match root.set_sabun(name.to_string(), RustParam::Bool(val)){
+        Ok(_) => true,
+        Err(_) => false,
+    }
+}
+pub fn set_num(root : RootObjectPtr, name : &str, val : Qv<f64>) -> bool{
+    let root = unsafe{ root.ptr.as_mut().unwrap() };
+    match root.set_sabun(name.to_string(), RustParam::Number(val)){
         Ok(_) => true,
         Err(_) => false,
     }

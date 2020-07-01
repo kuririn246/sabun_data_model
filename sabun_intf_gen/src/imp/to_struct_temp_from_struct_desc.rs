@@ -2,10 +2,14 @@ use crate::imp::structs::struct_desc::{StructDesc, RefItem, ParamItem, ParamType
 use crate::imp::structs::struct_temp::{StructTemp};
 use sabun_maker::structs::VarType;
 use crate::imp::util::to_type_name::{to_item_name, to_type_name, to_item_type_name};
+use crate::imp::fun_get::param::get_fun_string;
+use crate::imp::fun_get::col::get_col_fun_string;
+use crate::imp::fun_set::param_fun_set::fun_set;
+use crate::imp::fun_get::refs::get_ref_fun_string;
 
 pub fn to_struct_temp_from_struct_desc(d : &StructDesc) -> StructTemp{
     let mut ref_funs = refs_to_funs(&d.refs, d.ref_is_enum, &d.item_mod_name, d.is_mut);
-    let mut param_funs = params_to_funs(&d.params, &d.item_mod_name, d.is_mut);
+    let mut param_funs = params_to_funs(&d.params, &d.item_mod_name, &d.item_struct_name, d.is_mut);
     let mut col_funs = cols_to_funs(d);
     param_funs.append(&mut col_funs);
     param_funs.append(&mut ref_funs);
@@ -57,10 +61,10 @@ fn separate(v : Vec<Ret>) -> (Vec<String>, Vec<String>){
     (funs, proxies)
 }
 
-fn params_to_funs(items : &[ParamItem], self_mod_name : &str, is_mut : bool) -> Vec<Ret>{
+fn params_to_funs(items : &[ParamItem], self_mod_name : &str, self_type_name : &str, is_mut : bool) -> Vec<Ret>{
     let mut vec : Vec<Ret> = Vec::with_capacity(items.len());
     for item in items{
-        vec.push(param_to_fun_get(item, self_mod_name));
+        vec.push(param_to_fun_get(item, self_mod_name, self_type_name));
         if is_mut{
             vec.push(param_to_fun_set(item, self_mod_name))
         }
@@ -72,7 +76,7 @@ fn proxy_name(name : &str) -> String{
     format!("p_{}", name)
 }
 
-fn with_old(name : &str, is_old : bool) -> String {
+pub fn with_old(name : &str, is_old : bool) -> String {
     if is_old {
         format!("{}_old", name)
     } else {
@@ -80,7 +84,7 @@ fn with_old(name : &str, is_old : bool) -> String {
     }
 }
 
-fn with_var(t : &str, vt : VarType) -> String{
+pub fn with_var(t : &str, vt : VarType) -> String{
     match vt{
         VarType::Normal => t.to_string(),
         VarType::Nullable => format!("NullOr<{}>", t),
@@ -89,74 +93,41 @@ fn with_var(t : &str, vt : VarType) -> String{
     }
 }
 
-fn param_to_fun_get(item : &ParamItem, item_mod_name : &str) -> Ret{
-    let p = proxy_name(&item.name);
-
-    match item.param_type{
-        ParamType::Bool =>{
-            //let proxy = format!("{} : Option<{}>,", p, with_var("bool", item.var_type));
-            let s = get_fun_string(&item.name, item.is_old, item.var_type,
-                                   item_mod_name, "bool", &p, "bool");
-            Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("bool", item.var_type) }), fun : s }
-        },
-        ParamType::Num =>{
-            let s = get_fun_string(&item.name, item.is_old, item.var_type,
-                                   item_mod_name, "num", &p, "num");
-            Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("num", item.var_type) }), fun : s }
-        },
-        _ =>{ unimplemented!() }
-    }
-}
-
-fn push(s : &mut String, tabs : usize, text : &str) {
+pub fn push(s : &mut String, tabs : usize, text : &str) {
     for _ in 0..tabs {
         s.push('\t');
     }
     s.push_str(text);
 }
 
-fn get_fun_string(name : &str, is_old : bool, var_type : VarType, item_mod_name : &str, value_type_name: &str, proxy_name : &str, type_name : &str) -> String{
-    let mut s = String::new();
-    push(&mut s, 0, &format!("pub fn {}(&mut self) -> {}{{\n", with_old(name, is_old), with_var(type_name, var_type)));
-    push(&mut s, 1,&format!("if let Some(v) = &self.{}{{\n", proxy_name));
-    push(&mut s, 2,&format!("return v.clone();\n"));
-    push(&mut s, 1,&format!("}}\n"));
-    push(&mut s, 1,&format!("let qv = {}::get_{}(self.ptr, \"{}\").unwrap();\n", item_mod_name, value_type_name, name));
-    match &var_type {
-        VarType::Normal => {
-            push(&mut s, 1,&format!("let ans = qv.into_value().unwrap();\n"));
+
+fn param_to_fun_get(item : &ParamItem, self_mod_name : &str, self_type_name : &str) -> Ret{
+    let p = proxy_name(&item.name);
+
+    match item.param_type{
+        ParamType::Bool =>{
+            //let proxy = format!("{} : Option<{}>,", p, with_var("bool", item.var_type));
+            let s = get_fun_string(&item.name, item.is_old, item.var_type,
+                                   self_mod_name, self_type_name, "bool", &p, "bool");
+            Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("bool", item.var_type) }), fun : s }
         },
-        VarType::Undefiable => {
-            push(&mut s, 1,&format!("let ans = UndefOr.from_qv(qv).unwrap();\n"));
+        ParamType::Num =>{
+            let s = get_fun_string(&item.name, item.is_old, item.var_type,
+                                   self_mod_name, self_type_name, "num", &p, "f64");
+            Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("f64", item.var_type) }), fun : s }
         },
-        VarType::Nullable => {
-            push(&mut s, 1,&format!("let ans = NullOr.from_qv(qv).unwrap();\n"));
-        },
-        VarType::UndefNullable => {
-            push(&mut s, 1,&format!("let ans = qv;\n"));
-        },
+        _ =>{ unimplemented!() }
     }
-    push(&mut s, 1,&format!("self.{} = Some(ans);\n", proxy_name));
-    push(&mut s, 1,&format!("return self.{}.clone().unwrap();\n", proxy_name));
-    push(&mut s, 0,"}");
-    s
 }
 
 fn param_to_fun_set(item : &ParamItem, item_mod_name : &str) -> Ret {
     let p = proxy_name(&item.name);
-    let mut s = String::new();
-    match item.param_type {
-        ParamType::Bool => {
-            push(&mut s, 0,&format!("pub fn set_{}(&mut self, {} : {}){{\n", with_old(&item.name, item.is_old), &item.name, with_var("bool", item.var_type)));
-            push(&mut s, 1,&format!("self.{} = Some({}.clone());\n", &p, &item.name));
-            let param = if item.var_type == VarType::Normal{ format!("Qv::Val({})", &item.name)} else{ format!("{}.into_qv()", &item.name)};
 
-            push(&mut s, 1,&format!("{}::set_bool(self.ptr, \"{}\", {});\n", item_mod_name, &item.name, &param));
-            push(&mut s, 0, "}");
-        },
+    let fun = match item.param_type {
+        ParamType::Bool => fun_set(item, item_mod_name, &p),
         _ =>{ unimplemented!() }
-    }
-    Ret{ proxy : None, fun : s }
+    };
+    Ret{ proxy : None, fun }
 }
 
 fn cols_to_funs(d : &StructDesc) -> Vec<Ret>{
@@ -168,29 +139,17 @@ fn cols_to_funs(d : &StructDesc) -> Vec<Ret>{
             //let proxy = format!("{} : Option<{}>,", &p, &child.col_ptr_type);
             let s = get_col_fun_string(&item_name, child.col_is_old,
                                    &d.item_mod_name, &child.col_mod_name,
-                                   &p, &child.col_ptr_type);
+                                   &p, &child.col_struct_name);
             vec.push(Ret{ proxy : Some(Proxy{
                 name : p,
-                type_without_option : child.col_ptr_type.to_string(),
+                type_without_option : child.col_struct_name.to_string(),
             }), fun : s });
         }
     }
     vec
 }
 
-fn get_col_fun_string(name : &str, is_old : bool, item_mod_name : &str, value_mod_name : &str, proxy_name : &str, col_ptr_type : &str) -> String{
-    let mut s = String::new();
-    push(&mut s, 0, &format!("pub fn {}(&mut self) -> {}{{\n", with_old(name, is_old), col_ptr_type));
-    push(&mut s, 1,&format!("if let Some(v) = &self.{}{{\n", proxy_name));
-    push(&mut s, 2,&format!("return v.clone();\n"));
-    push(&mut s, 1,&format!("}}\n"));
-    push(&mut s, 1,&format!("let ans = {}::get_{}(self.ptr, \"{}\").unwrap();\n",item_mod_name, value_mod_name, name));
 
-    push(&mut s, 1,&format!("self.{} = Some(ans);\n", proxy_name));
-    push(&mut s, 1,&format!("return self.{}.clone().unwrap();\n", proxy_name));
-    push(&mut s, 0,"}");
-    s
-}
 
 fn refs_to_funs(items : &[RefItem], ref_is_enum : bool, self_mod_name : &str, is_mut : bool) -> Vec<Ret>{
     let mut vec : Vec<Ret> = Vec::with_capacity(items.len());
@@ -214,31 +173,4 @@ fn ref_to_fun_get(item : &RefItem, item_mod_name : &str) -> Ret {
     let s = get_ref_fun_string(&item.name, item.is_old, item.var_type,
                            item_mod_name,  &p, &item_type);
     Ret { proxy: Some(Proxy { name: p, type_without_option: with_var(&item_type, item.var_type) }), fun: s }
-}
-
-fn get_ref_fun_string(name : &str, is_old : bool, var_type : VarType, item_mod_name : &str, proxy_name : &str, type_name : &str) -> String{
-    let mut s = String::new();
-    push(&mut s, 0, &format!("pub fn ref_{}(&mut self) -> {}{{\n", with_old(name, is_old), with_var(type_name, var_type)));
-    push(&mut s, 1,&format!("if let Some(v) = &self.{}{{\n", proxy_name));
-    push(&mut s, 2,&format!("return v.clone();\n"));
-    push(&mut s, 1,&format!("}}\n"));
-    push(&mut s, 1,&format!("let qv = {}::get_ref(self.ptr, \"{}\").unwrap();\n",item_mod_name, name));
-    match &var_type {
-        VarType::Normal => {
-            push(&mut s, 1,&format!("let ans = qv.into_value().unwrap();\n"));
-        },
-        VarType::Undefiable => {
-            push(&mut s, 1,&format!("let ans = UndefOr.from_qv(qv).unwrap();\n"));
-        },
-        VarType::Nullable => {
-            push(&mut s, 1,&format!("let ans = NullOr.from_qv(qv).unwrap();\n"));
-        },
-        VarType::UndefNullable => {
-            push(&mut s, 1,&format!("let ans = qv;\n"));
-        },
-    }
-    push(&mut s, 1,&format!("self.{} = Some({}::new(ans));\n", proxy_name, type_name));
-    push(&mut s, 1,&format!("return self.{}.clone().unwrap();\n", proxy_name));
-    push(&mut s, 0,"}");
-    s
 }

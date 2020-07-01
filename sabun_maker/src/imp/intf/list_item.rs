@@ -37,6 +37,13 @@ pub fn get_bool(ps : ListItemPtr, name : &str) -> Option<Qv<bool>>{
     } else{ None }
 }
 
+pub fn get_num(ps : ListItemPtr, name : &str) -> Option<Qv<f64>>{
+    let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
+    if let Some(RustParam::Number(b)) = get_param(item, list_def, name){
+        Some(b.clone())
+    } else{ None }
+}
+
 pub fn get_param<'a>(item : &'a ListItem, def : &'a ListDefObj, name : &str) -> Option<&'a RustParam>{
     if let Some(ListSabValue::Param(p)) = item.values().get(name){
         Some(p)

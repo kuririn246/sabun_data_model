@@ -39,6 +39,14 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     param_type: ParamType::Bool,
                 });
             },
+            RustMemberType::Num =>{
+                params.push(ParamItem{
+                    is_old: mem.is_old(),
+                    name: mem.name().to_string(),
+                    var_type: mem.var_type().clone(),
+                    param_type: ParamType::Num,
+                });
+            },
             RustMemberType::Data =>{
                 let type_name = to_type_name(mem.name());
                 let children = mem.child_descs().unwrap();

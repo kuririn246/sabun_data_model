@@ -1,13 +1,11 @@
 Goals
 
-Efficient data format for small changes
+Efficient for small changes
 
-Robust against transition of the data format
+Robust when data scheme is changed
 
-Saves every history
+Breaks the barrier which separates data from programming languages
 
-Generates the static interface to read and modify data for some programming languages
-
-Not slow for opening and saving data
+Not slow
 
 Readable and easy to write Json5 format for initial data description

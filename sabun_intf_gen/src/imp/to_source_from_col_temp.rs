@@ -12,8 +12,9 @@ pub fn to_source_from_col_temp(imp : &StructDesc) -> StructSource {
 
     result.push(StrAndTab::new(
         format!("impl {} {{", &imp.col_struct_name), 0));
+    result.push(StrAndTab::new(
+        format!("pub fn new(ptr : {}) -> {}{{ {}{{ ptr }} }}",&imp.col_ptr_type, &imp.col_struct_name, &imp.col_struct_name), 1));
 
-    println!("keys {:?}", &imp.keys);
     for key in &imp.keys{
         let key_name = if key.is_old(){ format!("{}_old", key.key()) } else{ key.key().to_string() };
         result.push(StrAndTab::new(
