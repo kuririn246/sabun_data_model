@@ -1,7 +1,7 @@
 use crate::imp::structs::struct_desc::{StructDesc, RefItem, ParamItem};
 use crate::imp::structs::struct_temp::{StructTemp};
 use sabun_maker::structs::VarType;
-use crate::imp::util::to_type_name::{to_type_name, to_item_type_name, to_snake_name};
+use crate::imp::util::to_type_name::{to_item_type_name, to_snake_name};
 use crate::imp::fun_get::param::get_fun_string;
 use crate::imp::fun_get::col::get_col_fun_string;
 use crate::imp::fun_set::param_fun_set::fun_set;
@@ -18,7 +18,7 @@ pub fn to_struct_temp_from_struct_desc(d : &StructDesc) -> StructTemp{
     StructTemp{
         new : new(&d.item_ptr_type, &d.item_struct_name, &param_funs),
         funs,
-        self_mod_name: d.item_mod_name.to_string(),
+        //self_mod_name: d.item_mod_name.to_string(),
         struct_name: d.item_struct_name.to_string(),
         ptr_type: d.item_ptr_type.to_string(),
         proxies,
@@ -149,7 +149,7 @@ fn cols_to_funs(d : &StructDesc) -> Vec<Ret>{
 
 
 
-fn refs_to_funs(items : &[RefItem], ref_is_enum : bool, self_mod_name : &str, is_mut : bool) -> Vec<Ret>{
+fn refs_to_funs(items : &[RefItem], _ref_is_enum : bool, self_mod_name : &str, is_mut : bool) -> Vec<Ret>{
     let mut vec : Vec<Ret> = Vec::with_capacity(items.len());
     for item in items{
         vec.push(ref_to_fun_get(item, self_mod_name));

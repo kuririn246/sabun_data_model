@@ -8,7 +8,7 @@ pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : Va
     push(&mut s, 1,&format!("if let Some(v) = &self.{}{{\n", proxy_name));
     push(&mut s, 2,&format!("return v;\n"));
     push(&mut s, 1,&format!("}}\n"));
-    push(&mut s, 1,&format!("let qv = {}::get_{}(self.ptr, \"{}\").unwrap();\n", self_mod_name, value_nickname, id));
+    push(&mut s, 1,&format!("let qv = {}::get_{}(self.ptr, \"{}\").unwrap(); \n", self_mod_name, value_nickname, id));
     match &var_type {
         VarType::Normal => {
             push(&mut s, 1,&format!("let ans = qv.into_value().unwrap();\n"));
