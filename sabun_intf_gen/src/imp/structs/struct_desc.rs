@@ -3,6 +3,7 @@ use sabun_maker::structs::{VarType};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct StructDesc{
+    pub(crate) col_id : String,
     pub(crate) col_mod_name : String,
     pub(crate) item_mod_name : String,
     pub(crate) col_struct_name : String,
@@ -26,7 +27,8 @@ pub enum ColType{ Data, List, Root }
 #[derive(Debug, Clone, PartialEq)]
 pub struct ParamItem{
     pub(crate) is_old : bool,
-    pub(crate) name : String,
+    pub(crate) snake_name : String,
+    pub(crate) id : String,
     pub(crate) var_type : VarType,
     pub(crate) param_type : ParamType
 }
@@ -39,6 +41,7 @@ pub enum ParamType{
 #[derive(Debug, Clone, PartialEq)]
 pub struct RefItem{
     pub(crate) is_old : bool,
-    pub(crate) name : String,
+    pub(crate) snake_name: String,
+    pub(crate) id : String,
     pub(crate) var_type : VarType,
 }

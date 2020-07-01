@@ -12,7 +12,7 @@ pub fn to_type_name(s : &str) -> String{
 }
 
 ///小文字にしてsnake_caseにする
-pub fn to_item_name(s : &str) -> String{
+pub fn to_snake_name(s : &str) -> String{
     let mut r = String::new();
     for (i,c) in s.chars().enumerate(){
         if i == 0{

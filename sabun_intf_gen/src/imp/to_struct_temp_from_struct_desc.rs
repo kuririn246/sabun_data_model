@@ -1,7 +1,7 @@
 use crate::imp::structs::struct_desc::{StructDesc, RefItem, ParamItem, ParamType};
 use crate::imp::structs::struct_temp::{StructTemp};
 use sabun_maker::structs::VarType;
-use crate::imp::util::to_type_name::{to_item_name, to_type_name, to_item_type_name};
+use crate::imp::util::to_type_name::{to_type_name, to_item_type_name, to_snake_name};
 use crate::imp::fun_get::param::get_fun_string;
 use crate::imp::fun_get::col::get_col_fun_string;
 use crate::imp::fun_set::param_fun_set::fun_set;
@@ -134,10 +134,10 @@ fn cols_to_funs(d : &StructDesc) -> Vec<Ret>{
     let mut vec : Vec<Ret> = Vec::with_capacity(d.children.len());
     for child in &d.children{
         if child.col_struct_name.is_empty() == false{
-            let item_name = to_item_name(&child.col_struct_name);
-            let p = proxy_name(&item_name);
+            let snake_name = to_snake_name(&child.col_struct_name);
+            let p = proxy_name(&snake_name);
             //let proxy = format!("{} : Option<{}>,", &p, &child.col_ptr_type);
-            let s = get_col_fun_string(&item_name, child.col_is_old,
+            let s = get_col_fun_string(&child.id, &snake_name, child.col_is_old,
                                    &d.item_mod_name, &child.col_mod_name,
                                    &p, &child.col_struct_name);
             vec.push(Ret{ proxy : Some(Proxy{
@@ -166,11 +166,11 @@ fn ref_proxy_name(s : &str) -> String{
     format!("ref_{}", s)
 }
 
-fn ref_to_fun_get(item : &RefItem, item_mod_name : &str) -> Ret {
-    let p = ref_proxy_name(&item.name);
-    let item_type = to_item_type_name(&item.name);
+fn ref_to_fun_get(item : &RefItem, self_mod_name: &str) -> Ret {
+    let p = ref_proxy_name(&item.snake_name);
+    let item_type = to_item_type_name(&item.snake_name);
 
-    let s = get_ref_fun_string(&item.name, item.is_old, item.var_type,
-                           item_mod_name,  &p, &item_type);
+    let s = get_ref_fun_string(&item.snake_name, item.is_old, item.var_type,
+                               self_mod_name, &p, &item_type);
     Ret { proxy: Some(Proxy { name: p, type_without_option: with_var(&item_type, item.var_type) }), fun: s }
 }

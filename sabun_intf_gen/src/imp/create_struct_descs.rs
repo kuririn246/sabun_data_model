@@ -53,6 +53,7 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                 let (descs,params) = create_struct_descs(children.items());
                 let refs = create_ref_items(children.refs().items());
                 result.push(StructDesc{
+                    col_id : mem.name().to_string(),
                     children : descs,
                     refs,
                     params,
