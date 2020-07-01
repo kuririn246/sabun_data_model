@@ -1,5 +1,21 @@
 use sabun_maker::intf::*;
 use sabun_maker::structs::*;
+
+pub struct RootIntf{
+    obj : Box<RootObject>,
+    intf : RootItem,
+}
+impl RootIntf{
+    pub fn new(obj : RootObject) -> RootIntf{
+        let mut b = Box::new(obj);
+        let intf = RootItem::new(RootObjectPtr::new(b.as_mut()));
+        RootIntf{ obj : b, intf }
+    }
+    pub fn intf(&mut self) -> &mut RootItem{ &mut self.intf }
+    pub fn deconstruct(self) -> (Box<RootObject>, RootItem){ (self.obj, self.intf) }
+}
+
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct RootItem {
     pub ptr : RootObjectPtr,

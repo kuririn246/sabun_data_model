@@ -1,4 +1,4 @@
-use crate::imp::structs::struct_desc::{StructDesc, RefItem, ParamItem, ParamType};
+use crate::imp::structs::struct_desc::{StructDesc, RefItem, ParamItem};
 use crate::imp::structs::struct_temp::{StructTemp};
 use sabun_maker::structs::VarType;
 use crate::imp::util::to_type_name::{to_type_name, to_item_type_name, to_snake_name};
@@ -103,31 +103,28 @@ pub fn push(s : &mut String, tabs : usize, text : &str) {
 
 fn param_to_fun_get(item : &ParamItem, self_mod_name : &str, self_type_name : &str) -> Ret{
     let p = proxy_name(&item.id);
-
-    match item.param_type{
-        ParamType::Bool =>{
-            //let proxy = format!("{} : Option<{}>,", p, with_var("bool", item.var_type));
-            let s = get_fun_string(&item.id, &to_snake_name(&item.id), item.is_old, item.var_type,
-                                   self_mod_name, self_type_name, "bool", &p, "bool");
-            Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("bool", item.var_type) }), fun : s }
-        },
-        ParamType::Num =>{
-            let s = get_fun_string(&item.id, &to_snake_name(&item.id),  item.is_old, item.var_type,
-                                   self_mod_name, self_type_name, "num", &p, "f64");
-            Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("f64", item.var_type) }), fun : s }
-        },
-        _ =>{ unimplemented!() }
-    }
+    let fun = get_fun_string(&item.id, &to_snake_name(&item.id), item.is_old, item.var_type,
+                   self_mod_name, self_type_name, &item.value_type_nickname, &p, &item.value_type_name);
+    Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("bool", item.var_type) }), fun }
+    // match item.param_type{
+    //     ParamType::Bool =>{
+    //         //let proxy = format!("{} : Option<{}>,", p, with_var("bool", item.var_type));
+    //         let s =
+    //         Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("bool", item.var_type) }), fun : s }
+    //     },
+    //     ParamType::Num =>{
+    //         let s = get_fun_string(&item.id, &to_snake_name(&item.id),  item.is_old, item.var_type,
+    //                                self_mod_name, self_type_name, "num", &p, "f64");
+    //         Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("f64", item.var_type) }), fun : s }
+    //     },
+    //     _ =>{ unimplemented!() }
+    // }
 }
 
 fn param_to_fun_set(item : &ParamItem, item_mod_name : &str) -> Ret {
     let p = proxy_name(&item.id);
-
-    let fun = match item.param_type {
-        ParamType::Bool => fun_set(&item.id, &to_snake_name(&item.id), item.is_old,
-                                   "bool", item.var_type, item_mod_name, &p),
-        _ =>{ unimplemented!() }
-    };
+    let fun = fun_set(&item.id, &to_snake_name(&item.id), item.is_old,
+                                   &item.value_type_name, item.var_type, item_mod_name, &p);
     Ret{ proxy : None, fun }
 }
 

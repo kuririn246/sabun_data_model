@@ -21,7 +21,24 @@ pub fn generate_interface(root : &RootObject) -> Sources{
         flatten(&mut vec, tree);
     }
 
-    let usings = "use sabun_maker::intf::*;\nuse sabun_maker::structs::*;".to_string();
+    let usings = "\
+use sabun_maker::intf::*;
+use sabun_maker::structs::*;
+
+pub struct RootIntf{
+    obj : Box<RootObject>,
+    intf : RootItem,
+}
+impl RootIntf{
+    pub fn new(obj : RootObject) -> RootIntf{
+        let mut b = Box::new(obj);
+        let intf = RootItem::new(RootObjectPtr::new(b.as_mut()));
+        RootIntf{ obj : b, intf }
+    }
+    pub fn intf(&mut self) -> &mut RootItem{ &mut self.intf }
+    pub fn deconstruct(self) -> (Box<RootObject>, RootItem){ (self.obj, self.intf) }
+}
+".to_string();
     Sources::new(usings, root.source().to_string(), vec)
 }
 

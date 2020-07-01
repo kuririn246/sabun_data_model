@@ -4,7 +4,7 @@ use crate::imp::to_struct_temp_from_struct_desc::{push, with_old, with_var};
 pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : VarType, self_mod_name : &str, self_type_name : &str,
                       value_nickname: &str, proxy_name : &str, value_type_name : &str) -> String{
     let mut s = String::new();
-    push(&mut s, 0, &format!("pub fn {}(&self) -> &{}{{\n", with_old(snake_name, is_old), with_var(value_type_name, var_type)));
+    push(&mut s, 0, &format!("pub fn {}(&mut self) -> &{}{{\n", with_old(snake_name, is_old), with_var(value_type_name, var_type)));
     push(&mut s, 1,&format!("if let Some(v) = &self.{}{{\n", proxy_name));
     push(&mut s, 2,&format!("return v;\n"));
     push(&mut s, 1,&format!("}}\n"));

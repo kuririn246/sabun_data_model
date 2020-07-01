@@ -30,13 +30,15 @@ pub struct ParamItem{
     //pub(crate) snake_name : String,
     pub(crate) id : String,
     pub(crate) var_type : VarType,
-    pub(crate) param_type : ParamType
+    //pub(crate) param_type : ParamType
+    pub(crate) value_type_name : String,
+    pub(crate) value_type_nickname : String,
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum ParamType{
-    Bool, Num, //Str, NumArray, StrArray, NumArray2
-}
+// #[derive(Debug, Clone, PartialEq)]
+// pub enum ParamType{
+//     Bool, Num, //Str, NumArray, StrArray, NumArray2
+// }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct RefItem{

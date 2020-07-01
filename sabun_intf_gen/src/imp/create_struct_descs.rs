@@ -1,6 +1,6 @@
 use sabun_maker::intf::member_desc::{MemberDesc};
 use sabun_maker::structs::{RustMemberType};
-use crate::imp::structs::struct_desc::{StructDesc, ParamItem, ColType, ParamType};
+use crate::imp::structs::struct_desc::{StructDesc, ParamItem, ColType};
 use crate::imp::util::to_type_name::{to_type_name, to_item_type_name};
 use crate::imp::create_ref_items::create_ref_items;
 
@@ -37,7 +37,8 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     is_old: mem.is_old(),
                     id: mem.name().to_string(),
                     var_type: mem.var_type().clone(),
-                    param_type: ParamType::Bool,
+                    value_type_name : "bool".to_string(),
+                    value_type_nickname : "bool".to_string(),
                 });
             },
             RustMemberType::Num =>{
@@ -45,7 +46,8 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     is_old: mem.is_old(),
                     id: mem.name().to_string(),
                     var_type: mem.var_type().clone(),
-                    param_type: ParamType::Num,
+                    value_type_name : "f64".to_string(),
+                    value_type_nickname : "f64".to_string(),
                 });
             },
             RustMemberType::Data =>{
