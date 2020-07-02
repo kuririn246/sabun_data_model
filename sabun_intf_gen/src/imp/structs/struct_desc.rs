@@ -33,6 +33,7 @@ pub struct ParamItem{
     //pub(crate) param_type : ParamType
     pub(crate) value_type_name : String,
     pub(crate) value_type_nickname : String,
+    pub(crate) is_ref : bool,
 }
 
 // #[derive(Debug, Clone, PartialEq)]

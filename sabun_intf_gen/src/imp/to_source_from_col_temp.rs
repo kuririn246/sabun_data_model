@@ -5,7 +5,7 @@ use crate::imp::structs::struct_desc::StructDesc;
 pub fn to_source_from_col_temp(imp : &StructDesc) -> StructSource {
     let mut result: Vec<StrAndTab> = vec![];
 
-    result.push(StrAndTab::new(format!("#[derive(Debug, PartialEq, Clone)]"), 0));
+    result.push(StrAndTab::new(format!("#[derive(Debug, PartialEq)]"), 0));
     result.push(StrAndTab::new(format!("pub struct {} {{", &imp.col_struct_name), 0));
     result.push(StrAndTab::new(format!("pub ptr : {},", &imp.col_ptr_type), 1));
     result.push(StrAndTab::new("}".to_string(), 0));

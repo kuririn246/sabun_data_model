@@ -101,11 +101,11 @@ pub fn push(s : &mut String, tabs : usize, text : &str) {
 }
 
 
-fn param_to_fun_get(item : &ParamItem, self_mod_name : &str, self_type_name : &str) -> Ret{
+fn param_to_fun_get(item : &ParamItem, self_mod_name : &str, self_type_name : &str, is_ref : bool) -> Ret{
     let p = proxy_name(&item.id);
     let fun = get_fun_string(&item.id, &to_snake_name(&item.id), item.is_old, item.var_type,
-                   self_mod_name, self_type_name, &item.value_type_nickname, &p, &item.value_type_name);
-    Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("bool", item.var_type) }), fun }
+                   self_mod_name, self_type_name, &item.value_type_nickname, &p, &item.value_type_name, item.is_ref);
+    Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var(&item.value_type_name, item.var_type) }), fun }
     // match item.param_type{
     //     ParamType::Bool =>{
     //         //let proxy = format!("{} : Option<{}>,", p, with_var("bool", item.var_type));

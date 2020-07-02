@@ -5,7 +5,7 @@ use crate::imp::structs::struct_temp::StructTemp;
 pub fn to_source_from_struct_temp(imp : &StructTemp) -> StructSource {
     let mut result: Vec<StrAndTab> = vec![];
 
-    result.push(StrAndTab::new(format!("#[derive(Debug, PartialEq, Clone)]"), 0));
+    result.push(StrAndTab::new(format!("#[derive(Debug, PartialEq)]"), 0));
     result.push(StrAndTab::new(format!("pub struct {} {{", &imp.struct_name), 0));
     result.push(StrAndTab::new(format!("pub ptr : {},", &imp.ptr_type), 1));
     for proxy in &imp.proxies {
