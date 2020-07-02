@@ -7,7 +7,11 @@ pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : Va
     let and = if is_ref{ "&" } else{ "" };
     push(&mut s, 0, &format!("pub fn {}(&mut self) -> {}{}{{\n", with_old(snake_name, is_old), and, with_var(value_type_name, var_type)));
     push(&mut s, 1,&format!("if let Some(v) = &self.{}{{\n", proxy_name));
-    push(&mut s, 2,&format!("return v;\n"));
+    if is_ref {
+        push(&mut s, 2, &format!("return v;\n"));
+    } else{
+        push(&mut s, 2, &format!("return v.clone();\n"));
+    }
     push(&mut s, 1,&format!("}}\n"));
     push(&mut s, 1,&format!("let qv = {}::get_{}(self.ptr, \"{}\").unwrap(); \n", self_mod_name, value_nickname, id));
     match &var_type {
@@ -24,8 +28,8 @@ pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : Va
             push(&mut s, 1,&format!("let ans = qv;\n"));
         },
     }
-    push(&mut s, 1,&format!("let mp = unsafe {{ (self as *const {} as *mut {}).as_mut().unwrap() }};\n", self_type_name, self_type_name));
-    push(&mut s, 1,&format!("mp.{} = Some(ans);\n", proxy_name));
+
+    push(&mut s, 1,&format!("self.{} = Some(ans);\n", proxy_name));
     push(&mut s, 1,&format!("return self.{}.as_ref().unwrap();\n", proxy_name));
     push(&mut s, 0,"}");
     s

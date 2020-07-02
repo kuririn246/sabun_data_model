@@ -21,6 +21,10 @@ pub struct StructDesc{
     pub(crate) children : Vec<StructDesc>,
 }
 
+impl StructDesc{
+    pub fn is_root(&self) -> bool{ self.col_id.is_empty() }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum ColType{ Data, List, Root }
 

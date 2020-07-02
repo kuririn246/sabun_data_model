@@ -16,19 +16,26 @@ pub fn to_struct_temp_from_struct_desc(d : &StructDesc) -> StructTemp{
     let (funs, proxies) = separate(param_funs.clone());
 
     StructTemp{
-        new : new(&d.item_ptr_type, &d.item_struct_name, &param_funs),
+        new : new(&d.item_ptr_type, &d.item_struct_name, &param_funs, d.col_id.is_empty()),
         funs,
         //self_mod_name: d.item_mod_name.to_string(),
         struct_name: d.item_struct_name.to_string(),
         ptr_type: d.item_ptr_type.to_string(),
         proxies,
+        is_root : d.is_root(),
     }
 }
 
-fn new(ptr_type_name : &str, result_type_name : &str, proxies : &[Ret]) -> String{
+fn new(ptr_type_name : &str, result_type_name : &str, proxies : &[Ret], is_root : bool) -> String{
     let mut s = String::new();
-    push(&mut s, 0, &format!("pub fn new(ptr : {}) -> {}{{\n", ptr_type_name, result_type_name));
-    push(&mut s, 1, &format!("{}{{ ptr, ", result_type_name));
+    if is_root{
+        push(&mut s, 0, &format!("pub fn new(ptr : {}) -> {}{{\n", ptr_type_name, result_type_name));
+        push(&mut s, 1, &format!("{}{{ ptr, ", result_type_name));
+    } else {
+        push(&mut s, 0, &format!("pub fn new(ptr : {}, root : *const RootItem) -> {}{{\n", ptr_type_name, result_type_name));
+        push(&mut s, 1, &format!("{}{{ ptr, root, ", result_type_name));
+    }
+
     for p in proxies {
         if let Some(n) = &p.proxy {
             s.push_str(&format!("{} : None, ", n.name))
@@ -101,24 +108,12 @@ pub fn push(s : &mut String, tabs : usize, text : &str) {
 }
 
 
-fn param_to_fun_get(item : &ParamItem, self_mod_name : &str, self_type_name : &str, is_ref : bool) -> Ret{
+fn param_to_fun_get(item : &ParamItem, self_mod_name : &str, self_type_name : &str) -> Ret{
     let p = proxy_name(&item.id);
     let fun = get_fun_string(&item.id, &to_snake_name(&item.id), item.is_old, item.var_type,
                    self_mod_name, self_type_name, &item.value_type_nickname, &p, &item.value_type_name, item.is_ref);
     Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var(&item.value_type_name, item.var_type) }), fun }
-    // match item.param_type{
-    //     ParamType::Bool =>{
-    //         //let proxy = format!("{} : Option<{}>,", p, with_var("bool", item.var_type));
-    //         let s =
-    //         Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("bool", item.var_type) }), fun : s }
-    //     },
-    //     ParamType::Num =>{
-    //         let s = get_fun_string(&item.id, &to_snake_name(&item.id),  item.is_old, item.var_type,
-    //                                self_mod_name, self_type_name, "num", &p, "f64");
-    //         Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var("f64", item.var_type) }), fun : s }
-    //     },
-    //     _ =>{ unimplemented!() }
-    // }
+
 }
 
 fn param_to_fun_set(item : &ParamItem, item_mod_name : &str) -> Ret {
@@ -137,7 +132,7 @@ fn cols_to_funs(d : &StructDesc) -> Vec<Ret>{
             //let proxy = format!("{} : Option<{}>,", &p, &child.col_ptr_type);
             let s = get_col_fun_string(&child.col_id, &snake_name, child.col_is_old,
                                    &d.item_mod_name, &child.col_mod_name,
-                                   &p, &child.col_struct_name);
+                                   &p, &child.col_struct_name, child.is_mut);
             vec.push(Ret{ proxy : Some(Proxy{
                 name : p,
                 type_without_option : child.col_struct_name.to_string(),

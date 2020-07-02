@@ -39,6 +39,7 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     var_type: mem.var_type().clone(),
                     value_type_name : "bool".to_string(),
                     value_type_nickname : "bool".to_string(),
+                    is_ref : false,
                 });
             },
             RustMemberType::Num =>{
@@ -47,7 +48,8 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     id: mem.name().to_string(),
                     var_type: mem.var_type().clone(),
                     value_type_name : "f64".to_string(),
-                    value_type_nickname : "f64".to_string(),
+                    value_type_nickname : "num".to_string(),
+                    is_ref : false,
                 });
             },
             RustMemberType::Data =>{
