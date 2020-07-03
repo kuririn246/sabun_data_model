@@ -29,11 +29,11 @@ pub fn to_source_from_col_temp(imp : &StructDesc) -> StructSource {
     for key in &imp.keys{
         let key_name = if key.is_old(){ format!("{}_old", key.key()) } else{ key.key().to_string() };
         result.push(StrAndTab::new(
-            format!("pub fn {}(&mut self) -> &{} {{", &key_name, &imp.item_struct_name), 1));
+            format!("pub fn {}(&mut self) -> &mut {} {{", &key_name, &imp.item_struct_name), 1));
         result.push(StrAndTab::new(
-            format!("if let Some(item) = &self.p_{} {{", key.key()), 2));
+            format!("if self.p_{}.is_some() {{", key.key()), 2));
         result.push(StrAndTab::new(
-            format!("return item;"), 3));
+            format!("return self.p_{}.as_mut().unwrap();", key.key()), 3));
         result.push(StrAndTab::new(
             format!("}}"), 2));
 
@@ -44,14 +44,14 @@ pub fn to_source_from_col_temp(imp : &StructDesc) -> StructSource {
         result.push(StrAndTab::new(
             format!("self.p_{} = Some(item);", key.key()), 2));
         result.push(StrAndTab::new(
-            format!("self.p_{}.as_ref().unwrap()", key.key()), 2));
+            format!("self.p_{}.as_mut().unwrap()", key.key()), 2));
         result.push(StrAndTab::new(
             "}".to_string(), 1));
     }
 
     if imp.keys.len() != 0{
         result.push(StrAndTab::new(
-            format!("pub fn from_id(&mut self, id : &str) -> &{} {{", &imp.item_struct_name), 1));
+            format!("pub fn from_id(&mut self, id : &str) -> &mut {} {{", &imp.item_struct_name), 1));
         result.push(StrAndTab::new(
             format!("match id{{"), 2));
         for key in &imp.keys {

@@ -171,5 +171,5 @@ fn ref_to_fun_get(item : &RefItem, self_mod_name: &str) -> Ret {
 
     let s = get_ref_fun_string(&item.col_name,  &snake, item.is_old, item.var_type,
                                self_mod_name, &p, &item_type);
-    Ret { proxy: Some(Proxy { name: p, type_without_option: with_var(&format!("*const {}",&item_type), item.var_type) }), fun: s }
+    Ret { proxy: Some(Proxy { name: p, type_without_option: with_var(&format!("*mut {}",&item_type), item.var_type) }), fun: s }
 }

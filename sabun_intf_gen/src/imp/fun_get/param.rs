@@ -6,11 +6,11 @@ pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : Va
     let mut s = String::new();
     let and = if is_ref{ "&" } else{ "" };
     push(&mut s, 0, &format!("pub fn {}(&mut self) -> {}{}{{\n", with_old(snake_name, is_old), and, with_var(value_type_name, var_type)));
-    push(&mut s, 1,&format!("if let Some(v) = &self.{}{{\n", proxy_name));
+    push(&mut s, 1,&format!("if self.{}.is_some() {{\n", proxy_name));
     if is_ref {
-        push(&mut s, 2, &format!("return v;\n"));
+        push(&mut s, 2, &format!("return self.{}.as_ref().unwrap();\n", proxy_name));
     } else{
-        push(&mut s, 2, &format!("return v.clone();\n"));
+        push(&mut s, 2, &format!("return self.{}.unwrap();\n", proxy_name));
     }
     push(&mut s, 1,&format!("}}\n"));
     push(&mut s, 1,&format!("let qv = {}::get_{}(self.ptr, \"{}\").unwrap(); \n", self_mod_name, value_nickname, id));
@@ -33,7 +33,7 @@ pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : Va
     if is_ref {
         push(&mut s, 1, &format!("return self.{}.as_ref().unwrap();\n", proxy_name));
     } else{
-        push(&mut s, 1, &format!("return self.{}.as_ref().unwrap().clone();\n", proxy_name));
+        push(&mut s, 1, &format!("return self.{}.unwrap()\n", proxy_name));
     }
     push(&mut s, 0,"}");
     s
