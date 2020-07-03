@@ -10,7 +10,7 @@ pub fn get_col_fun_string(id : &str, snake_name : &str, is_old : bool, self_mod_
     push(&mut s, 1,&format!("}}\n"));
     push(&mut s, 1,&format!("let ans = {}::get_{}(self.ptr, \"{}\").unwrap();\n", self_mod_name, value_nickname, id));
 
-    push(&mut s, 1,&format!("self.{} = Some({}::new(ans, self.root));\n", proxy_name, col_type));
+    push(&mut s, 1,&format!("self.{} = Some({}::new(ans, self.root()));\n", proxy_name, col_type));
     push(&mut s, 1,&format!("return self.{}.as_ref().unwrap();\n", proxy_name));
     push(&mut s, 0,"}");
     s

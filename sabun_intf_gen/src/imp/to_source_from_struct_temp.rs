@@ -9,7 +9,7 @@ pub fn to_source_from_struct_temp(imp : &StructTemp) -> StructSource {
     result.push(StrAndTab::new(format!("pub struct {} {{", &imp.struct_name), 0));
     result.push(StrAndTab::new(format!("pub ptr : {},", &imp.ptr_type), 1));
     if imp.is_root == false {
-        result.push(StrAndTab::new(format!("pub root : *const RootItem,"), 1));
+        result.push(StrAndTab::new(format!("pub root : *mut RootItem,"), 1));
     }
     for proxy in &imp.proxies {
         result.push(StrAndTab::new(proxy.to_string(), 1));

@@ -2,10 +2,10 @@ use crate::imp::structs::value_type::VarType;
 use crate::imp::structs::ref_def_obj::RefDefObj;
 
 impl RefDesc{
-    pub(crate) fn new(name : String, value_type : VarType, is_old : bool) -> RefDesc{
-        RefDesc{ name, value_type, is_old }
+    pub(crate) fn new(col_name : String, value_type : VarType, is_old : bool) -> RefDesc{
+        RefDesc{ col_name, value_type, is_old }
     }
-    pub fn name(&self) -> &str{ &self.name }
+    pub fn col_name(&self) -> &str{ &self.col_name }
     pub fn var_type(&self) -> &VarType { &self.value_type }
     pub fn is_old(&self) -> bool{ self.is_old }
 }
@@ -18,7 +18,7 @@ pub struct RefDescs{
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct RefDesc{
-    name : String,
+    col_name : String,
     value_type : VarType,
     is_old : bool,
 }

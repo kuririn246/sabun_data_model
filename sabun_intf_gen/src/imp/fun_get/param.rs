@@ -1,7 +1,7 @@
 use sabun_maker::structs::VarType;
 use crate::imp::to_struct_temp_from_struct_desc::{push, with_old, with_var};
 
-pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : VarType, self_mod_name : &str, self_type_name : &str,
+pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : VarType, self_mod_name : &str,
                       value_nickname: &str, proxy_name : &str, value_type_name : &str, is_ref : bool) -> String{
     let mut s = String::new();
     let and = if is_ref{ "&" } else{ "" };
@@ -30,7 +30,11 @@ pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : Va
     }
 
     push(&mut s, 1,&format!("self.{} = Some(ans);\n", proxy_name));
-    push(&mut s, 1,&format!("return self.{}.as_ref().unwrap();\n", proxy_name));
+    if is_ref {
+        push(&mut s, 1, &format!("return self.{}.as_ref().unwrap();\n", proxy_name));
+    } else{
+        push(&mut s, 1, &format!("return self.{}.as_ref().unwrap().clone();\n", proxy_name));
+    }
     push(&mut s, 0,"}");
     s
 }

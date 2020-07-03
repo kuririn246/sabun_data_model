@@ -32,7 +32,7 @@ fn new(ptr_type_name : &str, result_type_name : &str, proxies : &[Ret], is_root 
         push(&mut s, 0, &format!("pub fn new(ptr : {}) -> {}{{\n", ptr_type_name, result_type_name));
         push(&mut s, 1, &format!("{}{{ ptr, ", result_type_name));
     } else {
-        push(&mut s, 0, &format!("pub fn new(ptr : {}, root : *const RootItem) -> {}{{\n", ptr_type_name, result_type_name));
+        push(&mut s, 0, &format!("pub fn new(ptr : {}, root : *mut RootItem) -> {}{{\n", ptr_type_name, result_type_name));
         push(&mut s, 1, &format!("{}{{ ptr, root, ", result_type_name));
     }
 
@@ -42,7 +42,12 @@ fn new(ptr_type_name : &str, result_type_name : &str, proxies : &[Ret], is_root 
         }
     }
     s.push_str("}\n");
-    push(&mut s, 0, "}");
+    push(&mut s, 0, "}\n");
+    if is_root{
+        push(&mut s, 0, &format!("pub fn root(&mut self) -> *mut RootItem{{ self }}\n"));
+    } else{
+        push(&mut s, 0, &format!("pub fn root(&mut self) -> *mut RootItem{{ self.root }}\n"));
+    }
     s
 }
 
@@ -111,7 +116,7 @@ pub fn push(s : &mut String, tabs : usize, text : &str) {
 fn param_to_fun_get(item : &ParamItem, self_mod_name : &str, self_type_name : &str) -> Ret{
     let p = proxy_name(&item.id);
     let fun = get_fun_string(&item.id, &to_snake_name(&item.id), item.is_old, item.var_type,
-                   self_mod_name, self_type_name, &item.value_type_nickname, &p, &item.value_type_name, item.is_ref);
+                   self_mod_name,  &item.value_type_nickname, &p, &item.value_type_name, item.is_ref);
     Ret{ proxy : Some(Proxy{ name : p, type_without_option : with_var(&item.value_type_name, item.var_type) }), fun }
 
 }
@@ -127,7 +132,7 @@ fn cols_to_funs(d : &StructDesc) -> Vec<Ret>{
     let mut vec : Vec<Ret> = Vec::with_capacity(d.children.len());
     for child in &d.children{
         if child.col_struct_name.is_empty() == false{
-            let snake_name = to_snake_name(&child.col_struct_name);
+            let snake_name = to_snake_name(&child.col_id);
             let p = proxy_name(&snake_name);
             //let proxy = format!("{} : Option<{}>,", &p, &child.col_ptr_type);
             let s = get_col_fun_string(&child.col_id, &snake_name, child.col_is_old,
@@ -160,11 +165,11 @@ fn ref_proxy_name(s : &str) -> String{
 }
 
 fn ref_to_fun_get(item : &RefItem, self_mod_name: &str) -> Ret {
-    let snake = to_snake_name(&item.id);
+    let snake = to_snake_name(&item.col_name);
     let p = ref_proxy_name(&snake);
-    let item_type = to_item_type_name(&item.id);
+    let item_type = to_item_type_name(&item.col_name);
 
-    let s = get_ref_fun_string(&item.id,  &snake, item.is_old, item.var_type,
+    let s = get_ref_fun_string(&item.col_name,  &snake, item.is_old, item.var_type,
                                self_mod_name, &p, &item_type);
-    Ret { proxy: Some(Proxy { name: p, type_without_option: with_var(&item_type, item.var_type) }), fun: s }
+    Ret { proxy: Some(Proxy { name: p, type_without_option: with_var(&format!("*const {}",&item_type), item.var_type) }), fun: s }
 }

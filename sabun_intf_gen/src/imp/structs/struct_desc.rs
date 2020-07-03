@@ -48,7 +48,6 @@ pub struct ParamItem{
 #[derive(Debug, Clone, PartialEq)]
 pub struct RefItem{
     pub(crate) is_old : bool,
-    //pub(crate) snake_name: String,
-    pub(crate) id : String,
+    pub(crate) col_name: String,
     pub(crate) var_type : VarType,
 }
