@@ -9,7 +9,7 @@ use crate::imp::fun_get::refs::get_ref_fun_string;
 
 pub fn to_struct_temp_from_struct_desc(d : &StructDesc) -> StructTemp{
     let mut ref_funs = refs_to_funs(&d.refs, d.ref_is_enum, &d.item_mod_name, d.is_mut);
-    let mut param_funs = params_to_funs(&d.params, &d.item_mod_name, &d.item_struct_name, d.is_mut);
+    let mut param_funs = params_to_funs(&d.params, &d.item_mod_name,  d.is_mut);
     let mut col_funs = cols_to_funs(d);
     param_funs.append(&mut col_funs);
     param_funs.append(&mut ref_funs);
@@ -73,10 +73,10 @@ fn separate(v : Vec<Ret>) -> (Vec<String>, Vec<String>){
     (funs, proxies)
 }
 
-fn params_to_funs(items : &[ParamItem], self_mod_name : &str, self_type_name : &str, is_mut : bool) -> Vec<Ret>{
+fn params_to_funs(items : &[ParamItem], self_mod_name : &str, is_mut : bool) -> Vec<Ret>{
     let mut vec : Vec<Ret> = Vec::with_capacity(items.len());
     for item in items{
-        vec.push(param_to_fun_get(item, self_mod_name, self_type_name));
+        vec.push(param_to_fun_get(item, self_mod_name));
         if is_mut{
             vec.push(param_to_fun_set(item, self_mod_name))
         }
@@ -113,7 +113,7 @@ pub fn push(s : &mut String, tabs : usize, text : &str) {
 }
 
 
-fn param_to_fun_get(item : &ParamItem, self_mod_name : &str, self_type_name : &str) -> Ret{
+fn param_to_fun_get(item : &ParamItem, self_mod_name : &str) -> Ret{
     let p = proxy_name(&item.id);
     let fun = get_fun_string(&item.id, &to_snake_name(&item.id), item.is_old, item.var_type,
                    self_mod_name,  &item.value_type_nickname, &p, &item.value_type_name, item.is_ref);
@@ -137,7 +137,7 @@ fn cols_to_funs(d : &StructDesc) -> Vec<Ret>{
             //let proxy = format!("{} : Option<{}>,", &p, &child.col_ptr_type);
             let s = get_col_fun_string(&child.col_id, &snake_name, child.col_is_old,
                                    &d.item_mod_name, &child.col_mod_name,
-                                   &p, &child.col_struct_name, child.is_mut);
+                                   &p, &child.col_struct_name);
             vec.push(Ret{ proxy : Some(Proxy{
                 name : p,
                 type_without_option : child.col_struct_name.to_string(),

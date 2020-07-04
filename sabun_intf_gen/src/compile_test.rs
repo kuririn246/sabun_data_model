@@ -173,7 +173,7 @@ impl ColItem {
         }
         let qv = list_item::get_ref(self.ptr, "refed").unwrap();
         let ref_id = if let Qv::Val(v) = qv{ v } else { unreachable!() };
-        let mut root = unsafe{ self.root.as_mut().unwrap() };
+        let root = unsafe{ self.root.as_mut().unwrap() };
         let ref_ptr : *mut RefedItem = root.refed().from_id(ref_id).unwrap();
         self.ref_refed = Some(ref_ptr);
         let pp = self.ref_refed.unwrap();

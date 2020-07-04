@@ -1,5 +1,6 @@
 {
 	bu : false,
+	str : "sutoringu",
 	col : ["Data",
 		[{
 			nakabu : true,

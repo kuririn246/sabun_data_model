@@ -1,7 +1,7 @@
 use crate::imp::to_struct_temp_from_struct_desc::{push, with_old};
 
 pub fn get_col_fun_string(id : &str, snake_name : &str, is_old : bool, self_mod_name : &str, value_nickname: &str,
-                          proxy_name : &str, col_type : &str, is_mut : bool) -> String{
+                          proxy_name : &str, col_type : &str) -> String{
     let mut s = String::new();
 
     push(&mut s, 0, &format!("pub fn {}(&mut self) -> &mut {}{{\n", with_old(snake_name, is_old), col_type));

@@ -5,6 +5,7 @@ use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_list::{ConstList, MutList};
 use crate::imp::intf::ConstDataPtr;
+use crate::imp::structs::rust_string::RustString;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct RootObjectPtr{
@@ -32,15 +33,24 @@ pub fn get_num(root : RootObjectPtr, name : &str) -> Option<Qv<f64>>{
     }
 }
 
+pub fn get_str(root : RootObjectPtr, name : &str) -> Option<Qv<String>>{
+    let root = unsafe{ root.ptr.as_ref().unwrap() };
+    if let Some(RustParam::String(b)) = get_param(root.default(), root.sabun(), name){
+        Some(b.map(|s| s.str().to_string()))
+    } else{
+        None
+    }
+}
+
 pub fn get_data(root : RootObjectPtr, name : &str) -> Option<ConstDataPtr>{
     let root = unsafe{ root.ptr.as_ref().unwrap() };
     if let Some(RootValue::Data(d)) = root.default().get(name){
         Some(ConstDataPtr::new(d, root))
     } else{ None }
 }
-pub fn get_data2(root : *const RootObject, name : &str) -> Option<ConstDataPtr>{
-    get_data(RootObjectPtr::new(root as *mut RootObject), name)
-}
+// pub fn get_data2(root : *const RootObject, name : &str) -> Option<ConstDataPtr>{
+//     get_data(RootObjectPtr::new(root as *mut RootObject), name)
+// }
 
 pub fn get_list(root : *const RootObject, name : &str) -> Option<*const ConstList>{
     let root = unsafe{ root.as_ref().unwrap() };
@@ -76,6 +86,13 @@ pub fn set_bool(root : RootObjectPtr, name : &str, val : Qv<bool>) -> bool{
 pub fn set_num(root : RootObjectPtr, name : &str, val : Qv<f64>) -> bool{
     let root = unsafe{ root.ptr.as_mut().unwrap() };
     match root.set_sabun(name.to_string(), RustParam::Number(val)){
+        Ok(_) => true,
+        Err(_) => false,
+    }
+}
+pub fn set_str(root : RootObjectPtr, name : &str, val : Qv<String>) -> bool{
+    let root = unsafe{ root.ptr.as_mut().unwrap() };
+    match root.set_sabun(name.to_string(), RustParam::String(val.map(|s| RustString::new(s.to_string())))){
         Ok(_) => true,
         Err(_) => false,
     }
