@@ -87,11 +87,11 @@ impl RefedData {
         self.p_second = Some(item);
         self.p_second.as_mut().unwrap()
     }
-    pub fn from_id(&mut self, id : &str) -> &mut RefedItem {
+    pub fn from_id(&mut self, id : &str) -> Option<&mut RefedItem> {
         match id{
-            "first" => self.first(),
-            "second" => self.second(),
-            _ =>{ unreachable!() },
+            "first" => Some(self.first()),
+            "second" => Some(self.second()),
+            _ =>{ None },
         }
     }
 }
@@ -137,10 +137,10 @@ impl ColData {
         self.p_huga = Some(item);
         self.p_huga.as_mut().unwrap()
     }
-    pub fn from_id(&mut self, id : &str) -> &mut ColItem {
+    pub fn from_id(&mut self, id : &str) -> Option<&mut ColItem> {
         match id{
-            "huga" => self.huga(),
-            _ =>{ unreachable!() },
+            "huga" => Some(self.huga()),
+            _ =>{ None },
         }
     }
 }
@@ -174,7 +174,7 @@ impl ColItem {
         let qv = list_item::get_ref(self.ptr, "refed").unwrap();
         let ref_id = if let Qv::Val(v) = qv{ v } else { unreachable!() };
         let mut root = unsafe{ self.root.as_mut().unwrap() };
-        let ref_ptr : *mut RefedItem = root.refed().from_id(ref_id);
+        let ref_ptr : *mut RefedItem = root.refed().from_id(ref_id).unwrap();
         self.ref_refed = Some(ref_ptr);
         let pp = self.ref_refed.unwrap();
         unsafe{ pp.as_mut().unwrap() }

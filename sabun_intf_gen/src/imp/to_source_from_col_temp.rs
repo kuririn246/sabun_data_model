@@ -51,15 +51,15 @@ pub fn to_source_from_col_temp(imp : &StructDesc) -> StructSource {
 
     if imp.keys.len() != 0{
         result.push(StrAndTab::new(
-            format!("pub fn from_id(&mut self, id : &str) -> &mut {} {{", &imp.item_struct_name), 1));
+            format!("pub fn from_id(&mut self, id : &str) -> Option<&mut {}> {{", &imp.item_struct_name), 1));
         result.push(StrAndTab::new(
             format!("match id{{"), 2));
         for key in &imp.keys {
             result.push(StrAndTab::new(
-                format!("\"{}\" => self.{}(),", key.key(), key.key()), 3));
+                format!("\"{}\" => Some(self.{}()),", key.key(), key.key()), 3));
         }
         result.push(StrAndTab::new(
-            format!("_ =>{{ unreachable!() }},"), 3));
+            format!("_ =>{{ None }},"), 3));
         result.push(StrAndTab::new(
             format!("}}"), 2));
         result.push(StrAndTab::new(

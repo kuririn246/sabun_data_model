@@ -30,7 +30,7 @@ pub fn get_ref_fun_string(col_name : &str, snake_name : &str, is_old : bool, var
         let ref_id = if let Qv::Val(v) = qv{{ v }} else {{ unreachable!() }};\n"));
     }
     push(&mut s, 1,&format!("let mut root = unsafe{{ self.root.as_mut().unwrap() }};\n"));
-    push(&mut s, 1,&format!("let ref_ptr : *mut {} = root.{}().from_id(ref_id);\n", result_type_name, col_name));
+    push(&mut s, 1,&format!("let ref_ptr : *mut {} = root.{}().from_id(ref_id).unwrap();\n", result_type_name, col_name));
     push(&mut s, 1,&format!("self.{} = Some(ref_ptr);\n", proxy_name));
     push(&mut s, 1,&format!("let pp = self.{}.unwrap(); \n", proxy_name));
     push(&mut s, 1,&format!("unsafe{{ pp.as_mut().unwrap() }}\n"));
