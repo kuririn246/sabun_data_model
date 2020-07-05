@@ -1,13 +1,25 @@
 use crate::imp::structs::qv::Qv;
-
+#[derive(Debug, PartialEq)]
 pub enum NullOr<T>{
     Val(T),
     Null
 }
-
+#[derive(Debug, PartialEq)]
 pub enum UndefOr<T>{
     Val(T),
     Undefined,
+}
+
+impl<T : Clone> Clone for NullOr<T>{
+    fn clone(&self) -> Self {
+        self.map(|t| t.clone())
+    }
+}
+
+impl<T : Clone> Clone for UndefOr<T>{
+    fn clone(&self) -> Self {
+        self.map(|t| t.clone())
+    }
 }
 
 impl<T> NullOr<T>{
@@ -40,6 +52,8 @@ impl<T> NullOr<T>{
         }
     }
 }
+
+
 
 impl<T> UndefOr<T>{
     pub fn map<U>(&self, f : impl Fn(&T) -> U) -> UndefOr<U> {

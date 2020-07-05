@@ -1,0 +1,50 @@
+#[cfg(test)]
+mod tests {
+    use sabun_maker::json_dir_to_rust;
+    use sabun_maker::intf::RootObjectPtr;
+    use sabun_maker::intf::null_or::{NullOr, UndefOr};
+    use sabun_maker::structs::Qv;
+
+    #[test]
+    fn it_works() {
+
+        match json_dir_to_rust("src/json_dir/test/params", true) {
+            Ok(mut a) => {
+                let mut root_intf = crate::generated::params::RootIntf::new(a);
+                let intf = root_intf.intf();
+                assert_eq!(intf.s(),"sutoringu");
+                assert_eq!(intf.shatena(), &NullOr::Val("esuhatena".to_string()));
+                assert_eq!(intf.sbikkuri(), &UndefOr::Undefined);
+                assert_eq!(intf.sbh(), &Qv::Val("bikkurihatena".to_string()));
+                intf.set_s("s2".to_string());
+                assert_eq!(intf.s(),"s2");
+                intf.set_shatena(NullOr::Null);
+                assert_eq!(intf.shatena(),&NullOr::Null);
+                intf.set_sbikkuri(UndefOr::Val("und".to_string()));
+                assert_eq!(intf.sbikkuri(),&UndefOr::Val("und".to_string()));
+                intf.set_sbh(Qv::Null);
+                assert_eq!(intf.sbh(),&Qv::Null);
+
+                assert_eq!(intf.b(),false);
+                assert_eq!(intf.bhatena(), NullOr::Null);
+                assert_eq!(intf.bbikkuri(), UndefOr::Val(false));
+                assert_eq!(intf.bbh(), Qv::Val(true));
+                intf.set_b(true);
+                assert_eq!(intf.b(),true);
+                intf.set_bhatena(NullOr::Val(false));
+                assert_eq!(intf.bhatena(),NullOr::Val(false));
+                intf.set_bbikkuri(UndefOr::Undefined);
+                assert_eq!(intf.bbikkuri(),UndefOr::Undefined);
+                intf.set_bbh(Qv::Null);
+                assert_eq!(intf.bbh(),Qv::Null);
+
+                assert_eq!(intf.n(), 10.0);
+                intf.set_n(20.0);
+                assert_eq!(intf.n(), 20.);
+
+
+            },
+            Err(e) => { println!("val 1 {}", e.message) }
+        }
+    }
+}

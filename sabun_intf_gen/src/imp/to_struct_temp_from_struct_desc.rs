@@ -124,7 +124,8 @@ fn param_to_fun_get(item : &ParamItem, self_mod_name : &str) -> Ret{
 fn param_to_fun_set(item : &ParamItem, item_mod_name : &str) -> Ret {
     let p = proxy_name(&item.id);
     let fun = fun_set(&item.id, &to_snake_name(&item.id), item.is_old,
-                                   &item.value_type_name, item.var_type, item_mod_name, &p);
+                                   &item.value_type_name, item.var_type, item_mod_name,
+                      &p, &item.value_type_nickname);
     Ret{ proxy : None, fun }
 }
 

@@ -10,7 +10,7 @@ pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : Va
     if is_ref {
         push(&mut s, 2, &format!("return self.{}.as_ref().unwrap();\n", proxy_name));
     } else{
-        push(&mut s, 2, &format!("return self.{}.unwrap();\n", proxy_name));
+        push(&mut s, 2, &format!("return self.{}.clone().unwrap();\n", proxy_name));
     }
     push(&mut s, 1,&format!("}}\n"));
     push(&mut s, 1,&format!("let qv = {}::get_{}(self.ptr, \"{}\").unwrap(); \n", self_mod_name, value_nickname, id));
@@ -19,10 +19,10 @@ pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : Va
             push(&mut s, 1,&format!("let ans = qv.into_value().unwrap();\n"));
         },
         VarType::Undefiable => {
-            push(&mut s, 1,&format!("let ans = UndefOr.from_qv(qv).unwrap();\n"));
+            push(&mut s, 1,&format!("let ans = UndefOr::from_qv(qv).unwrap();\n"));
         },
         VarType::Nullable => {
-            push(&mut s, 1,&format!("let ans = NullOr.from_qv(qv).unwrap();\n"));
+            push(&mut s, 1,&format!("let ans = NullOr::from_qv(qv).unwrap();\n"));
         },
         VarType::UndefNullable => {
             push(&mut s, 1,&format!("let ans = qv;\n"));
@@ -33,7 +33,7 @@ pub fn get_fun_string(id : &str, snake_name : &str, is_old : bool, var_type : Va
     if is_ref {
         push(&mut s, 1, &format!("return self.{}.as_ref().unwrap();\n", proxy_name));
     } else{
-        push(&mut s, 1, &format!("return self.{}.unwrap()\n", proxy_name));
+        push(&mut s, 1, &format!("return self.{}.clone().unwrap()\n", proxy_name));
     }
     push(&mut s, 0,"}");
     s
