@@ -8,7 +8,7 @@ pub enum JVal{
     Undefined(Span),
     Bool(bool, Span),
     String(String, Span),
-    //Int(i64, Span),
+    Int(i64, Span),
     Double(f64, Span),
     Array(Vec<JVal>, Span),
     Map(LinkedHashMap<String, JVal>, Span)
@@ -44,6 +44,13 @@ impl JVal{
         }
     }
 
+    pub fn as_int(&self) -> Option<i64>{
+        return match self{
+            JVal::Int(i, _) =>{ Some(*i) },
+            _ =>{ None }
+        }
+    }
+
     pub fn as_bool(&self) -> Option<bool>{
         return match self{
             JVal::Bool(b, _) =>{ Some(*b) }
@@ -72,6 +79,7 @@ impl JVal{
             JVal::Bool(_,s) => s,
             JVal::String(_, s) => s,
             JVal::Double(_, s) => s,
+            JVal::Int(_,s) => s,
             JVal::Array(_, s) => s,
             JVal::Map(_, s) => s,
         }

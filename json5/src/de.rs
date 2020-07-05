@@ -2,7 +2,7 @@ use pest::iterators::{Pair, Pairs};
 use pest::Parser as P;
 use pest_derive::Parser;
 use crate::error::{Result, MyError};
-use crate::deserialize_item::{get_unit, get_bool, get_string, get_f64, get_seq, get_map, get_undefined};
+use crate::deserialize_item::{get_unit, get_bool, get_string, get_f64, get_seq, get_map, get_undefined, get_i64};
 use crate::jval::JVal;
 use std::f64;
 use std::char;
@@ -30,7 +30,7 @@ pub fn deserialize_any(pair: Pair<'_, Rule>, rc : Rc<String>) -> Result<JVal>
         Rule::string | Rule::identifier => Ok(get_string(parse_string(pair)?, span, rc)),
         Rule::number => {
             if is_int(pair.as_str()) {
-                Ok(get_f64(parse_integer(&pair)? as f64, span, rc))
+                Ok(get_i64(parse_integer(&pair)?, span, rc))
             } else {
                 Ok(get_f64(parse_number(&pair)?, span, rc))
             }
