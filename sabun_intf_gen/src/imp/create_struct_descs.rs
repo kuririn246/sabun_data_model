@@ -42,16 +42,27 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     is_ref : false,
                 });
             },
-            RustMemberType::Num =>{
+            RustMemberType::Float =>{
                 params.push(ParamItem{
                     is_old: mem.is_old(),
                     id: mem.name().to_string(),
                     var_type: mem.var_type().clone(),
                     value_type_name : "f64".to_string(),
-                    value_type_nickname : "num".to_string(),
+                    value_type_nickname : "float".to_string(),
                     is_ref : false,
                 });
             },
+            RustMemberType::Int =>{
+                params.push(ParamItem{
+                    is_old: mem.is_old(),
+                    id: mem.name().to_string(),
+                    var_type: mem.var_type().clone(),
+                    value_type_name : "i64".to_string(),
+                    value_type_nickname : "int".to_string(),
+                    is_ref : false,
+                });
+            },
+
             RustMemberType::Str =>{
                 params.push(ParamItem{
                     is_old: mem.is_old(),

@@ -16,8 +16,11 @@ pub fn json_item_to_rust(name : &str, value_type : VarType, v : &JVal, names : &
             Ok(RustValue::Param(RustParam::Bool(Qv::Val(*b)), value_type))
         },
         JVal::Double(f, _)=>{
-            Ok(RustValue::Param(RustParam::Number(Qv::Val(*f)), value_type))
-        }
+            Ok(RustValue::Param(RustParam::Float(Qv::Val(*f)), value_type))
+        },
+        JVal::Int(i, _) =>{
+            Ok(RustValue::Param(RustParam::Int(Qv::Val(*i)), value_type))
+        },
         JVal::String(s, _) => {
             let s = s.to_string();
             Ok(RustValue::Param(RustParam::String(Qv::Val(RustString::new(s))), value_type))
@@ -45,7 +48,10 @@ pub fn json_item_to_rust_ref(name : &str, value_type : VarType, v : &JVal, names
         },
         JVal::Double(_, span)=>{
             Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
-        }
+        },
+        JVal::Int(_, span)=>{
+            Err(format!("{} {} Ref object's members must be string or null {}", span.line_str(), span.slice(), names))?
+        },
         JVal::String(s, _) => {
             let s = s.to_string();
             Ok(RustValue::Param(RustParam::String(Qv::Val(RustString::new(s))), value_type))

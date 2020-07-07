@@ -7,7 +7,7 @@ pub fn get_param(v : &RustParam) -> Value{
     let r = match v{
         RustParam::Bool(b) => to(b,  "Bool",|b| Value::Bool(*b)),
         RustParam::String(s) => to(s, "Str", |s| Value::String(s.str().to_string())),
-        RustParam::Number(n)=> to(n, "Num", |n| Value::Number(*n)),
+        RustParam::Float(n)=> to(n, "Num", |n| Value::Number(*n)),
         _ =>{
             let (array, at) = v.to_rust_array().unwrap();
             rust_array_to_json(&array, &at)

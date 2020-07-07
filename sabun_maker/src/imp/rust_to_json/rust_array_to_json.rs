@@ -9,17 +9,20 @@ pub fn rust_array_to_json(array : &RustArray, at : &ArrayType) -> Value{
 
 
     match at{
-        ArrayType::String =>{ result.push(Value::String("StrArray".to_string())) },
-        ArrayType::Num =>{
+        //ArrayType::String =>{ result.push(Value::String("StrArray".to_string())) },
+        ArrayType::Int =>{
             let array_len = if let Qv::Val(v) = array.qv(){
                 v.len()
             } else{ 0 };
             //noisyすぎるので基本省略
             if array_len == 0 {
-                result.push(Value::String("NumArray".to_string()))
+                result.push(Value::String("IntArray".to_string()))
             }
-        }
-        ArrayType::Num2 =>{ result.push(Value::String("Num2Array".to_string())) }
+        },
+        ArrayType::Float => {
+            result.push(Value::String("FloatArray".to_string()))
+        },
+        //ArrayType::Num2 =>{ result.push(Value::String("Num2Array".to_string())) }
     }
     match array.qv(){
         Qv::Val(v) => {

@@ -26,7 +26,7 @@ pub fn get_bool(root : RootObjectPtr, name : &str) -> Option<Qv<bool>>{
 
 pub fn get_num(root : RootObjectPtr, name : &str) -> Option<Qv<f64>>{
     let root = unsafe{ root.ptr.as_ref().unwrap() };
-    if let Some(RustParam::Number(b)) = get_param(root.default(), root.sabun(), name){
+    if let Some(RustParam::Float(b)) = get_param(root.default(), root.sabun(), name){
         Some(b.clone())
     } else{
         None
@@ -85,7 +85,7 @@ pub fn set_bool(root : RootObjectPtr, name : &str, val : Qv<bool>) -> bool{
 }
 pub fn set_num(root : RootObjectPtr, name : &str, val : Qv<f64>) -> bool{
     let root = unsafe{ root.ptr.as_mut().unwrap() };
-    match root.set_sabun(name.to_string(), RustParam::Number(val)){
+    match root.set_sabun(name.to_string(), RustParam::Float(val)){
         Ok(_) => true,
         Err(_) => false,
     }

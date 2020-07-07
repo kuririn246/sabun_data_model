@@ -1,28 +1,32 @@
 use crate::imp::structs::qv::{Qv, QvType};
 use crate::imp::structs::rust_string::{RustString };
 use crate::imp::structs::rust_value::RustMemberType;
-use crate::imp::structs::rust_array::{RustArray, RustNumArray, RustStrArray, RustNum2Array};
+use crate::imp::structs::rust_array::{RustArray, RustIntArray, RustFloatArray, };
 use crate::imp::structs::array_type::ArrayType;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum RustParam{
     Bool(Qv<bool>),
-    Number(Qv<f64>),
+    Float(Qv<f64>),
+    Int(Qv<i64>),
     String(Qv<RustString>),
-    NumArray(Qv<RustNumArray>),
-    StrArray(Qv<RustStrArray>),
-    Num2Array(Qv<RustNum2Array>)
+    IntArray(Qv<RustIntArray>),
+    FloatArray(Qv<RustFloatArray>),
+    //StrArray(Qv<RustStrArray>),
+    //Num2Array(Qv<RustNum2Array>)
 }
 
 impl RustParam {
     pub(crate) fn qv_type(&self) -> QvType {
         match self {
             RustParam::Bool(b) => b.qv_type(),
-            RustParam::Number(n) => n.qv_type(),
+            RustParam::Float(f) => f.qv_type(),
+            RustParam::Int(i) => i.qv_type(),
             RustParam::String(s) => s.qv_type(),
-            RustParam::NumArray(a) => a.qv_type(),
-            RustParam::StrArray(a) => a.qv_type(),
-            RustParam::Num2Array(a) => a.qv_type(),
+            RustParam::IntArray(a) => a.qv_type(),
+            RustParam::FloatArray(a) => a.qv_type(),
+            //RustParam::StrArray(a) => a.qv_type(),
+            //RustParam::Num2Array(a) => a.qv_type(),
         }
     }
 
@@ -30,11 +34,13 @@ impl RustParam {
         use RustMemberType::*;
         match self {
             RustParam::Bool(_) => Bool,
-            RustParam::Number(_) => Num,
+            RustParam::Float(_) => Float,
+            RustParam::Int(_) => Int,
             RustParam::String(_) => Str,
-            RustParam::NumArray(_) => NumArray,
-            RustParam::StrArray(_) => StrArray,
-            RustParam::Num2Array(_) => Num2Array,
+            RustParam::FloatArray(_) => FloatArray,
+            RustParam::IntArray(_) => IntArray,
+            //RustParam::StrArray(_) => StrArray,
+            //RustParam::Num2Array(_) => Num2Array,
         }
     }
 
@@ -49,33 +55,44 @@ impl RustParam {
     pub(crate) fn to_undefined(&self) -> Self {
         match self {
             RustParam::Bool(_) => RustParam::Bool(Qv::Undefined),
-            RustParam::Number(_) => RustParam::Number(Qv::Undefined),
+            RustParam::Float(_) => RustParam::Float(Qv::Undefined),
+            RustParam::Int(_) => RustParam::Int(Qv::Undefined),
             RustParam::String(_) => RustParam::String(Qv::Undefined),
-            RustParam::NumArray(_) => RustParam::NumArray(Qv::Undefined),
-            RustParam::StrArray(_) => RustParam::StrArray(Qv::Undefined),
-            RustParam::Num2Array(_) => RustParam::Num2Array(Qv::Undefined)
+            RustParam::FloatArray(_) => RustParam::FloatArray(Qv::Undefined),
+            RustParam::IntArray(_) => RustParam::IntArray(Qv::Undefined),
+            //RustParam::StrArray(_) => RustParam::StrArray(Qv::Undefined),
+            //RustParam::Num2Array(_) => RustParam::Num2Array(Qv::Undefined)
         }
     }
 
     pub(crate) fn to_rust_array(&self) -> Option<(RustArray, ArrayType)>{
         match self{
-            RustParam::NumArray(a) => Some((RustArray::from_num_array(a), ArrayType::Num)),
-            RustParam::StrArray(a) => Some((RustArray::from_str_array(a), ArrayType::String)),
-            RustParam::Num2Array(a) => Some((RustArray::from_num2_array(a), ArrayType::Num2)),
+            RustParam::FloatArray(a) => Some((RustArray::from_float_array(a), ArrayType::Float)),
+            RustParam::IntArray(a) => Some((RustArray::from_int_array(a), ArrayType::Int)),
+            //RustParam::StrArray(a) => Some((RustArray::from_str_array(a), ArrayType::String)),
+            //RustParam::Num2Array(a) => Some((RustArray::from_num2_array(a), ArrayType::Num2)),
             _ => None,
         }
     }
 
-    pub(crate) fn to_num(&self) -> Option<f64>{
-        if let RustParam::Number(Qv::Val(s)) = self { Some(*s) } else{ None }
+    pub(crate) fn to_float(&self) -> Option<f64>{
+        if let RustParam::Float(Qv::Val(s)) = self { Some(*s) } else{ None }
+    }
+
+    pub(crate) fn to_int(&self) -> Option<i64>{
+        if let RustParam::Int(Qv::Val(s)) = self { Some(*s) } else{ None }
     }
 
     pub(crate) fn to_string(&self) -> Option<String>{
         if let RustParam::String(Qv::Val(s)) = self { Some(s.to_string()) } else{ None }
     }
 
-    pub(crate) fn to_num_array(&self) -> Option<Vec<f64>>{
-        if let RustParam::NumArray(Qv::Val(a)) = self { Some(a.as_ref().clone()) } else{ None }
+    pub(crate) fn to_float_array(&self) -> Option<Vec<f64>>{
+        if let RustParam::FloatArray(Qv::Val(a)) = self { Some(a.as_ref().clone()) } else{ None }
+    }
+
+    pub(crate) fn to_int_array(&self) -> Option<Vec<i64>>{
+        if let RustParam::IntArray(Qv::Val(a)) = self { Some(a.as_ref().clone()) } else{ None }
     }
 
     // pub(crate) fn from_num_array(v: Vec<RustParam>, qv_type: &QvType) -> Option<RustParam> {
