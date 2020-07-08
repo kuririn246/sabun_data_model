@@ -20,17 +20,18 @@ pub struct RootItem {
     pub ptr : RootObjectPtr,
     p_bbikkuri : Option<UndefOr<bool>>,
     p_sbikkuri : Option<UndefOr<String>>,
+    p_int : Option<i64>,
     p_sbh : Option<Qv<String>>,
     p_s : Option<String>,
     p_bbh : Option<Qv<bool>>,
     p_shatena : Option<NullOr<String>>,
-    p_n : Option<f64>,
     p_bhatena : Option<NullOr<bool>>,
     p_b : Option<bool>,
+    p_float : Option<f64>,
 }
 impl RootItem {
     pub fn new(ptr : RootObjectPtr) -> RootItem{
-        RootItem{ ptr, p_bbikkuri : None, p_sbikkuri : None, p_sbh : None, p_s : None, p_bbh : None, p_shatena : None, p_n : None, p_bhatena : None, p_b : None, }
+        RootItem{ ptr, p_bbikkuri : None, p_sbikkuri : None, p_int : None, p_sbh : None, p_s : None, p_bbh : None, p_shatena : None, p_bhatena : None, p_b : None, p_float : None, }
     }
     pub fn root(&mut self) -> *mut RootItem{ self }
 
@@ -59,6 +60,19 @@ impl RootItem {
     pub fn set_sbikkuri(&mut self, sbikkuri : UndefOr<String>){
         self.p_sbikkuri = Some(sbikkuri.clone());
         root::set_str(self.ptr, "sbikkuri", sbikkuri.into_qv());
+    }
+    pub fn int(&mut self) -> i64{
+        if self.p_int.is_some() {
+            return self.p_int.clone().unwrap();
+        }
+        let qv = root::get_int(self.ptr, "int").unwrap();
+        let ans = qv.into_value().unwrap();
+        self.p_int = Some(ans);
+        return self.p_int.clone().unwrap()
+    }
+    pub fn set_int(&mut self, int : i64){
+        self.p_int = Some(int.clone());
+        root::set_int(self.ptr, "int", Qv::Val(int));
     }
     pub fn sbh(&mut self) -> &Qv<String>{
         if self.p_sbh.is_some() {
@@ -112,19 +126,6 @@ impl RootItem {
         self.p_shatena = Some(shatena.clone());
         root::set_str(self.ptr, "shatena", shatena.into_qv());
     }
-    pub fn n(&mut self) -> f64{
-        if self.p_n.is_some() {
-            return self.p_n.clone().unwrap();
-        }
-        let qv = root::get_num(self.ptr, "n").unwrap();
-        let ans = qv.into_value().unwrap();
-        self.p_n = Some(ans);
-        return self.p_n.clone().unwrap()
-    }
-    pub fn set_n(&mut self, n : f64){
-        self.p_n = Some(n.clone());
-        root::set_num(self.ptr, "n", Qv::Val(n));
-    }
     pub fn bhatena(&mut self) -> NullOr<bool>{
         if self.p_bhatena.is_some() {
             return self.p_bhatena.clone().unwrap();
@@ -150,6 +151,19 @@ impl RootItem {
     pub fn set_b(&mut self, b : bool){
         self.p_b = Some(b.clone());
         root::set_bool(self.ptr, "b", Qv::Val(b));
+    }
+    pub fn float(&mut self) -> f64{
+        if self.p_float.is_some() {
+            return self.p_float.clone().unwrap();
+        }
+        let qv = root::get_float(self.ptr, "float").unwrap();
+        let ans = qv.into_value().unwrap();
+        self.p_float = Some(ans);
+        return self.p_float.clone().unwrap()
+    }
+    pub fn set_float(&mut self, float : f64){
+        self.p_float = Some(float.clone());
+        root::set_float(self.ptr, "float", Qv::Val(float));
     }
 }
 

@@ -37,9 +37,16 @@ pub fn get_bool(ps : ListItemPtr, name : &str) -> Option<Qv<bool>>{
     } else{ None }
 }
 
-pub fn get_num(ps : ListItemPtr, name : &str) -> Option<Qv<f64>>{
+pub fn get_float(ps : ListItemPtr, name : &str) -> Option<Qv<f64>>{
     let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     if let Some(RustParam::Float(b)) = get_param(item, list_def, name){
+        Some(b.clone())
+    } else{ None }
+}
+
+pub fn get_int(ps : ListItemPtr, name : &str) -> Option<Qv<i64>>{
+    let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
+    if let Some(RustParam::Int(b)) = get_param(item, list_def, name){
         Some(b.clone())
     } else{ None }
 }

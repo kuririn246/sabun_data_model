@@ -10,7 +10,7 @@ mod tests {
 
         match json_dir_to_rust("src/json_dir/test/params", true) {
             Ok(mut a) => {
-                let mut root_intf = crate::generated::params::RootIntf::new(a);
+                let mut root_intf = crate::test_generated::params::RootIntf::new(a);
                 let intf = root_intf.intf();
                 assert_eq!(intf.s(),"sutoringu");
                 assert_eq!(intf.shatena(), &NullOr::Val("esuhatena".to_string()));
@@ -38,9 +38,13 @@ mod tests {
                 intf.set_bbh(Qv::Null);
                 assert_eq!(intf.bbh(),Qv::Null);
 
-                assert_eq!(intf.n(), 10.0);
-                intf.set_n(20.0);
-                assert_eq!(intf.n(), 20.);
+                assert_eq!(intf.int(), 10);
+                intf.set_int(20);
+                assert_eq!(intf.int(), 20);
+
+                assert_eq!(intf.float(), 12.0);
+                intf.set_float(22.0);
+                assert_eq!(intf.float(), 22.0);
 
 
             },

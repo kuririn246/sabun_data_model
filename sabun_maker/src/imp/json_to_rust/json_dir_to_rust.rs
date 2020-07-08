@@ -25,7 +25,10 @@ pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RootObject
                 let file_stem_ref = oss.to_str().ok_or_else(|| format!("os_string couldn't be converted to a rust string {:?}", oss))?;
                 let file_stem = file_stem_ref.to_string();
 
-                let mut file =  File::open(de.path())?;
+                let mut file =  match File::open(de.path()){
+                    Ok(f) => f,
+                    Err(_) =>{ continue; }
+                };
                 let mut buf = String::new();
                 match file.read_to_string(&mut buf){
                     Ok(_) => vec.push(JsonFile{ json : buf, file_name_without_ext : file_stem }),
@@ -34,7 +37,7 @@ pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RootObject
             },
             Err(e) =>{
                 //???
-                Err(format!("{}", e.to_string()))?;
+                //Err(format!("{}", e.to_string()))?;
             }
         }
     }

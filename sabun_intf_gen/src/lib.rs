@@ -1,4 +1,4 @@
-mod generated;
+mod test_generated;
 pub mod compile_test;
 mod test;
 mod imp;

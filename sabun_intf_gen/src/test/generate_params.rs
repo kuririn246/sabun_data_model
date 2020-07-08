@@ -8,7 +8,7 @@
 //
 //     #[test]
 //     fn it_works() {
-//         match json_dir_to_rust("src/json_dir/test", true) {
+//         match json_dir_to_rust("src/json_dir/test/params", true) {
 //             Ok(a) => {
 //                 //println!("{:?}", a);
 //                 let ans = generate_interface(&a);
