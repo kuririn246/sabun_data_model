@@ -19,17 +19,17 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : VarType, span : &Span
             let array = get_array( &array[1..], &array_type, names)?;
             Ok(RustValue::Param(array.to_param(&array_type).unwrap(), value_type))
         },
-        NoTagNum =>{
+        NoTagInt =>{
             let array = get_array(&array, &ArrayType::Int, names)?;
             Ok(RustValue::Param(array.to_param(&ArrayType::Int).unwrap(), value_type))
         }
-        Num | Str | Bool =>{
+        Float | Int | Str | Bool =>{
             array_null_or_undefined(&array[1..], gat, value_type, span, names)
         },
         InnerMutUndefined =>{
             Ok(RustValue::InnerMut(None))
         },
-        NotDefined =>{ Err(format!(r#"{} Array must be "...Array", "List", "Data", "MutList", "InnerData", "InnerList", "InnerMut", "InnderDataDef", "InnerListDef", "InnerMutDef", "Num", "Str" or "Bool" {}"#, span.line_str(), names))? },
+        NotDefined =>{ Err(format!(r#"{} Array must be "...Array", "List", "Data", "MutList", "InnerData", "InnerList", "InnerMut", "InnderDataDef", "InnerListDef", "InnerMutDef", "Int", "Float", "Str" or "Bool" {}"#, span.line_str(), names))? },
         List | Data | MutList | InnerList | InnerData | InnerMut | InnerListDef | InnerDataDef | InnerMutDef |
         ViolatedList | InnerViolatedList | InnerViolatedListDef =>{
             match value_type{
@@ -84,8 +84,9 @@ pub enum GatResult{
     ViolatedList,
     InnerViolatedList,
     InnerViolatedListDef,
-    Num,
-    NoTagNum,
+    Int,
+    NoTagInt,
+    Float,
     Str,
     Bool,
     InnerMutUndefined,
@@ -102,7 +103,8 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
                     "FloatArray" =>{ AT(ArrayType::Float) },
                     //"StrArray" =>{ AT(ArrayType::String) },
                     //"Num2Array" =>{ AT(ArrayType::Num2) },
-                    "Num" =>{ Num },
+                    "Int" =>{ Int },
+                    "Float" =>{ Float },
                     "Str" =>{ Str },
                     "Bool" =>{ Bool },
                     "List" => { GatResult::List },
@@ -121,7 +123,7 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
                     _=>{ GatResult::NotDefined },
                 }
             },
-            JVal::Double(_num, _) => NoTagNum,
+            JVal::Int(_num, _) => NoTagInt,
             _ => NotDefined,
         }
     }

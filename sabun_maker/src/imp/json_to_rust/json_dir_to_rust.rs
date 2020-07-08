@@ -21,19 +21,21 @@ pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RootObject
         match dir{
             Ok(de) =>{
                 let path = de.path();
-                let oss : &OsStr = path.file_stem().ok_or_else(|| format!("file stem couldn't be read {:?}", &de))?;
-                let file_stem_ref = oss.to_str().ok_or_else(|| format!("os_string couldn't be converted to a rust string {:?}", oss))?;
-                let file_stem = file_stem_ref.to_string();
+                if path.extension() == Some(&OsStr::new("json5")){
+                    let oss: &OsStr = path.file_stem().ok_or_else(|| format!("file stem couldn't be read {:?}", &de))?;
+                    let file_stem_ref = oss.to_str().ok_or_else(|| format!("os_string couldn't be converted to a rust string {:?}", oss))?;
+                    let file_stem = file_stem_ref.to_string();
 
-                let mut file =  match File::open(de.path()){
-                    Ok(f) => f,
-                    Err(_) =>{ continue; }
-                };
-                let mut buf = String::new();
-                match file.read_to_string(&mut buf){
-                    Ok(_) => vec.push(JsonFile{ json : buf, file_name_without_ext : file_stem }),
-                    Err(e) =>{ Err(format!("{} couldn't be read", e))?; }
-                };
+                    let mut file = match File::open(de.path()) {
+                        Ok(f) => f,
+                        Err(e) => { println!("{} couldn't be read", e); continue; }
+                    };
+                    let mut buf = String::new();
+                    match file.read_to_string(&mut buf) {
+                        Ok(_) => vec.push(JsonFile { json: buf, file_name_without_ext: file_stem }),
+                        Err(e) => { Err(format!("{} couldn't be read", e))?; }
+                    };
+                }
             },
             Err(e) =>{
                 //???

@@ -15,7 +15,8 @@ pub fn array_null_or_undefined(a : &[JVal], gat : GatResult, value_type : VarTyp
     let val = match a[0] {
         JVal::Null(_) => {
             match gat {
-                GatResult::Num => RustValue::Param(RustParam::Float(Qv::Null), value_type),
+                GatResult::Float => RustValue::Param(RustParam::Float(Qv::Null), value_type),
+                GatResult::Int => RustValue::Param(RustParam::Int(Qv::Null), value_type),
                 GatResult::Str => RustValue::Param(RustParam::String(Qv::Null), value_type),
                 GatResult::Bool => RustValue::Param(RustParam::Bool(Qv::Null), value_type),
                 _ => unreachable!(),
@@ -23,7 +24,8 @@ pub fn array_null_or_undefined(a : &[JVal], gat : GatResult, value_type : VarTyp
         },
         JVal::Undefined(_) =>{
             match gat {
-                GatResult::Num => RustValue::Param(RustParam::Float(Qv::Undefined), value_type),
+                GatResult::Float => RustValue::Param(RustParam::Float(Qv::Undefined), value_type),
+                GatResult::Int => RustValue::Param(RustParam::Int(Qv::Undefined), value_type),
                 GatResult::Str => RustValue::Param(RustParam::String(Qv::Undefined), value_type),
                 GatResult::Bool => RustValue::Param(RustParam::Bool(Qv::Undefined), value_type),
                 _ => unreachable!(),

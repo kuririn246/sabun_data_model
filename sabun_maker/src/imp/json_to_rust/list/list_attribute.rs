@@ -39,7 +39,7 @@ pub(crate) fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -
                 "NextID" =>{
                     if array.len() == 2{
                         match array[1]{
-                            JVal::Double(n, _) =>{
+                            JVal::Int(n, _) =>{
                                 return Ok(ListAttribute::NextID(n as u64))
                             }
                             _ =>{}

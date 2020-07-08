@@ -89,7 +89,7 @@
   iniItemList : [
     "List",
     ["Default",{
-      "atk?" : ["Num", null],
+      "atk?" : ["Int", null],
       "Ref": { weapon : "" }, //Refの基本の形、なにか入れないとエラーになる。
     }],
     {
