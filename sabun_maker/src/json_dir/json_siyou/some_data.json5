@@ -1,6 +1,6 @@
 [
 	"Data",
-	["Default", { s : "", n : 0, Ref : { unkoList : ""}}],
+	["Default", { s : "", n : 0.0, Ref : { unkoList : ""}}],
 	{
 		ID : "1ban",
 		Ref : { unkoList : "first" },

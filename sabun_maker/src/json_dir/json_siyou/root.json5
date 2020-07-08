@@ -1,5 +1,6 @@
 {
-  hogeNumber : 10,
+  hogeInt : 10,
+  hogeFloat : 11.0,
   hogeString : "hoge",
   hogeBool : true,
   "@HugaNumber" : 30, //先頭が大文字のメンバ名はすべてシステムが予約しているので認められない。しかしメンバ名をどうしても大文字で始めたい場合、
@@ -8,44 +9,47 @@
   //名前が?で終わるメンバはnull値を含むことが出来る。
   //プログラム側のメンバ名にはこの?は反映されず、型が変わるだけ(もし俺以外の実装が現れたらわからないが・・・）
   //初期値にnullを入れるには、特殊な記法を使う必要がある
-  "hegoNumber?" : ["Num", null], //型を指定し、null値を入れる。これでnullになる。
+  "hegoInt?" : ["Int", null], //型を指定し、null値を入れる。これでnullになる。
+  "hegoFloat?" : ["Float", null], //型を指定し、null値を入れる。これでnullになる。
 
   //!で終わる場合、バージョン違いでこのメンバを持っていなかった場合、デフォルト値でなくundefinedが入る。
   //undefinedを手入力してはいけない
-  "pugyaNumber!" : 10,
-  "pugyaNumber2!?" : ["Num", null], //!?も出来る。?!ではダメ
+  "pugyaInt!" : 10,
+  "pugyaInt2!?" : ["Int", null], //!?も出来る。?!ではダメ
 
-  //配列はいまのところnumber配列、string配列、number配列の配列の4通り。
-  numArray : [ "NumArray", 0, 3, 10 ],
 
-  //numArrayはタグなしでも書ける特殊記法がある
-  numArrayNoTag : [ 5.8, 8, 10 ],
-  emptyNumArray : [ "NumArray" ], //初期値が空配列のnum-array
-  "nullableNumArray?" : [ "NumArray", null ], //nullable配列の初期値をnullにする場合
-  num2Array : [ "Num2Array", [2,3], [3,1] ], //二次元のnumarray
+  //配列はいまのところint配列、float配列の2通り。
+  floatArray : [ "FloatArray", 5.8, 8, 10 ],
 
-  //文字列配列
-  //そもそも配列なんてこのシステムに必要なんだろうか・・・？　まともに差分生成出来る気もしないしなあ。
-  strArray : [ "StrArray", "hoge", "hogehoge" ],
+  //Int配列はタグなしでもかける・・・必要か？
+  intArray : [ 0, 3, 10 ],
+
+  emptyIntArray : [ "IntArray" ], //初期値が空配列のnum-array
+  "nullableIntArray?" : [ "IntArray", null ], //nullable配列の初期値をnullにする場合
 
   //古くて今では使っていないが、互換性のために残すメンバはOldに指定する
-  //oldに設定されたメンバは、_Oldを付けなければプログラムから使用できず、
+  //oldに設定されたメンバは、_oldを付けなければプログラムから使用できず、
   //ConstDataである場合、jsonで Refできない。
   Old : [ "oldName", "oldName2" ],
 
   //nullを入れておく。この変数に値が入っているなら、それは古いデータということになるだろう
   "oldName?" : ["Str", null],
-  "oldName2?" : ["Num", null],
+  "oldName2?" : ["Int", null],
+
+  //undefined可能に設定することで、古いデータの場合はundefinedが設定される。
+  //その場合、oldの古いデータを参照し、なんらかの変換をかけることで新しい値を設定できるかもしれない
+  "newName!" : "new_dayo",
+  "newName2!" : 100,
 
   unkoList : [
 	"Data", //オブジェクトのコレクションを作るためにはList,Data,MutListのどれかを使う必要がある。DataはIDによる参照が可能である
 	["Default", {
-		hogeNumber : 0,
+		hogeInt : 0,
 		hogeString : "hoge"
 	}], //デフォルト値を設定
 	{
 		ID : "first",
-		hogeNumber : 12,
+		hogeInt : 12,
 		hogeString : "huga"
 	},
 	{
@@ -123,7 +127,6 @@
     },
     {
       ID : "nantoka",
-
     }
   ],
 
