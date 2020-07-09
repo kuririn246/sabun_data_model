@@ -1,6 +1,7 @@
 {
 	bu : false,
 	str : "sutoringu",
+	"@AtDesu" : "att",
 	col : ["Data",
 		[{
 			nakabu : true,

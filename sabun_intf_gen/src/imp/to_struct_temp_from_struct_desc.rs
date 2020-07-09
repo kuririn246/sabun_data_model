@@ -84,8 +84,8 @@ fn params_to_funs(items : &[ParamItem], self_mod_name : &str, is_mut : bool) -> 
     vec
 }
 
-fn proxy_name(name : &str) -> String{
-    format!("p_{}", name)
+fn proxy_name(id : &str) -> String{
+    format!("p_{}", to_snake_name(id))
 }
 
 pub fn with_old(name : &str, is_old : bool) -> String {

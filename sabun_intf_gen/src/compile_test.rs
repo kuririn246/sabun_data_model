@@ -20,12 +20,13 @@ pub struct RootItem {
     pub ptr : RootObjectPtr,
     p_bu : Option<bool>,
     p_str : Option<String>,
+    p_at_at_desu : Option<String>,
     p_col : Option<ColData>,
     p_refed : Option<RefedData>,
 }
 impl RootItem {
     pub fn new(ptr : RootObjectPtr) -> RootItem{
-        RootItem{ ptr, p_bu : None, p_str : None, p_col : None, p_refed : None, }
+        RootItem{ ptr, p_bu : None, p_str : None, p_at_at_desu : None, p_col : None, p_refed : None, }
     }
     pub fn root(&mut self) -> *mut RootItem{ self }
 
@@ -54,6 +55,19 @@ impl RootItem {
     pub fn set_str(&mut self, str : String){
         self.p_str = Some(str.clone());
         root::set_str(self.ptr, "str", Qv::Val(str));
+    }
+    pub fn at_at_desu(&mut self) -> &String{
+        if self.p_at_at_desu.is_some() {
+            return self.p_at_at_desu.as_ref().unwrap();
+        }
+        let qv = root::get_str(self.ptr, "@AtDesu").unwrap();
+        let ans = qv.into_value().unwrap();
+        self.p_at_at_desu = Some(ans);
+        return self.p_at_at_desu.as_ref().unwrap();
+    }
+    pub fn set_at_at_desu(&mut self, at_at_desu : String){
+        self.p_at_at_desu = Some(at_at_desu.clone());
+        root::set_str(self.ptr, "@AtDesu", Qv::Val(at_at_desu));
     }
     pub fn col(&mut self) -> &mut ColData{
         if self.p_col.is_some() {
