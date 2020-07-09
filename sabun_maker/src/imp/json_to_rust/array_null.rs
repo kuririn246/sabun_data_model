@@ -7,7 +7,7 @@ use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::qv::Qv;
 use crate::imp::structs::rust_param::RustParam;
 
-pub fn array_null_or_undefined(a : &[JVal], gat : GatResult, value_type : VarType, span : &Span, names : &Names) -> Result<RustValue> {
+pub fn array_null_or_undefined(a : &[JVal], gat : GatResult, var_type: VarType, span : &Span, names : &Names) -> Result<RustValue> {
     if a.len() != 1 {
         Err(format!(r#"{} {} null must be ["type", null] {}"#, span.line_str(), span.slice(), names))?
     }
@@ -15,22 +15,34 @@ pub fn array_null_or_undefined(a : &[JVal], gat : GatResult, value_type : VarTyp
     let val = match a[0] {
         JVal::Null(_) => {
             match gat {
-                GatResult::Float => RustValue::Param(RustParam::Float(Qv::Null), value_type),
-                GatResult::Int => RustValue::Param(RustParam::Int(Qv::Null), value_type),
-                GatResult::Str => RustValue::Param(RustParam::String(Qv::Null), value_type),
-                GatResult::Bool => RustValue::Param(RustParam::Bool(Qv::Null), value_type),
+                GatResult::Float => RustValue::Param(RustParam::Float(Qv::Null), var_type),
+                GatResult::Int => RustValue::Param(RustParam::Int(Qv::Null), var_type),
+                GatResult::Str => RustValue::Param(RustParam::String(Qv::Null), var_type),
+                GatResult::Bool => RustValue::Param(RustParam::Bool(Qv::Null), var_type),
                 _ => unreachable!(),
             }
         },
         JVal::Undefined(_) =>{
             match gat {
-                GatResult::Float => RustValue::Param(RustParam::Float(Qv::Undefined), value_type),
-                GatResult::Int => RustValue::Param(RustParam::Int(Qv::Undefined), value_type),
-                GatResult::Str => RustValue::Param(RustParam::String(Qv::Undefined), value_type),
-                GatResult::Bool => RustValue::Param(RustParam::Bool(Qv::Undefined), value_type),
+                GatResult::Float => RustValue::Param(RustParam::Float(Qv::Undefined), var_type),
+                GatResult::Int => RustValue::Param(RustParam::Int(Qv::Undefined), var_type),
+                GatResult::Str => RustValue::Param(RustParam::String(Qv::Undefined), var_type),
+                GatResult::Bool => RustValue::Param(RustParam::Bool(Qv::Undefined), var_type),
                 _ => unreachable!(),
             }
-        }
+        },
+        JVal::Int(d, _) =>{
+            match gat{
+                GatResult::Float => RustValue::Param(RustParam::Float(Qv::Val(d as f64)), var_type),
+                _ => Err(format!(r#"{} {} null must be ["type", null] {}"#, span.line_str(), span.slice(), names))?,
+            }
+        },
+        JVal::Double(d, _) =>{
+            match gat{
+                GatResult::Float => RustValue::Param(RustParam::Float(Qv::Val(d)), var_type),
+                _ => Err(format!(r#"{} {} null must be ["type", null] {}"#, span.line_str(), span.slice(), names))?,
+            }
+        },
         _ =>{ Err(format!(r#"{} {} null must be ["type", null] {}"#, span.line_str(), span.slice(), names))? }
     };
     Ok(val)

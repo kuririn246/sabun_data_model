@@ -167,25 +167,25 @@ pub fn get_array(a : &[JVal], array_type : &ArrayType, names : &Names) -> Result
                     Err(format!(r#"{} undefined must be ["type", undefined] {}"#, item.line_str(), names))?
                 }
             },
-            JVal::Array(_a2, _span) =>{
+            JVal::Array(a2, span) =>{
                 match array_type{
-                    // ArrayType::Num2 => {
-                    //     let rv = json_array_to_rust(a2, VarType::Normal, span, names)?;
-                    //     match rv{
-                    //         RustValue::Param(RustParam::NumArray(array), _vt) =>{
-                    //             match &array {
-                    //                 Qv::Val(_val) => RustParam::NumArray(array),
-                    //                 Qv::Null => {
-                    //                     Err(format!(r#"{} null is not a num array {}"#, item.line_str(), names))?
-                    //                 },
-                    //                 Qv::Undefined => {
-                    //                     Err(format!(r#"{} undefined is not a num array {}"#, item.line_str(), names))?
-                    //                 },
-                    //             }
-                    //         },
-                    //         _ =>{ Err(format!(r#"{} {} is not a num array {}"#, span.line_str(), span.slice(), names))? }
-                    //     }
-                    // },
+                    ArrayType::Float => {
+                        let rv = json_array_to_rust(a2, VarType::Normal, span, names)?;
+                        match rv{
+                            RustValue::Param(RustParam::Float(f), _vt) =>{
+                                match &f {
+                                    Qv::Val(val) => RustParam::Float(Qv::Val(*val)),
+                                    Qv::Null => {
+                                        Err(format!(r#"{} null is not valid {}"#, item.line_str(), names))?
+                                    },
+                                    Qv::Undefined => {
+                                        Err(format!(r#"{} undefined is not valid {}"#, item.line_str(), names))?
+                                    },
+                                }
+                            },
+                            _ =>{ Err(format!(r#"{} {} is not a float value {}"#, span.line_str(), span.slice(), names))? }
+                        }
+                    },
                     _ => Err(format!(r#"{} two-dimensional array is not valid {}"#, item.line_str(), names))?,
                 }
             },

@@ -7,7 +7,8 @@ pub fn get_param(v : &RustParam) -> Value{
     let r = match v{
         RustParam::Bool(b) => to(b,  "Bool",|b| Value::Bool(*b)),
         RustParam::String(s) => to(s, "Str", |s| Value::String(s.str().to_string())),
-        RustParam::Float(n)=> to(n, "Float", |n| Value::Number(*n)),
+        RustParam::Float(n)=> to(n, "Float",
+                                 |n| Value::Array(vec![Value::String("Float".to_string()), Value::Number(*n)])),
         RustParam::Int(n)=> to(n, "Int", |n| Value::Number(*n as f64)),
         _ =>{
             let (array, at) = v.to_rust_array().unwrap();
