@@ -55,10 +55,7 @@
 //
 //     #[test]
 //     fn it_works() {
-//         let mut hoge = Hoge::new();
-//         let ptr = hoge.ptr();
-//         println!("inner_x {}", ptr.inner_x());
-//         println!("x {}", hoge.root.x);
+//
 //
 //     }
 // }
