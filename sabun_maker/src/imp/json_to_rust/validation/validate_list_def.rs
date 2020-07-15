@@ -16,12 +16,12 @@ pub fn validate_list_def(def : &ListDefObj, root : &RootObject, can_use_old : bo
 
     for (name, val) in def.default().iter() {
         match val {
-            ListDefValue::InnerDataDef(d) => {
-                if is_mut{
-                    Err(format!("{} {} MutList can't have InnerData", names, name))?;
-                }
-                validate_list_def(d, root, can_use_old, is_mut,&names.append(name))?;
-            },
+            // ListDefValue::InnerDataDef(d) => {
+            //     if is_mut{
+            //         Err(format!("{} {} MutList can't have InnerData", names, name))?;
+            //     }
+            //     validate_list_def(d, root, can_use_old, is_mut,&names.append(name))?;
+            // },
             ListDefValue::InnerMutDef(d) => {
                 if is_mut == false{
                     Err(format!("{} {} Data/List can't have InnerMutList", names, name))?;

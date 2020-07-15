@@ -85,10 +85,10 @@ impl TmpJsonList{
             compatible : get_from_set(l.compatible()), next_id: Some(l.next_id()), old : None, default : Some(l.default().clone()) }
     }
 
-    pub fn from_inner_data(l : &InnerData) -> TmpJsonList{
-        TmpJsonList{ vec : btree_map(l.list()).iter().map(|(id, item)| TmpJsonObj::from_list_item(item, Some(id))).collect(),
-            compatible : None, next_id: None, old : get_from_set(l.old()), default : None }
-    }
+    // pub fn from_inner_data(l : &InnerData) -> TmpJsonList{
+    //     TmpJsonList{ vec : btree_map(l.list()).iter().map(|(id, item)| TmpJsonObj::from_list_item(item, Some(id))).collect(),
+    //         compatible : None, next_id: None, old : get_from_set(l.old()), default : None }
+    // }
 
     pub fn from_inner_list(l : &InnerList) -> TmpJsonList{
         TmpJsonList{ vec : l.list().iter().map(|item| TmpJsonObj::from_list_item(item, None)).collect(),

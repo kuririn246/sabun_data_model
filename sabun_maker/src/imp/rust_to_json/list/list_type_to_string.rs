@@ -5,7 +5,7 @@ pub fn list_type_to_string(l : &ListType, has_item : bool) -> String{
         ListType::Data => "Data",
         ListType::List => "List",
         ListType::Mut => if has_item{ "__ViolatedList" } else{ "MutList" },
-        ListType::InnerData => "InnerData",
+        //ListType::InnerData => "InnerData",
         ListType::InnerList => "InnerList",
         ListType::InnerMut => if has_item{ "__InnerViolatedList" } else{ "InnerMut" },
         ListType::InnderDataDef => "InnerDataDef",

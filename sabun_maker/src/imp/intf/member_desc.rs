@@ -102,13 +102,13 @@ pub fn get_list_def_desc(def : &ListDefObj) -> Vec<MemberDesc>{
                 vec.push(MemberDesc::new(mem, vt.clone(), p.type_num(),
                                          is_old, None));
             },
-            ListDefValue::InnerDataDef(d) =>{
-                let ld = get_list_def_desc(d);
-                let rd = get_ref_def_desc(d.refs());
-                vec.push(MemberDesc::new(
-                    mem, VarType::Normal, RustMemberType::InnerData,
-                    is_old,Some(MemberDescs::new(ld, rd))));
-            },
+            // ListDefValue::InnerDataDef(d) =>{
+            //     let ld = get_list_def_desc(d);
+            //     let rd = get_ref_def_desc(d.refs());
+            //     vec.push(MemberDesc::new(
+            //         mem, VarType::Normal, RustMemberType::InnerData,
+            //         is_old,Some(MemberDescs::new(ld, rd))));
+            // },
             ListDefValue::InnerListDef(d) =>{
                 let ld = get_list_def_desc(d);
                 let rd = get_ref_def_desc(d.refs());

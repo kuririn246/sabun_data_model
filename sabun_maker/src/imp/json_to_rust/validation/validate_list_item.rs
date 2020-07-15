@@ -27,14 +27,14 @@ pub fn validate_list_item(def : &ListDefObj, sabun_values : &HashM<String, ListS
         }
         //inner listは中までしっかり調べる必要があるわね
         match def_value {
-            ListDefValue::InnerDataDef(def) => {
-                if let ListSabValue::InnerData(data) = val {
-                    validate_data(def, data.list(), root, data.old(), can_use_old, &names.append(name))?
-                } else {
-                    //correspondしてることは確認済みである
-                    unreachable!();
-                }
-            },
+            // ListDefValue::InnerDataDef(def) => {
+            //     if let ListSabValue::InnerData(data) = val {
+            //         validate_data(def, data.list(), root, data.old(), can_use_old, &names.append(name))?
+            //     } else {
+            //         //correspondしてることは確認済みである
+            //         unreachable!();
+            //     }
+            // },
             ListDefValue::InnerListDef(def) => {
                 if let ListSabValue::InnerList(list) = val {
                     validate_list(def, list.list(), root, can_use_old, &names.append(name))?

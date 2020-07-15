@@ -13,11 +13,11 @@ pub enum RustValue{
     Data(ConstData),
     List(ConstList),
     Mut(MutList),
-    InnerData(InnerData),
+    //InnerData(InnerData),
     InnerList(InnerList),
     ///InnerMutListだけundefinedになりうる
     InnerMut(Option<InnerMutList>),
-    InnerDataDef(ListDefObj),
+    //InnerDataDef(ListDefObj),
     InnerListDef(ListDefObj),
     InnerMutDef(InnerMutDefObj),
 }
@@ -26,7 +26,8 @@ pub enum RustValue{
 #[derive(Debug, PartialEq, Clone)]
 pub enum RustMemberType {
     Bool, Float, Int, Str, IntArray, FloatArray, //StrArray,Num2Array,
-    Data, List, Mut, InnerData, InnerList, InnerMut
+    Data, List, Mut, //InnerData,
+    InnerList, InnerMut
 }
 
 impl RustValue{
@@ -51,7 +52,7 @@ impl RustValue{
     pub(crate) fn into_list_def_value(self) -> Result<ListDefValue, String>{
         let v = match self{
             RustValue::Param(p,v) => ListDefValue::Param(p,v),
-            RustValue::InnerDataDef(d) => ListDefValue::InnerDataDef(d),
+            //RustValue::InnerDataDef(d) => ListDefValue::InnerDataDef(d),
             RustValue::InnerListDef(l) => ListDefValue::InnerListDef(l),
             RustValue::InnerMutDef(m) => ListDefValue::InnerMutDef(m),
             _ =>{ return Err(self.type_string()); },
@@ -63,7 +64,7 @@ impl RustValue{
     pub(crate) fn into_list_sab_value(self) -> Result<ListSabValue, String>{
         let v = match self{
             RustValue::Param(p,_v) => ListSabValue::Param(p),
-            RustValue::InnerData(d) => ListSabValue::InnerData(d),
+            //RustValue::InnerData(d) => ListSabValue::InnerData(d),
             RustValue::InnerList(l) => ListSabValue::InnerList(l),
             RustValue::InnerMut(m) => ListSabValue::InnerMut(m),
             _ =>{ return Err(self.type_string()); },
@@ -77,10 +78,10 @@ impl RustValue{
             RustValue::Data(_) => "Data",
             RustValue::List(_) => "List",
             RustValue::Mut(_) => "Mut",
-            RustValue::InnerData(_) => "InnerData",
+           // RustValue::InnerData(_) => "InnerData",
             RustValue::InnerList(_) => "InnerList",
             RustValue::InnerMut(_) => "InnerMut",
-            RustValue::InnerDataDef(_) => "InnerDataDef",
+            //RustValue::InnerDataDef(_) => "InnerDataDef",
             RustValue::InnerListDef(_) => "InnerListDef",
             RustValue::InnerMutDef(_) => "InnerMutDef",
         };

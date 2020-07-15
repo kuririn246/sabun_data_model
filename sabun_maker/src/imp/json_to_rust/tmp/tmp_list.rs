@@ -72,20 +72,20 @@ impl TmpList{
 
         Ok(ConstData::new(self.default.unwrap(), to_data_items(self.vec)?,  old))
     }
-    pub fn into_inner_data(self) -> Result<InnerData>{
-        if self.compatible.is_some(){
-            Err(format!("{} Compatible is not needed for Data {}", self.span.line_str(), self.span.slice()))?
-        }
-        if self.default.is_some(){
-            Err(format!("{} Default must not be defined {}", self.span.line_str(), self.span.slice()))?
-        }
-        if self.next_id.is_some(){
-            Err(format!("{} NextID must not be defined {}", self.span.line_str(), self.span.slice()))?
-        }
-        let old = self.old.unwrap_or_else(|| HashSt::new());
-
-        Ok(InnerData::new(to_data_items(self.vec)?, old))
-    }
+    // pub fn into_inner_data(self) -> Result<InnerData>{
+    //     if self.compatible.is_some(){
+    //         Err(format!("{} Compatible is not needed for Data {}", self.span.line_str(), self.span.slice()))?
+    //     }
+    //     if self.default.is_some(){
+    //         Err(format!("{} Default must not be defined {}", self.span.line_str(), self.span.slice()))?
+    //     }
+    //     if self.next_id.is_some(){
+    //         Err(format!("{} NextID must not be defined {}", self.span.line_str(), self.span.slice()))?
+    //     }
+    //     let old = self.old.unwrap_or_else(|| HashSt::new());
+    //
+    //     Ok(InnerData::new(to_data_items(self.vec)?, old))
+    // }
 
     pub fn into_mut_list(self) -> Result<MutList>{
         if self.old.is_some(){
