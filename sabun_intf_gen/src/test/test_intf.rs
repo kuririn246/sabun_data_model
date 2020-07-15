@@ -10,14 +10,17 @@
 //         match json_dir_to_rust("src/json_dir/test", true) {
 //             Ok(mut a) => {
 //                 let mut root = crate::compile_test::RootItem::new(RootObjectPtr::new(&mut a));
-//                 let b = root.bu();
+//                 println!("bu {} ", root.bu());
+//
 //                 let ba = root.col();
 //                 let huga = ba.huga();
 //                 let refed = huga.ref_refed();
 //                 let mem = refed.mem();
-//                 println!("b {} mem {}", b, mem);
+//                 let atdesu = root.at_at_desu();
+//                 println!("{}", atdesu);
+//                 root.set_at_at_desu("hogehoge".to_string());
+//
 //                 root.set_bu(true);
-//                 println!("bu {} ", root.bu());
 //             },
 //             Err(e) => { println!("val 1 {}", e.message) }
 //         }

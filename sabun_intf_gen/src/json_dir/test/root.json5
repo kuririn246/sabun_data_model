@@ -1,22 +1,23 @@
 {
 	bu : false,
 	str : "sutoringu",
+	"@AtDesu" : "att",
 	col : ["Data",
 		[{
 			nakabu : true,
 			Ref : {
-				refed : "",
+				"@refed" : "",
 			}
 		}],
 		{
 			ID : "huga",
 			nakabu : false,
 			Ref : {
-				refed : "second",
+				"@refed" : "@second",
 			}
 		}
 	],
-	refed : ["Data",
+	"@refed" : ["Data",
 		[{
 			mem : 0
 		}],
@@ -25,7 +26,7 @@
 			mem : 1,
 		},
 		{
-			ID : "second",
+			ID : "@second",
 			mem : 2
 		}]
 }

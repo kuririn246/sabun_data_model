@@ -1,5 +1,5 @@
 use crate::imp::structs::rust_list::MutListItem;
-use crate::imp::intf::inner_data::InnerDataPtrs;
+use crate::imp::intf::inner_data::InnerDataPtr;
 use crate::imp::structs::list_value::{ListDefValue, ListSabValue};
 use crate::imp::structs::qv::Qv;
 use crate::imp::structs::rust_param::RustParam;
@@ -22,11 +22,11 @@ impl MutListItemPtrs {
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
 }
 
-pub fn get_inner_data(ps : MutListItemPtrs, name : &str) -> Option<InnerDataPtrs>{
+pub fn get_inner_data(ps : MutListItemPtrs, name : &str) -> Option<InnerDataPtr>{
     let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     if let Some(ListDefValue::InnerDataDef(def)) = list_def.default().get(name){
         if let Some(ListSabValue::InnerData(data)) = item.values().get(name){
-            return Some(InnerDataPtrs::new(data, def, ps.root))
+            return Some(InnerDataPtr::new(data, def, ps.root))
         }
     }
     None

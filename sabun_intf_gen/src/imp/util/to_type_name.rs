@@ -3,7 +3,11 @@ pub fn to_type_name(s : &str) -> String{
     let mut r = String::with_capacity(s.len());
     for (i,c) in s.chars().enumerate(){
         if i == 0{
-            r.push(c.to_ascii_uppercase());
+            if c == '@'{
+                r.push_str("At");
+            } else {
+                r.push(c.to_ascii_uppercase());
+            }
         } else{
             r.push(c)
         }
@@ -16,7 +20,11 @@ pub fn to_snake_name(s : &str) -> String{
     let mut r = String::new();
     for (i,c) in s.chars().enumerate(){
         if i == 0{
-            r.push(c.to_ascii_lowercase());
+            if c == '@'{
+                r.push_str("at");
+            } else {
+                r.push(c.to_ascii_lowercase());
+            }
         } else{
             if c.is_ascii_uppercase(){
                 r.push('_');
