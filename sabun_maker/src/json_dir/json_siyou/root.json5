@@ -148,48 +148,19 @@
   dim2List : [
     "Data", [{
       dataMem : 3,
-      innerData : [ "InnerDataDef",[{
-        innerDataMem : 5,
-        innerList : ["InnerListDef",[{
-          Ref : { hegoList :  "" },
-          innerListMem : 10,
-        }]],
-      }]],
+
     }],
     {
       ID : "item1",
-      innerData : [
-        "InnerData", //InnerDataではDefaultは書かない
-        {
-          ID : "innerDataItem1",
-          innerDataMem : 505,
-          innerList : [
-            "InnerList",
-            {
-              Ref : { hegoList : "hegohego" },
-              innerListMem : 20,
-            }
-          ],
-        },
-        {
-          ID : "innerDataItem2",
-          //innerListは定義しない
-        }
-      ],
+
       dataMem : 300,
     },
     {
       ID : "item2",
-      //innerData定義なし
     },
     {
       ID : "item3",
-      innerData : [
-        "InnerData",
-        {
-          ID : "innerDataItem1", //同じIDを使ってみたり
-        }
-      ]
+
     }
   ],
 
@@ -198,7 +169,7 @@
     ["Default",{
       innerMutList : [
         "InnerMutDef",
-        ["Compatible", "dim2List.innerData.innerList"],
+
         ["Default",{
           Ref : { hegoList :  "" },
           innerListMem : 3,
