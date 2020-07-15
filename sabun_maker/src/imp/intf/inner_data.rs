@@ -1,5 +1,4 @@
 use crate::imp::intf::data::{DataKVs, get_kvs_impl, get_value_impl};
-use crate::imp::structs::rust_list::InnerData;
 use crate::imp::intf::list_item::ListItemPtr;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;

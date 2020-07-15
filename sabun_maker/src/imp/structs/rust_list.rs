@@ -96,19 +96,19 @@ impl InnerList{
 }
 
 
-///アイテムごとにIDをもち、Refで参照することが可能である
-#[derive(Debug, PartialEq, Clone)]
-pub struct InnerData{
-    list : Box<HashM<String, ListItem>>,
-    ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
-    old : Box<HashS<String>>,
-}
-
-impl InnerData{
-    pub(crate) fn new(list : HashM<String, ListItem>, old : HashS<String>) -> InnerData{ InnerData{ list : Box::new(list), old : Box::new(old)} }
-    pub(crate) fn list(&self) -> &HashM<String, ListItem>{ self.list.as_ref() }
-    pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
-}
+// ///アイテムごとにIDをもち、Refで参照することが可能である
+// #[derive(Debug, PartialEq, Clone)]
+// pub struct InnerData{
+//     list : Box<HashM<String, ListItem>>,
+//     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
+//     old : Box<HashS<String>>,
+// }
+//
+// impl InnerData{
+//     pub(crate) fn new(list : HashM<String, ListItem>, old : HashS<String>) -> InnerData{ InnerData{ list : Box::new(list), old : Box::new(old)} }
+//     pub(crate) fn list(&self) -> &HashM<String, ListItem>{ self.list.as_ref() }
+//     pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
+// }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct InnerMutList{

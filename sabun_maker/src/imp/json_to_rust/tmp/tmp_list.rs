@@ -2,7 +2,7 @@ use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
 use crate::{HashM, HashS, HashSt, HashMt};
 use json5_parser::Span;
 use crate::error::Result;
-use crate::imp::structs::rust_list::{ConstList, InnerList, ConstData, InnerData, MutList, InnerMutList, ListItem, MutListItem};
+use crate::imp::structs::rust_list::{ConstList, InnerList, ConstData, MutList, InnerMutList, ListItem, MutListItem};
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
 use crate::imp::structs::mut_list_hash::MutListHash;

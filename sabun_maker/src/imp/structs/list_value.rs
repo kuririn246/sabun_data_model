@@ -1,5 +1,5 @@
 use crate::imp::structs::rust_param::RustParam;
-use crate::imp::structs::rust_list::{InnerData, InnerList, InnerMutList};
+use crate::imp::structs::rust_list::{InnerList, InnerMutList};
 use crate::imp::structs::rust_value::{RustValue, RustMemberType};
 use crate::imp::structs::value_type::VarType;
 use crate::imp::structs::qv::QvType;
