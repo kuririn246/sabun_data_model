@@ -8,15 +8,15 @@ use crate::imp::structs::root_obj::RootObject;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
-pub struct MutListItemPtrs {
+pub struct MutListItemPtr {
     item : *mut MutListItem,
     list_def : *const ListDefObj,
     root : *mut RootObject,
 }
 
-impl MutListItemPtrs {
-    pub fn new(item : *mut MutListItem, list_def : *const ListDefObj, root : *mut RootObject) -> MutListItemPtrs {
-        MutListItemPtrs { item, list_def, root }
+impl MutListItemPtr {
+    pub fn new(item : *mut MutListItem, list_def : *const ListDefObj, root : *mut RootObject) -> MutListItemPtr {
+        MutListItemPtr { item, list_def, root }
     }
     pub fn item(&self) -> *const MutListItem{ self.item }
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
@@ -32,7 +32,7 @@ impl MutListItemPtrs {
 //     None
 // }
 
-pub fn get_bool(ps : MutListItemPtrs, name : &str) -> Option<Qv<bool>>{
+pub fn get_bool(ps : MutListItemPtr, name : &str) -> Option<Qv<bool>>{
     let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     if let Some(RustParam::Bool(b)) = get_param(item, list_def, name){
         Some(b.clone())
@@ -49,7 +49,7 @@ pub fn get_param<'a>(item : &'a MutListItem, def : &'a ListDefObj, name : &str) 
     }
 }
 
-pub fn set_bool(ps : MutListItemPtrs, name : &str, val : Qv<bool>) -> bool{
+pub fn set_bool(ps : MutListItemPtr, name : &str, val : Qv<bool>) -> bool{
     let (item,def) = unsafe{ (ps.item.as_mut().unwrap(),ps.list_def.as_ref().unwrap()) };
     match item.set_sabun(def, name.to_string(), RustParam::Bool(val)) {
         Ok(_) => true,
