@@ -6,6 +6,7 @@ use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_list::{ConstList, MutList};
 use crate::imp::intf::ConstDataPtr;
 use crate::imp::structs::rust_string::RustString;
+use crate::imp::intf::list::ConstListPtr;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct RootObjectPtr{
@@ -62,10 +63,10 @@ pub fn get_data(root : RootObjectPtr, name : &str) -> Option<ConstDataPtr>{
 //     get_data(RootObjectPtr::new(root as *mut RootObject), name)
 // }
 
-pub fn get_list(root : *const RootObject, name : &str) -> Option<*const ConstList>{
-    let root = unsafe{ root.as_ref().unwrap() };
+pub fn get_list(root : RootObjectPtr, name : &str) -> Option<ConstListPtr>{
+    let root = unsafe{ root.ptr.as_ref().unwrap() };
     if let Some(RootValue::List(l)) = root.default().get(name){
-        Some(l as *const ConstList)
+        Some(ConstListPtr::new(l, root))
     } else{ None }
 }
 

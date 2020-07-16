@@ -31,7 +31,6 @@ pub struct DataKV {
 }
 
 impl DataKV {
-    ///utf-8とcstringの相互変換はcheckなしで安全に可能だよね・・・？
     pub(crate) fn new(is_old : bool, id : String, item : *const ListItem) -> DataKV { DataKV { is_old, id, item }}
     pub fn is_old(&self) -> bool { self.is_old }
     pub fn id(&self) -> &str{ self.id.as_str() }

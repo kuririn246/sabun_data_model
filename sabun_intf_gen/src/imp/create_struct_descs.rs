@@ -97,7 +97,7 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     is_mut : false,
                 });
             },
-            RustMemberType::InnerData =>{
+            RustMemberType::List =>{
                 let type_name = to_type_name(mem.name());
                 let children = mem.child_descs().unwrap();
                 let (descs,params) = create_struct_descs(children.items());
@@ -107,15 +107,15 @@ pub fn create_struct_descs(mems : &[MemberDesc]) -> (Vec<StructDesc>, Vec<ParamI
                     children : descs,
                     refs,
                     params,
-                    keys : children.keys().iter().map(|k| k.clone()).collect(),
+                    keys : vec![],
                     item_mod_name : "list_item".to_string(),
-                    col_mod_name : "inner_data".to_string(),
+                    col_mod_name : "list".to_string(),
                     item_struct_name : to_item_type_name(mem.name()),
-                    col_struct_name : format!("{}Data", type_name),
-                    col_ptr_type : "InnerDataPtr".to_string(),
+                    col_struct_name : format!("{}List", type_name),
+                    col_ptr_type : "ConstListPtr".to_string(),
                     item_ptr_type: "ListItemPtr".to_string(),
                     col_undefiable : false,
-                    col_type: ColType::Data,
+                    col_type: ColType::List,
                     col_is_old : mem.is_old(),
                     ref_is_enum : children.refs().is_enum(),
                     is_mut : false,
