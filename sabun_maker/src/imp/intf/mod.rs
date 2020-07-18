@@ -12,3 +12,4 @@ pub mod root;
 pub use root::RootObjectPtr as RootObjectPtr;
 pub use data::ConstDataPtr as ConstDataPtr;
 pub use list_item::ListItemPtr as ListItemPtr;
+pub use list::ConstListPtr as ConstListPtr;
