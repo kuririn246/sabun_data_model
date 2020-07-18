@@ -39,15 +39,33 @@ pub fn get_value_impl(vec: &Vec<ListItem>, list_def : &ListDefObj, idx : usize, 
 }
 
 #[derive(Debug, PartialEq)]
-pub struct ConstListIntf {
-    pub ptr : ConstListPtr,
+pub struct ConstListIntf<T> {
+    pub vec : *const Vec<ListItem>,
+    pub def : *const ListDefObj,
     root : *mut RootItem,
+    proxy_vec : Vec<T>,
 }
-impl ConstListIntf {
+impl<T> ConstListIntf<T> {
     pub fn new(ptr : ConstListPtr, root : *mut RootItem) -> ColList{ ColList{ ptr, root, } }
     pub fn len(&self) -> usize{ get_len(self.ptr) }
-    pub fn get(&self, index : usize) -> ListItemPtr{ get_value(self.ptr, index).unwrap() }
-    pub fn iter(&self) -> ConstListIter{ ConstListIter::new(self.ptr) }
+    pub fn get(&mut self, index : usize, getter : impl Fn(ListItemPtr) -> T) -> &T{
+        let p = self.proxy(getter);
+        p.get(index).unwrap()
+    }
+    pub fn iter(&mut self, getter : impl Fn(ListItemPtr) -> T) -> std::slice::Iter<T>{
+        let p = self.proxy(getter);
+        p.iter()
+    }
+    fn proxy(&mut self, getter : impl Fn(ListItemPtr) -> T) -> &mut Vec<T>{
+        if self.proxy_vec.is_empty(){
+            for i in 0..self.len(){
+                let ptr = get_value(self.ptr, index).unwrap();
+                self.proxy_vec.push(getter(ptr));
+            }
+        }
+        &mut self.proxy_vec
+    }
+
 }
 
 
