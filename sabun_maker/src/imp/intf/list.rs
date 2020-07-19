@@ -26,15 +26,22 @@ impl ConstListPtr{
 
 pub fn get_len(list: ConstListPtr) -> usize{
     let d = unsafe{ list.ptr.as_ref().unwrap()};
-    d.list().len()
+    get_len_impl(d.list())
 }
+
+pub fn get_len_impl(list: *const Vec<ListItem>) -> usize{
+    let d = unsafe{ list.as_ref().unwrap()};
+    d.len()
+}
+
 
 pub fn get_value(list: ConstListPtr, idx : usize) -> Option<ListItemPtr>{
     let d = unsafe{ list.ptr.as_ref().unwrap()};
     get_value_impl(d.list(), d.default(), idx, list.root)
 }
 
-pub fn get_value_impl(vec: &Vec<ListItem>, list_def : &ListDefObj, idx : usize, root : *const RootObject) -> Option<ListItemPtr>{
+pub fn get_value_impl(vec: *const Vec<ListItem>, list_def : *const ListDefObj, idx : usize, root : *const RootObject) -> Option<ListItemPtr>{
+    let vec = unsafe{ vec.as_ref().unwrap() };
     vec.get(idx).map(|item| ListItemPtr::new(item, list_def, root))
 }
 
@@ -42,12 +49,15 @@ pub fn get_value_impl(vec: &Vec<ListItem>, list_def : &ListDefObj, idx : usize, 
 pub struct ConstListIntf<T> {
     pub vec : *const Vec<ListItem>,
     pub def : *const ListDefObj,
-    root : *mut RootItem,
-    proxy_vec : Vec<T>,
+    pub root : *const RootObject,
+    proxy_vec : Option<Vec<T>>,
 }
 impl<T> ConstListIntf<T> {
-    pub fn new(ptr : ConstListPtr, root : *mut RootItem) -> ColList{ ColList{ ptr, root, } }
-    pub fn len(&self) -> usize{ get_len(self.ptr) }
+    pub fn from_const_list(ptr : ConstListPtr, root : *const RootObject) -> ConstListIntf<T>{
+        let ptr = unsafe{ ptr.ptr.as_ref().unwrap() };
+        ConstListIntf{ vec : ptr.list(), def : ptr.default(), root, proxy_vec : None }
+    }
+    pub fn len(&self) -> usize{ get_len_impl(self.vec) }
     pub fn get(&mut self, index : usize, getter : impl Fn(ListItemPtr) -> T) -> &T{
         let p = self.proxy(getter);
         p.get(index).unwrap()
@@ -57,13 +67,16 @@ impl<T> ConstListIntf<T> {
         p.iter()
     }
     fn proxy(&mut self, getter : impl Fn(ListItemPtr) -> T) -> &mut Vec<T>{
-        if self.proxy_vec.is_empty(){
+        if self.proxy_vec.is_none(){
+            let mut vec : Vec<T> = Vec::with_capacity(self.len());
             for i in 0..self.len(){
-                let ptr = get_value(self.ptr, index).unwrap();
-                self.proxy_vec.push(getter(ptr));
+                let ptr = get_value_impl(self.vec, self.def, i, self.root).unwrap();
+                let value = getter(ptr);
+                vec.push(value);
             }
+            self.proxy_vec = Some(vec);
         }
-        &mut self.proxy_vec
+        self.proxy_vec.as_mut().unwrap()
     }
 
 }
