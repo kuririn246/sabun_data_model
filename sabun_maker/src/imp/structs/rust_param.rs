@@ -83,17 +83,17 @@ impl RustParam {
         if let RustParam::Int(Qv::Val(s)) = self { Some(*s) } else{ None }
     }
 
-    pub(crate) fn to_string(&self) -> Option<String>{
-        if let RustParam::String(Qv::Val(s)) = self { Some(s.to_string()) } else{ None }
-    }
+    // pub(crate) fn to_string(&self) -> Option<String>{
+    //     if let RustParam::String(Qv::Val(s)) = self { Some(s.to_string()) } else{ None }
+    // }
+    //
+    // pub(crate) fn to_float_array(&self) -> Option<Vec<f64>>{
+    //     if let RustParam::FloatArray(Qv::Val(a)) = self { Some(a.as_ref().clone()) } else{ None }
+    // }
 
-    pub(crate) fn to_float_array(&self) -> Option<Vec<f64>>{
-        if let RustParam::FloatArray(Qv::Val(a)) = self { Some(a.as_ref().clone()) } else{ None }
-    }
-
-    pub(crate) fn to_int_array(&self) -> Option<Vec<i64>>{
-        if let RustParam::IntArray(Qv::Val(a)) = self { Some(a.as_ref().clone()) } else{ None }
-    }
+    // pub(crate) fn to_int_array(&self) -> Option<Vec<i64>>{
+    //     if let RustParam::IntArray(Qv::Val(a)) = self { Some(a.as_ref().clone()) } else{ None }
+    // }
 
     // pub(crate) fn from_num_array(v: Vec<RustParam>, qv_type: &QvType) -> Option<RustParam> {
     //     match qv_type {

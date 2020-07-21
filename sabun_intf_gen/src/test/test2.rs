@@ -1,8 +1,8 @@
-#[cfg(test)]
+//#[cfg(test)]
 mod tests {
     use std::collections::HashMap;
 
-    struct Item{
+    pub struct Item{
         pub map : HashMap<String, String>,
     }
     impl Item{
@@ -15,7 +15,7 @@ mod tests {
             self.map.get(key)
         }
     }
-    struct List{
+    pub struct List{
         pub vec : Vec<Item>
     }
     impl List{
@@ -27,7 +27,7 @@ mod tests {
         }
     }
 
-    struct Root{
+    pub struct Root{
         list : List
     }
     impl Root{
@@ -36,7 +36,7 @@ mod tests {
         }
     }
 
-    struct RootNormalIntf{
+    pub struct RootNormalIntf{
         pub root : Root
     }
     impl RootNormalIntf{
@@ -48,7 +48,7 @@ mod tests {
         }
     }
 
-    struct ListNormalIntf<'a>{
+    pub struct ListNormalIntf<'a>{
         pub list : &'a List
     }
     impl ListNormalIntf<'_>{
@@ -59,7 +59,7 @@ mod tests {
             ItemNormalIntf::new(self.list.get(index))
         }
     }
-    struct ItemNormalIntf<'a>{
+    pub struct ItemNormalIntf<'a>{
         pub item : &'a Item
     }
     impl ItemNormalIntf<'_>{
@@ -71,24 +71,73 @@ mod tests {
         }
     }
 
-    struct ListMagicIntf{
-        list : *mut List,
+    pub struct RootMagicIntf{
+        pub root : Root
+    }
+    impl RootMagicIntf{
+        pub fn new(root : Root) -> RootMagicIntf{
+            RootMagicIntf{ root }
+        }
+        pub fn list(&self) -> ListMagicIntf{
+            ListMagicIntf::new(&self.root.list)
+        }
+
+        pub fn list_mut(&mut self) -> &mut List{
+            &mut self.root.list
+        }
+    }
+
+    #[repr(C)]
+    pub struct ListMagicIntf{
+        list : *const List,
     }
     impl ListMagicIntf{
-        pub fn new(list : &mut List) -> ListMagicIntf{
+        pub fn new(list : *const List) -> ListMagicIntf{
             ListMagicIntf{ list }
         }
         pub fn get(&self, index : usize) -> ItemMagicIntf{
-
+            let list = unsafe{ self.list.as_ref().unwrap() };
+            ItemMagicIntf::new(list.get(index))
         }
     }
-    struct ItemMagicIntf{
-        item : *mut Item,
+    #[allow(non_snake_case)]
+    pub extern "C" fn ListMagicIntf_get(list : *const ListMagicIntf, index : usize) -> ItemMagicIntf{
+        let list = unsafe{ list.as_ref().unwrap() };
+        list.get(index)
+    }
+    pub struct ItemMagicIntf{
+        item : *const Item,
     }
     impl ItemMagicIntf{
-        
+        pub fn new(item : *const Item) -> ItemMagicIntf{ ItemMagicIntf{ item }}
+        pub fn param1(&self) -> &String{
+            let item = unsafe{ self.item.as_ref().unwrap() };
+            item.get("param1").unwrap()
+        }
     }
 
+    pub struct ListMutIntf
+
+
+    #[test]
+    fn it_works_magic() {
+        let root = Root::new();
+        let intf = RootMagicIntf::new(root);
+        let list = intf.list();
+        let item = list.get(0);
+        println!("magic param1 {}", item.param1());
+
+    }
+
+    #[test]
+    fn it_works_magic_mut() {
+        let root = Root::new();
+        let mut intf = RootMagicIntf::new(root);
+        let list = intf.list_mut();
+        let item = list.;
+        println!("magic param1 {}", item.param1());
+
+    }
 
 
     #[test]

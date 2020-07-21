@@ -37,7 +37,7 @@ pub fn json_dir_to_rust(dir_path : &str, validation : bool) -> Result<RootObject
                     };
                 }
             },
-            Err(e) =>{
+            Err(_e) =>{
                 //???
                 //Err(format!("{}", e.to_string()))?;
             }

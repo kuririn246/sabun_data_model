@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests {
     use sabun_maker::json_dir_to_rust;
-    use sabun_maker::intf::RootObjectPtr;
     use sabun_maker::intf::null_or::{NullOr, UndefOr};
     use sabun_maker::structs::Qv;
 
@@ -10,7 +9,7 @@ mod tests {
 
         match json_dir_to_rust("src/json_dir/test/params", true) {
             Ok(mut a) => {
-                let mut root_intf = crate::test_generated::params::RootIntf::new(a);
+                let mut root_intf = crate::test_generated::params::test::RootIntf::new(a);
                 let intf = root_intf.intf();
                 assert_eq!(intf.s(),"sutoringu");
                 assert_eq!(intf.shatena(), &NullOr::Val("esuhatena".to_string()));

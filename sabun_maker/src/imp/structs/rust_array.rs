@@ -61,7 +61,7 @@ pub struct RustFloatArray{
 
 impl RustFloatArray{
     pub(crate) fn new(b : Vec<f64>) -> RustFloatArray{ RustFloatArray{ b : Box::new(b) }}
-    pub(crate) fn as_ref(&self) -> &Vec<f64>{ self.b.as_ref() }
+    //pub(crate) fn as_ref(&self) -> &Vec<f64>{ self.b.as_ref() }
     pub(crate) fn to_params(&self) -> Vec<RustParam>{
         self.b.iter().map(|a| RustParam::Float(Qv::Val(*a))).collect()
     }
@@ -78,7 +78,7 @@ pub struct RustIntArray{
 
 impl RustIntArray{
     pub(crate) fn new(b : Vec<i64>) -> RustIntArray{ RustIntArray{ b : Box::new(b) }}
-    pub(crate) fn as_ref(&self) -> &Vec<i64>{ self.b.as_ref() }
+    //pub(crate) fn as_ref(&self) -> &Vec<i64>{ self.b.as_ref() }
     pub(crate) fn to_params(&self) -> Vec<RustParam>{
         self.b.iter().map(|a| RustParam::Int(Qv::Val(*a))).collect()
     }

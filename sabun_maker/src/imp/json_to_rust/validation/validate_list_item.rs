@@ -1,7 +1,6 @@
 use crate::HashM;
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
-use crate::imp::json_to_rust::validation::validate_data::validate_data;
 use crate::imp::json_to_rust::validation::validate_list::validate_list;
 use crate::imp::json_to_rust::validation::validate_refs::validate_refs;
 use crate::imp::json_to_rust::validation::validate_mut_list::validate_mut_list;

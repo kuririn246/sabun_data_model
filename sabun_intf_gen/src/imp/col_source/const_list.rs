@@ -1,7 +1,6 @@
 use crate::imp::structs::sources::StructSource;
 use crate::imp::structs::str_and_tab::{str_and_tabs_to_string, StrAndTab};
 use crate::imp::structs::struct_desc::StructDesc;
-use crate::imp::util::to_type_name::to_snake_name;
 
 pub fn to_const_list_source(imp : &StructDesc) -> StructSource {
     let mut result: Vec<StrAndTab> = vec![];
