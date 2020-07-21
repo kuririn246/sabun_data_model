@@ -71,6 +71,7 @@ mod tests {
         }
     }
 
+    #[repr(C)]
     pub struct RootMagicIntf{
         pub root : Root
     }
@@ -80,10 +81,6 @@ mod tests {
         }
         pub fn list(&self) -> ListMagicIntf{
             ListMagicIntf::new(&self.root.list)
-        }
-
-        pub fn list_mut(&mut self) -> &mut List{
-            &mut self.root.list
         }
     }
 
@@ -105,40 +102,57 @@ mod tests {
         let list = unsafe{ list.as_ref().unwrap() };
         list.get(index)
     }
+    #[repr(C)]
     pub struct ItemMagicIntf{
         item : *const Item,
     }
     impl ItemMagicIntf{
         pub fn new(item : *const Item) -> ItemMagicIntf{ ItemMagicIntf{ item }}
         pub fn param1(&self) -> &String{
-            let item = unsafe{ self.item.as_ref().unwrap() };
+            let item = unsafe{ &*self.item };
             item.get("param1").unwrap()
         }
+        pub fn set_param1(&self, s : String){
+            let item = unsafe{ &mut *(self.item as *mut Item) };
+            item.map.insert("param1".to_string(), s);
+        }
+    }
+    #[allow(non_snake_case)]
+    pub extern "C" fn ItemMagicIntf_param1<'a>(item : *const ItemMagicIntf) -> *const String{
+        let item = unsafe{ &*item };
+        item.param1()
+    }
+    #[allow(non_snake_case)]
+    pub extern "C" fn ItemMagicIntf_set_param1(item : *const ItemMagicIntf, s : String){
+        let item = unsafe{ &mut *(item as *mut ItemMagicIntf) };
+        item.set_param1(s)
     }
 
-    pub struct ListMutIntf
+
+    // fn test_lifetime<'a>(n : &Vec<usize>) -> &'a usize{
+    //     n.get(0).unwrap()
+    // }
 
 
     #[test]
     fn it_works_magic() {
-        let root = Root::new();
-        let intf = RootMagicIntf::new(root);
-        let list = intf.list();
-        let item = list.get(0);
-        println!("magic param1 {}", item.param1());
+
+
+
+        let hoge = {
+            let root = Root::new();
+            let intf = RootMagicIntf::new(root);
+            let list = intf.list();
+            let item = list.get(0);
+            println!("magic param1 {}", item.param1());
+            item.set_param1("set param1".to_string());
+            let p1 = ItemMagicIntf_param1(&item);
+            p1
+
+        };
+        println!("magic param1 {}", unsafe{ &*hoge })
 
     }
-
-    #[test]
-    fn it_works_magic_mut() {
-        let root = Root::new();
-        let mut intf = RootMagicIntf::new(root);
-        let list = intf.list_mut();
-        let item = list.;
-        println!("magic param1 {}", item.param1());
-
-    }
-
 
     #[test]
     fn it_works() {
