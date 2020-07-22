@@ -116,7 +116,7 @@ mod tests {
         }
     }
 
-    pub struct ListMutIntf
+
 
 
     #[test]
