@@ -1,9 +1,10 @@
 //#[cfg(test)]
+#[allow(dead_code)]
 mod tests {
     use std::collections::HashMap;
 
     pub struct Item{
-        pub map : HashMap<String, String>,
+        pub map : HashMap<String, String> ,
     }
     impl Item{
         pub fn new() -> Item{
@@ -84,7 +85,7 @@ mod tests {
         }
     }
 
-    #[repr(C)]
+    #[repr(C)] #[derive(Debug, Clone, Copy)]
     pub struct ListMagicIntf{
         list : *const List,
     }
@@ -93,15 +94,69 @@ mod tests {
             ListMagicIntf{ list }
         }
         pub fn get(&self, index : usize) -> ItemMagicIntf{
-            let list = unsafe{ self.list.as_ref().unwrap() };
+            let list = unsafe{ &*self.list };
             ItemMagicIntf::new(list.get(index))
         }
+        pub fn len(&self) -> usize{
+            let list = unsafe{ &*self.list };
+            list.vec.len()
+        }
+        pub fn iter(&self) -> ListMagicIntfIter{
+            ListMagicIntfIter{ intf : self.clone(), counter : 0 }
+        }
+        pub fn general_iter(&self) -> GeneralIter<ListMagicIntf, ItemMagicIntf>{
+            GeneralIter{ counter : 0, len : self.len(), intf : self.clone(), getter : ListMagicIntf::get }
+        }
     }
-    #[allow(non_snake_case)]
-    pub extern "C" fn ListMagicIntf_get(list : *const ListMagicIntf, index : usize) -> ItemMagicIntf{
-        let list = unsafe{ list.as_ref().unwrap() };
+    #[allow(non_snake_case)] #[no_mangle]
+    pub extern "C" fn ListMagicIntf_get(list : ListMagicIntf, index : usize) -> ItemMagicIntf{
         list.get(index)
     }
+    #[allow(non_snake_case)] #[no_mangle]
+    pub extern "C" fn ListMagicIntf_len(list : ListMagicIntf) -> usize{
+        list.len()
+    }
+   #[derive(Debug, Clone, Copy)]
+    pub struct ListMagicIntfIter{
+        intf : ListMagicIntf,
+        counter : usize,
+    }
+    impl Iterator for ListMagicIntfIter{
+        type Item = ItemMagicIntf;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            let len = self.intf.len();
+            if self.counter < len{
+                let counter = self.counter;
+                self.counter += 1;
+                Some(self.intf.get(counter))
+            } else{
+                None
+            }
+        }
+    }
+
+    pub struct GeneralIter<T,U>{
+        len : usize,
+        counter : usize,
+        intf : T,
+        getter : fn(&T,usize) -> U,
+    }
+
+    impl<T,U> Iterator for GeneralIter<T,U>{
+        type Item = U;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            if self.counter < self.len{
+                let counter = self.counter;
+                self.counter += 1;
+                Some((self.getter)(&self.intf, counter))
+            } else{
+                None
+            }
+        }
+    }
+
     #[repr(C)]
     pub struct ItemMagicIntf{
         item : *const Item,
@@ -118,14 +173,15 @@ mod tests {
         }
     }
     #[allow(non_snake_case)]
-    pub extern "C" fn ItemMagicIntf_param1<'a>(item : *const ItemMagicIntf) -> *const String{
+    pub extern "C" fn ItemMagicIntf_param1(item : *const ItemMagicIntf) -> *const String{
         let item = unsafe{ &*item };
         item.param1()
     }
     #[allow(non_snake_case)]
-    pub extern "C" fn ItemMagicIntf_set_param1(item : *const ItemMagicIntf, s : String){
+    pub extern "C" fn ItemMagicIntf_set_param1(item : *const ItemMagicIntf, s : *const String){
         let item = unsafe{ &mut *(item as *mut ItemMagicIntf) };
-        item.set_param1(s)
+        let s = unsafe{ &*s };
+        item.set_param1(s.to_string())
     }
 
 
