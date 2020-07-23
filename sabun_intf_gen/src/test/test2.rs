@@ -2,6 +2,9 @@
 #[allow(dead_code)]
 mod tests {
     use std::collections::HashMap;
+    use sabun_maker::intf::RustStrPtr;
+    use std::ffi::CStr;
+    use std::os::raw::c_char;
 
     pub struct Item{
         pub map : HashMap<String, String> ,
@@ -163,9 +166,9 @@ mod tests {
     }
     impl ItemMagicIntf{
         pub fn new(item : *const Item) -> ItemMagicIntf{ ItemMagicIntf{ item }}
-        pub fn param1(&self) -> &String{
+        pub fn param1(&self) -> String{
             let item = unsafe{ &*self.item };
-            item.get("param1").unwrap()
+            item.get("param1").unwrap().clone()
         }
         pub fn set_param1(&self, s : String){
             let item = unsafe{ &mut *(self.item as *mut Item) };
@@ -173,15 +176,15 @@ mod tests {
         }
     }
     #[allow(non_snake_case)]
-    pub extern "C" fn ItemMagicIntf_param1(item : *const ItemMagicIntf) -> *const String{
-        let item = unsafe{ &*item };
-        item.param1()
+    pub extern "C" fn ItemMagicIntf_param1(item : *const ItemMagicIntf) -> RustStrPtr{
+        let item = unsafe{ &*(*item).item };
+        RustStrPtr::new(item.get("param1").unwrap())
     }
     #[allow(non_snake_case)]
-    pub extern "C" fn ItemMagicIntf_set_param1(item : *const ItemMagicIntf, s : *const String){
+    pub extern "C" fn ItemMagicIntf_set_param1(item : *const ItemMagicIntf, s : *const c_char){
         let item = unsafe{ &mut *(item as *mut ItemMagicIntf) };
-        let s = unsafe{ &*s };
-        item.set_param1(s.to_string())
+        let s = unsafe{ CStr::from_ptr(s) };
+        item.set_param1(s.to_str().unwrap().to_string())
     }
 
 
@@ -206,7 +209,7 @@ mod tests {
             p1
 
         };
-        println!("magic param1 {}", unsafe{ &*hoge })
+        println!("magic param1 {}", hoge.to_string())
 
     }
 
