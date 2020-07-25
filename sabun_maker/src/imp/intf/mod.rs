@@ -1,3 +1,4 @@
+pub mod rust_int_ptr;
 pub mod general_iter;
 pub mod rust_str_ptr;
 pub mod list;

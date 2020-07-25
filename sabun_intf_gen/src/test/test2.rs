@@ -112,9 +112,6 @@ mod tests {
     }
 
 
-    // fn test_lifetime<'a>(n : &Vec<usize>) -> &'a usize{
-    //     n.get(0).unwrap()
-    // }
 
 
     #[test]
