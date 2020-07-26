@@ -1,4 +1,6 @@
-pub mod rust_int_ptr;
+pub mod rust_qv_bool;
+pub mod rust_qv_float;
+pub mod rust_qv_int;
 pub mod general_iter;
 pub mod rust_str_ptr;
 pub mod list;

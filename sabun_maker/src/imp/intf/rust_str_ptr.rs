@@ -9,7 +9,7 @@ use std::ptr::null;
 /// このポインタがdefaultを指していると、Stringがsetされた場合、defaultの情報を指し続けることになり、不整合になる。
 /// String自体は生きていても、stringのcapacity変更に伴う再構築が起きれば、ptrから取れる*const u8は無効になる
 ///
-/// まあ一般的に、書き込んだ後はこのポインタは無効になると考えるべきだろう。
+/// まあ一般的に、書き込んだ後にはこのポインタは無効になると考えるべきだろう。
 #[repr(C)] #[derive(Debug, Clone, Copy)]
 pub struct RustStrPtr{
     s : *const String,
@@ -23,14 +23,18 @@ impl RustStrPtr{
 }
 
 #[no_mangle] #[allow(non_snake_case)]
-pub extern "C" fn RustStrPtr_len(p : RustStrPtr) -> u64{
+pub extern "C" fn RustStrPtr_Len(p : RustStrPtr) -> u64{
     let s = unsafe{&*p.s};
     s.len() as u64
 }
 #[no_mangle] #[allow(non_snake_case)]
-pub extern "C" fn RustStrPtr_ptr(p : RustStrPtr) -> *const u8{
+pub extern "C" fn RustStrPtr_Ptr(p : RustStrPtr) -> *const u8{
     let s = unsafe{&*p.s};
     s.as_ptr()
+}
+#[no_mangle] #[allow(non_snake_case)]
+pub extern "C" fn RustStrPtr_IsNull(p : RustStrPtr) -> i8{
+    p.s.is_null() as i8
 }
 
 #[repr(C)] #[derive(Debug, Clone, Copy)]
@@ -39,7 +43,10 @@ pub struct QvStrPtr{
 }
 impl QvStrPtr{
     pub fn new(s : *const Qv<String>)-> QvStrPtr{ QvStrPtr{ s } }
-    pub fn value(&self) -> Qv<String>{ unsafe{(&*self.s).into_qv() } }
+    pub fn value(&self) -> Qv<String>{
+        let qv = unsafe{ &*self.s };
+        qv.clone()
+    }
 }
 #[no_mangle] #[allow(non_snake_case)]
 pub extern "C" fn QvStrPtr_NullOr(p : QvStrPtr) -> RustStrPtr{
