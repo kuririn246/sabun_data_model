@@ -2,30 +2,30 @@
 	bu : false,
 	str : "sutoringu",
 
-	col : ["List",
-		[{
-			nakabu : true,
-			Ref : {
-				"refed" : "",
-			}
-		}],
-		{
-			nakabu : false,
-			Ref : {
-				"refed" : "second",
-			}
-		}
-	],
-	"refed" : ["Data",
-		[{
-			mem : 0
-		}],
-		{
-			ID : "first",
-			mem : 1,
-		},
-		{
-			ID : "second",
-			mem : 2
-		}]
+//	col : ["List",
+//		[{
+//			nakabu : true,
+//			Ref : {
+//				"refed" : "",
+//			}
+//		}],
+//		{
+//			nakabu : false,
+//			Ref : {
+//				"refed" : "second",
+//			}
+//		}
+//	],
+//	"refed" : ["Data",
+//		[{
+//			mem : 0
+//		}],
+//		{
+//			ID : "first",
+//			mem : 1,
+//		},
+//		{
+//			ID : "second",
+//			mem : 2
+//		}]
 }

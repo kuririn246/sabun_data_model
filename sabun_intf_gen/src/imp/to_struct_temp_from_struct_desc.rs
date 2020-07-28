@@ -18,7 +18,6 @@ pub fn to_struct_temp_from_struct_desc(d : &StructDesc) -> StructTemp{
     StructTemp{
         new : new(&d.item_ptr_type, &d.item_struct_name, &param_funs, d.col_id.is_empty()),
         funs,
-        //self_mod_name: d.item_mod_name.to_string(),
         struct_name: d.item_struct_name.to_string(),
         ptr_type: d.item_ptr_type.to_string(),
         proxies,
@@ -26,52 +25,11 @@ pub fn to_struct_temp_from_struct_desc(d : &StructDesc) -> StructTemp{
     }
 }
 
-fn new(ptr_type_name : &str, result_type_name : &str, proxies : &[Ret], is_root : bool) -> String{
-    let mut s = String::new();
-    if is_root{
-        push(&mut s, 0, &format!("pub fn new(ptr : {}) -> {}{{\n", ptr_type_name, result_type_name));
-        push(&mut s, 1, &format!("{}{{ ptr, ", result_type_name));
-    } else {
-        push(&mut s, 0, &format!("pub fn new(ptr : {}, root : *mut RootItem) -> {}{{\n", ptr_type_name, result_type_name));
-        push(&mut s, 1, &format!("{}{{ ptr, root, ", result_type_name));
-    }
-
-    for p in proxies {
-        if let Some(n) = &p.proxy {
-            s.push_str(&format!("{} : None, ", n.name))
-        }
-    }
-    s.push_str("}\n");
-    push(&mut s, 0, "}\n");
-    if is_root{
-        push(&mut s, 0, &format!("pub fn root(&mut self) -> *mut RootItem{{ self }}\n"));
-    } else{
-        push(&mut s, 0, &format!("pub fn root(&mut self) -> *mut RootItem{{ self.root }}\n"));
-    }
-    s
+fn new(ptr_type_name : &str, result_type_name : &str) -> String{
+    return format!("pub fn new(ptr : {}, root : *const RootIntf) -> {}{{ {}{{ ptr, root }} }}\n", ptr_type_name, result_type_name, result_type_name));
 }
 
-#[derive(Debug, PartialEq, Clone)]
-struct Ret{
-    fun : String,
-    proxy : Option<Proxy>,
-}
-#[derive(Debug, PartialEq, Clone)]
-struct Proxy{
-    name : String,
-    type_without_option : String,
-}
-fn separate(v : Vec<Ret>) -> (Vec<String>, Vec<String>){
-    let mut funs :Vec<String> = vec![];
-    let mut proxies :Vec<String> = vec![];
-    for item in v{
-        funs.push(item.fun);
-        if let Some(p) = item.proxy {
-            proxies.push(format!("{} : Option<{}>,",p.name, p.type_without_option));
-        }
-    }
-    (funs, proxies)
-}
+
 
 fn params_to_funs(items : &[ParamItem], self_mod_name : &str, is_mut : bool) -> Vec<Ret>{
     let mut vec : Vec<Ret> = Vec::with_capacity(items.len());
@@ -82,10 +40,6 @@ fn params_to_funs(items : &[ParamItem], self_mod_name : &str, is_mut : bool) -> 
         }
     }
     vec
-}
-
-fn proxy_name(id : &str) -> String{
-    format!("p_{}", to_snake_name(id))
 }
 
 pub fn with_old(name : &str, is_old : bool) -> String {
@@ -135,7 +89,6 @@ fn cols_to_funs(d : &StructDesc) -> Vec<Ret>{
         if child.col_struct_name.is_empty() == false{
             let snake_name = to_snake_name(&child.col_id);
             let p = proxy_name(&snake_name);
-            //let proxy = format!("{} : Option<{}>,", &p, &child.col_ptr_type);
             let s = get_col_fun_string(&child.col_id, &snake_name, child.col_is_old,
                                    &d.item_mod_name, &child.col_mod_name,
                                    &p, &child.col_struct_name);
@@ -147,8 +100,6 @@ fn cols_to_funs(d : &StructDesc) -> Vec<Ret>{
     }
     vec
 }
-
-
 
 fn refs_to_funs(items : &[RefItem], _ref_is_enum : bool, self_mod_name : &str, is_mut : bool) -> Vec<Ret>{
     let mut vec : Vec<Ret> = Vec::with_capacity(items.len());
@@ -165,12 +116,12 @@ fn ref_proxy_name(s : &str) -> String{
     format!("ref_{}", s)
 }
 
-fn ref_to_fun_get(item : &RefItem, self_mod_name: &str) -> Ret {
+fn ref_to_fun_get(item : &RefItem, self_mod_name: &str) -> String {
     let snake = to_snake_name(&item.col_name);
     let p = ref_proxy_name(&snake);
     let item_type = to_item_type_name(&item.col_name);
 
     let s = get_ref_fun_string(&item.col_name,  &snake, item.is_old, item.var_type,
                                self_mod_name, &p, &item_type);
-    Ret { proxy: Some(Proxy { name: p, type_without_option: with_var(&format!("*mut {}",&item_type), item.var_type) }), fun: s }
+
 }
