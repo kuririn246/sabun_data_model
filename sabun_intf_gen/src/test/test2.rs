@@ -5,9 +5,11 @@ mod tests {
     use sabun_maker::intf::{RustStrPtr, GeneralIter};
     use std::ffi::CStr;
     use std::os::raw::c_char;
+    use sabun_maker::structs::Qv;
+    use sabun_maker::intf::null_or::NullOr;
 
     pub struct Item{
-        pub map : HashMap<String, String> ,
+        pub map : HashMap<String, Qv<String>> ,
     }
     impl Item{
         pub fn new() -> Item{
@@ -15,7 +17,7 @@ mod tests {
             map.insert("param1".to_string(), "value_h".to_string());
             Item{ map }
         }
-        pub fn get(&self, key : &str) -> Option<&String>{
+        pub fn get(&self, key : &str) -> Option<&Qv<String>>{
             self.map.get(key)
         }
     }
@@ -90,13 +92,14 @@ mod tests {
     }
     impl ItemMagicIntf{
         pub fn new(item : *const Item) -> ItemMagicIntf{ ItemMagicIntf{ item }}
-        pub fn param1(&self) -> String{
+        pub fn param1(&self) -> NullOr<String>{
             let item = unsafe{ &*self.item };
-            item.get("param1").unwrap().clone()
+            let qv = item.get("param1").unwrap().clone()
+            NullOr::from_qv(qv).unwrap()
         }
-        pub fn set_param1(&self, s : String){
+        pub fn set_param1(&self, s : NullOr<String>){
             let item = unsafe{ &mut *(self.item as *mut Item) };
-            item.map.insert("param1".to_string(), s);
+            item.map.insert("param1".to_string(), s.into_qv());
         }
     }
     #[allow(non_snake_case)]
