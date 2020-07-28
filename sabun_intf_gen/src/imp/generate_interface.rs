@@ -6,12 +6,12 @@ use crate::imp::structs::struct_desc::StructDesc;
 use crate::imp::structs::sources::{SourceTree, StructSource, Sources};
 use crate::imp::to_source_from_col_temp::to_source_from_col_temp;
 use crate::imp::to_struct_temp_from_struct_desc::to_struct_temp_from_struct_desc;
-use crate::imp::to_source_from_struct_temp::to_source_from_struct_temp;
+use crate::imp::generate_item_source::to_source_from_struct_temp;
 
 /// データに静的にアクセスできるラッパーを生成する。
 /// RootIntf::newしそこを起点にしてアクセスする。
 /// RootIntfから取れたポインタは、RootIntfが削除されれば全て不正になる
-pub fn generate_interface(root : &RootObject) -> Sources{
+pub fn generate_interface(root : &RootObject) -> Vec<StructSource>{
     let mem_descs = member_desc::get_member_desc(root);
     let desc = create_struct_desc_root(&mem_descs);
 
@@ -25,22 +25,7 @@ pub fn generate_interface(root : &RootObject) -> Sources{
         flatten(&mut vec, tree);
     }
 
-    let usings = "\
-use sabun_maker::intf::*;
-use sabun_maker::structs::*;
-
-pub struct RootIntf{
-    obj : Box<RootObject>,
-}
-impl RootIntf{
-    pub fn new(obj : RootObject) -> RootIntf{
-        let mut b = Box::new(obj);
-        RootIntf{ obj : b, intf : Box::new(intf) }
-    }
-    pub fn deconstruct(self) -> Box<RootObject>{ self.obj }
-}
-".to_string();
-    Sources::new(usings, root_source , vec)
+    vec
 }
 
 fn generate_source_tree(desc : &StructDesc) -> SourceTree{
