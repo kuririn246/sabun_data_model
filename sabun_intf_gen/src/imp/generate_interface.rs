@@ -9,21 +9,15 @@ use crate::imp::to_struct_temp_from_struct_desc::to_struct_temp_from_struct_desc
 use crate::imp::to_source_from_struct_temp::to_source_from_struct_temp;
 
 /// データに静的にアクセスできるラッパーを生成する。
-/// RootIntf::newし、intf()を起点にしてアクセスする。
-/// 全データはget時にキャッシュされるので、二度目以降はハッシュテーブルアクセスは行われない。
-/// キャッシュされるので、getでもmodifyが必要となり、&mutを要求する。
-/// キャッシュ値を入れるだけなので、マルチスレッドでgetアクセスしても、キャッシュが二度作られることはあるだろうが、別に安全だと思う。
-/// もちろんgetとsetを同時に行えば不整合が起きることもあるだろう。マルチスレッドでの動作は安全ではない。
-/// &mut越しならばマルチスレッドアクセスはされないが、使いにくいと思うので、適宜&mutをポインタに変換して利用することも考えている
-/// キャッシュされているので、ポインタは一定値をとる。なので&mut参照を*mut(or *const)ポインタとして保持して良い。
-/// もちろんMutListのアイテムへのポインタを持ちながら、アイテムを削除すればそのポインタは不正になる。
-/// RootObjectを削除してしまえば、RootItem以下の全部が不正になる
+/// RootIntf::newしそこを起点にしてアクセスする。
+/// RootIntfから取れたポインタは、RootIntfが削除されれば全て不正になる
 pub fn generate_interface(root : &RootObject) -> Sources{
     let mem_descs = member_desc::get_member_desc(root);
     let desc = create_struct_desc_root(&mem_descs);
 
     let st = to_struct_temp_from_struct_desc(&desc);
     let root= to_source_from_struct_temp(&st);
+    let root_source = root.source().to_string();
 
     let mut vec : Vec<StructSource> = vec![];
     for child in &desc.children{
@@ -37,19 +31,16 @@ use sabun_maker::structs::*;
 
 pub struct RootIntf{
     obj : Box<RootObject>,
-    intf : Box<RootItem>,
 }
 impl RootIntf{
     pub fn new(obj : RootObject) -> RootIntf{
         let mut b = Box::new(obj);
-        let intf = RootItem::new(RootObjectPtr::new(b.as_mut()));
         RootIntf{ obj : b, intf : Box::new(intf) }
     }
-    pub fn intf(&mut self) -> &mut RootItem{ &mut self.intf }
-    pub fn deconstruct(self) -> (Box<RootObject>, Box<RootItem>){ (self.obj, self.intf) }
+    pub fn deconstruct(self) -> Box<RootObject>{ self.obj }
 }
 ".to_string();
-    Sources::new(usings, root.source().to_string(), vec)
+    Sources::new(usings, root_source , vec)
 }
 
 fn generate_source_tree(desc : &StructDesc) -> SourceTree{
