@@ -9,16 +9,19 @@ use sabun_maker::intf::*;
 use sabun_maker::structs::*;
 
 pub struct RootIntf{
+    root : Box<RootObject>,
     item : Box<RootItem>,
 }
 pub struct RootItem{
-    obj : RootObject
+    ptr : RootObjectPtr
 }
 impl RootIntf{
     pub fn new(obj : RootObject) -> RootIntf{
-        RootIntf{ item : Box::new(RootItem{ obj }) }
+        let root = Box::new(obj);
+        let item = Box::new(RootObjectPtr::new(root.as_ref()));
+        RootIntf{ root, item }
     }
-".to_string());
+");
 
     sb.to_string()
 }

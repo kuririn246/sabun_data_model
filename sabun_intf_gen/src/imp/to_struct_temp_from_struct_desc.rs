@@ -42,13 +42,6 @@ fn params_to_funs(items : &[ParamItem], self_mod_name : &str, is_mut : bool) -> 
     vec
 }
 
-pub fn with_old(name : &str, is_old : bool) -> String {
-    if is_old {
-        format!("{}_old", name)
-    } else {
-        name.to_string()
-    }
-}
 
 pub fn with_var(t : &str, vt : VarType) -> String{
     match vt{
