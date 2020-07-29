@@ -2,7 +2,7 @@ use crate::imp::json_to_rust::json_name::{json_name, NameType};
 use crate::HashM;
 use crate::error::Result;
 use crate::imp::json_to_rust::validation::validate_root::validate_root;
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::structs::root_value::RootValue;
 

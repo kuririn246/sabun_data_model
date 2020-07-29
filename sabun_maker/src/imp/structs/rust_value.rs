@@ -1,4 +1,4 @@
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 use crate::imp::structs::rust_list::{ConstData, ConstList, MutList, InnerList, InnerMutList};
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::list_value::{ListDefValue, ListSabValue};

@@ -94,7 +94,7 @@ mod tests {
         pub fn new(item : *const Item) -> ItemMagicIntf{ ItemMagicIntf{ item }}
         pub fn param1(&self) -> NullOr<String>{
             let item = unsafe{ &*self.item };
-            let qv = item.get("param1").unwrap().clone()
+            let qv = item.get("param1").unwrap().clone();
             NullOr::from_qv(qv).unwrap()
         }
         pub fn set_param1(&self, s : NullOr<String>){

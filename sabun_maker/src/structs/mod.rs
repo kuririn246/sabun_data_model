@@ -5,4 +5,5 @@ pub use crate::imp::structs::rust_value::RustMemberType as RustMemberType;
 pub use crate::imp::structs::qv::Qv as Qv;
 pub use crate::imp::intf::null_or::NullOr as NullOr;
 pub use crate::imp::intf::null_or::UndefOr as UndefOr;
-pub use crate::imp::structs::value_type::VarType as VarType;
+pub use crate::imp::structs::var_type::VarType as VarType;
+pub use crate::imp::structs::rust_param::ParamType as ParamType;

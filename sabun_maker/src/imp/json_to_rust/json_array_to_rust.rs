@@ -4,7 +4,7 @@ use super::names::Names;
 use json5_parser::{JVal, Span};
 use super::list::json_list_to_rust::json_list_to_rust;
 use crate::imp::json_to_rust::array_null::array_null_or_undefined;
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::array_type::ArrayType;
 use crate::imp::structs::qv::Qv;

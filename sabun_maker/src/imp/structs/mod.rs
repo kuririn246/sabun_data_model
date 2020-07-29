@@ -2,7 +2,7 @@ pub mod mut_list_hash;
 pub mod inner_mut_def_obj;
 pub mod list_def_obj;
 pub mod array_type;
-pub mod value_type;
+pub mod var_type;
 pub mod rust_value;
 pub mod qv;
 pub mod rust_list;

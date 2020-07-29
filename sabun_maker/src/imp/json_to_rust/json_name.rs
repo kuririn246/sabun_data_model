@@ -1,7 +1,7 @@
 use regex::Regex;
 use regex::Captures;
 use lazy_static::lazy_static;
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 
 pub enum SystemNames{
     Old,

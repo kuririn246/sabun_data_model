@@ -1,4 +1,4 @@
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 use crate::imp::structs::qv::Qv;
 
 #[derive(Debug, PartialEq, Clone)]

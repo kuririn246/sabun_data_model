@@ -1,6 +1,4 @@
-pub mod struct_temp;
-pub mod struct_desc;
-pub mod str_and_tab;
-pub mod sources;
-pub mod fun;
+pub mod col_source;
+pub mod param_source;
+pub mod root_source;
 pub mod source_builder;

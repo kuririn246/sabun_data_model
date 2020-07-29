@@ -17,7 +17,7 @@ use json5_parser::JVal;
 use names::Names;
 use crate::error::Result;
 use crate::imp::structs::rust_value::RustValue;
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 use crate::imp::structs::root_obj::RootObject;
 
 pub fn json_root_to_rust(json : &str) -> Result<RootObject>{

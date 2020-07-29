@@ -1,5 +1,5 @@
 use crate::imp::structs::rust_param::RustParam;
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 
 pub fn verify_set_sabun(p : &RustParam, vt : &VarType, sab : &RustParam) -> Result<(), SetSabunError>{
     if p.acceptable(sab) == false{

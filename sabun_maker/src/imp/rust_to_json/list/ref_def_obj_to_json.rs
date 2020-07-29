@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use crate::imp::structs::ref_def_obj::RefDefObj;
 use crate::imp::structs::qv::Qv;
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 use crate::imp::structs::my_json::Value;
 
 pub fn ref_def_obj_to_json(obj : &RefDefObj) -> BTreeMap<String, Value>{

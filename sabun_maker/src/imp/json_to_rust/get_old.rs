@@ -2,7 +2,7 @@ use json5_parser::{JVal};
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
 use crate::imp::json_to_rust::json_name::{json_name, NameType};
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 use crate::{HashS, HashSt};
 
 pub fn get_old(array : &[JVal], names : &Names) -> Result<HashS<String>>{

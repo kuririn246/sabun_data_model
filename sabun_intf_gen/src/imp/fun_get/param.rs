@@ -1,8 +1,9 @@
 use sabun_maker::structs::VarType;
-use crate::imp::to_struct_temp_from_struct_desc::{push, with_old, with_var};
 use crate::imp::structs::source_builder::SourceBuilder;
 use sabun_maker::intf::member_desc::MemberDesc;
 use crate::imp::util::to_type_name::to_snake_name;
+use crate::imp::util::with_old::with_old;
+use crate::imp::util::with_var::with_var;
 
 
 //pub fn param1(&self) -> NullOr<String>{
@@ -37,6 +38,6 @@ pub fn generate_param_fun_get(
         },
     }
     sb.push(0,&format!("}}"));
-    s
+    sb.to_string()
 }
 

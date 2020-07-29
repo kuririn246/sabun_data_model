@@ -1,7 +1,7 @@
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_list::{InnerList, InnerMutList};
 use crate::imp::structs::rust_value::{RustValue, RustMemberType};
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 use crate::imp::structs::qv::QvType;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;

@@ -2,7 +2,7 @@ use json5_parser::{JVal, Span};
 use super::names::Names;
 use crate::error::Result;
 use super::json_array_to_rust::GatResult;
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::qv::Qv;
 use crate::imp::structs::rust_param::RustParam;

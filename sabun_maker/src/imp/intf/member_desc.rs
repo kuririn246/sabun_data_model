@@ -1,4 +1,4 @@
-use crate::imp::structs::value_type::VarType;
+use crate::imp::structs::var_type::VarType;
 use crate::imp::structs::rust_value::RustMemberType;
 use crate::imp::structs::list_value::ListDefValue;
 use crate::imp::structs::list_def_obj::ListDefObj;
