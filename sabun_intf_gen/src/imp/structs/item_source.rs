@@ -7,6 +7,6 @@ pub struct ItemSource {
 impl ItemSource{
     pub fn new(members : Vec<MemberSource>) -> ItemSource{ ItemSource{ members } }
     pub fn to_string(&self) -> String{
-        
+
     }
 }
