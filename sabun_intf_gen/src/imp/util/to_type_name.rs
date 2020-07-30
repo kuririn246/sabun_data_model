@@ -37,6 +37,10 @@ pub fn to_snake_name(s : &str) -> String{
     r
 }
 
-pub fn to_item_type_name(mem : &str) -> String{
-    format!("{}Item", to_type_name(mem))
+pub fn to_item_type_name(stem : &str) -> String{
+    format!("{}Item", to_type_name(stem))
+}
+
+pub fn to_data_type_name(stem : &str) -> String{
+    format!("{}Data", to_type_name(stem))
 }

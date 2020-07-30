@@ -1,20 +1,17 @@
 use crate::imp::structs::param_source::ParamSource;
-use crate::imp::structs::col_source::ColSource;
+use crate::imp::structs::data_source::ColSource;
 use crate::imp::structs::source_builder::SourceBuilder;
+use crate::imp::to_member_source::MemberSource;
 
 pub struct RootSource{
-    params : Vec<ParamSource>,
-    cols : Vec<ColSource>
+    members : Vec<MemberSource>,
 }
 impl RootSource{
-    pub fn new(params : Vec<ParamSource>, cols : Vec<ColSource>) -> RootSource{
-        RootSource{ params, cols }
+    pub fn new(members : Vec<MemberSource>) -> RootSource{
+        RootSource{ members }
     }
-    pub fn params(&self) -> &[ParamSource]{
+    pub fn members(&self) -> &[MemberSource]{
         &self.params
-    }
-    pub fn cols(&self) -> &[ColSource]{
-        &self.cols
     }
 
     pub fn to_string(&self) -> String{
@@ -39,9 +36,13 @@ impl RootIntf{
     }
     pub fn ptr(&self) -> RootObjectPtr{ self.item.as_ref().ptr }
 ");
-        for param in self.params() {
-            sb.push(1, &param.get("root", "self.ptr()"));
-            sb.push(1, &param.set("root", "self.ptr()"));
+        for mem in self.members() {
+            match mem{
+                MemberSource::Param(param) =>{
+                    sb.push(1, &param.get("root", "self.ptr()"));
+                    sb.push(1, &param.set("root", "self.ptr()"));
+                }
+            }
         }
         sb.push(0, "}");
 
