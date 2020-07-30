@@ -47,4 +47,12 @@ impl RootIntf{
 
         sb.to_string()
     }
+
+    pub fn to_test_string(&self) -> String{
+        let mut sb = SourceBuilder::new();
+        sb.push(0, &format!("#[cfg(test)] pub mod test{{"));
+        sb.push(1, &self.to_string());
+        sb.push(0, "}");
+        sb.to_string()
+    }
 }

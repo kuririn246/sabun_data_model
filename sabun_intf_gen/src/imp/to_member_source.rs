@@ -32,6 +32,14 @@ pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
                 mem.is_old(),
             ))
         },
+        RustMemberType::Str =>{
+            MemberSource::Param(ParamSource::new(
+                mem.name().to_string(),
+                mem.var_type(),
+                ParamType::String,
+                mem.is_old(),
+            ))
+        },
         _ => unreachable!(),
     }
 }

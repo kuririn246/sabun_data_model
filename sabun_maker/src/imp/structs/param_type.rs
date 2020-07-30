@@ -8,7 +8,7 @@ impl ParamType{
             ParamType::Bool => "bool",
             ParamType::Int => "int",
             ParamType::Float => "float",
-            ParamType::String => "string",
+            ParamType::String => "str",
             ParamType::IntArray => "int_array",
             ParamType::FloatArray => "float_array",
         }

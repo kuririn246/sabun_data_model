@@ -25,4 +25,13 @@ impl RootIntf{
 		root::set_bool(self.ptr(), "bu", Qv::Val(bu));
 	}
 	
+	pub fn str(&self) -> String{
+		let qv = root::get_str(self.ptr(), "str").unwrap();
+		qv.into_value().unwrap()
+	}
+	
+	pub fn set_str(&mut self, str : String){
+		root::set_str(self.ptr(), "str", Qv::Val(str));
+	}
+	
 }
