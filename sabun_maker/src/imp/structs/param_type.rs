@@ -13,4 +13,14 @@ impl ParamType{
             ParamType::FloatArray => "float_array",
         }
     }
+    pub fn typename(&self) -> &str{
+        match self{
+            ParamType::Bool => "bool",
+            ParamType::Int => "i64",
+            ParamType::Float => "f64",
+            ParamType::String => "String",
+            ParamType::IntArray => "Vec<i64>",
+            ParamType::FloatArray => "Vec<f64>",
+        }
+    }
 }

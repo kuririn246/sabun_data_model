@@ -34,13 +34,14 @@ pub struct RootItem{
 impl RootIntf{
     pub fn new(obj : RootObject) -> RootIntf{
         let root = Box::new(obj);
-        let item = Box::new(RootObjectPtr::new(root.as_ref()));
+        let item = Box::new(RootItem{ ptr : RootObjectPtr::new(root.as_ref()) });
         RootIntf{ root, item }
     }
+    pub fn ptr(&self) -> RootObjectPtr{ self.item.as_ref().ptr }
 ");
         for param in self.params() {
-            sb.push(1, param.get());
-            sb.push(1, param.set());
+            sb.push(1, &param.get("root", "self.ptr()"));
+            sb.push(1, &param.set("root", "self.ptr()"));
         }
         sb.push(0, "}");
 

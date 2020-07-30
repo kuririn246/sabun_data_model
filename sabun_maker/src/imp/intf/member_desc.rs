@@ -21,7 +21,7 @@ impl MemberDesc{
     }
 
     pub fn name(&self) -> &str{ &self.name }
-    pub fn var_type(&self) -> &VarType { &self.var_type }
+    pub fn var_type(&self) -> VarType { self.var_type }
     pub fn member_type(&self) -> &RustMemberType { &self.member_type }
     pub fn is_old(&self) -> bool{ self.is_old }
     pub fn child_descs(&self) -> Option<&MemberDescs>{ self.child_descs.as_ref() }

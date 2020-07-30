@@ -1,7 +1,7 @@
 use sabun_maker::intf::*;
 use sabun_maker::structs::RootObject;
 use crate::imp::structs::root_source::RootSource;
-use crate::imp::generate_root_source::generate_root;
+use crate::imp::generate_root_source::generate_root_source;
 
 
 /// データに静的にアクセスできるラッパーを生成する。
@@ -9,6 +9,6 @@ use crate::imp::generate_root_source::generate_root;
 /// RootIntfから取れたポインタは、RootIntfが削除されれば全て不正になる
 pub fn generate_interface(root : &RootObject) -> RootSource{
     let mem_descs = member_desc::get_member_desc(root);
-    generate_root(&mem_descs)
+    generate_root_source(&mem_descs)
 
 }

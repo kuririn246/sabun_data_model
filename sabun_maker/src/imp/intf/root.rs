@@ -13,7 +13,7 @@ pub struct RootObjectPtr{
     ptr : *mut RootObject
 }
 impl RootObjectPtr {
-    pub fn new(ptr: *mut RootObject) -> RootObjectPtr { RootObjectPtr { ptr } }
+    pub fn new(ptr: *const RootObject) -> RootObjectPtr { RootObjectPtr { ptr : ptr as *mut RootObject } }
 }
 
 pub fn get_bool(root : RootObjectPtr, name : &str) -> Option<Qv<bool>>{

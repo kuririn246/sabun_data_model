@@ -13,14 +13,6 @@ impl SourceBuilder{
     }
 }
 
-pub struct StrAndTab{
-    pub(crate) s : String,
-    pub(crate) tab : usize,
-}
-
-impl StrAndTab{
-    pub(crate) fn new(s : String, tab : usize) -> StrAndTab{ StrAndTab{ s, tab }}
-}
 
 fn tab_line(tabs : usize, s : &str) -> String{
     let mut r : String = String::new();
