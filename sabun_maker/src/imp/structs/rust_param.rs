@@ -16,10 +16,6 @@ pub enum RustParam{
     //Num2Array(Qv<RustNum2Array>)
 }
 
-#[repr(u32)] #[derive(Debug, PartialEq, Clone, Copy)]
-pub enum ParamType{
-    Bool, Int, Float, String, IntArray, FloatArray,
-}
 
 impl RustParam {
     pub(crate) fn qv_type(&self) -> QvType {

@@ -39,8 +39,8 @@ impl RootIntf{
     }
 ");
         for param in self.params() {
-            sb.push(1, param.get().unwrap());
-            sb.push(1, param.set().unwrap());
+            sb.push(1, param.get());
+            sb.push(1, param.set());
         }
         sb.push(0, "}");
 
