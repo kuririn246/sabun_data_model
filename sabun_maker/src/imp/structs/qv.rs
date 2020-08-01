@@ -19,6 +19,14 @@ impl<T> Qv<T>{
         }
     }
 
+    pub fn into_map<U>(self, f : impl Fn(T) -> U) -> Qv<U>{
+        match self {
+            Qv::Val(v) => Qv::Val(f(v)),
+            Qv::Null => Qv::Null,
+            Qv::Undefined => Qv::Undefined
+        }
+    }
+
     pub fn opt_map<U>(&self, f : impl Fn(&T) -> Option<U>) -> Option<Qv<U>>{
         match self {
             Qv::Val(v) => f(v).map(|r| Qv::Val(r)),

@@ -17,7 +17,7 @@ pub struct KeySource{
 }
 impl KeySource{
     pub fn key_name(&self) -> String{
-        if key.is_old(){ format!("{}_old", to_snake_name(&key.key)) } else{ to_snake_name(&key.key) }
+        if self.is_old{ format!("{}_old", to_snake_name(&self.key)) } else{ to_snake_name(&self.key) }
     }
 }
 impl DataSource{
@@ -48,7 +48,7 @@ impl DataSource{
         let item_type_name = to_item_type_name(id);
 
         sb.push(0,&format!("#[derive(Debug, PartialEq)]"));
-        sb.push(0,&format!("pub struct {} {{", &data_type_name);
+        sb.push(0,&format!("pub struct {} {{", &data_type_name));
         sb.push(1,"ptr : ConstDataPtr,");
         sb.push(1,"root : *mut RootItem,");
         sb.push(0,"}");

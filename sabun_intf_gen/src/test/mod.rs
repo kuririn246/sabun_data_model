@@ -1,3 +1,4 @@
+mod test3;
 mod generate_params;
 mod test_params;
 mod test2;

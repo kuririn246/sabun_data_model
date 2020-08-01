@@ -2,7 +2,7 @@
 mod tests {
     use sabun_maker::json_dir_to_rust;
     use crate::generate_interface;
-    use crate::test::write_file::write_file;
+    use crate::test::write_file::test::write_file;
     //use crate::rust_to_json_new_default;
     //use crate::imp::json_to_rust::json_root_to_rust;
     //use crate::imp::rust_to_json::root_to_json::root_to_json_new_default;

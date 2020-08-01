@@ -2,6 +2,7 @@ use sabun_maker::intf::member_desc::MemberDesc;
 use crate::imp::structs::param_source::ParamSource;
 use sabun_maker::structs::{RustMemberType, ParamType};
 
+#[derive(Debug, PartialEq)]
 pub enum MemberSource{
     Param(ParamSource)
 }

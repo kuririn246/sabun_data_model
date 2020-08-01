@@ -1,5 +1,4 @@
 use crate::imp::structs::param_source::ParamSource;
-use crate::imp::structs::data_source::ColSource;
 use crate::imp::structs::source_builder::SourceBuilder;
 use crate::imp::to_member_source::MemberSource;
 
@@ -11,7 +10,7 @@ impl RootSource{
         RootSource{ members }
     }
     pub fn members(&self) -> &[MemberSource]{
-        &self.params
+        &self.members
     }
 
     pub fn to_string(&self) -> String{
