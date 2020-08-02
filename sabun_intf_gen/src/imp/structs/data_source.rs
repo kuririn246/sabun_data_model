@@ -42,8 +42,6 @@ impl DataSource{
     pub fn to_string(&self) -> String{
         let mut sb = SourceBuilder::new();
         let id = self.stem();
-        let snake_name = to_snake_name(id);
-        let is_old = self.is_old();
         let data_type_name = to_data_type_name(id);
         let item_type_name = to_item_type_name(id);
 
@@ -61,7 +59,7 @@ impl DataSource{
             sb.push(1,&format!("pub fn {}(&self) -> {} {{", &key_name, &item_type_name));
             sb.push(2,&format!("let ptr = data::get_value(self.ptr, \"{}\").unwrap();", &key.key));
 
-            sb.push(2, &format!("{}::new(ptr, self.root);", &item_type_name));
+            sb.push(2, &format!("{}::new(ptr, self.root, );", &item_type_name));
             sb.push(1, "}");
         }
 
