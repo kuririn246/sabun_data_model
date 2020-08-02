@@ -15,8 +15,8 @@ pub struct MutListItemPtr {
 }
 
 impl MutListItemPtr {
-    pub fn new(item : *mut MutListItem, list_def : *const ListDefObj, root : *mut RootObject) -> MutListItemPtr {
-        MutListItemPtr { item, list_def, root }
+    pub fn new(item : *const MutListItem, list_def : *const ListDefObj, root : *const RootObject) -> MutListItemPtr {
+        MutListItemPtr { item : item as *mut MutListItem, list_def, root : root as *mut RootObject  }
     }
     pub fn item(&self) -> *const MutListItem{ self.item }
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
@@ -56,3 +56,16 @@ pub fn set_bool(ps : MutListItemPtr, name : &str, val : Qv<bool>) -> bool{
         Err(_) => false,
     }
 }
+
+// pub fn set_ref(ps : MutListItemPtr, list_name : &str, id : &str){
+//     let item= unsafe{ ps.item.as_mut().unwrap() };
+//     item.refs()
+//     let qv = if let Some(sab) = item.refs().get(list_name){
+//         sab.value()
+//     } else{
+//         if let Some(d) = list_def.refs().refs().get(list_name){
+//             d.value()
+//         } else{ return None; }
+//     };
+//     Some(qv)
+// }

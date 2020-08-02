@@ -5,6 +5,7 @@ use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::qv::Qv;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
+use crate::imp::intf::RootObjectPtr;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -68,7 +69,7 @@ pub fn get_param<'a>(item : &'a ListItem, def : &'a ListDefObj, name : &str) -> 
     }
 }
 
-pub fn get_ref(ps : ListItemPtr, list_name : &str) -> Option<&Qv<String>>{
+pub fn get_ref(ps : ListItemPtr, list_name : &str) -> Option<Qv<ListItemPtr>>{
     let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     let qv = if let Some(sab) = item.refs().get(list_name){
         sab.value()
@@ -77,5 +78,8 @@ pub fn get_ref(ps : ListItemPtr, list_name : &str) -> Option<&Qv<String>>{
             d.value()
         } else{ return None; }
     };
-    Some(qv)
+    qv.opt_map(|id|{
+        let data = super::root::get_data(RootObjectPtr::new(ps.root), list_name).unwrap();
+        super::data::get_value(data, id)
+    })
 }

@@ -85,7 +85,3 @@ impl ParamSource{
         unimplemented!()
     }
 }
-fn opt(s : &str) -> Option<&str>{
-    if s.is_empty(){ None }
-    else{ Some(s) }
-}
