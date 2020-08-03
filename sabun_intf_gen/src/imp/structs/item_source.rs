@@ -31,7 +31,6 @@ impl ItemSource{
             match mem{
                 MemberSource::Param(param) =>{
                     sb.push(1, &param.get("list_item", "self.ptr"));
-                    sb.push(1, &param.set("list_item", "self.ptr"));
                 }
             }
         }
