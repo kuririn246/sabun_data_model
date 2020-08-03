@@ -3,18 +3,11 @@ use sabun_maker::structs::*;
 
 pub struct RootIntf{
     root : Box<RootObject>,
-    item : Box<RootItem>,
 }
-pub struct RootItem{
-    ptr : RootObjectPtr
-}
+
 impl RootIntf{
-    pub fn new(obj : RootObject) -> RootIntf{
-        let root = Box::new(obj);
-        let item = Box::new(RootItem{ ptr : RootObjectPtr::new(root.as_ref()) });
-        RootIntf{ root, item }
-    }
-    pub fn ptr(&self) -> RootObjectPtr{ self.item.as_ref().ptr }
+    pub fn new(obj : RootObject) -> RootIntf{ RootIntf{ root : Box::new(obj) } }
+    pub(crate) fn ptr(&self) -> RootObjectPtr{ RootObjectPtr::new(self.root.as_ref()) }
 
 	pub fn bu(&self) -> bool{
 		let qv = root::get_bool(self.ptr(), "bu").unwrap();

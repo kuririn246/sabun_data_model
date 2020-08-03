@@ -1,14 +1,7 @@
 // use sabun_maker::structs::VarType;
 // use crate::imp::to_struct_temp_from_struct_desc::{push, with_old, with_var};
 //
-// fn option_type_str(var : VarType) -> String{
-//     match var{
-//         VarType::Nullable => "NullOr".to_string(),
-//         VarType::Undefiable => "UndefOr".to_string(),
-//         VarType::UndefNullable => "Qv".to_string(),
-//         VarType::Normal => "".to_string(),
-//     }
-// }
+
 //
 // pub fn get_ref_fun_string(col_name : &str, snake_name : &str, is_old : bool, var_type : VarType, self_mod_name: &str, proxy_name : &str, result_type_name: &str) -> String{
 //     let mut s = String::new();
