@@ -1,6 +1,7 @@
 use sabun_maker::intf::*;
 use sabun_maker::structs::*;
-
+unsafe impl Send for RootIntf{}
+#[derive(Debug, PartialEq)]
 pub struct RootIntf{
     root : Box<RootObject>,
 }
