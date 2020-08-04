@@ -1,3 +1,4 @@
+pub mod inner_list;
 pub mod c_qv_bool;
 pub mod c_qv_float;
 pub mod c_qv_int;
@@ -18,5 +19,6 @@ pub use root::RootObjectPtr as RootObjectPtr;
 pub use data::ConstDataPtr as ConstDataPtr;
 pub use list_item::ListItemPtr as ListItemPtr;
 pub use list::ConstListPtr as ConstListPtr;
+pub use inner_list::InnerListPtr as InnerListPtr;
 pub use c_qv_str::StrPtr as RustStrPtr;
 pub use general_iter::GeneralIter as GeneralIter;

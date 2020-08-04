@@ -6,6 +6,7 @@ use crate::imp::structs::qv::Qv;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::intf::RootObjectPtr;
+use crate::imp::intf::inner_list::InnerListPtr;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -21,15 +22,15 @@ impl ListItemPtr {
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
 }
 
-// pub fn get_inner_data(ps : ListItemPtr, name : &str) -> Option<InnerDataPtr>{
-//     let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
-//     if let Some(ListDefValue::InnerDataDef(def)) = list_def.default().get(name){
-//         if let Some(ListSabValue::InnerData(data)) = item.values().get(name){
-//             return Some(InnerDataPtr::new(data, def, ps.root))
-//         }
-//     }
-//     None
-// }
+pub fn get_inner_list(ps : ListItemPtr, name : &str) -> Option<InnerListPtr>{
+    let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
+    if let Some(ListDefValue::InnerListDef(def)) = list_def.default().get(name){
+        if let Some(ListSabValue::InnerList(data)) = item.values().get(name){
+            return Some(InnerListPtr::new(data, def, ps.root))
+        }
+    }
+    None
+}
 
 pub fn get_bool(ps : ListItemPtr, name : &str) -> Option<Qv<bool>>{
     let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };

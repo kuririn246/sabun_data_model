@@ -5,12 +5,25 @@
 	list : ["List",
 		[{
 			nakabu : true,
+			innerList : ["InnerListDef",
+			[{
+				innerMem : 10,
+			}]
+			],
 			Ref : {
 				"refed" : "",
 			}
 		}],
 		{
 			nakabu : false,
+			innerList : ["InnerList",
+				{
+					innerMem : 20,
+				},
+				{
+					innerMem : 30,
+				},
+			],
 			Ref : {
 				"refed" : "second",
 			}

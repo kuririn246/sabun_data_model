@@ -45,12 +45,26 @@ impl ItemSource{
                 },
                 MemberSource::Data(_) =>{},
                 MemberSource::List(_) =>{},
+                MemberSource::InnerList(l) =>{
+                    sb.push_without_newline(1, &l.get("list_item", "self.ptr"));
+                }
             }
         }
         for r in self.refs() {
             sb.push_without_newline(1, &r.get("list_item"))
         }
         sb.push(0, "}");
+
+        for mem in &self.members{
+            match mem{
+                MemberSource::InnerList(l) =>{
+                    sb.push_without_newline(0, &l.to_string());
+                },
+                MemberSource::List(_) =>{},
+                MemberSource::Data(_) =>{},
+                MemberSource::Param(_) =>{},
+            }
+        }
 
         sb.to_string()
     }

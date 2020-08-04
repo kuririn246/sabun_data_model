@@ -38,6 +38,7 @@ impl RootIntf{
                 MemberSource::List(l) =>{
                     sb.push_without_newline(1, &l.get("root", "self.ptr()"));
                 },
+                MemberSource::InnerList(_) =>{},
             }
         }
         sb.push(0, "}");
@@ -50,7 +51,8 @@ impl RootIntf{
                 MemberSource::List(l) =>{
                     sb.push(0, &l.to_string())
                 },
-                MemberSource::Param(_) =>{}
+                MemberSource::Param(_) =>{},
+                MemberSource::InnerList(_) =>{},
             }
         }
 

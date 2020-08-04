@@ -3,12 +3,14 @@ use crate::imp::structs::param_source::ParamSource;
 use sabun_maker::structs::{RustMemberType, ParamType};
 use crate::imp::structs::data_source::DataSource;
 use crate::imp::structs::list_source::ListSource;
+use crate::imp::structs::inner_list_source::InnerListSource;
 
 #[derive(Debug, PartialEq)]
 pub enum MemberSource{
     Param(ParamSource),
     Data(DataSource),
     List(ListSource),
+    InnerList(InnerListSource),
 }
 
 pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
@@ -50,6 +52,9 @@ pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
         },
         RustMemberType::List =>{
             MemberSource::List(ListSource::from(mem))
+        },
+        RustMemberType::InnerList =>{
+            MemberSource::InnerList(InnerListSource::from(mem))
         },
         _ => unreachable!(),
     }
