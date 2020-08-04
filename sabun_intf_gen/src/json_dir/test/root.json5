@@ -16,16 +16,16 @@
 //			}
 //		}
 //	],
-//	"refed" : ["Data",
-//		[{
-//			mem : 0
-//		}],
-//		{
-//			ID : "first",
-//			mem : 1,
-//		},
-//		{
-//			ID : "second",
-//			mem : 2
-//		}]
+	"refed" : ["Data",
+		[{
+			mem : 0
+		}],
+		{
+			ID : "first",
+			mem : 1,
+		},
+		{
+			ID : "second",
+			mem : 2
+		}]
 }
