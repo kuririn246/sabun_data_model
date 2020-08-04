@@ -1,8 +1,8 @@
 use crate::imp::structs::source_builder::SourceBuilder;
-use crate::imp::util::to_type_name::{to_snake_name, to_data_type_name, to_item_type_name, to_list_type_name};
+use crate::imp::util::to_type_name::{to_snake_name, to_item_type_name, to_list_type_name};
 use crate::imp::util::with_old::with_old;
 use crate::imp::structs::item_source::ItemSource;
-use sabun_maker::intf::member_desc::{MemberDesc, KeyItem};
+use sabun_maker::intf::member_desc::{MemberDesc};
 
 #[derive(Debug, PartialEq)]
 pub struct ListSource{
@@ -55,21 +55,17 @@ impl ListSource{
         sb.push(1, &format!("pub fn new(ptr : ConstListPtr) -> {}{{ {}{{ ptr }} }} ",
                            &list_type_name, &list_type_name));
 
-        sb.push(1, &format!("pub fn len(&self) -> usize{{ list::get_len(self.ptr) }}");
+        sb.push(1, &format!("pub fn len(&self) -> usize{{ list::get_len(self.ptr) }}"));
         sb.push(1, &format!("pub fn index(&self, idx : usize) -> {}{{", item_type_name));
-        sb.push(2, &format!("let val = list::get_value(self.ptr, idx).unwrap(); }}"))
+        sb.push(2, &format!("let val = list::get_value(self.ptr, idx).unwrap();"));
         sb.push(2, &format!("{}::new(val)", item_type_name));
         sb.push(1, "}");
-        sb.push(1, &format!("pub fn iter(&self) -> {}{{", item_type_name));
-        sb.push(2, &format!("let val = list::get_value(self.ptr, idx).unwrap(); }}"))
-        sb.push(2, &format!("{}::new(val)", item_type_name));
-        sb.push(1, "}");
-
-
+        sb.push(1, &format!("pub fn iter(&self) -> GeneralIter<{}, {}>{{", &list_type_name, &item_type_name));
+        sb.push(2, &format!("GeneralIter::new(self.len(), self, {}::index)", &list_type_name));
         sb.push(1, "}");
         sb.push(0, "}");
 
-        sb.push(0, &self.item_source.to_string());
+        sb.push_without_newline(0, &self.item_source.to_string());
         sb.to_string()
     }
 }

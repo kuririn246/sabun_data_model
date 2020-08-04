@@ -41,13 +41,14 @@ impl ItemSource{
         for mem in self.members() {
             match mem{
                 MemberSource::Param(param) =>{
-                    sb.push(1, &param.get("list_item", "self.ptr"));
+                    sb.push_without_newline(1, &param.get("list_item", "self.ptr"));
                 },
-                MemberSource::Data(_) =>{}
+                MemberSource::Data(_) =>{},
+                MemberSource::List(_) =>{},
             }
         }
         for r in self.refs() {
-            sb.push(1, &r.get("list_item"))
+            sb.push_without_newline(1, &r.get("list_item"))
         }
         sb.push(0, "}");
 

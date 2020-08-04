@@ -2,20 +2,20 @@
 	bu : false,
 	str : "sutoringu",
 
-//	col : ["List",
-//		[{
-//			nakabu : true,
-//			Ref : {
-//				"refed" : "",
-//			}
-//		}],
-//		{
-//			nakabu : false,
-//			Ref : {
-//				"refed" : "second",
-//			}
-//		}
-//	],
+	list : ["List",
+		[{
+			nakabu : true,
+			Ref : {
+				"refed" : "",
+			}
+		}],
+		{
+			nakabu : false,
+			Ref : {
+				"refed" : "second",
+			}
+		}
+	],
 	"refed" : ["Data",
 		[{
 			mem : 0

@@ -22,7 +22,6 @@ use sabun_maker::structs::*;
 pub struct RootIntf{
     root : Box<RootObject>,
 }
-
 impl RootIntf{
     pub fn new(obj : RootObject) -> RootIntf{ RootIntf{ root : Box::new(obj) } }
     pub(crate) fn ptr(&self) -> RootObjectPtr{ RootObjectPtr::new(self.root.as_ref()) }
@@ -30,12 +29,15 @@ impl RootIntf{
         for mem in self.members() {
             match mem{
                 MemberSource::Param(param) =>{
-                    sb.push(1, &param.get("root", "self.ptr()"));
-                    sb.push(1, &param.set("root", "self.ptr()"));
+                    sb.push_without_newline(1, &param.get("root", "self.ptr()"));
+                    sb.push_without_newline(1, &param.set("root", "self.ptr()"));
                 },
                 MemberSource::Data(data) =>{
-                    sb.push(1, &data.get("root", "self.ptr()", ))
-                }
+                    sb.push_without_newline(1, &data.get("root", "self.ptr()", ));
+                },
+                MemberSource::List(l) =>{
+                    sb.push_without_newline(1, &l.get("root", "self.ptr()"));
+                },
             }
         }
         sb.push(0, "}");
@@ -44,7 +46,10 @@ impl RootIntf{
             match mem{
                 MemberSource::Data(data) =>{
                     sb.push(0, &data.to_string())
-                }
+                },
+                MemberSource::List(l) =>{
+                    sb.push(0, &l.to_string())
+                },
                 MemberSource::Param(_) =>{}
             }
         }

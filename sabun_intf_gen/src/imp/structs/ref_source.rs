@@ -42,16 +42,16 @@ impl RefSource{
         let var_type = self.var_type();
         let item_type_name = to_item_type_name(id);
         let var_type_name = var_type_name(var_type);
-        sb.push(0, &format!("pub fn ref_{}(&self) -> {}{{\n", with_old(&snake_name, is_old), with_var(&item_type_name, var_type)));
-        sb.push(1,&format!("let qv = {}::get_ref(self.ptr, \"{}\").unwrap();\n", mod_name, id));
+        sb.push(0, &format!("pub fn ref_{}(&self) -> {}{{", with_old(&snake_name, is_old), with_var(&item_type_name, var_type)));
+        sb.push(1,&format!("let qv = {}::get_ref(self.ptr, \"{}\").unwrap();", mod_name, id));
         if var_type != VarType::Normal {
             sb.push(1, &format!("let ptr = match qv{{"));
             sb.push(2, &format!("Qv::None =>{{ return {}::Null; }},", &var_type_name));
-            sb.push(2, &format!("Qv::Undefined =>{{ return {}::Undefined; }},\n", &var_type_name));
+            sb.push(2, &format!("Qv::Undefined =>{{ return {}::Undefined; }},", &var_type_name));
             sb.push(2, &format!("Qv::Val(id) => {}::Val(id)", &var_type_name));
             sb.push(1, "}");
         } else {
-            sb.push(1, &format!("let ptr = if let Qv::Val(v) = qv{{ {}::new(v) }} else {{ unreachable!() }};", &item_type_name));
+            sb.push(1, &format!("if let Qv::Val(v) = qv{{ {}::new(v) }} else {{ unreachable!() }}", &item_type_name));
         }
         sb.push(0, "}");
         sb.to_string()

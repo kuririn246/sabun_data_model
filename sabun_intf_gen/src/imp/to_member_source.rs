@@ -2,11 +2,13 @@ use sabun_maker::intf::member_desc::MemberDesc;
 use crate::imp::structs::param_source::ParamSource;
 use sabun_maker::structs::{RustMemberType, ParamType};
 use crate::imp::structs::data_source::DataSource;
+use crate::imp::structs::list_source::ListSource;
 
 #[derive(Debug, PartialEq)]
 pub enum MemberSource{
     Param(ParamSource),
-    Data(DataSource)
+    Data(DataSource),
+    List(ListSource),
 }
 
 pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
@@ -45,7 +47,10 @@ pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
         },
         RustMemberType::Data =>{
             MemberSource::Data(DataSource::from(mem))
-        }
+        },
+        RustMemberType::List =>{
+            MemberSource::List(ListSource::from(mem))
+        },
         _ => unreachable!(),
     }
 }

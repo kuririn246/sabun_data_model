@@ -98,7 +98,7 @@ impl DataSource{
         sb.push(1, "}");
         sb.push(0, "}");
 
-        sb.push(0, &self.item_source.to_string());
+        sb.push_without_newline(0, &self.item_source.to_string());
         sb.to_string()
     }
 }
