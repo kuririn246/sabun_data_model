@@ -80,22 +80,25 @@ impl DataSource{
             sb.push(1,&format!("pub fn {}(&self) -> {} {{", &key_name, &item_type_name));
             sb.push(2,&format!("let ptr = data::get_value(self.ptr, \"{}\").unwrap();", &key.key));
 
-            sb.push(2, &format!("{}::new(ptr);", &item_type_name));
+            sb.push(2, &format!("{}::new(ptr)", &item_type_name));
             sb.push(1, "}");
         }
 
         if self.keys.len() != 0 {
-            sb.push(1,&format!("pub fn from_id(&self, id : &str) -> {}{{", &item_type_name));
+            sb.push(1,&format!("pub fn from_id(&self, id : &str) -> Option<{}>{{", &item_type_name));
             sb.push(2,"match id{");
 
             for key in &self.keys {
-                 sb.push(3,&format!("\"{}\" => self.{}(),", &key.key, &key.key_name()));
+                 sb.push(3,&format!("\"{}\" => Some(self.{}()),", &key.key, &key.key_name()));
             }
 
             sb.push(3, &format!("_ =>{{ None }},"));
             sb.push(2, "}");
         }
         sb.push(1, "}");
+        sb.push(0, "}");
+
+        sb.push(0, &self.item_source.to_string());
         sb.to_string()
     }
 }
