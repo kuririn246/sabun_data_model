@@ -3,286 +3,254 @@ use crate::imp::structs::rust_list::MutListItem;
 use std::collections::hash_map::{Iter, IntoIter};
 use std::ptr::{null_mut, null};
 
-unsafe impl Send for MutListHash{}
-unsafe impl Sync for MutListHash{}
+unsafe impl<V> Send for LinkedMap<V> {}
+unsafe impl<V> Sync for LinkedMap<V> {}
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct MutListHash{
-    map : HashM<u64, Box<MutNode>>,
-    first : *mut MutNode,
-    last : *mut MutNode,
+pub struct LinkedMap<V>{
+    map : HashM<u64, Box<MutNode<V>>>,
+    first : *mut MutNode<V>,
+    last : *mut MutNode<V>,
     next_id : u64,
 }
 
 
 #[derive(Debug, PartialEq, Clone)]
-struct MutNode{
-    prev : *mut MutNode,
-    next : *mut MutNode,
-    item : MutListItem,
+struct MutNode<V>{
+    prev : *mut MutNode<V>,
+    next : *mut MutNode<V>,
+    item : V,
     id : u64,
 }
-impl MutNode{
-    fn new(item : MutListItem, id : u64) -> MutNode{
+impl<V> MutNode<V>{
+    fn new(item : V, id : u64) -> MutNode<V>{
         MutNode{ item, prev : null_mut(), next : null_mut(), id }
     }
 }
-fn set_next(this : *mut MutNode, next : *mut MutNode){
+fn get_next<V>(this : *mut MutNode<V>) -> *mut MutNode<V>{
+    let node = unsafe{ this.as_mut().unwrap() };
+    node.next
+}
+fn set_next<V>(this : *mut MutNode<V>, next : *mut MutNode<V>){
     let node = unsafe{ this.as_mut().unwrap() };
     node.next = next;
 }
-fn set_prev(this : *mut MutNode, prev : *mut MutNode){
+fn get_prev<V>(this : *mut MutNode<V>) -> *mut MutNode<V>{
+    let node = unsafe{ this.as_mut().unwrap() };
+    node.prev
+}
+fn set_prev<V>(this : *mut MutNode<V>, prev : *mut MutNode<V>){
     let node = unsafe{ this.as_mut().unwrap() };
     node.prev = prev;
+}
+fn get_id<V>(this : *const MutNode<V>) -> u64{
+    let node = unsafe{ this.as_ref().unwrap() };
+    node.id
+}
+fn get_item<'a, V>(this : *const MutNode<V>) -> &'a V{
+    let node = unsafe{ this.as_ref().unwrap() };
+    &node.item
+}
+fn get_item_mut<'a, V>(this : *mut MutNode<V>) -> &'a mut V{
+    let node = unsafe{ this.as_mut().unwrap() };
+    &mut node.item
 }
 
 fn ptr_eq<T>(l : *const T, r : *const T) -> bool{ std::ptr::eq(l,r) }
 
-impl MutListHash{
-    pub(crate) fn new(capacity : usize) -> MutListHash{
-        MutListHash{ map : HashMt::with_capacity(capacity), first : null_mut(), last : null_mut(), next_id : 0, }
+impl<V> LinkedMap<V> {
+    pub(crate) fn new(capacity : usize) -> LinkedMap<V> {
+        LinkedMap { map : HashMt::with_capacity(capacity), first : null_mut(), last : null_mut(), next_id : 0, }
     }
 
-    pub fn first(&self) -> &MutListItem{
-        let first = unsafe{ self.first.as_ref().unwrap()};
-        &first.item
-    }
-    pub fn first_mut(&mut self) -> &mut MutListItem{
-        let first = unsafe{ self.first.as_mut().unwrap()};
-        &mut first.item
-    }
-    pub fn first_id(&self) -> u64{
-        let first = unsafe{ self.first.as_ref().unwrap()};
-        first.id
-    }
-    pub fn last(&self) -> &MutListItem{
-        let last = unsafe{ self.last.as_ref().unwrap()};
-        &last.item
-    }
-    pub fn last_mut(&mut self) -> &mut MutListItem{
-        let last = unsafe{ self.last.as_mut().unwrap()};
-        &mut last.item
-    }
-    pub fn last_id(&self) -> u64{
-        let last = unsafe{ self.last.as_ref().unwrap()};
-        last.id
-    }
+    pub fn first(&self) -> &V{ get_item(self.first) }
+    pub fn first_mut(&mut self) -> &mut V{ get_item_mut(self.first) }
+    pub fn first_id(&self) -> u64{ get_id(self.first) }
+    pub fn last(&self) -> &V{ get_item(self.last) }
+    pub fn last_mut(&mut self) -> &mut V{ get_item_mut(self.last) }
+    pub fn last_id(&self) -> u64{ get_id(self.last) }
 
-    pub fn insert(&mut self, val : MutListItem) -> u64{
-        self.insert_last(val)
-    }
+    fn node_from_id_mut(&mut self, id : u64) -> Option<&mut MutNode<V>>{ self.map.get_mut(&id).map(|b| b.as_mut()) }
 
-    pub fn insert_last(&mut self, val : MutListItem) -> u64{
-        let mut node = Box::new(MutNode::new(val, self.next_id));
-        if self.last.is_null(){
-            let ptr = node.as_mut() as *mut MutNode;
-            self.last = ptr;
-            self.first = ptr;
-            self.map.insert(self.next_id, node);
-            self.next_id += 1;
-            return self.next_id - 1;
-        } else{
-            node.as_mut().prev = self.last;
-            set_next(self.last, node.as_mut());
-            self.last = node.as_mut();
-            self.map.insert(self.next_id, node);
-            self.next_id += 1;
-            return self.next_id - 1;
-        }
-    }
-    pub fn insert_first(&mut self, val : MutListItem) -> u64{
-        let mut node = Box::new(MutNode::new(val, self.next_id));
-        if self.first.is_null(){
-            let ptr = node.as_mut() as *mut MutNode;
-            self.last = ptr;
-            self.first = ptr;
-            self.map.insert(self.next_id, node);
-            self.next_id += 1;
-            return self.next_id - 1;
-        } else{
-            node.as_mut().next = self.first;
-            set_prev(self.first, node.as_mut());
-            self.first = node.as_mut();
-            self.map.insert(self.next_id, node);
-            self.next_id += 1;
-            return self.next_id - 1;
-        }
-    }
-
-    fn node_from_id_mut(&mut self, id : u64) -> Option<&mut MutNode>{ self.map.get_mut(&id).map(|b| b.as_mut()) }
-
-    pub fn from_id(&self, id : u64) -> Option<&MutListItem>{ self.map.get(&id).map(|b| &b.as_ref().item) }
-    pub fn from_id_mut(&mut self, id : u64) -> Option<&mut MutListItem>{ self.map.get_mut(&id).map(|b| &mut b.as_mut().item) }
+    pub fn from_id(&self, id : u64) -> Option<&V>{ self.map.get(&id).map(|b| &b.as_ref().item) }
+    pub fn from_id_mut(&mut self, id : u64) -> Option<&mut V>{ self.map.get_mut(&id).map(|b| &mut b.as_mut().item) }
 
     pub fn contains_key(&self, key : u64) -> bool{ self.map.contains_key(&key) }
     pub fn len(&self) -> usize{ self.map.len() }
 
+    fn pull_last(&mut self) -> *mut MutNode<V>{
+        if self.last.is_null(){ return null_mut() }
+        let last = unsafe{ self.last.as_mut().unwrap() };
+        if last.prev.is_null(){
+            self.last = null_mut();
+            self.first = null_mut();
+            return last;
+        } else{
+            self.last = last.prev;
+            set_next(self.last, null_mut());
+            last.prev = null_mut();
+            return last;
+        }
+    }
+
+    fn pull_first(&mut self) -> *mut MutNode<V>{
+        if self.first.is_null(){ return null_mut() }
+        let first = unsafe{ self.first.as_mut().unwrap() };
+        if first.next.is_null(){
+            self.first = null_mut();
+            self.last = null_mut();
+            return first;
+        } else{
+            self.first = first.next;
+            set_prev(self.first, null_mut());
+            first.next = null_mut();
+            return first;
+        }
+    }
+
+    fn pull(&mut self, id : u64) -> *mut MutNode<V>{
+        let node = if let Some(node) = self.node_from_id_mut(id){ node as *mut MutNode<V> } else{ return null_mut(); };
+        if ptr_eq(node, self.first){ return self.pull_first(); }
+        if ptr_eq(node, self.last){ return self.pull_last(); }
+        //firstでもlastでもないということは、中間ということ
+        let prev = get_prev(node);
+        let next = get_next(node);
+        set_next(prev, next);
+        set_prev(next, prev);
+        set_next(node, null_mut());
+        set_prev(node, null_mut());
+        return node;
+    }
+
+    fn put_first(&mut self, node : *mut MutNode<V>){
+        if self.first.is_null(){
+            self.first = node;
+            self.last = node;
+        } else{
+            if ptr_eq(self.first, node){ panic!() }
+
+            let next = self.first;
+            self.first = node;
+            set_next(self.first, next);
+            set_prev(next, self.first);
+        }
+    }
+
+    fn put_last(&mut self, node : *mut MutNode<V>){
+        if self.last.is_null(){
+            self.first = node;
+            self.last = node;
+        } else{
+            if ptr_eq(self.last, node){ panic!() }
+
+            let prev = self.last;
+            self.last = node;
+            set_next(prev, self.last);
+            set_prev(self.last, prev);
+        }
+    }
+
+    fn put_next(&mut self, prev : *mut MutNode<V>, node : *mut MutNode<V>){
+        if ptr_eq(prev, node){ panic!() }
+        if self.last.is_null(){ panic!() }
+
+        if ptr_eq(prev, self.last){
+            return self.put_last(node);
+        }
+        let next = get_next(prev);
+        set_next(prev, node);
+        set_prev(node, prev);
+        set_next(node, next);
+        set_prev(next, node);
+    }
+
+    fn put_prev(&mut self, next : *mut MutNode<V>, node : *mut MutNode<V>){
+        if ptr_eq(next, node){ panic!() }
+        if self.first.is_null(){ panic!() }
+
+        if ptr_eq(next, self.first){
+            return self.put_first(node);
+        }
+
+        let prev = get_prev(next);
+        set_next(prev, node);
+        set_prev(node, prev);
+        set_next(node, next);
+        set_prev(next, node);
+    }
+
+    pub fn insert(&mut self, val : V) -> u64{
+        self.insert_last(val)
+    }
+
+    pub fn insert_last(&mut self, val : V) -> u64{
+        let mut node = Box::new(MutNode::new(val, self.next_id));
+        self.put_last(node.as_mut());
+        self.map.insert(self.next_id, node);
+        self.next_id += 1;
+        return self.next_id - 1;
+    }
+    pub fn insert_first(&mut self, val : V) -> u64{
+        let mut node = Box::new(MutNode::new(val, self.next_id));
+        self.put_first(node.as_mut());
+        self.map.insert(self.next_id, node);
+        self.next_id += 1;
+        return self.next_id - 1;
+    }
+
     pub fn remove(&mut self, id : u64) -> bool {
-        let node = if let Some(node) = self.node_from_id_mut(id) { node } else { return false; };
-        if ptr_eq(node,self.first){
-            return self.remove_first();
-        }
-        if ptr_eq(node, self.last) {
-            return self.remove_last();
-        }
-        //lastかfirstでないなら前と後ろがあるはずである
-        let (next, prev) = unsafe { (node.next.as_mut().unwrap(), node.prev.as_mut().unwrap()) };
-        next.prev = prev;
-        prev.next = next;
+        let node = self.pull(id);
+        if node.is_null(){ return false; }
         self.map.remove(&id);
         return true;
     }
     pub fn remove_first(&mut self) -> bool{
-        if self.first.is_null(){ return false; }
-
-        let first = unsafe{ self.first.as_ref().unwrap() };
-        if first.next.is_null() == false {
-            let next = unsafe { first.next.as_mut().unwrap() };
-            next.prev = null_mut();
-            self.first = next;
-            self.map.remove(&first.id);
-        } else{
-            self.map.remove(&first.id);
-            self.first = null_mut();
-            self.last = null_mut();
-        }
+        let node = self.pull_first();
+        if node.is_null(){ return false; }
+        self.map.remove(&get_id(node));
         return true;
     }
 
     pub fn remove_last(&mut self) -> bool{
-        if self.last.is_null(){ return false; }
-
-        let last = unsafe{ self.last.as_ref().unwrap() };
-        if last.prev.is_null() == false {
-            let prev = unsafe { last.prev.as_mut().unwrap() };
-            prev.next = null_mut();
-            self.last = prev;
-            self.map.remove(&last.id);
-        } else{
-            self.map.remove(&last.id);
-            self.last = null_mut();
-            self.first = null_mut();
-        }
-
+        let node = self.pull_last();
+        if node.is_null(){ return false; }
+        self.map.remove(&get_id(node));
         return true;
     }
 
-
     pub fn to_first(&mut self, id : u64) -> bool {
-        let mut node = if let Some(node) = self.node_from_id_mut(id) { node } else { return false; };
-        if ptr_eq(node, self.first) { return true; }
-        if ptr_eq(node, self.last) {
-            let mut last = unsafe{ self.last.as_mut().unwrap() };
-            let mut prev = unsafe{ last.prev.as_mut().unwrap() };
-            self.last = prev;
-            set_next(self.last, null_mut());
-
-            let mut next = unsafe{self.first.as_mut().unwrap() };
-            self.first = last;
-            set_prev(self.first, null_mut());
-            set_next(self.first, next);
-            next.prev = self.first;
-            return true;
-        }
-        let mut node_prev = unsafe{ node.prev.as_mut().unwrap() };
-        let mut node_next = unsafe{ node.next.as_mut().unwrap() };
-        node_prev.next = node_next;
-        node_next.prev = node_prev;
-
-        let mut next = unsafe { self.first.as_mut().unwrap() };
-        self.first = node;
-        set_prev(self.first, null_mut());
-        set_next(self.first, next);
-        next.prev = self.first;
+        let node = self.pull(id);
+        if node.is_null(){ return false; }
+        self.put_first(node);
         return true;
     }
 
     pub fn to_last(&mut self, id : u64) -> bool {
-        let mut node = if let Some(node) = self.node_from_id_mut(id) { node } else { return false; };
-        if ptr_eq(node, self.last) { return true; }
-        if ptr_eq(node, self.first) {
-            let mut first = unsafe{ self.first.as_mut().unwrap() };
-            let mut next = unsafe{ first.next.as_mut().unwrap() };
-            self.first = next;
-            set_prev(self.first, null_mut());
-
-            let mut prev = unsafe{self.last.as_mut().unwrap() };
-            self.last = first;
-            set_next(self.last, null_mut());
-            set_prev(self.last, prev);
-            prev.next = self.last;
-            return true;
-        }
-        let mut node_prev = unsafe{ node.prev.as_mut().unwrap() };
-        let mut node_next = unsafe{ node.next.as_mut().unwrap() };
-        node_prev.next = node_next;
-        node_next.prev = node_prev;
-
-        let mut next = unsafe { self.first.as_mut().unwrap() };
-        self.first = node;
-        set_prev(self.first, null_mut());
-        set_next(self.first, next);
-        next.prev = self.first;
+        let node = self.pull(id);
+        if node.is_null(){ return false; }
+        self.put_last(node);
         return true;
     }
 
-
-    ///swapが失敗するとfalse
-    pub fn swap(&mut self, id1 : u64, id2 : u64) -> bool{
-        if id1 == id2{ return false; }
-        let mut l = if let Some(l) =  self.map.get_mut(&id1).map(|i1| i1.as_mut() as *mut MutNode){ l } else{ return false; };
-        let mut r = if let Some(r) =  self.map.get_mut(&id2).map(|i2| i2.as_mut() as *mut MutNode){ r } else{ return false; };
-        let mut l = unsafe{ l.as_mut().unwrap() };
-        let mut r = unsafe{ r.as_mut().unwrap() };
-
-        if self.first_id() == id1{
-            self.first = r;
-        } else if self.first_id() == id2{
-            self.first = l;
-        }
-
-        if self.last_id() == id1{
-            self.last = r;
-        } else if self.last_id() == id2{
-            self.last = l;
-        }
-
-        if ptr_eq(l.next, r){ return self.swap_adjacent(l, r); }
-        if ptr_eq(r.next, l){ return self.swap_adjacent(r, l); }
-
-        let l_next = l.next;
-        let l_prev = l.prev;
-        let r_next = r.next;
-        let r_prev = r.prev;
-        r.next = l_next;
-        r.prev = l_prev;
-        l.next = r_next;
-        l.prev = r_prev;
-        if l_next.is_null() == false{
-            set_prev(l_next, r);
-        }
-        if l_prev.is_null() == false{
-            set_next(l_prev, r);
-        }
-        if r_next.is_null() == false{
-            set_prev(r_next, l);
-        }
-        if r_prev.is_null() == false{
-            set_next(r_prev, l);
-        }
+    pub fn to_prev(&mut self, next_items_id : u64, id : u64) -> bool{
+        if id == next_items_id{ return false; }
+        let next = if let Some(node) = self.map.get_mut(&next_items_id).map(|b| b.as_mut() as *mut MutNode<V>){ node } else{ return false };
+        let node = self.pull(id);
+        if node.is_null(){ return false; }
+        self.put_prev(next, node);
         return true;
     }
-    fn swap_adjacent(&mut self, l : &mut MutNode, r : &mut MutNode) -> bool{
-        let l_prev = l.prev;
-        let r_next = r.next;
-        r.prev = l_prev;
-        l.next = r_next;
-        r.next = l;
-        l.prev = r;
+
+    pub fn to_next(&mut self, prev_items_id : u64, id : u64) -> bool{
+        if id == prev_items_id{ return false; }
+        let prev = if let Some(node) = self.map.get_mut(&prev_items_id).map(|b| b.as_mut() as *mut MutNode<V>){ node } else{ return false };
+        let node = self.pull(id);
+        if node.is_null(){ return false; }
+        self.put_next(prev, node);
         return true;
     }
-    // pub(crate) fn iter(&self) -> MutListHashIter{ MutListHashIter{ hash_iter : self.map.iter() } }
-    // pub(crate) fn into_iter(self) -> IntoIter<u64, Box<MutListItem>>{ self.map.into_iter() }
+
+    pub fn iter(&self) -> LinkedMapIter<V> { LinkedMapIter::new(self) }
 
 
 
@@ -290,34 +258,35 @@ impl MutListHash{
 
 
 
-pub struct MutListHashIter<'a>{
-    hash_iter : Iter<'a, u64, Box<MutNode>>,
+pub struct LinkedMapIter<'a, V>{
+    map : &'a LinkedMap<V>,
+    node : *mut MutNode<V>
+}
+impl<'a, V> LinkedMapIter<'a, V>{
+    pub fn new(map : &'a LinkedMap<V>) -> LinkedMapIter<'a, V>{ LinkedMapIter{ map, node : map.first } }
 }
 
-impl<'a> Iterator for MutListHashIter<'a>{
-    type Item = (&'a u64, &'a MutListItem);
+impl<'a,V> Iterator for LinkedMapIter<'a, V>{
+    type Item = (&'a u64, &'a V);
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Some((key, val)) = self.hash_iter.next(){
-            Some((key, &val.as_ref().item))
-        }  else{ None }
+        if self.node.is_null(){ return None; }
+        let current_node = self.node;
+        if ptr_eq(self.node, self.map.last){
+            self.node = null_mut();
+        } else {
+            self.node = get_next(self.node);
+        }
+        let node = unsafe{ current_node.as_mut().unwrap() };
+        return Some((&node.id, get_item(current_node)))
     }
 }
-//
-// impl<'a> IntoIterator for &'a MutListHash{
-//     type Item = (&'a u64, &'a MutListItem);
-//     type IntoIter = MutListHashIter<'a>;
-//
-//     fn into_iter(self) -> Self::IntoIter {
-//         self.iter()
-//     }
-// }
-//
-// impl IntoIterator for MutListHash{
-//     type Item = (u64, Box<MutListItem>);
-//     type IntoIter = IntoIter<u64, Box<MutListItem>>;
-//
-//     fn into_iter(self) -> Self::IntoIter {
-//         self.into_iter()
-//     }
-// }
+
+impl<'a,V> IntoIterator for &'a LinkedMap<V>{
+    type Item = (&'a u64, &'a V);
+    type IntoIter = LinkedMapIter<'a, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
