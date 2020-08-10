@@ -288,6 +288,12 @@ impl<'a,V> IntoIterator for &'a LinkedMap<V>{
         self.iter()
     }
 }
+
+/// 基本的にはLinkedHashMapであるが、indexを用いて getしたときにノードがキャッシュされる。
+/// そのため C言語の for文で i++ i--のように順繰りにアクセスした場合、キャッシュしたノードの次、前、という形で探せるので
+/// O(N)でなくO(1)に出来る。
+/// つまりCからアクセスするときの利便性と引き換えに、ちょっとしたオーバーヘッドが発生し、Syncを失っている。
+/// 俺はこのライブラリは実質Cライブラリだと思ってるのでこれで良いだろう。
 #[derive(Debug)]
 pub struct ListMap<V>{
     map : LinkedMap<V>,
@@ -322,7 +328,7 @@ impl<V> ListMap<V> {
 
     pub fn insert(&mut self, val: V) -> u64 {
         self.delete_cache();
-        self.insert_last(val)
+        self.map.insert(val)
     }
 
     pub fn insert_last(&mut self, val: V) -> u64 {
