@@ -2,11 +2,12 @@ use crate::{HashM, HashMt};
 use crate::imp::structs::rust_list::MutListItem;
 use std::collections::hash_map::{Iter, IntoIter};
 use std::ptr::{null_mut, null};
+use std::cell::{Cell, RefCell};
 
 unsafe impl<V> Send for LinkedMap<V> {}
 unsafe impl<V> Sync for LinkedMap<V> {}
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug)]
 pub struct LinkedMap<V>{
     map : HashM<u64, Box<MutNode<V>>>,
     first : *mut MutNode<V>,
@@ -15,7 +16,7 @@ pub struct LinkedMap<V>{
 }
 
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug)]
 struct MutNode<V>{
     prev : *mut MutNode<V>,
     next : *mut MutNode<V>,
@@ -59,8 +60,8 @@ fn get_item_mut<'a, V>(this : *mut MutNode<V>) -> &'a mut V{
 fn ptr_eq<T>(l : *const T, r : *const T) -> bool{ std::ptr::eq(l,r) }
 
 impl<V> LinkedMap<V> {
-    pub(crate) fn new(capacity : usize) -> LinkedMap<V> {
-        LinkedMap { map : HashMt::with_capacity(capacity), first : null_mut(), last : null_mut(), next_id : 0, }
+    pub fn new() -> LinkedMap<V> {
+        LinkedMap { map : HashMt::new(), first : null_mut(), last : null_mut(), next_id : 0, }
     }
 
     pub fn first(&self) -> &V{ get_item(self.first) }
@@ -251,9 +252,6 @@ impl<V> LinkedMap<V> {
     }
 
     pub fn iter(&self) -> LinkedMapIter<V> { LinkedMapIter::new(self) }
-
-
-
 }
 
 
@@ -288,5 +286,157 @@ impl<'a,V> IntoIterator for &'a LinkedMap<V>{
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
+    }
+}
+#[derive(Debug)]
+pub struct ListMap<V>{
+    map : LinkedMap<V>,
+    cache : RefCell<Option<Cache<V>>>
+}
+#[derive(Debug, Clone)]
+struct Cache<V>{
+    index : usize,
+    ptr : *mut MutNode<V>
+}
+impl<V> ListMap<V> {
+    pub fn new() -> ListMap<V> {
+        ListMap { map: LinkedMap::new(), cache : RefCell::new(None) }
+    }
+
+    fn delete_cache(&self){
+        self.cache.replace(None);
+    }
+
+    pub fn first(&self) -> &V { self.map.first() }
+    pub fn first_mut(&mut self) -> &mut V { self.map.first_mut() }
+    pub fn first_id(&self) -> u64 { self.map.first_id() }
+    pub fn last(&self) -> &V { self.map.last() }
+    pub fn last_mut(&mut self) -> &mut V { self.map.last_mut() }
+    pub fn last_id(&self) -> u64 { self.map.last_id() }
+
+    pub fn from_id(&self, id: u64) -> Option<&V> { self.map.from_id(id) }
+    pub fn from_id_mut(&mut self, id: u64) -> Option<&mut V> { self.map.from_id_mut(id) }
+
+    pub fn contains_key(&self, key: u64) -> bool { self.map.contains_key(key) }
+    pub fn len(&self) -> usize { self.map.len() }
+
+    pub fn insert(&mut self, val: V) -> u64 {
+        self.delete_cache();
+        self.insert_last(val)
+    }
+
+    pub fn insert_last(&mut self, val: V) -> u64 {
+        self.delete_cache();
+        self.map.insert_last(val)
+    }
+    pub fn insert_first(&mut self, val: V) -> u64 {
+        self.delete_cache();
+        self.map.insert_first(val)
+    }
+
+    pub fn remove(&mut self, id: u64) -> bool {
+        self.delete_cache();
+        self.map.remove(id)
+    }
+    pub fn remove_first(&mut self) -> bool {
+        self.delete_cache();
+        self.map.remove_first()
+    }
+
+    pub fn remove_last(&mut self) -> bool {
+        self.delete_cache();
+        self.map.remove_last()
+    }
+
+    pub fn to_first(&mut self, id: u64) -> bool {
+        self.delete_cache();
+        self.map.to_first(id)
+    }
+
+    pub fn to_last(&mut self, id: u64) -> bool {
+        self.delete_cache();
+        self.map.to_last(id)
+    }
+
+    pub fn to_prev(&mut self, next_items_id: u64, id: u64) -> bool {
+        self.delete_cache();
+        self.map.to_prev(next_items_id, id)
+    }
+
+    pub fn to_next(&mut self, prev_items_id: u64, id: u64) -> bool {
+        self.delete_cache();
+        self.map.to_next(prev_items_id, id)
+    }
+
+    pub fn iter(&self) -> LinkedMapIter<V> { self.map.iter() }
+
+    pub fn index_mut(&mut self, index : usize) -> &mut V{
+        let node = self.index_impl(index);
+        self.cache.replace(Some(Cache{ index, ptr : node }));
+        unsafe{ &mut node.as_mut().unwrap().item }
+    }
+
+    pub fn index(&self, index : usize) -> &V{
+        let node = self.index_impl(index);
+        self.cache.replace(Some(Cache{ index, ptr : node }));
+        unsafe{ &node.as_ref().unwrap().item }
+    }
+
+    fn index_impl(&self, index : usize) -> *mut MutNode<V>{
+        if self.len() <= index{ panic!("index out of bound") }
+        let index = index as i64;
+        let from_first = index as i64;
+        let from_last = self.len() as i64 - 1 - index;
+        let cache = self.cache.borrow();
+        if cache.is_none() {
+            if from_first < from_last {
+                self.from_first(index as usize)
+            } else{
+                self.from_last(index as usize)
+            }
+        } else{
+            let cache = cache.as_ref().unwrap();
+            let diff = (index - cache.index as i64).abs();
+            if diff < from_first && diff < from_last{
+                self.get_item(index as usize, cache.ptr, cache.index)
+            } else{
+                if from_first < from_last {
+                    self.from_first(index as usize)
+                } else{
+                    self.from_last(index as usize)
+                }
+            }
+        }
+    }
+
+    fn from_first(&self, index : usize) -> *mut MutNode<V>{
+        return self.get_item(index, self.map.first, 0);
+    }
+
+    fn from_last(&self, index : usize) -> *mut MutNode<V>{
+        return self.get_item(index, self.map.last, self.len() - 1);
+    }
+
+    fn get_node(&self, index : usize, node : *mut MutNode<V>, node_index : usize) -> *mut MutNode<V>{
+        let mut current = node_index;
+        let mut node = node;
+        if node_index <= index{
+            loop{
+                if index == current {
+                    return node;
+                }
+                node = get_next(node);
+                current += 1;
+            }
+        } else{
+            loop{
+                if index == current {
+                    return node;
+                }
+                node = get_prev(node);
+                current -= 1;
+            }
+        }
+
     }
 }
