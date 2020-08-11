@@ -1,6 +1,7 @@
 use crate::{HashM, HashMt};
 use std::ptr::{null_mut};
 use std::cell::{ RefCell};
+use std::marker::PhantomData;
 
 unsafe impl<V> Send for LinkedMap<V> {}
 unsafe impl<V> Sync for LinkedMap<V> {}
@@ -26,16 +27,16 @@ impl<V> MutNode<V>{
         MutNode{ item, prev : null_mut(), next : null_mut(), id }
     }
 }
-fn get_next<V>(this : *mut MutNode<V>) -> *mut MutNode<V>{
-    let node = unsafe{ this.as_mut().unwrap() };
+fn get_next<V>(this : *const MutNode<V>) -> *mut MutNode<V>{
+    let node = unsafe{ this.as_ref().unwrap() };
     node.next
 }
 fn set_next<V>(this : *mut MutNode<V>, next : *mut MutNode<V>){
     let node = unsafe{ this.as_mut().unwrap() };
     node.next = next;
 }
-fn get_prev<V>(this : *mut MutNode<V>) -> *mut MutNode<V>{
-    let node = unsafe{ this.as_mut().unwrap() };
+fn get_prev<V>(this : *const MutNode<V>) -> *mut MutNode<V>{
+    let node = unsafe{ this.as_ref().unwrap() };
     node.prev
 }
 fn set_prev<V>(this : *mut MutNode<V>, prev : *mut MutNode<V>){
@@ -77,6 +78,7 @@ impl<V> LinkedMap<V> {
 
     pub fn contains_key(&self, key : u64) -> bool{ self.map.contains_key(&key) }
     pub fn len(&self) -> usize{ self.map.len() }
+    pub fn is_empty(&self) -> bool{ self.map.is_empty() }
 
     fn pull_last(&mut self) -> *mut MutNode<V>{
         if self.last.is_null(){ return null_mut() }
@@ -250,45 +252,89 @@ impl<V> LinkedMap<V> {
         return true;
     }
 
-    pub fn iter(&self) -> LinkedMapIter<V> { LinkedMapIter::new(self) }
-    pub fn iter_from_last(&self) -> LinkedMapIter<V>{ LinkedMapIter{ map : self, node : self.last }}
+    pub fn iter(&self) -> LinkedMapIter<V> { LinkedMapIter::new(self, self.first) }
+    pub fn iter_from_last(&self) -> LinkedMapIter<V>{ LinkedMapIter::new(self, self.last)}
     pub fn iter_from_id(&self, id : u64) -> Option<LinkedMapIter<V>>{
-        self.node_from_id(id).map(|node| LinkedMapIter{ map : self, node : node as *const _ as *mut _})
+        self.node_from_id(id).map(|node| LinkedMapIter::new(self, node))
+    }
+    pub unsafe fn iter_unsafe(&self) -> LinkedMapUnsafeIter<V>{ LinkedMapUnsafeIter::new(self) }
+    pub unsafe fn iter_from_last_unsafe(&self) -> LinkedMapUnsafeIter<V>{ LinkedMapUnsafeIter{ map : self, node : self.last } }
+    pub unsafe fn iter_from_id_unsafe(&self, id : u64) -> Option<LinkedMapUnsafeIter<V>>{
+        self.node_from_id(id).map(|node| LinkedMapUnsafeIter{ map : self, node })
     }
 }
 
 
 
 pub struct LinkedMapIter<'a, V>{
-    map : &'a LinkedMap<V>,
-    node : *mut MutNode<V>
+    iter : LinkedMapUnsafeIter<V>,
+    phantom : PhantomData<&'a LinkedMap<V>>,
 }
 impl<'a, V> LinkedMapIter<'a, V>{
-    pub fn new(map : &'a LinkedMap<V>) -> LinkedMapIter<'a, V>{ LinkedMapIter{ map, node : map.first } }
+    fn new(map : &'a LinkedMap<V>, node : *const MutNode<V>) -> LinkedMapIter<'a, V>{
+        LinkedMapIter{ iter : LinkedMapUnsafeIter{ map, node }, phantom : PhantomData::default() }
+    }
 
+    ///現在のカーソルにあるアイテムを返し、カーソルを進める
     pub fn next(&mut self) -> Option<(&'a u64, &'a V)> {
+        self.iter.next()
+    }
+
+    ///前に戻ることが出来る。そして元あった場所を削除し、それによって削除されたアイテムの次にあったアイテムが現在のカーソルの次にくるので、
+    /// next2回でそれをとることも出来る。Cインターフェースやunsafe iterなら
+    ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
+    pub fn prev(&mut self) -> Option<(&'a u64, &'a V)> {
+        self.iter.prev()
+    }
+
+    ///nextもprevも現在のカーソルにあるアイテムを返す
+    ///空であるか、最後/最初まで移動してアイテムが無くなったらfalse
+    pub fn is_available(&self) -> bool {
+        self.iter.is_available()
+    }
+}
+
+pub struct LinkedMapUnsafeIter<V>{
+    map : *const LinkedMap<V>,
+    node : *const MutNode<V>,
+}
+impl<V> LinkedMapUnsafeIter<V>{
+    pub fn new(map : &LinkedMap<V>) -> LinkedMapUnsafeIter<V>{ LinkedMapUnsafeIter{ map, node : map.first } }
+
+    ///現在のカーソルにあるアイテムを返し、カーソルを進める
+    pub fn next<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
         if self.node.is_null() { return None; }
         let current_node = self.node;
-        if ptr_eq(self.node, self.map.last) {
+        let map = unsafe{ self.map.as_ref().unwrap() };
+        if ptr_eq(self.node, map.last) {
             self.node = null_mut();
         } else {
             self.node = get_next(self.node);
         }
-        let node = unsafe { current_node.as_mut().unwrap() };
-        return Some((&node.id, get_item(current_node)));
+        let node = unsafe { current_node.as_ref().unwrap() };
+        return Some((&node.id, &node.item));
     }
 
-    ///前に戻ることが出来る。そして元あった場所を削除し、再びnextでとっていくことも出来る。今ある場所をremoveしたらポインタが不正に
-    pub fn prev(&mut self) -> Option<(&'a u64, &'a V)> {
+    ///前に戻ることが出来る。そして元あった場所を削除し、それによって削除されたアイテムの次にあったアイテムが現在のカーソルの次にくるので、
+    /// next2回でそれをとることも出来る。
+    ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
+    pub fn prev<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
         if self.node.is_null(){ return None; }
         let current_node = self.node;
-        if ptr_eq(self.node, self.map.first){
+        let map = unsafe{ self.map.as_ref().unwrap() };
+        if ptr_eq(self.node, map.first){
             self.node = null_mut();
         } else {
             self.node = get_prev(self.node);
         }
-        let node = unsafe{ current_node.as_mut().unwrap() };
-        return Some((&node.id, get_item(current_node)))
+        let node = unsafe{ current_node.as_ref().unwrap() };
+        return Some((&node.id, &node.item))
+    }
+
+    ///nextもprevも現在のカーソルにあるアイテムを返す
+    ///空であるか、最後/最初まで移動してアイテムが無くなったらfalse
+    pub fn is_available(&self) -> bool {
+        !self.node.is_null()
     }
 }
 
