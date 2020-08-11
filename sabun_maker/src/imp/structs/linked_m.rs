@@ -1,6 +1,5 @@
 use crate::{HashM, HashMt};
 use std::ptr::{null_mut};
-use std::cell::{ RefCell};
 use std::marker::PhantomData;
 
 unsafe impl<V> Send for LinkedMap<V> {}
@@ -257,13 +256,78 @@ impl<V> LinkedMap<V> {
     pub fn iter_from_id(&self, id : u64) -> Option<LinkedMapIter<V>>{
         self.node_from_id(id).map(|node| LinkedMapIter::new(self, node))
     }
-    pub unsafe fn iter_unsafe(&self) -> LinkedMapUnsafeIter<V>{ LinkedMapUnsafeIter::new(self) }
-    pub unsafe fn iter_from_last_unsafe(&self) -> LinkedMapUnsafeIter<V>{ LinkedMapUnsafeIter{ map : self, node : self.last } }
-    pub unsafe fn iter_from_id_unsafe(&self, id : u64) -> Option<LinkedMapUnsafeIter<V>>{
-        self.node_from_id(id).map(|node| LinkedMapUnsafeIter{ map : self, node })
+    pub fn iter_mut(&mut self) -> LinkedMapIterMut<V> { LinkedMapIterMut::new(self, self.first) }
+    pub fn iter_mut_from_last(&mut self) -> LinkedMapIterMut<V>{ LinkedMapIterMut::new(self, self.last)}
+    pub fn iter_mut_from_id(&mut self, id : u64) -> Option<LinkedMapIterMut<V>>{
+        let node = if let Some(node) = self.node_from_id_mut(id){ node as *mut MutNode<V> } else{ return None; };
+        Some(LinkedMapIterMut::new(self, node))
+    }
+
+    pub unsafe fn iter_unsafe(&mut self) -> LinkedMapUnsafeIter<V>{ LinkedMapUnsafeIter::new(self, self.first) }
+    pub unsafe fn iter_from_last_unsafe(&mut self) -> LinkedMapUnsafeIter<V>{ LinkedMapUnsafeIter::new(self, self.last) }
+    pub unsafe fn iter_from_id_unsafe(&mut self, id : u64) -> Option<LinkedMapUnsafeIter<V>>{
+        let node = if let Some(node) = self.node_from_id_mut(id){ node as *mut MutNode<V> } else{ return None; };
+        Some(LinkedMapUnsafeIter::new(self, node))
+
     }
 }
 
+
+pub struct LinkedMapUnsafeIter<V>{
+    map : *mut LinkedMap<V>,
+    node : *mut MutNode<V>,
+}
+impl<V> LinkedMapUnsafeIter<V>{
+    pub fn new(map : *mut LinkedMap<V>, node : *mut MutNode<V>) -> LinkedMapUnsafeIter<V>{ LinkedMapUnsafeIter{ map, node } }
+
+    ///現在のカーソルにあるアイテムを返し、カーソルを進める
+    pub fn next<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
+        self.next_mut().map(|(k,v)| (k,&*v))
+    }
+
+    ///現在のカーソルにあるアイテムを返し、カーソルを進める
+    pub fn next_mut<'a>(&mut self) -> Option<(&'a u64, &'a mut V)> {
+        if self.node.is_null() { return None; }
+        let current_node = self.node as *mut MutNode<V>;
+        let map = unsafe{ self.map.as_ref().unwrap() };
+        if ptr_eq(self.node, map.last) {
+            self.node = null_mut();
+        } else {
+            self.node = get_next(self.node);
+        }
+        let node = unsafe { current_node.as_mut().unwrap() };
+        return Some((&node.id, &mut node.item));
+    }
+
+    ///前に戻ることが出来る。そして元あった場所を削除し、それによって削除されたアイテムの次にあったアイテムが現在のカーソルの次にくるので、
+    /// next2回でそれをとることも出来る。
+    ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
+    pub fn prev_mut<'a>(&mut self) -> Option<(&'a u64, &'a mut V)> {
+        if self.node.is_null(){ return None; }
+        let current_node = self.node as *mut MutNode<V>;
+        let map = unsafe{ self.map.as_ref().unwrap() };
+        if ptr_eq(self.node, map.first){
+            self.node = null_mut();
+        } else {
+            self.node = get_prev(self.node);
+        }
+        let node = unsafe{ current_node.as_mut().unwrap() };
+        return Some((&node.id, &mut node.item))
+    }
+
+    ///前に戻ることが出来る。そして元あった場所を削除し、それによって削除されたアイテムの次にあったアイテムが現在のカーソルの次にくるので、
+    /// next2回でそれをとることも出来る。
+    ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
+    pub fn prev<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
+        self.prev_mut().map(|(k,v)| (k,&*v))
+    }
+
+    ///nextもprevも現在のカーソルにあるアイテムを返す
+    ///空であるか、最後/最初まで移動してアイテムが無くなったらfalse
+    pub fn is_available(&self) -> bool {
+        !self.node.is_null()
+    }
+}
 
 
 pub struct LinkedMapIter<'a, V>{
@@ -293,51 +357,6 @@ impl<'a, V> LinkedMapIter<'a, V>{
         self.iter.is_available()
     }
 }
-
-pub struct LinkedMapUnsafeIter<V>{
-    map : *const LinkedMap<V>,
-    node : *const MutNode<V>,
-}
-impl<V> LinkedMapUnsafeIter<V>{
-    pub fn new(map : &LinkedMap<V>) -> LinkedMapUnsafeIter<V>{ LinkedMapUnsafeIter{ map, node : map.first } }
-
-    ///現在のカーソルにあるアイテムを返し、カーソルを進める
-    pub fn next<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
-        if self.node.is_null() { return None; }
-        let current_node = self.node;
-        let map = unsafe{ self.map.as_ref().unwrap() };
-        if ptr_eq(self.node, map.last) {
-            self.node = null_mut();
-        } else {
-            self.node = get_next(self.node);
-        }
-        let node = unsafe { current_node.as_ref().unwrap() };
-        return Some((&node.id, &node.item));
-    }
-
-    ///前に戻ることが出来る。そして元あった場所を削除し、それによって削除されたアイテムの次にあったアイテムが現在のカーソルの次にくるので、
-    /// next2回でそれをとることも出来る。
-    ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
-    pub fn prev<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
-        if self.node.is_null(){ return None; }
-        let current_node = self.node;
-        let map = unsafe{ self.map.as_ref().unwrap() };
-        if ptr_eq(self.node, map.first){
-            self.node = null_mut();
-        } else {
-            self.node = get_prev(self.node);
-        }
-        let node = unsafe{ current_node.as_ref().unwrap() };
-        return Some((&node.id, &node.item))
-    }
-
-    ///nextもprevも現在のカーソルにあるアイテムを返す
-    ///空であるか、最後/最初まで移動してアイテムが無くなったらfalse
-    pub fn is_available(&self) -> bool {
-        !self.node.is_null()
-    }
-}
-
 impl<'a,V> Iterator for LinkedMapIter<'a, V>{
     type Item = (&'a u64, &'a V);
 
@@ -345,7 +364,6 @@ impl<'a,V> Iterator for LinkedMapIter<'a, V>{
         self.next()
     }
 }
-
 impl<'a,V> IntoIterator for &'a LinkedMap<V>{
     type Item = (&'a u64, &'a V);
     type IntoIter = LinkedMapIter<'a, V>;
@@ -355,160 +373,45 @@ impl<'a,V> IntoIterator for &'a LinkedMap<V>{
     }
 }
 
-/// 基本的にはLinkedHashMapであるが、indexを用いて getしたときにノードがキャッシュされる。
-/// そのため C言語の for文で i++ i--のように順繰りにアクセスした場合、キャッシュしたノードの次、前、という形で探せるので
-/// O(N)でなくO(1)に出来る。
-/// つまりCからアクセスするときの利便性と引き換えに、ちょっとしたオーバーヘッドが発生し、Syncを失っている。
-/// 俺はこのライブラリは実質Cライブラリだと思ってるのでこれで良いだろう。
-#[derive(Debug)]
-pub struct ListMap<V>{
-    map : LinkedMap<V>,
-    cache : RefCell<Option<Cache<V>>>
+pub struct LinkedMapIterMut<'a, V>{
+    iter : LinkedMapUnsafeIter<V>,
+    phantom : PhantomData<&'a LinkedMap<V>>,
 }
-#[derive(Debug, Clone)]
-struct Cache<V>{
-    index : usize,
-    ptr : *mut MutNode<V>
+impl<'a, V> LinkedMapIterMut<'a, V>{
+    fn new(map : &'a mut LinkedMap<V>, node : *const MutNode<V>) -> LinkedMapIterMut<'a, V>{
+        LinkedMapIterMut{ iter : LinkedMapUnsafeIter{ map, node }, phantom : PhantomData::default() }
+    }
+
+    ///現在のカーソルにあるアイテムを返し、カーソルを進める
+    pub fn next(&mut self) -> Option<(&'a u64, &'a mut V)> {
+        self.iter.next_mut()
+    }
+
+    ///前に戻ることが出来る。そして元あった場所を削除し、それによって削除されたアイテムの次にあったアイテムが現在のカーソルの次にくるので、
+    /// next2回でそれをとることも出来る。Cインターフェースやunsafe iterなら
+    ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
+    pub fn prev(&mut self) -> Option<(&'a u64, &'a mut V)> {
+        self.iter.prev_mut()
+    }
+
+    ///nextもprevも現在のカーソルにあるアイテムを返す
+    ///空であるか、最後/最初まで移動してアイテムが無くなったらfalse
+    pub fn is_available(&self) -> bool {
+        self.iter.is_available()
+    }
 }
-impl<V> ListMap<V> {
-    pub fn new() -> ListMap<V> {
-        ListMap { map: LinkedMap::new(), cache : RefCell::new(None) }
+impl<'a,V> Iterator for LinkedMapIterMut<'a, V>{
+    type Item = (&'a u64, &'a mut V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next()
     }
+}
+impl<'a,V> IntoIterator for &'a mut LinkedMap<V>{
+    type Item = (&'a u64, &'a mut V);
+    type IntoIter = LinkedMapIterMut<'a, V>;
 
-    fn delete_cache(&self){
-        self.cache.replace(None);
-    }
-
-    pub fn first(&self) -> &V { self.map.first() }
-    pub fn first_mut(&mut self) -> &mut V { self.map.first_mut() }
-    pub fn first_id(&self) -> u64 { self.map.first_id() }
-    pub fn last(&self) -> &V { self.map.last() }
-    pub fn last_mut(&mut self) -> &mut V { self.map.last_mut() }
-    pub fn last_id(&self) -> u64 { self.map.last_id() }
-
-    pub fn from_id(&self, id: u64) -> Option<&V> { self.map.from_id(id) }
-    pub fn from_id_mut(&mut self, id: u64) -> Option<&mut V> { self.map.from_id_mut(id) }
-
-    pub fn contains_key(&self, key: u64) -> bool { self.map.contains_key(key) }
-    pub fn len(&self) -> usize { self.map.len() }
-
-    pub fn insert(&mut self, val: V) -> u64 {
-        self.delete_cache();
-        self.map.insert(val)
-    }
-
-    pub fn insert_last(&mut self, val: V) -> u64 {
-        self.delete_cache();
-        self.map.insert_last(val)
-    }
-    pub fn insert_first(&mut self, val: V) -> u64 {
-        self.delete_cache();
-        self.map.insert_first(val)
-    }
-
-    pub fn remove(&mut self, id: u64) -> bool {
-        self.delete_cache();
-        self.map.remove(id)
-    }
-    pub fn remove_first(&mut self) -> bool {
-        self.delete_cache();
-        self.map.remove_first()
-    }
-
-    pub fn remove_last(&mut self) -> bool {
-        self.delete_cache();
-        self.map.remove_last()
-    }
-
-    pub fn to_first(&mut self, id: u64) -> bool {
-        self.delete_cache();
-        self.map.to_first(id)
-    }
-
-    pub fn to_last(&mut self, id: u64) -> bool {
-        self.delete_cache();
-        self.map.to_last(id)
-    }
-
-    pub fn to_prev(&mut self, next_items_id: u64, id: u64) -> bool {
-        self.delete_cache();
-        self.map.to_prev(next_items_id, id)
-    }
-
-    pub fn to_next(&mut self, prev_items_id: u64, id: u64) -> bool {
-        self.delete_cache();
-        self.map.to_next(prev_items_id, id)
-    }
-
-    pub fn iter(&self) -> LinkedMapIter<V> { self.map.iter() }
-
-    pub fn index_mut(&mut self, index : usize) -> &mut V{
-        let node = self.index_impl(index);
-        self.cache.replace(Some(Cache{ index, ptr : node }));
-        unsafe{ &mut node.as_mut().unwrap().item }
-    }
-
-    pub fn index(&self, index : usize) -> &V{
-        let node = self.index_impl(index);
-        self.cache.replace(Some(Cache{ index, ptr : node }));
-        unsafe{ &node.as_ref().unwrap().item }
-    }
-
-    fn index_impl(&self, index : usize) -> *mut MutNode<V>{
-        if self.len() <= index{ panic!("index out of bound") }
-        let index = index as i64;
-        let from_first = index as i64;
-        let from_last = self.len() as i64 - 1 - index;
-        let cache = self.cache.borrow();
-        if cache.is_none() {
-            if from_first < from_last {
-                self.from_first(index as usize)
-            } else{
-                self.from_last(index as usize)
-            }
-        } else{
-            let cache = cache.as_ref().unwrap();
-            let diff = (index - cache.index as i64).abs();
-            if diff < from_first && diff < from_last{
-                self.get_node(index as usize, cache.ptr, cache.index)
-            } else{
-                if from_first < from_last {
-                    self.from_first(index as usize)
-                } else{
-                    self.from_last(index as usize)
-                }
-            }
-        }
-    }
-
-    fn from_first(&self, index : usize) -> *mut MutNode<V>{
-        return self.get_node(index, self.map.first, 0);
-    }
-
-    fn from_last(&self, index : usize) -> *mut MutNode<V>{
-        return self.get_node(index, self.map.last, self.len() - 1);
-    }
-
-    fn get_node(&self, index : usize, node : *mut MutNode<V>, node_index : usize) -> *mut MutNode<V>{
-        let mut current = node_index;
-        let mut node = node;
-        if node_index <= index{
-            loop{
-                if index == current {
-                    return node;
-                }
-                node = get_next(node);
-                current += 1;
-            }
-        } else{
-            loop{
-                if index == current {
-                    return node;
-                }
-                node = get_prev(node);
-                current -= 1;
-            }
-        }
-
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
     }
 }
