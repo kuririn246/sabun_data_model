@@ -1,8 +1,6 @@
 use crate::{HashM, HashMt};
-use crate::imp::structs::rust_list::MutListItem;
-use std::collections::hash_map::{Iter, IntoIter};
-use std::ptr::{null_mut, null};
-use std::cell::{Cell, RefCell};
+use std::ptr::{null_mut};
+use std::cell::{ RefCell};
 
 unsafe impl<V> Send for LinkedMap<V> {}
 unsafe impl<V> Sync for LinkedMap<V> {}
@@ -72,6 +70,7 @@ impl<V> LinkedMap<V> {
     pub fn last_id(&self) -> u64{ get_id(self.last) }
 
     fn node_from_id_mut(&mut self, id : u64) -> Option<&mut MutNode<V>>{ self.map.get_mut(&id).map(|b| b.as_mut()) }
+    fn node_from_id(&self, id : u64) -> Option<&MutNode<V>>{ self.map.get(&id).map(|b| b.as_ref()) }
 
     pub fn from_id(&self, id : u64) -> Option<&V>{ self.map.get(&id).map(|b| &b.as_ref().item) }
     pub fn from_id_mut(&mut self, id : u64) -> Option<&mut V>{ self.map.get_mut(&id).map(|b| &mut b.as_mut().item) }
@@ -252,6 +251,10 @@ impl<V> LinkedMap<V> {
     }
 
     pub fn iter(&self) -> LinkedMapIter<V> { LinkedMapIter::new(self) }
+    pub fn iter_from_last(&self) -> LinkedMapIter<V>{ LinkedMapIter{ map : self, node : self.last }}
+    pub fn iter_from_id(&self, id : u64) -> Option<LinkedMapIter<V>>{
+        self.node_from_id(id).map(|node| LinkedMapIter{ map : self, node : node as *const _ as *mut _})
+    }
 }
 
 
@@ -262,21 +265,38 @@ pub struct LinkedMapIter<'a, V>{
 }
 impl<'a, V> LinkedMapIter<'a, V>{
     pub fn new(map : &'a LinkedMap<V>) -> LinkedMapIter<'a, V>{ LinkedMapIter{ map, node : map.first } }
+
+    pub fn next(&mut self) -> Option<(&'a u64, &'a V)> {
+        if self.node.is_null() { return None; }
+        let current_node = self.node;
+        if ptr_eq(self.node, self.map.last) {
+            self.node = null_mut();
+        } else {
+            self.node = get_next(self.node);
+        }
+        let node = unsafe { current_node.as_mut().unwrap() };
+        return Some((&node.id, get_item(current_node)));
+    }
+
+    ///前に戻ることが出来る。そして元あった場所を削除し、再びnextでとっていくことも出来る。今ある場所をremoveしたらポインタが不正に
+    pub fn prev(&mut self) -> Option<(&'a u64, &'a V)> {
+        if self.node.is_null(){ return None; }
+        let current_node = self.node;
+        if ptr_eq(self.node, self.map.first){
+            self.node = null_mut();
+        } else {
+            self.node = get_prev(self.node);
+        }
+        let node = unsafe{ current_node.as_mut().unwrap() };
+        return Some((&node.id, get_item(current_node)))
+    }
 }
 
 impl<'a,V> Iterator for LinkedMapIter<'a, V>{
     type Item = (&'a u64, &'a V);
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.node.is_null(){ return None; }
-        let current_node = self.node;
-        if ptr_eq(self.node, self.map.last){
-            self.node = null_mut();
-        } else {
-            self.node = get_next(self.node);
-        }
-        let node = unsafe{ current_node.as_mut().unwrap() };
-        return Some((&node.id, get_item(current_node)))
+        self.next()
     }
 }
 
@@ -404,7 +424,7 @@ impl<V> ListMap<V> {
             let cache = cache.as_ref().unwrap();
             let diff = (index - cache.index as i64).abs();
             if diff < from_first && diff < from_last{
-                self.get_item(index as usize, cache.ptr, cache.index)
+                self.get_node(index as usize, cache.ptr, cache.index)
             } else{
                 if from_first < from_last {
                     self.from_first(index as usize)
@@ -416,11 +436,11 @@ impl<V> ListMap<V> {
     }
 
     fn from_first(&self, index : usize) -> *mut MutNode<V>{
-        return self.get_item(index, self.map.first, 0);
+        return self.get_node(index, self.map.first, 0);
     }
 
     fn from_last(&self, index : usize) -> *mut MutNode<V>{
-        return self.get_item(index, self.map.last, self.len() - 1);
+        return self.get_node(index, self.map.last, self.len() - 1);
     }
 
     fn get_node(&self, index : usize, node : *mut MutNode<V>, node_index : usize) -> *mut MutNode<V>{
