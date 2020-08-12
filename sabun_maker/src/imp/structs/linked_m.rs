@@ -278,7 +278,7 @@ pub struct LinkedMapUnsafeIter<V>{
     node : *mut MutNode<V>,
 }
 impl<V> LinkedMapUnsafeIter<V>{
-    pub fn new(map : *mut LinkedMap<V>, node : *mut MutNode<V>) -> LinkedMapUnsafeIter<V>{ LinkedMapUnsafeIter{ map, node } }
+    fn new(map : *mut LinkedMap<V>, node : *mut MutNode<V>) -> LinkedMapUnsafeIter<V>{ LinkedMapUnsafeIter{ map, node } }
 
     ///現在のカーソルにあるアイテムを返し、カーソルを進める
     pub fn next<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
@@ -336,7 +336,8 @@ pub struct LinkedMapIter<'a, V>{
 }
 impl<'a, V> LinkedMapIter<'a, V>{
     fn new(map : &'a LinkedMap<V>, node : *const MutNode<V>) -> LinkedMapIter<'a, V>{
-        LinkedMapIter{ iter : LinkedMapUnsafeIter{ map, node }, phantom : PhantomData::default() }
+        //LinkedMapIterが有効な間に書き換えるとアウトだが、&が有効なはずなので大丈夫だろう
+        LinkedMapIter{ iter : LinkedMapUnsafeIter{ map : map as *const _ as *mut _, node : node as *mut _ }, phantom : PhantomData::default() }
     }
 
     ///現在のカーソルにあるアイテムを返し、カーソルを進める
@@ -378,8 +379,8 @@ pub struct LinkedMapIterMut<'a, V>{
     phantom : PhantomData<&'a LinkedMap<V>>,
 }
 impl<'a, V> LinkedMapIterMut<'a, V>{
-    fn new(map : &'a mut LinkedMap<V>, node : *const MutNode<V>) -> LinkedMapIterMut<'a, V>{
-        LinkedMapIterMut{ iter : LinkedMapUnsafeIter{ map, node }, phantom : PhantomData::default() }
+    fn new(map : &'a mut LinkedMap<V>, node : *mut MutNode<V>) -> LinkedMapIterMut<'a, V>{
+        LinkedMapIterMut{ iter : LinkedMapUnsafeIter::new(map, node), phantom : PhantomData::default() }
     }
 
     ///現在のカーソルにあるアイテムを返し、カーソルを進める
