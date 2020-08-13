@@ -154,12 +154,6 @@ mod tests {
 
     #[test]
     fn iter(){
-        let mut map = create_map3();
-        let iter = map.iter();
-        map.remove(1);
-        assert_eq!(keys(&map), vec![0,2]);
-        for (k,v) in iter{
-            println!("{} {}",*k, *v)
-        }
+       
     }
 }
