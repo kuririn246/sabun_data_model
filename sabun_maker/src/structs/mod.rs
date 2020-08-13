@@ -7,3 +7,7 @@ pub use crate::imp::intf::null_or::NullOr as NullOr;
 pub use crate::imp::intf::null_or::UndefOr as UndefOr;
 pub use crate::imp::structs::var_type::VarType as VarType;
 pub use crate::imp::structs::param_type::ParamType as ParamType;
+pub use crate::imp::structs::linked_m::LinkedMap as LinkedMap;
+pub use crate::imp::structs::linked_m::LinkedMapIter as LinkedMapIter;
+pub use crate::imp::structs::linked_m::LinkedMapIterMut as LinkedMapIterMut;
+pub use crate::imp::structs::linked_m::LinkedMapUnsafeIter as LinkedMapUnsafeIter;

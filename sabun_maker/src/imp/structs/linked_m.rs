@@ -26,8 +26,8 @@ impl<V> MutNode<V>{
         MutNode{ item, prev : null_mut(), next : null_mut(), id }
     }
 }
-fn get_next<V>(this : *const MutNode<V>) -> *mut MutNode<V>{
-    let node = unsafe{ this.as_ref().unwrap() };
+fn get_next<V>(this : *const MutNode<V>) ->*mut MutNode<V>{
+    let node = unsafe{ &*this };
     node.next
 }
 fn set_next<V>(this : *mut MutNode<V>, next : *mut MutNode<V>){
@@ -35,7 +35,7 @@ fn set_next<V>(this : *mut MutNode<V>, next : *mut MutNode<V>){
     node.next = next;
 }
 fn get_prev<V>(this : *const MutNode<V>) -> *mut MutNode<V>{
-    let node = unsafe{ this.as_ref().unwrap() };
+    let node = unsafe{ &*this };
     node.prev
 }
 fn set_prev<V>(this : *mut MutNode<V>, prev : *mut MutNode<V>){
@@ -43,31 +43,44 @@ fn set_prev<V>(this : *mut MutNode<V>, prev : *mut MutNode<V>){
     node.prev = prev;
 }
 fn get_id<V>(this : *const MutNode<V>) -> u64{
-    let node = unsafe{ this.as_ref().unwrap() };
+    let node = unsafe{ &*this };
     node.id
 }
 fn get_item<'a, V>(this : *const MutNode<V>) -> &'a V{
-    let node = unsafe{ this.as_ref().unwrap() };
+    let node = unsafe{ &*this };
     &node.item
 }
-fn get_item_mut<'a, V>(this : *mut MutNode<V>) -> &'a mut V{
-    let node = unsafe{ this.as_mut().unwrap() };
+fn get_item_mut<'a, V>(this : *mut MutNode<V>) ->&'a mut V{
+    let node = unsafe{ &mut *this };
     &mut node.item
 }
 
 fn ptr_eq<T>(l : *const T, r : *const T) -> bool{ std::ptr::eq(l,r) }
 
 impl<V> LinkedMap<V> {
-    pub fn new() -> LinkedMap<V> {
+    #[allow(dead_code)]
+    pub(crate) fn new() -> LinkedMap<V> {
         LinkedMap { map : HashMt::new(), first : null_mut(), last : null_mut(), next_id : 0, }
     }
 
-    pub fn first(&self) -> &V{ get_item(self.first) }
-    pub fn first_mut(&mut self) -> &mut V{ get_item_mut(self.first) }
-    pub fn first_id(&self) -> u64{ get_id(self.first) }
-    pub fn last(&self) -> &V{ get_item(self.last) }
-    pub fn last_mut(&mut self) -> &mut V{ get_item_mut(self.last) }
-    pub fn last_id(&self) -> u64{ get_id(self.last) }
+    pub fn first(&self) -> Option<&V> {
+        if self.first.is_null() { None } else { Some(get_item(self.first)) }
+    }
+    pub fn first_mut(&mut self) -> Option<&mut V> {
+        if self.first.is_null() { None } else { Some(get_item_mut(self.first)) }
+    }
+    pub fn first_id(&self) -> Option<u64> {
+        if self.first.is_null() { None } else { Some(get_id(self.first)) }
+    }
+    pub fn last(&self) -> Option<&V> {
+        if self.last.is_null() { None } else { Some(get_item(self.last)) }
+    }
+    pub fn last_mut(&mut self) -> Option<&mut V> {
+        if self.last.is_null() { None } else { Some(get_item_mut(self.last)) }
+    }
+    pub fn last_id(&self) -> Option<u64> {
+        if self.last.is_null() { None } else { Some(get_id(self.last)) }
+    }
 
     fn node_from_id_mut(&mut self, id : u64) -> Option<&mut MutNode<V>>{ self.map.get_mut(&id).map(|b| b.as_mut()) }
     fn node_from_id(&self, id : u64) -> Option<&MutNode<V>>{ self.map.get(&id).map(|b| b.as_ref()) }
@@ -110,7 +123,7 @@ impl<V> LinkedMap<V> {
     }
 
     fn pull(&mut self, id : u64) -> *mut MutNode<V>{
-        let node = if let Some(node) = self.node_from_id_mut(id){ node as *mut MutNode<V> } else{ return null_mut(); };
+        let node = if let Some(node) = self.node_from_id_mut(id){ node as *mut _ } else{ return null_mut(); };
         if ptr_eq(node, self.first){ return self.pull_first(); }
         if ptr_eq(node, self.last){ return self.pull_last(); }
         //firstでもlastでもないということは、中間ということ
