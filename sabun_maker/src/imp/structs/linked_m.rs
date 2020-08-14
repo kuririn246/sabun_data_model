@@ -62,6 +62,32 @@ impl<V> LinkedMap<V> {
     pub(crate) fn new() -> LinkedMap<V> {
         LinkedMap { map : HashMt::new(), first : null_mut(), last : null_mut(), next_id : 0, }
     }
+    pub fn construct(items : Vec<(u64,V)>) -> LinkedMap<V>{
+        let mut items = items;
+        if items.is_empty(){
+            return new();
+        }
+        let mut map : HashM<u64,Box<MutNode<V>>> = HashMt::with_capacity(items.len());
+        let (id,val) = items.remove(0);
+        let first_id = id;
+        let mut last_id = first_id;
+        let mut max_id = first_id;
+        let mut prev_node  = Box::new(MutNode::new(val, id));
+        map.insert(prev_node.as_ref().id, prev_node);
+        for (id,val) in items{
+            let mut node = Box::new(MutNode::new(val, id));
+            prev_node.as_mut().next = node.as_mut();
+            node.as_mut().prev = prev_node.as_mut();
+            map.insert(id, node);
+            last_id = id;
+            if max_id < id{
+                max_id = id;
+            }
+        }
+        let first = map.get_mut(&first_id).unwrap().as_mut() as *mut _;
+        let last = map.get_mut(&last_id).unwrap().as_mut() as *mut _;
+        LinkedMap{ map, first, last, next_id : max_id + 1 }
+    }
 
     pub fn first(&self) -> Option<&V> {
         if self.first.is_null() { None } else { Some(get_item(self.first)) }

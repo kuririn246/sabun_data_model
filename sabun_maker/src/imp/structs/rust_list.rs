@@ -6,6 +6,7 @@ use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::util::set_sabun::{SetSabunError, verify_set_sabun};
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::mut_list_hash::MutListHash;
+use crate::imp::structs::linked_m::LinkedMap;
 
 
 ///アイテムごとにIDをもち、Refで参照することが可能である
@@ -45,21 +46,21 @@ impl ConstList{
 #[derive(Debug, PartialEq, Clone)]
 pub struct MutList{
     default : Box<ListDefObj>,
-    list : Box<MutListHash>,
-    prop : Box<MutListProp>,
+    list : Box<LinkedMap<MutListItem>>,
+    compatible : Box<HashS<String>>,
 }
 
 
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct MutListProp{
-    ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
-    next_id : u64,
-
-    ///MutListは初期値を持てないのでConstListに初期値を書いておくことになるだろう。
-    /// その場合、compatibleを設定しdefaultが同一であることを保証することで、そのままListItemをコピーすることが可能になる
-    compatible : HashS<String>,
-}
+// #[derive(Debug, PartialEq, Clone)]
+// pub struct MutListProp{
+//     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
+//     next_id : u64,
+//
+//     ///MutListは初期値を持てないのでConstListに初期値を書いておくことになるだろう。
+//     /// その場合、compatibleを設定しdefaultが同一であることを保証することで、そのままListItemをコピーすることが可能になる
+//
+// }
 
 impl MutList{
     pub(crate) fn new(default : ListDefObj, list : MutListHash, next_id : u64, compatible : HashS<String>) -> MutList{
