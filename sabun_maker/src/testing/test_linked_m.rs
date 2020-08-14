@@ -153,7 +153,164 @@ mod tests {
     }
 
     #[test]
-    fn iter(){
-       
+    fn to_honyarara(){
+        let mut map = create_map0();
+        map.to_first(0);
+        map.to_last(0);
+        map.to_next(0,0);
+        map.to_prev(0,0);
+        map.to_next(0,1);
+        map.to_prev(0,1);
+        let mut map = create_map1();
+        map.to_first(0);
+        map.to_last(0);
+        map.to_next(0,0);
+        map.to_prev(0,0);
+        map.to_next(0,1);
+        map.to_prev(0,1);
+        let mut map = create_map2();
+        map.to_next(1, 0);
+        assert_eq!(keys(&map), vec![1,0]);
+        assert!(map.first().is_some());
+        assert!(map.last().is_some());
+        map.to_next(1, 0);
+        assert_eq!(keys(&map), vec![1,0]);
+        assert!(map.first().is_some());
+        assert!(map.last().is_some());
+        map.to_prev(1, 0);
+        assert_eq!(keys(&map), vec![0,1]);
+        assert!(map.first().is_some());
+        assert!(map.last().is_some());
+        map.to_next(1, 0);
+        assert_eq!(keys(&map), vec![1,0]);
+        assert!(map.first().is_some());
+        assert!(map.last().is_some());
+        map.to_first(1);
+        map.to_last(0);
+        assert_eq!(keys(&map), vec![1,0]);
+        map.to_first(0);
+        assert_eq!(keys(&map), vec![0,1]);
+        map.to_last(0);
+        assert_eq!(keys(&map), vec![1,0]);
+        map.to_next(1,1);
+        map.to_prev(1,1);
+
+        let mut map = create_map3();
+        map.to_next(2, 0);
+        assert_eq!(keys(&map), vec![1,2,0]);
+        assert!(map.first().is_some());
+        assert!(map.last().is_some());
+        map.to_next(2, 1);
+        assert_eq!(keys(&map), vec![2,1,0]);
+        assert_eq!(map.first().unwrap(), &2);
+        assert_eq!(map.last().unwrap(), &0);
+        map.to_next(2, 0);
+        assert_eq!(keys(&map), vec![2,0,1]);
+        assert_eq!(map.first().unwrap(), &2);
+        assert_eq!(map.last().unwrap(), &1);
+        map.to_next(2, 2);
+        assert_eq!(keys(&map), vec![2,0,1]);
+        assert_eq!(map.first().unwrap(), &2);
+        assert_eq!(map.last().unwrap(), &1);
+        map.to_next(1, 1);
+        assert_eq!(keys(&map), vec![2,0,1]);
+        assert_eq!(map.first().unwrap(), &2);
+        assert_eq!(map.last().unwrap(), &1);
+        map.to_next(0, 0);
+        assert_eq!(keys(&map), vec![2,0,1]);
+        assert_eq!(map.first().unwrap(), &2);
+        assert_eq!(map.last().unwrap(), &1);
+        map.to_next(2, 0);
+        assert_eq!(keys(&map), vec![2,0,1]);
+        assert_eq!(map.first().unwrap(), &2);
+        assert_eq!(map.last().unwrap(), &1);
+        map.to_next(0, 1);
+        assert_eq!(keys(&map), vec![2,0,1]);
+        assert_eq!(map.first().unwrap(), &2);
+        assert_eq!(map.last().unwrap(), &1);
+
+        map.to_prev(2, 1);
+        assert_eq!(keys(&map), vec![1,2,0]);
+        assert!(map.first().is_some());
+        assert!(map.last().is_some());
+        map.to_prev(2, 0);
+        assert_eq!(keys(&map), vec![1,0,2]);
+        assert_eq!(map.first().unwrap(), &1);
+        assert_eq!(map.last().unwrap(), &2);
+        map.to_prev(2, 1);
+        assert_eq!(keys(&map), vec![0,1,2]);
+        assert_eq!(map.first().unwrap(), &0);
+        assert_eq!(map.last().unwrap(), &2);
+        map.to_prev(2, 2);
+        assert_eq!(keys(&map), vec![0,1,2]);
+        assert_eq!(map.first().unwrap(), &0);
+        assert_eq!(map.last().unwrap(), &2);
+        map.to_prev(1, 1);
+        assert_eq!(keys(&map), vec![0,1,2]);
+        assert_eq!(map.first().unwrap(), &0);
+        assert_eq!(map.last().unwrap(), &2);
+        map.to_prev(0, 0);
+        assert_eq!(keys(&map), vec![0,1,2]);
+        assert_eq!(map.first().unwrap(), &0);
+        assert_eq!(map.last().unwrap(), &2);
+        map.to_prev(1, 0);
+        assert_eq!(keys(&map), vec![0,1,2]);
+        assert_eq!(map.first().unwrap(), &0);
+        assert_eq!(map.last().unwrap(), &2);
+        map.to_prev(2, 1);
+        assert_eq!(keys(&map), vec![0,1,2]);
+        assert_eq!(map.first().unwrap(), &0);
+        assert_eq!(map.last().unwrap(), &2);
+
+        map.to_last(0);
+        assert_eq!(keys(&map), vec![1,2,0]);
+        assert_eq!(map.first().unwrap(), &1);
+        assert_eq!(map.last().unwrap(), &0);
+        map.to_last(2);
+        assert_eq!(keys(&map), vec![1,0,2]);
+        assert_eq!(map.first().unwrap(), &1);
+        assert_eq!(map.last().unwrap(), &2);
+        map.to_last(2);
+        assert_eq!(keys(&map), vec![1,0,2]);
+        assert_eq!(map.first().unwrap(), &1);
+        assert_eq!(map.last().unwrap(), &2);
+
+        map.to_first(1);
+        assert_eq!(keys(&map), vec![1,0,2]);
+        assert_eq!(map.first().unwrap(), &1);
+        assert_eq!(map.last().unwrap(), &2);
+        map.to_first(0);
+        assert_eq!(keys(&map), vec![0,1,2]);
+        assert_eq!(map.first().unwrap(), &0);
+        assert_eq!(map.last().unwrap(), &2);
+        map.to_first(2);
+        assert_eq!(keys(&map), vec![2,0,1]);
+        assert_eq!(map.first().unwrap(), &2);
+        assert_eq!(map.last().unwrap(), &1);
+
+    }
+
+    #[test]
+    fn unsafe_iter(){
+        let mut map = create_map3();
+        let mut iter = unsafe{ map.iter_unsafe() };
+        assert_eq!(iter.next(), Some((&0,&0)));
+        assert_eq!(iter.current(), Some((&1,&1)));
+        assert_eq!(iter.prev(), Some((&1,&1)));
+        map.remove(1);
+        assert_eq!(iter.next(), Some((&0,&0)));
+        assert_eq!(iter.current(), Some((&2,&2)));
+
+        let mut map = create_map3();
+        let mut iter = unsafe{ map.iter_unsafe() };
+        assert_eq!(iter.current(), Some((&0,&0)));
+        map.to_last(0);
+        assert_eq!(iter.prev(), Some((&0,&0)));
+        assert_eq!(iter.prev(), Some((&2,&2)));
+        assert_eq!(iter.prev(), Some((&1,&1)));
+        assert_eq!(iter.prev(), None);
+        assert_eq!(iter.prev(), None);
+
+
     }
 }

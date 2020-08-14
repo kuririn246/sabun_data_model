@@ -328,6 +328,16 @@ impl<V> LinkedMapUnsafeIter<V>{
         return Some((&node.id, &mut node.item))
     }
 
+    pub fn current_mut<'a>(&mut self) -> Option<(&'a u64, &'a mut V)> {
+        if self.node.is_null(){ return None; }
+        let node = unsafe{ &mut *self.node };
+        return Some((&node.id, &mut node.item))
+    }
+
+    pub fn current<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
+        return self.current_mut().map(|(k,v)| (k,&*v))
+    }
+
     ///前に戻ることが出来る。そして元あった場所を削除し、それによって削除されたアイテムの次にあったアイテムが現在のカーソルの次にくるので、
     /// next2回でそれをとることも出来る。
     ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
@@ -363,6 +373,10 @@ impl<'a, V> LinkedMapIter<'a, V>{
     ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
     pub fn prev(&mut self) -> Option<(&'a u64, &'a V)> {
         self.iter.prev()
+    }
+
+    pub fn current(&mut self) -> Option<(&'a u64, &'a V)> {
+        self.iter.current()
     }
 
     ///nextもprevも現在のカーソルにあるアイテムを返す
@@ -406,6 +420,10 @@ impl<'a, V> LinkedMapIterMut<'a, V>{
     ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
     pub fn prev(&mut self) -> Option<(&'a u64, &'a mut V)> {
         self.iter.prev_mut()
+    }
+
+    pub fn current(&mut self) -> Option<(&'a u64, &'a mut V)> {
+        self.iter.current_mut()
     }
 
     ///nextもprevも現在のカーソルにあるアイテムを返す
