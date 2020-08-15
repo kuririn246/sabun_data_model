@@ -313,4 +313,40 @@ mod tests {
 
 
     }
+
+    #[test]
+    fn partial_eq(){
+        let l = create_map3();
+        let r = create_map3();
+        assert_eq!(l, r);
+        let l = create_map2();
+        let r = create_map2();
+        assert_eq!(l, r);
+        let l = create_map1();
+        let r = create_map1();
+        assert_eq!(l, r);
+        let l = create_map0();
+        let r = create_map0();
+        assert_eq!(l, r);
+        let l = create_map3();
+        let mut r = create_map3();
+        r.to_last(r.first_id().unwrap());
+        assert_ne!(l, r);
+    }
+
+    #[test]
+    fn clone(){
+        let l = create_map3();
+        let r = l.clone();
+        assert_eq!(l, r);
+        let l = create_map2();
+        let r = l.clone();
+        assert_eq!(l, r);
+        let l = create_map1();
+        let r = l.clone();
+        assert_eq!(l, r);
+        let l = create_map0();
+        let r = l.clone();
+        assert_eq!(l, r);
+    }
 }

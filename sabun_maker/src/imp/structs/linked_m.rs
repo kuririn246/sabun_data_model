@@ -1,6 +1,7 @@
 use crate::{HashM, HashMt};
 use std::ptr::{null_mut};
 use std::marker::PhantomData;
+use std::collections::VecDeque;
 
 unsafe impl<V> Send for LinkedMap<V> {}
 unsafe impl<V> Sync for LinkedMap<V> {}
@@ -21,8 +22,19 @@ struct MutNode<V>{
     item : V,
     id : u64,
 }
+impl<V : Clone> Clone for MutNode<V>{
+    fn clone(&self) -> Self {
+        MutNode{ prev : null_mut(), next : null_mut(), item : self.item.clone(), id : self.id }
+    }
+}
+impl<V : PartialEq> PartialEq for MutNode<V>{
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id && self.item.eq(&other.item)
+    }
+}
+
 impl<V> MutNode<V>{
-    fn new(id : u64, item : V, dummy : u64) -> MutNode<V>{
+    fn new(id : u64, item : V) -> MutNode<V>{
         MutNode{ item, prev : null_mut(), next : null_mut(), id }
     }
 }
@@ -55,6 +67,7 @@ fn get_item_mut<'a, V>(this : *mut MutNode<V>) ->&'a mut V{
     &mut node.item
 }
 
+
 fn ptr_eq<T>(l : *const T, r : *const T) -> bool{ std::ptr::eq(l,r) }
 
 impl<V> LinkedMap<V> {
@@ -69,18 +82,21 @@ impl<V> LinkedMap<V> {
         let mut map : HashM<u64,Box<MutNode<V>>> = HashMt::with_capacity(items.len());
         let mut iter = items.into_iter();
         let (id,val) = iter.next().unwrap();
-        let mut first_node  = Box::new(MutNode::new(id, val, id));
+        let mut first_node  = Box::new(MutNode::new(id, val));
         let first_node_ptr = first_node.as_mut() as *mut _;
         let mut prev_node_ptr = first_node_ptr;
         map.insert(id, first_node);
-        for (id,val) in items{
-            let mut node = Box::new(MutNode::new( id, val, id));
+        for (id,val) in iter{
+            let mut node = Box::new(MutNode::new( id, val));
             set_next(prev_node_ptr, node.as_mut());
             node.as_mut().prev = prev_node_ptr;
             prev_node_ptr = node.as_mut();
             map.insert(id, node);
         }
         LinkedMap{ map, first : first_node_ptr, last : prev_node_ptr, next_id }
+    }
+    fn deconstruct(self) -> HashM<u64, Box<MutNode<V>>>{
+        self.map
     }
     pub fn next_id(&self) -> u64{ self.next_id }
 
@@ -219,14 +235,14 @@ impl<V> LinkedMap<V> {
     }
 
     pub fn insert_last(&mut self, val : V) -> u64{
-        let mut node = Box::new(MutNode::new(val, self.next_id));
+        let mut node = Box::new(MutNode::new(self.next_id, val));
         self.put_last(node.as_mut());
         self.map.insert(self.next_id, node);
         self.next_id += 1;
         return self.next_id - 1;
     }
     pub fn insert_first(&mut self, val : V) -> u64{
-        let mut node = Box::new(MutNode::new(val, self.next_id));
+        let mut node = Box::new(MutNode::new(self.next_id, val));
         self.put_first(node.as_mut());
         self.map.insert(self.next_id, node);
         self.next_id += 1;
@@ -303,6 +319,40 @@ impl<V> LinkedMap<V> {
         let node = if let Some(node) = self.node_from_id_mut(id){ node as *mut MutNode<V> } else{ return None; };
         Some(LinkedMapUnsafeIter::new(self, node))
 
+    }
+
+    pub fn into_iter(self) -> LinkedMapIntoIter<V>{ LinkedMapIntoIter::new(self) }
+}
+
+impl<V : Clone> Clone for LinkedMap<V>{
+    fn clone(&self) -> Self {
+        if self.map.is_empty(){ return LinkedMap::new() }
+        let mut map = self.map.clone();
+        let first_node = map.get_mut(&self.first_id().unwrap()).unwrap().as_mut() as *mut _;
+        let last_node = map.get_mut(&self.last_id().unwrap()).unwrap().as_mut() as *mut _;
+        let mut iter = self.iter();
+        iter.next();
+        let mut prev_node = first_node;
+        for (id, _) in iter{
+            let current = map.get_mut(id).unwrap();
+            set_next(prev_node, current.as_mut());
+            current.as_mut().prev = prev_node;
+            prev_node = current.as_mut();
+        }
+        LinkedMap{ map, first : first_node, last : last_node, next_id : self.next_id }
+    }
+}
+
+impl<V : PartialEq> PartialEq for LinkedMap<V>{
+    fn eq(&self, other: &Self) -> bool {
+        if !self.map.eq(&other.map){ return false; }
+        if self.next_id != other.next_id{ return false; }
+        let l = self.iter();
+        let r = other.iter();
+        for ((a,_),(b,_)) in l.zip(r){
+            if *a != *b{ return false; }
+        }
+        return true;
     }
 }
 
@@ -469,8 +519,32 @@ impl<'a,V> IntoIterator for &'a mut LinkedMap<V>{
     }
 }
 
-
 pub struct LinkedMapIntoIter<V>{
-    iter : LinkedMapUnsafeIter<V>,
-    phantom : PhantomData<&'a LinkedMap<V>>,
+    map : HashM<u64, Box<MutNode<V>>>,
+    deq : VecDeque<u64>,
+}
+impl<V> LinkedMapIntoIter<V>{
+    pub fn new(map : LinkedMap<V>) -> LinkedMapIntoIter<V>{
+        let deq : VecDeque<u64> = map.iter().map(|(k,_)| *k).collect();
+        LinkedMapIntoIter{ map : map.deconstruct(), deq }
+    }
+}
+impl<V> Iterator for LinkedMapIntoIter<V>{
+    type Item = (u64,V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let id = self.deq.pop_front()?;
+        let b = self.map.remove(&id)?;
+        let node = *b;
+        return Some((id,node.item));
+    }
+}
+
+impl<V> IntoIterator for LinkedMap<V>{
+    type Item = (u64, V);
+    type IntoIter = LinkedMapIntoIter<V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        LinkedMapIntoIter::new(self)
+    }
 }
