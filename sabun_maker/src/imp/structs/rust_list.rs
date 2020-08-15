@@ -5,7 +5,6 @@ use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::util::set_sabun::{SetSabunError, verify_set_sabun};
 use crate::imp::structs::list_def_obj::ListDefObj;
-use crate::imp::structs::mut_list_hash::MutListHash;
 use crate::imp::structs::linked_m::LinkedMap;
 
 
@@ -50,38 +49,22 @@ pub struct MutList{
     compatible : Box<HashS<String>>,
 }
 
-
-
-// #[derive(Debug, PartialEq, Clone)]
-// pub struct MutListProp{
-//     ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
-//     next_id : u64,
-//
-//     ///MutListは初期値を持てないのでConstListに初期値を書いておくことになるだろう。
-//     /// その場合、compatibleを設定しdefaultが同一であることを保証することで、そのままListItemをコピーすることが可能になる
-//
-// }
-
 impl MutList{
-    pub(crate) fn new(default : ListDefObj, list : MutListHash, next_id : u64, compatible : HashS<String>) -> MutList{
-        MutList{ default : Box::new(default), list : Box::new(list), prop : Box::new(MutListProp{ next_id, compatible }) }
+    pub(crate) fn new(default : ListDefObj, list : LinkedMap<MutListItem>, compatible : HashS<String>) -> MutList{
+        MutList{ default : Box::new(default), list : Box::new(list), compatible : Box::new(compatible) }
     }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
-    pub(crate) fn list(&self) -> &MutListHash{ self.list.as_ref() }
+    pub(crate) fn list(&self) -> &LinkedMap<MutListItem>{ self.list.as_ref() }
+    pub(crate) fn next_id(&self) -> u64{ self.list.as_ref().next_id() }
     //pub(crate) fn list_mut(&mut self) -> &mut LinkedHashM<u64, MutListItem>{ self.list.as_mut() }
-    pub(crate) fn next_id(&self) -> u64{ self.prop.next_id }
     //pub(crate) fn increment_next_id(&mut self){ self.prop.next_id += 1 }
     pub(crate) fn append_new_item(&mut self) -> u64{
-        let next_id = self.next_id();
-        self.list.insert(next_id, Box::new(MutListItem::new(next_id, HashMt::new(), HashMt::new())));
-        self.prop.next_id += 1;
-        return next_id;
+        self.list.insert(MutListItem::new(self.next_id(), HashMt::new(), HashMt::new()));
     }
 
     pub(crate) fn compatible(&self) -> &HashS<String>{ &self.prop.compatible }
-    pub(crate) fn deconstruct(self) -> (ListDefObj, MutListHash, u64, HashS<String>){
-        let prop = *self.prop;
-        (*self.default, *self.list, prop.next_id, prop.compatible)
+    pub(crate) fn deconstruct(self) -> (ListDefObj, LinkedMap<MutListItem>, HashS<String>){
+        (*self.default, *self.list, *self.compatible)
     }
 }
 
@@ -96,32 +79,15 @@ impl InnerList{
     pub(crate) fn list(&self) -> &Vec<ListItem>{ &self.list }
 }
 
-
-// ///アイテムごとにIDをもち、Refで参照することが可能である
-// #[derive(Debug, PartialEq, Clone)]
-// pub struct InnerData{
-//     list : Box<HashM<String, ListItem>>,
-//     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
-//     old : Box<HashS<String>>,
-// }
-//
-// impl InnerData{
-//     pub(crate) fn new(list : HashM<String, ListItem>, old : HashS<String>) -> InnerData{ InnerData{ list : Box::new(list), old : Box::new(old)} }
-//     pub(crate) fn list(&self) -> &HashM<String, ListItem>{ self.list.as_ref() }
-//     pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
-// }
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct InnerMutList{
-    list : Box<MutListHash>,
-    ///追加される度にこのIDがふられ、これがインクリメントされることを徹底する必要がある。u64を使い切るには1万年ぐらいかかるだろう
-    next_id : u64,
+    list : Box<LinkedMap<MutListItem>>,
 }
 
 impl InnerMutList{
-    pub(crate) fn new(list : MutListHash, next_id : u64) -> InnerMutList{ InnerMutList{ list : Box::new(list), next_id } }
-    pub(crate) fn deconstruct(self) -> (MutListHash, u64){ (*self.list, self.next_id) }
-    pub(crate) fn list(&self) -> &MutListHash{ self.list.as_ref() }
+    pub(crate) fn new(list : LinkedMap<MutListItem>,) -> InnerMutList{ InnerMutList{ list : Box::new(list) } }
+    pub(crate) fn deconstruct(self) -> LinkedMap<MutListItem>{ *self.list }
+    pub(crate) fn list(&self) -> &LinkedMap<MutListItem>{ self.list.as_ref() }
     //pub(crate) fn next_id(&self) -> u64{ self.next_id }
 }
 

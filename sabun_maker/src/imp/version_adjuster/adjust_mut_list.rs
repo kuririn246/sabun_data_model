@@ -6,19 +6,22 @@ use crate::imp::structs::rust_list::{MutListItem, MutList, InnerMutList};
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::{HashM, HashMt};
 use crate::imp::structs::mut_list_hash::MutListHash;
+use crate::imp::structs::linked_m::LinkedMap;
 
 
-pub fn adjust_mut(def : &ListDefObj, old_list : MutListHash, names : &Names) -> Result<MutListHash>{
-    let mut counter : u64 = 0;
-    let mut result : HashM<u64, Box<MutListItem>> = HashMt::with_capacity(old_list.len());
-    for (_, value) in old_list{
+pub fn adjust_mut(def : &ListDefObj, old_list : LinkedMap<MutListItem>, names : &Names) -> Result<MutListHash>{
+    //let mut counter : u64 = 0;
+    //let mut result : HashM<u64, Box<MutListItem>> = HashMt::with_capacity(old_list.len());
+    let mut result : Vec<(u64, MutListItem)> = Vec::with_capacity(old_list.len());
+    let next_id = old_list.next_id();
+    for (id, value) in old_list{
         let (sabun, refs) = value.deconstruct();
         let new_sabun = adjust_mut_list_item_sabun(def, sabun, names)?;
         let new_refs = adjust_mut_list_item_ref(def.refs(), refs, names)?;
-        result.insert(counter, Box::new(MutListItem::new(counter, new_sabun, new_refs)));
-        counter += 1;
+        result.push((id, MutListItem::new(counter, new_sabun, new_refs)));
+
     }
-    return Ok(MutListHash::new(result));
+    return Ok(LinkedMap::construct());
 }
 
 pub fn adjust_mut_list(new : MutList, old : MutList, names : &Names) -> Result<MutList>{

@@ -5,7 +5,7 @@ use crate::error::Result;
 use crate::imp::structs::rust_list::{ConstList, InnerList, ConstData, MutList, InnerMutList, ListItem, MutListItem};
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
-use crate::imp::structs::mut_list_hash::MutListHash;
+use crate::imp::structs::linked_m::LinkedMap;
 
 pub struct TmpList{
     pub vec : Vec<TmpObj>,
@@ -102,7 +102,7 @@ impl TmpList{
             Err(format!("{} MutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
         let compatible = self.compatible.unwrap_or_else(|| HashSt::new());
-        Ok(MutList::new(self.default.unwrap(),MutListHash::new(HashMt::new()),0, compatible))
+        Ok(MutList::new(self.default.unwrap(),LinkedMap::new(), compatible))
     }
 
     pub fn into_inner_mut_list(self) -> Result<InnerMutList>{
@@ -121,7 +121,7 @@ impl TmpList{
         if self.vec.len() != 0{
             Err(format!("{} InnerMutList must not have items {}", self.span.line_str(), self.span.slice()))?
         }
-        Ok(InnerMutList::new(MutListHash::new(HashMt::new()), 0))
+        Ok(InnerMutList::new(LinkedMap::new()))
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
@@ -134,11 +134,12 @@ impl TmpList{
             Err(format!("{} Default must be defined {}", self.span.line_str(), self.span.slice()))?
         }
 
-        let items = to_violated_list_items(self.vec)?;
-        let next_id = self.next_id.unwrap_or(items.len() as u64);
+        let next_id = self.next_id.unwrap_or(self.vec.len() as u64);
+
+        let items = to_violated_list_items(self.vec, next_id)?;
         let compatible = self.compatible.unwrap_or_else(|| HashSt::new());
 
-        Ok(MutList::new(self.default.unwrap(), items , next_id, compatible))
+        Ok(MutList::new(self.default.unwrap(), items , compatible))
     }
 
     ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
@@ -153,10 +154,11 @@ impl TmpList{
             Err(format!("{} Default must not be defined {}", self.span.line_str(), self.span.slice()))?
         }
 
-        let items = to_violated_list_items(self.vec)?;
-        let next_id = self.next_id.unwrap_or(items.len() as u64);
+        let next_id = self.next_id.unwrap_or(self.vec.len() as u64);
 
-        Ok(InnerMutList::new(items, next_id))
+        let items = to_violated_list_items(self.vec, next_id)?;
+
+        Ok(InnerMutList::new(items))
     }
 
     pub fn into_inner_def(self) -> Result<ListDefObj>{
@@ -215,17 +217,12 @@ fn to_data_items(vec : Vec<TmpObj>) -> Result<HashM<String, ListItem>>{
     return Ok(result);
 }
 
-fn to_violated_list_items(vec : Vec<TmpObj>) -> Result<MutListHash>{
-    let mut result : HashM<u64, Box<MutListItem>> = HashMt::with_capacity(vec.len());
+fn to_violated_list_items(vec : Vec<TmpObj>, next_id : u64) -> Result<LinkedMap<MutListItem>>{
+    let mut result : Vec<(u64, MutListItem)> = Vec::with_capacity(vec.len());
     for (idx, tmp_item) in vec.into_iter().enumerate(){
         let span = tmp_item.span.clone();
         let item = tmp_item.into_violated_list_item(idx)?;
-        match result.insert(item.id(), Box::new(item)){
-            Some(_) =>{
-                Err(format!("{} Item's ID is invalid. Maybe all list items should have IDs, or all IDs should be elided. {}", span.line_str(), span.slice()))?
-            }
-            None =>{},
-        }
+        result.push((idx as u64, item));
     }
-    return Ok(MutListHash::new(result));
+    return Ok(LinkedMap::construct(result, next_id));
 }

@@ -22,7 +22,7 @@ struct MutNode<V>{
     id : u64,
 }
 impl<V> MutNode<V>{
-    fn new(item : V, id : u64) -> MutNode<V>{
+    fn new(id : u64, item : V, dummy : u64) -> MutNode<V>{
         MutNode{ item, prev : null_mut(), next : null_mut(), id }
     }
 }
@@ -58,36 +58,31 @@ fn get_item_mut<'a, V>(this : *mut MutNode<V>) ->&'a mut V{
 fn ptr_eq<T>(l : *const T, r : *const T) -> bool{ std::ptr::eq(l,r) }
 
 impl<V> LinkedMap<V> {
-    #[allow(dead_code)]
-    pub(crate) fn new() -> LinkedMap<V> {
+
+    pub fn new() -> LinkedMap<V> {
         LinkedMap { map : HashMt::new(), first : null_mut(), last : null_mut(), next_id : 0, }
     }
-    pub fn construct(items : Vec<(u64,V)>) -> LinkedMap<V>{
-        let mut items = items;
+    pub fn construct(items : Vec<(u64,V)>, next_id : u64) -> LinkedMap<V>{
         if items.is_empty(){
-            return new();
+            return LinkedMap::new();
         }
         let mut map : HashM<u64,Box<MutNode<V>>> = HashMt::with_capacity(items.len());
-        let (id,val) = items.remove(0);
-        let first_id = id;
-        let mut last_id = first_id;
-        let mut max_id = first_id;
-        let mut prev_node  = Box::new(MutNode::new(val, id));
-        map.insert(prev_node.as_ref().id, prev_node);
+        let mut iter = items.into_iter();
+        let (id,val) = iter.next().unwrap();
+        let mut first_node  = Box::new(MutNode::new(id, val, id));
+        let first_node_ptr = first_node.as_mut() as *mut _;
+        let mut prev_node_ptr = first_node_ptr;
+        map.insert(id, first_node);
         for (id,val) in items{
-            let mut node = Box::new(MutNode::new(val, id));
-            prev_node.as_mut().next = node.as_mut();
-            node.as_mut().prev = prev_node.as_mut();
+            let mut node = Box::new(MutNode::new( id, val, id));
+            set_next(prev_node_ptr, node.as_mut());
+            node.as_mut().prev = prev_node_ptr;
+            prev_node_ptr = node.as_mut();
             map.insert(id, node);
-            last_id = id;
-            if max_id < id{
-                max_id = id;
-            }
         }
-        let first = map.get_mut(&first_id).unwrap().as_mut() as *mut _;
-        let last = map.get_mut(&last_id).unwrap().as_mut() as *mut _;
-        LinkedMap{ map, first, last, next_id : max_id + 1 }
+        LinkedMap{ map, first : first_node_ptr, last : prev_node_ptr, next_id }
     }
+    pub fn next_id(&self) -> u64{ self.next_id }
 
     pub fn first(&self) -> Option<&V> {
         if self.first.is_null() { None } else { Some(get_item(self.first)) }
@@ -472,4 +467,10 @@ impl<'a,V> IntoIterator for &'a mut LinkedMap<V>{
     fn into_iter(self) -> Self::IntoIter {
         self.iter_mut()
     }
+}
+
+
+pub struct LinkedMapIntoIter<V>{
+    iter : LinkedMapUnsafeIter<V>,
+    phantom : PhantomData<&'a LinkedMap<V>>,
 }
