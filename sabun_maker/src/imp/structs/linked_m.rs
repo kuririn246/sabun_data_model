@@ -1,6 +1,7 @@
 use crate::{HashM, HashMt};
 use std::ptr::{null_mut};
 use std::marker::PhantomData;
+use std::collections::VecDeque;
 
 unsafe impl<V> Send for LinkedMap<V> {}
 unsafe impl<V> Sync for LinkedMap<V> {}
@@ -81,6 +82,9 @@ impl<V> LinkedMap<V> {
             map.insert(id, node);
         }
         LinkedMap{ map, first : first_node_ptr, last : prev_node_ptr, next_id }
+    }
+    pub(crate) fn deconstruct(self) -> HashM<u64, Box<MutNode<V>>>{
+        self.map
     }
     pub fn next_id(&self) -> u64{ self.next_id }
 
@@ -304,6 +308,8 @@ impl<V> LinkedMap<V> {
         Some(LinkedMapUnsafeIter::new(self, node))
 
     }
+
+    pub fn into_iter(self) -> LinkedMapIntoIter<V>{ LinkedMapIntoIter::new(self) }
 }
 
 
@@ -469,8 +475,32 @@ impl<'a,V> IntoIterator for &'a mut LinkedMap<V>{
     }
 }
 
-
 pub struct LinkedMapIntoIter<V>{
-    iter : LinkedMapUnsafeIter<V>,
-    phantom : PhantomData<&'a LinkedMap<V>>,
+    map : HashM<u64, Box<MutNode<V>>>,
+    deq : VecDeque<u64>,
+}
+impl<V> LinkedMapIntoIter<V>{
+    pub fn new(map : LinkedMap<V>) -> LinkedMapIntoIter<V>{
+        let deq : VecDeque<u64> = map.iter().map(|(k,_)| *k).collect();
+        LinkedMapIntoIter{ map : map.deconstruct(), deq }
+    }
+}
+impl<V> Iterator for LinkedMapIntoIter<V>{
+    type Item = (u64,V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let id = self.deq.pop_front()?;
+        let b = self.map.remove(&id)?;
+        let node = *b;
+        return Some(node.item);
+    }
+}
+
+impl<V> IntoIterator for LinkedMap<V>{
+    type Item = (u64, V);
+    type IntoIter = LinkedMapIntoIter<V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        LinkedMapIntoIter::new(self)
+    }
 }
