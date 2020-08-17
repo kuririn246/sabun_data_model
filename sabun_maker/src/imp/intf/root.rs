@@ -73,6 +73,7 @@ pub fn get_list(root : RootObjectPtr, name : &str) -> Option<ConstListPtr>{
 pub fn get_mut(root : *mut RootObject, name : &str) -> Option<*mut MutList>{
     let root = unsafe{ root.as_ref().unwrap() };
     if let Some(RootValue::Mut(l)) = root.default().get(name){
+
         Some(l as *const MutList as *mut MutList)
     } else{ None }
 }
