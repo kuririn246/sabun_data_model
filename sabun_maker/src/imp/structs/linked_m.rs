@@ -421,6 +421,28 @@ impl<V> LinkedMapUnsafeIter<V>{
     pub fn is_available(&self) -> bool {
         !self.node.is_null()
     }
+
+    pub fn is_first(&self) -> bool {
+        if self.node.is_null(){ return false; }
+        let map = unsafe{ &*self.map };
+        let node = unsafe{ &*self.node };
+        if let Some(id) = map.first_id(){
+            return id == node.id;
+        } else{
+            return false;
+        }
+    }
+
+    pub fn is_last(&self) -> bool {
+        if self.node.is_null(){ return false; }
+        let map = unsafe{ &*self.map };
+        let node = unsafe{ &*self.node };
+        if let Some(id) = map.last_id(){
+            return id == node.id;
+        } else{
+            return false;
+        }
+    }
 }
 
 
