@@ -60,7 +60,7 @@ impl MutList{
     //pub(crate) fn list_mut(&mut self) -> &mut LinkedHashM<u64, MutListItem>{ self.list.as_mut() }
     //pub(crate) fn increment_next_id(&mut self){ self.prop.next_id += 1 }
     pub(crate) fn append_new_item(&mut self) -> u64{
-        self.list.insert(MutListItem::new(self.next_id(), HashMt::new(), HashMt::new()))
+        self.list.insert(MutListItem::new( HashMt::new(), HashMt::new()))
     }
 
     pub(crate) fn compatible(&self) -> &HashS<String>{ self.compatible.as_ref() }
@@ -129,8 +129,8 @@ impl ListItem{
 /// それが出来る土台として、idとLinkedHashMで出来たMutListがある
 #[derive(Debug, PartialEq, Clone)]
 pub struct MutListItem{
-    ///アイテムごとにidが振られ、これによって削除や順番の変更を検出できる
-    id : u64,
+    /////アイテムごとにidが振られ、これによって削除や順番の変更を検出できる
+    //id : u64,
     ///ListItemの値は常にDefaultからの差分である
     values : Box<HashM<String, ListSabValue>>,
     ///ListItemの値はRefでも常にDefaultからの差分である
@@ -138,11 +138,11 @@ pub struct MutListItem{
 }
 
 impl MutListItem{
-    pub(crate) fn new(id : u64, values : HashM<String, ListSabValue>, refs : HashM<String, RefSabValue>) -> MutListItem{
-        MutListItem{ id, values : Box::new(values), refs : Box::new(refs) }
+    pub(crate) fn new(values : HashM<String, ListSabValue>, refs : HashM<String, RefSabValue>) -> MutListItem{
+        MutListItem{ values : Box::new(values), refs : Box::new(refs) }
     }
     pub(crate) fn deconstruct(self) -> (HashM<String, ListSabValue>, HashM<String, RefSabValue>){ (*self.values, *self.refs) }
-    pub(crate) fn id(&self) -> u64{ self.id }
+    //pub(crate) fn id(&self) -> u64{ self.id }
     pub(crate) fn values(&self) -> &HashM<String, ListSabValue>{ self.values.as_ref() }
     pub(crate) fn refs(&self) -> &HashM<String, RefSabValue>{ self.refs.as_ref() }
     pub(crate) fn set_sabun(&mut self, def :&ListDefObj, name : String, param : RustParam) -> Result<Option<RustParam>, SetSabunError> {

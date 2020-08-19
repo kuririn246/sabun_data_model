@@ -16,7 +16,7 @@ pub fn adjust_mut(def : &ListDefObj, old_list : LinkedMap<MutListItem>, names : 
         let (sabun, refs) = value.deconstruct();
         let new_sabun = adjust_mut_list_item_sabun(def, sabun, names)?;
         let new_refs = adjust_mut_list_item_ref(def.refs(), refs, names)?;
-        result.push((id, MutListItem::new(id, new_sabun, new_refs)));
+        result.push((id, MutListItem::new(new_sabun, new_refs)));
 
     }
     return Ok(LinkedMap::construct(result, next_id));

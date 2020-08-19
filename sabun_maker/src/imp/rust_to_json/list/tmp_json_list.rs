@@ -30,13 +30,13 @@ impl TmpJsonObj{
             id : id.map(|s| IdValue::Str(s.to_string())), old : None }
     }
 
-    pub fn from_mut_list_item(l : &MutListItem) -> TmpJsonObj{
+    pub fn from_mut_list_item(l : &MutListItem, id : u64) -> TmpJsonObj{
         let value_map : HashM<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().into_rust_value_for_json())).collect();
         let ref_map : HashM<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().into_ref_value_for_json())).collect();
         TmpJsonObj{
             default : btree_map(&value_map),
             refs : TmpJsonRefs::from_list_item(&ref_map),
-            id : Some(IdValue::Num(l.id())), old : None }
+            id : Some(IdValue::Num(id)), old : None }
     }
 }
 
@@ -81,7 +81,7 @@ impl TmpJsonList{
     }
 
     pub fn from_mut_list(l : &MutList) -> TmpJsonList{
-        TmpJsonList{ vec: l.list().iter().map(|(_,item)| TmpJsonObj::from_mut_list_item(item)).collect(),
+        TmpJsonList{ vec: l.list().iter().map(|(id,item)| TmpJsonObj::from_mut_list_item(item, *id)).collect(),
             compatible : get_from_set(l.compatible()), next_id: Some(l.next_id()), old : None, default : Some(l.default().clone()) }
     }
 
@@ -96,7 +96,7 @@ impl TmpJsonList{
     }
 
     pub fn from_inner_mut(l : &InnerMutList) -> TmpJsonList{
-        TmpJsonList{ vec : l.list().iter().map(|(_id, item)| TmpJsonObj::from_mut_list_item(item)).collect(),
+        TmpJsonList{ vec : l.list().iter().map(|(id, item)| TmpJsonObj::from_mut_list_item(item, *id)).collect(),
             compatible : None, next_id: None, old : None, default : None }
     }
 }

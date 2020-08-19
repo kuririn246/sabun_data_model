@@ -221,8 +221,8 @@ fn to_violated_list_items(vec : Vec<TmpObj>, next_id : u64) -> Result<LinkedMap<
     let mut result : Vec<(u64, MutListItem)> = Vec::with_capacity(vec.len());
     for (idx, tmp_item) in vec.into_iter().enumerate(){
         //let span = tmp_item.span.clone();
-        let item = tmp_item.into_violated_list_item(idx)?;
-        result.push((idx as u64, item));
+        let pair = tmp_item.into_violated_list_item(idx)?;
+        result.push(pair);
     }
     return Ok(LinkedMap::construct(result, next_id));
 }

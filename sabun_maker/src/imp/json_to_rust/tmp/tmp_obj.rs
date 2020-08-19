@@ -123,7 +123,7 @@ impl TmpObj{
         }
     }
 
-    pub fn into_violated_list_item(self, id : usize) -> Result<MutListItem>{
+    pub fn into_violated_list_item(self, id : usize) -> Result<(u64, MutListItem)>{
         let id = match self.id {
             Some(IdValue::Num(id)) => id,
             Some(_) =>{
@@ -139,7 +139,7 @@ impl TmpObj{
             Err(format!("{} Old is not needed for a violated list item {}", self.refs.span.line_str(), self.refs.span.slice()))?
         }
 
-        Ok(MutListItem::new(id, to_list_sab_map(self.default, &self.span)?,to_ref_sab_map(self.refs.map)))
+        Ok((id, MutListItem::new( to_list_sab_map(self.default, &self.span)?,to_ref_sab_map(self.refs.map))))
     }
 }
 

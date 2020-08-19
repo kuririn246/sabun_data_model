@@ -477,6 +477,13 @@ impl<'a, V> LinkedMapIter<'a, V>{
     pub fn is_available(&self) -> bool {
         self.iter.is_available()
     }
+
+    pub fn is_first(&self) -> bool {
+        self.iter.is_first()
+    }
+    pub fn is_last(&self) -> bool {
+        self.iter.is_first()
+    }
 }
 impl<'a,V> Iterator for LinkedMapIter<'a, V>{
     type Item = (&'a u64, &'a V);
@@ -523,6 +530,12 @@ impl<'a, V> LinkedMapIterMut<'a, V>{
     ///空であるか、最後/最初まで移動してアイテムが無くなったらfalse
     pub fn is_available(&self) -> bool {
         self.iter.is_available()
+    }
+    pub fn is_first(&self) -> bool {
+        self.iter.is_first()
+    }
+    pub fn is_last(&self) -> bool {
+        self.iter.is_first()
     }
 }
 impl<'a,V> Iterator for LinkedMapIterMut<'a, V>{
