@@ -7,7 +7,7 @@ pub mod c_qv_str;
 pub mod list;
 pub mod null_or;
 pub mod mut_list_item;
-pub mod mut_list;
+pub mod mut_list_ptr;
 pub mod inner_data;
 pub mod ref_desc;
 pub mod list_item;

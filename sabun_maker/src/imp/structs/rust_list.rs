@@ -60,7 +60,7 @@ impl MutList{
     //pub(crate) fn list_mut(&mut self) -> &mut LinkedHashM<u64, MutListItem>{ self.list.as_mut() }
     //pub(crate) fn increment_next_id(&mut self){ self.prop.next_id += 1 }
     pub(crate) fn append_new_item(&mut self) -> u64{
-        self.list.insert(MutListItem::new( HashMt::new(), HashMt::new()))
+        self.list.insert(MutListItem::construct(HashMt::new(), HashMt::new()))
     }
 
     pub(crate) fn compatible(&self) -> &HashS<String>{ self.compatible.as_ref() }
@@ -138,8 +138,11 @@ pub struct MutListItem{
 }
 
 impl MutListItem{
-    pub(crate) fn new(values : HashM<String, ListSabValue>, refs : HashM<String, RefSabValue>) -> MutListItem{
+    pub(crate) fn construct(values : HashM<String, ListSabValue>, refs : HashM<String, RefSabValue>) -> MutListItem{
         MutListItem{ values : Box::new(values), refs : Box::new(refs) }
+    }
+    pub(crate) fn new() -> MutListItem{
+        MutListItem{ values : Box::new(HashMt::new()), refs : Box::new(HashMt::new()) }
     }
     pub(crate) fn deconstruct(self) -> (HashM<String, ListSabValue>, HashM<String, RefSabValue>){ (*self.values, *self.refs) }
     //pub(crate) fn id(&self) -> u64{ self.id }

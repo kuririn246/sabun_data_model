@@ -139,7 +139,7 @@ impl TmpObj{
             Err(format!("{} Old is not needed for a violated list item {}", self.refs.span.line_str(), self.refs.span.slice()))?
         }
 
-        Ok((id, MutListItem::new( to_list_sab_map(self.default, &self.span)?,to_ref_sab_map(self.refs.map))))
+        Ok((id, MutListItem::construct(to_list_sab_map(self.default, &self.span)?, to_ref_sab_map(self.refs.map))))
     }
 }
 
