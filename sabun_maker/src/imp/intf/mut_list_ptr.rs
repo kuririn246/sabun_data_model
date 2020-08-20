@@ -1,9 +1,6 @@
-use crate::imp::structs::linked_m::{LinkedMap, LinkedMapIter, LinkedMapUnsafeIter};
+use crate::imp::structs::linked_m::{LinkedMap, LinkedMapUnsafeIter};
 use crate::imp::structs::rust_list::MutListItem;
 use std::marker::PhantomData;
-use std::ops::{Deref, DerefMut};
-use std::ptr::null_mut;
-use std::path::Iter;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -60,12 +57,12 @@ impl<V : From<*mut MutListItem>> MutListPtr<V>{
     pub fn insert_last(&mut self) -> V{
         let map = unsafe{ &mut *self.map };
         let id = map.insert_last(MutListItem::new());
-        self.from_id(id)
+        self.from_id(id).unwrap()
     }
     pub fn insert_first(&mut self) -> V{
         let map = unsafe{ &mut *self.map };
         let id = map.insert_first(MutListItem::new());
-        self.from_id(id)
+        self.from_id(id).unwrap()
     }
 
     pub fn remove(&mut self, id : u64) -> bool {
@@ -103,23 +100,24 @@ impl<V : From<*mut MutListItem>> MutListPtr<V>{
     }
 
     pub fn iter(&mut self) -> MutPtrIter<V> {
-        let map = unsafe{ &mut *self.map };
-        MutPtrIter { iter: unsafe{ map.iter_unsafe() } }
+        let map = unsafe { &mut *self.map };
+        MutPtrIter::new(unsafe { map.iter_unsafe() })
     }
 
     pub fn iter_from_last(&mut self) -> MutPtrIter<V> {
         let map = unsafe{ &mut *self.map };
-        MutPtrIter { iter: unsafe { map.iter_from_last_unsafe() } }
+        MutPtrIter::new(unsafe{ map.iter_from_last_unsafe() })
     }
 
     pub fn iter_from_id(&mut self, id : u64) -> Option<MutPtrIter<V>> {
         let map = unsafe{ &mut *self.map };
-        unsafe { map.iter_from_id_unsafe(id) }.map(|iter| MutPtrIter { iter })
+        unsafe { map.iter_from_id_unsafe(id) }.map(|iter| MutPtrIter::new(iter))
     }
 }
 
 pub struct MutPtrIter<V : From<*mut MutListItem>>{
     iter : LinkedMapUnsafeIter<MutListItem>,
+    phantom : PhantomData<*const V>,
 }
 impl<V : From<*mut MutListItem>> Iterator for MutPtrIter<V>{
     type Item = (u64, V);
@@ -129,6 +127,10 @@ impl<V : From<*mut MutListItem>> Iterator for MutPtrIter<V>{
     }
 }
 impl<V : From<*mut MutListItem>> MutPtrIter<V>{
+    pub(crate) fn new(iter : LinkedMapUnsafeIter<MutListItem>) -> MutPtrIter<V>{
+        MutPtrIter{ iter, phantom : PhantomData }
+    }
+
     ///現在のカーソルにあるアイテムを返し、カーソルを進める
     pub fn next(&mut self) -> Option<(u64, V)> {
         self.iter.next_mut().map(|(k,v)| (*k, V::from(v)))
@@ -142,7 +144,7 @@ impl<V : From<*mut MutListItem>> MutPtrIter<V>{
     }
     
     pub fn current<'a>(&mut self) -> Option<(u64, V)> {
-        self.iter.current_mut().map(|(k,v)| (*k,V::from(v))
+        self.iter.current_mut().map(|(k,v)| (*k,V::from(v)))
     }
 
 
@@ -158,99 +160,99 @@ impl<V : From<*mut MutListItem>> MutPtrIter<V>{
         self.iter.is_last()
     }
 }
-
-#[derive(Debug)]
-pub struct MutCon<'a, V : From<&'a MutListItem>>{
-    map : &'a LinkedMap<MutListItem>,
-    phantom : PhantomData<*const V>,
-}
-impl<'a, V : From<&'a MutListItem>> Deref for MutCon<'a, V>{
-    type Target = LinkedMap<MutListItem>;
-
-    fn deref(&self) -> &Self::Target {
-        self.map
-    }
-}
-
-impl<'a, V : From<&'a MutListItem>> MutCon<'a, V>{
-    pub fn new(map : &'a LinkedMap<MutListItem>) -> MutCon<V>{
-        MutCon{ map, phantom : PhantomData }
-    }
-
-    pub fn last(&self) -> Option<V>{
-        self.map.last().map(|item| V::from(item))
-    }
-}
-
-#[derive(Debug)]
-struct HogeItem{
-    item : *mut MutListItem,
-    tekitou : i64,
-    inner : *mut LinkedMap<MutListItem>
-}
-
-
-impl From<*mut MutListItem> for HogeItem{
-    fn from(item : *mut MutListItem) -> Self {
-        HogeItem{ item, tekitou : 0, inner : null_mut() }
-    }
-}
-
-impl HogeItem{
-    pub fn tekitou(&self) -> i64{ self.tekitou }
-
-    pub fn inner_con(&self) -> MutCon<HugaCon>{ MutCon::new(unsafe{ &*self.inner })}
-    pub fn inner_mut(&mut self) -> MutMut<HugaMut>{}
-
-}
-
-struct Huga{
-    item : *mut MutListItem,
-}
-impl From<*mut MutListItem> for Huga{
-    fn from(item: *mut MutListItem) -> Self {
-        Huga{ item }
-    }
-}
-struct HugaMut<'a>{
-    xxx : Huga,
-    phantom : PhantomData<&'a mut u64>,
-}
-impl<'a> From<&'a mut MutListItem> for HugaMut<'a>{
-    fn from(this: &'a mut MutListItem) -> Self {
-        HugaMut{ xxx : Huga::from(this as *mut _), phantom : PhantomData }
-    }
-}
-impl<'a> DerefMut for HugaMut<'a>{
-
-
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.xxx
-    }
-}
-
-impl<'a> Deref for HugaMut<'a>{
-    type Target = Huga;
-
-    fn deref(&self) -> &Self::Target {
-        &self.xxx
-    }
-}
-
-struct HugaCon<'a>{
-    xxx : Huga,
-    phantom : PhantomData<&'a u64>,
-}
-impl<'a> From<&'a MutListItem> for HugaCon<'a>{
-    fn from(this: &'a MutListItem) -> Self {
-        HugaCon{ xxx : Huga::from(this as *const _ as *mut _), phantom : PhantomData }
-    }
-}
-
-impl<'a> Deref for HugaCon<'a>{
-    type Target = Huga;
-
-    fn deref(&self) -> &Self::Target {
-        &self.xxx
-    }
-}
+//
+// #[derive(Debug)]
+// pub struct MutCon<'a, V : From<&'a MutListItem>>{
+//     map : &'a LinkedMap<MutListItem>,
+//     phantom : PhantomData<*const V>,
+// }
+// impl<'a, V : From<&'a MutListItem>> Deref for MutCon<'a, V>{
+//     type Target = LinkedMap<MutListItem>;
+//
+//     fn deref(&self) -> &Self::Target {
+//         self.map
+//     }
+// }
+//
+// impl<'a, V : From<&'a MutListItem>> MutCon<'a, V>{
+//     pub fn new(map : &'a LinkedMap<MutListItem>) -> MutCon<V>{
+//         MutCon{ map, phantom : PhantomData }
+//     }
+//
+//     pub fn last(&self) -> Option<V>{
+//         self.map.last().map(|item| V::from(item))
+//     }
+// }
+//
+// #[derive(Debug)]
+// struct HogeItem{
+//     item : *mut MutListItem,
+//     tekitou : i64,
+//     inner : *mut LinkedMap<MutListItem>
+// }
+//
+//
+// impl From<*mut MutListItem> for HogeItem{
+//     fn from(item : *mut MutListItem) -> Self {
+//         HogeItem{ item, tekitou : 0, inner : null_mut() }
+//     }
+// }
+//
+// impl HogeItem{
+//     pub fn tekitou(&self) -> i64{ self.tekitou }
+//
+//     pub fn inner_con(&self) -> MutCon<HugaCon>{ MutCon::new(unsafe{ &*self.inner })}
+//     pub fn inner_mut(&mut self) -> MutMut<HugaMut>{}
+//
+// }
+//
+// struct Huga{
+//     item : *mut MutListItem,
+// }
+// impl From<*mut MutListItem> for Huga{
+//     fn from(item: *mut MutListItem) -> Self {
+//         Huga{ item }
+//     }
+// }
+// struct HugaMut<'a>{
+//     xxx : Huga,
+//     phantom : PhantomData<&'a mut u64>,
+// }
+// impl<'a> From<&'a mut MutListItem> for HugaMut<'a>{
+//     fn from(this: &'a mut MutListItem) -> Self {
+//         HugaMut{ xxx : Huga::from(this as *mut _), phantom : PhantomData }
+//     }
+// }
+// impl<'a> DerefMut for HugaMut<'a>{
+//
+//
+//     fn deref_mut(&mut self) -> &mut Self::Target {
+//         &mut self.xxx
+//     }
+// }
+//
+// impl<'a> Deref for HugaMut<'a>{
+//     type Target = Huga;
+//
+//     fn deref(&self) -> &Self::Target {
+//         &self.xxx
+//     }
+// }
+//
+// struct HugaCon<'a>{
+//     xxx : Huga,
+//     phantom : PhantomData<&'a u64>,
+// }
+// impl<'a> From<&'a MutListItem> for HugaCon<'a>{
+//     fn from(this: &'a MutListItem) -> Self {
+//         HugaCon{ xxx : Huga::from(this as *const _ as *mut _), phantom : PhantomData }
+//     }
+// }
+//
+// impl<'a> Deref for HugaCon<'a>{
+//     type Target = Huga;
+//
+//     fn deref(&self) -> &Self::Target {
+//         &self.xxx
+//     }
+//}

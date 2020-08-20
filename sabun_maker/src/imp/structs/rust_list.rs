@@ -55,13 +55,13 @@ impl MutList{
     }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
     pub(crate) fn list(&self) -> &LinkedMap<MutListItem>{ self.list.as_ref() }
-    pub(crate) fn distribute_mut(&mut self) -> (&mut ListDefObj, &mut LinkedMap<MutListItem>, &mut HashS<String>){ (self.default.as_mut(), self.list.as_mut(), self.compatible.as_mut()) }
+    //pub(crate) fn distribute_mut(&mut self) -> (&mut ListDefObj, &mut LinkedMap<MutListItem>, &mut HashS<String>){ (self.default.as_mut(), self.list.as_mut(), self.compatible.as_mut()) }
     pub(crate) fn next_id(&self) -> u64{ self.list.as_ref().next_id() }
     //pub(crate) fn list_mut(&mut self) -> &mut LinkedHashM<u64, MutListItem>{ self.list.as_mut() }
     //pub(crate) fn increment_next_id(&mut self){ self.prop.next_id += 1 }
-    pub(crate) fn append_new_item(&mut self) -> u64{
-        self.list.insert(MutListItem::construct(HashMt::new(), HashMt::new()))
-    }
+    // pub(crate) fn append_new_item(&mut self) -> u64{
+    //     self.list.insert(MutListItem::construct(HashMt::new(), HashMt::new()))
+    // }
 
     pub(crate) fn compatible(&self) -> &HashS<String>{ self.compatible.as_ref() }
     pub(crate) fn deconstruct(self) -> (ListDefObj, LinkedMap<MutListItem>, HashS<String>){
