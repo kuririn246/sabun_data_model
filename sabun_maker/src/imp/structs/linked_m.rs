@@ -356,7 +356,9 @@ impl<V : PartialEq> PartialEq for LinkedMap<V>{
     }
 }
 
-
+/// &LinkedMapから as *const _ as *mut _でポインタを取り出しても良い。
+/// next_mutのようなmut系を呼び出さなければ、&mut参照はされないので安全。もちろん mut 系を呼び出したらアウト
+/// これによって、これをベースにLinkedMapIterが作れる
 pub struct LinkedMapUnsafeIter<V>{
     map : *mut LinkedMap<V>,
     node : *mut MutNode<V>,
@@ -366,11 +368,24 @@ impl<V> LinkedMapUnsafeIter<V>{
 
     ///現在のカーソルにあるアイテムを返し、カーソルを進める
     pub fn next<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
-        self.next_mut().map(|(k,v)| (k,&*v))
+        self.next_impl().map(|current_node| {
+            //next_mutからキャストするほうが楽なんだけど、UnsafeIterが&LinkedMapから作られる場合があり、その場合&mutにした時点で（書き換えなくても)UBになる
+            //https://github.com/rust-lang/rust-clippy/issues/4774#issuecomment-565651216
+            //これで回避できているはず・・・
+            let node = unsafe { &* current_node };
+            (&node.id, &node.item)
+        })
     }
 
     ///現在のカーソルにあるアイテムを返し、カーソルを進める
     pub fn next_mut<'a>(&mut self) -> Option<(&'a u64, &'a mut V)> {
+        self.next_impl().map(|current_node| {
+            let node = unsafe { &mut *current_node };
+            (&node.id, &mut node.item)
+        })
+    }
+
+    fn next_impl(&mut self) -> Option<*mut MutNode<V>>{
         if self.node.is_null() { return None; }
         let current_node = self.node as *mut MutNode<V>;
         let map = unsafe{ self.map.as_ref().unwrap() };
@@ -379,14 +394,31 @@ impl<V> LinkedMapUnsafeIter<V>{
         } else {
             self.node = get_next(self.node);
         }
-        let node = unsafe { current_node.as_mut().unwrap() };
-        return Some((&node.id, &mut node.item));
+        Some(current_node)
+    }
+
+    ///前に戻ることが出来る。そして元あった場所を削除し、それによって削除されたアイテムの次にあったアイテムが現在のカーソルの次にくるので、
+    /// next2回でそれをとることも出来る。
+    ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
+    pub fn prev<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
+        self.prev_impl().map(|current_node|{
+            let node = unsafe{ &*current_node };
+            (&node.id, &node.item)
+        })
+
     }
 
     ///前に戻ることが出来る。そして元あった場所を削除し、それによって削除されたアイテムの次にあったアイテムが現在のカーソルの次にくるので、
     /// next2回でそれをとることも出来る。
     ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
     pub fn prev_mut<'a>(&mut self) -> Option<(&'a u64, &'a mut V)> {
+        self.prev_impl().map(|current_node|{
+            let node = unsafe{ &mut *current_node };
+            (&node.id, &mut node.item)
+        })
+    }
+
+    fn prev_impl<'a>(&mut self) -> Option<*mut MutNode<V>> {
         if self.node.is_null(){ return None; }
         let current_node = self.node as *mut MutNode<V>;
         let map = unsafe{ self.map.as_ref().unwrap() };
@@ -395,8 +427,7 @@ impl<V> LinkedMapUnsafeIter<V>{
         } else {
             self.node = get_prev(self.node);
         }
-        let node = unsafe{ current_node.as_mut().unwrap() };
-        return Some((&node.id, &mut node.item))
+        Some(current_node)
     }
 
     pub fn current_mut<'a>(&mut self) -> Option<(&'a u64, &'a mut V)> {
@@ -406,14 +437,9 @@ impl<V> LinkedMapUnsafeIter<V>{
     }
 
     pub fn current<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
-        return self.current_mut().map(|(k,v)| (k,&*v))
-    }
-
-    ///前に戻ることが出来る。そして元あった場所を削除し、それによって削除されたアイテムの次にあったアイテムが現在のカーソルの次にくるので、
-    /// next2回でそれをとることも出来る。
-    ///今ある場所をremoveしたらポインタが不正になって安全にnext/prevできない
-    pub fn prev<'a>(&mut self) -> Option<(&'a u64, &'a V)> {
-        self.prev_mut().map(|(k,v)| (k,&*v))
+        if self.node.is_null(){ return None; }
+        let node = unsafe{ & *self.node };
+        return Some((&node.id, &node.item))
     }
 
     ///nextもprevも現在のカーソルにあるアイテムを返す
@@ -444,7 +470,6 @@ impl<V> LinkedMapUnsafeIter<V>{
         }
     }
 }
-
 
 pub struct LinkedMapIter<'a, V>{
     iter : LinkedMapUnsafeIter<V>,

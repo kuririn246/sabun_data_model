@@ -15,6 +15,7 @@ pub struct MutListItemPtr {
 }
 
 impl MutListItemPtr {
+    ///getだけなら &MutListItemからのポインタでもOKである。その場合setするとundefined behaviorなので、&mut からのポインタを得る必要がある
     pub fn new(item : *const MutListItem, list_def : *const ListDefObj, root : *const RootObject) -> MutListItemPtr {
         MutListItemPtr { item : item as *mut MutListItem, list_def, root : root as *mut RootObject  }
     }
