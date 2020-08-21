@@ -1,6 +1,7 @@
 use crate::imp::structs::linked_m::{LinkedMap, LinkedMapIter};
 use crate::imp::structs::rust_list::MutListItem;
 use std::marker::PhantomData;
+use std::ops::Deref;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -95,45 +96,46 @@ impl<'a, V : From<&'a MutListItem>> MutConIter<'a, V>{
     }
 }
 
-//
-// struct Hoge{
-//     ptr : *mut MutListItem,
-// }
-// impl Hoge{
-//     pub fn get_a(&self) -> bool{
-//         true
-//         //super::mut_list_item::get_bool(self.ptr, "a").unwrap().into_value().unwrap()
-//     }
-//
-//     pub fn set_a(&mut self, b : bool){
-//         //super::mut_list_item::set_bool(self.ptr, "a", Qv::Val(b));
-//     }
-// }
-//
-// struct HogeCon<'a>{
-//     hoge : Hoge,
-//     phantom : PhantomData<&'a u64>,
-// }
-// impl<'a> From<&'a MutListItem> for HogeCon<'a>{
-//     fn from(item : &'a MutListItem) -> Self {
-//         HogeCon{ hoge : Hoge{ ptr : item as *const _ as *mut _ }, phantom : PhantomData }
-//     }
-// }
-// impl<'a> Deref for HogeCon<'a>{
-//     type Target = Hoge;
-//
-//     fn deref(&self) -> &Self::Target {
-//         &self.hoge
-//     }
-// }
-//
-// #[test]
-// fn test(){
-//
-//
-//     let mut map : LinkedMap<MutListItem> = LinkedMap::new();
-//     map.insert(MutListItem::new());
-//     let con : MutListCon<HogeCon> = MutListCon::new(&map);
-//     let item = con.first().unwrap();
-//     println!("poyppoyo {}", item.get_a());
-// }
+
+struct Hoge{
+    ptr : *mut MutListItem,
+}
+impl Hoge{
+    pub fn get_a(&self) -> bool{
+        true
+        //super::mut_list_item::get_bool(self.ptr, "a").unwrap().into_value().unwrap()
+    }
+
+    pub fn set_a(&mut self, b : bool){
+        //super::mut_list_item::set_bool(self.ptr, "a", Qv::Val(b));
+    }
+}
+
+struct HogeCon<'a>{
+    hoge : Hoge,
+    phantom : PhantomData<&'a u64>,
+}
+impl<'a> From<&'a MutListItem> for HogeCon<'a>{
+    fn from(item : &'a MutListItem) -> Self {
+        HogeCon{ hoge : Hoge{ ptr : item as *const _ as *mut _ }, phantom : PhantomData }
+    }
+}
+impl<'a> Deref for HogeCon<'a>{
+    type Target = Hoge;
+
+    fn deref(&self) -> &Self::Target {
+        &self.hoge
+    }
+}
+
+#[test]
+fn test(){
+
+
+    let mut map : LinkedMap<MutListItem> = LinkedMap::new();
+    map.insert(MutListItem::new());
+    let con : MutListCon<HogeCon> = MutListCon::new(&map);
+    let item = con.first().unwrap();
+    let last = con.last().unwrap();
+    println!("poyppoyo {} {}", item.get_a(), last.get_a());
+}

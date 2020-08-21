@@ -5,95 +5,101 @@ use std::ops::{Deref, DerefMut};
 
 #[repr(C)]
 #[derive(Debug)]
-pub struct MutListMut<'a, V : From<&'a mut MutListItem> + 'a>{
-    map : &'a mut LinkedMap<MutListItem>,
-    phantom : PhantomData<*const V>,
+pub struct MutListMut<V : From<*mut MutListItem>>{
+    map : *mut LinkedMap<MutListItem>,
+    phantom : PhantomData<*mut V>,
 }
-impl<'a, V : From<&'a mut MutListItem> + 'a> MutListMut<'a, V>{
-    pub fn new(map : &'a mut LinkedMap<MutListItem>) -> MutListMut<V>{ MutListMut{ map, phantom : PhantomData } }
+impl<V: From<*mut MutListItem>> MutListMut<V>{
+    pub fn new(map : &mut LinkedMap<MutListItem>)
+    -> MutListMut<V>{ MutListMut{ map, phantom : PhantomData } }
 
-    pub fn first(&'a mut self) -> Option<V> {
-        self.map.first_mut().map(|v| V::from(v))
-    }
-    pub fn first_id(&self) -> Option<u64> {
-        self.map.first_id()
-    }
-    pub fn last(&'a mut self) -> Option<V> {
-        self.map.last_mut().map(|v| V::from(v))
+    fn first(&mut self, fun : impl Fn(&mut V) -> ()){
 
-    }
-    pub fn last_id(&self) -> Option<u64> {
-        self.map.last_id()
-    }
-    pub fn from_id(&'a mut self, id : u64) -> Option<V>{
-        self.map.from_id_mut(id).map(|v| V::from(v))
+        let map = unsafe{ &mut *self.map };
+        map.first_mut().map(|v| fun(&mut V::from(v)));
     }
 
-    pub fn next_id(&self) -> u64{
-        self.map.next_id()
-    }
+    fn huga(&mut self){}
+    // pub fn first_id(&self) -> Option<u64> {
+    //     self.map.first_id()
+    // }
+    // pub fn last(&'a mut self) -> Option<V> {
+    //     let getter = self.getter;
+    //     self.map.last_mut().map(|v| getter(v))
+    // }
+    // pub fn last_id(&self) -> Option<u64> {
+    //     self.map.last_id()
+    // }
+    // pub fn from_id(&'a mut self, id : u64) -> Option<V>{
+    //     let getter = self.getter;
+    //     self.map.from_id_mut(id).map(|v| getter(v))
+    // }
+    //
+    // pub fn next_id(&self) -> u64{
+    //     self.map.next_id()
+    // }
+    //
+    // pub fn contains_key(&self, key : u64) -> bool{
+    //     self.map.contains_key(key)
+    // }
+    // pub fn len(&self) -> usize{
+    //     self.map.len()
+    // }
+    // pub fn is_empty(&self) -> bool {
+    //     self.map.is_empty()
+    // }
+    //
+    // pub fn insert(&'a mut self) -> V{
+    //     self.insert_last()
+    // }
+    //
+    // pub fn insert_last(&'a mut self) -> V{
+    //     let id = self.map.insert_last(MutListItem::new());
+    //     (self.getter)(self.map.from_id_mut(id).unwrap())
+    // }
+    // pub fn insert_first(&'a mut self) -> V{
+    //     let id = self.map.insert_first(MutListItem::new());
+    //     (self.getter)(self.map.from_id_mut(id).unwrap())
+    // }
+    //
+    // pub fn remove(&mut self, id : u64) -> bool {
+    //     self.map.remove(id)
+    // }
+    // pub fn remove_first(&mut self) -> bool{
+    //     self.map.remove_first()
+    // }
+    //
+    // pub fn remove_last(&mut self) -> bool{
+    //     self.map.remove_last()
+    // }
+    //
+    // pub fn to_first(&mut self, id : u64) -> bool {
+    //     self.map.to_first(id)
+    // }
+    //
+    // pub fn to_last(&mut self, id : u64) -> bool {
+    //     self.map.to_last(id)
+    // }
+    //
+    // pub fn to_prev(&mut self, next_items_id : u64, id : u64) -> bool{
+    //     self.map.to_prev(next_items_id, id)
+    // }
+    //
+    // pub fn to_next(&mut self, prev_items_id : u64, id : u64) -> bool{
+    //     self.map.to_next(prev_items_id, id)
+    // }
 
-    pub fn contains_key(&self, key : u64) -> bool{
-        self.map.contains_key(key)
-    }
-    pub fn len(&self) -> usize{
-        self.map.len()
-    }
-    pub fn is_empty(&self) -> bool {
-        self.map.is_empty()
-    }
-
-    pub fn insert(&'a mut self) -> V{
-        self.insert_last()
-    }
-
-    pub fn insert_last(&'a mut self) -> V{
-        let id = self.map.insert_last(MutListItem::new());
-        V::from(self.map.from_id_mut(id).unwrap())
-    }
-    pub fn insert_first(&'a mut self) -> V{
-        let id = self.map.insert_first(MutListItem::new());
-        V::from(self.map.from_id_mut(id).unwrap())
-    }
-
-    pub fn remove(&mut self, id : u64) -> bool {
-        self.map.remove(id)
-    }
-    pub fn remove_first(&mut self) -> bool{
-        self.map.remove_first()
-    }
-
-    pub fn remove_last(&mut self) -> bool{
-        self.map.remove_last()
-    }
-
-    pub fn to_first(&mut self, id : u64) -> bool {
-        self.map.to_first(id)
-    }
-
-    pub fn to_last(&mut self, id : u64) -> bool {
-        self.map.to_last(id)
-    }
-
-    pub fn to_prev(&mut self, next_items_id : u64, id : u64) -> bool{
-        self.map.to_prev(next_items_id, id)
-    }
-
-    pub fn to_next(&mut self, prev_items_id : u64, id : u64) -> bool{
-        self.map.to_next(prev_items_id, id)
-    }
-
-    pub fn iter(&'a mut self) -> MutMutIter<'a, V> {
-        MutMutIter::new(self.map.iter_mut())
-    }
-
-    pub fn iter_from_last(&'a mut self) -> MutMutIter<'a, V> {
-        MutMutIter::new(self.map.iter_mut_from_last())
-    }
-
-    pub fn iter_from_id(&'a mut self, id : u64) -> Option<MutMutIter<'a, V>> {
-        self.map.iter_mut_from_id(id).map(|iter| MutMutIter::new(iter))
-    }
+    // pub fn iter(&'a mut self) -> MutMutIter<'a, V> {
+    //     MutMutIter::new(self.map.iter_mut())
+    // }
+    //
+    // pub fn iter_from_last(&'a mut self) -> MutMutIter<'a, V> {
+    //     MutMutIter::new(self.map.iter_mut_from_last())
+    // }
+    //
+    // pub fn iter_from_id(&'a mut self, id : u64) -> Option<MutMutIter<'a, V>> {
+    //     self.map.iter_mut_from_id(id).map(|iter| MutMutIter::new(iter))
+    // }
 }
 
 pub struct MutMutIter<'a, V : From<&'a mut MutListItem>>{
@@ -143,56 +149,37 @@ impl<'a, V : From<&'a mut MutListItem>> MutMutIter<'a, V>{
 
 struct Hoge{
     ptr : *mut MutListItem,
+    a : bool,
 }
 impl Hoge{
     pub fn get_a(&self) -> bool{
-        true
-        //super::mut_list_item::get_bool(self.ptr, "a").unwrap().into_value().unwrap()
+        self.a
     }
 
-    pub fn set_a(&mut self, _b : bool){
-        //super::mut_list_item::set_bool(self.ptr, "a", Qv::Val(b));
+    pub fn set_a(&mut self, b : bool){
+        self.a = b
     }
-}
 
-struct HogeMut<'a>{
-    hoge : Hoge,
-    phantom : PhantomData<&'a mut u64>,
+    pub fn new(ptr : *mut MutListItem) -> Hoge{ Hoge{ ptr, a : false }}
 }
-impl<'a> From<&'a mut MutListItem> for HogeMut<'a>{
-    fn from(item : &'a mut MutListItem) -> Self {
-        HogeMut{ hoge : Hoge{ ptr : item }, phantom : PhantomData }
-    }
-}
-impl<'a> Deref for HogeMut<'a>{
-    type Target = Hoge;
-
-    fn deref(&self) -> &Self::Target {
-        &self.hoge
+impl From<*mut MutListItem> for Hoge{
+    fn from(ptr : *mut MutListItem) -> Self {
+        Hoge{ ptr, a : false }
     }
 }
 
-impl<'a> DerefMut for HogeMut<'a>{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.hoge
-    }
-}
+
 
 #[test]
-fn test(){
-
-
-    let mut map : LinkedMap<MutListItem> = LinkedMap::new();
+fn test() {
+    let mut map: LinkedMap<MutListItem> = LinkedMap::new();
     map.insert(MutListItem::new());
-    let mut tek : MutListMut<HogeMut> = MutListMut::new(&mut map);
-    tek.insert();
-    tek.insert();
-    tek.remove_first();
-    tek.remove_last();
-    let hoge = tek.first();
-    tek.remove_first();
+    let mut mm : MutListMut<Hoge> = MutListMut::new(&mut map);
+    let b = false;
 
-    let mut item = tek.first().unwrap();
-    println!("poyppoyo {}", item.get_a());
-    item.set_a(false);
+    mm.first(|hoge| hoge.set_a(b));
+    mm.first(|hoge| println!("{} payopayo", hoge.get_a()));
+
+    let mut item = map.first_mut().unwrap();
+    println!("poyppoyo {:?}", item.refs());
 }
