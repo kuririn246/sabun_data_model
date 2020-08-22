@@ -156,6 +156,7 @@ impl<'a, V : From<&'a mut MutListItem>> MutMutIter<'a, V>{
 struct Hoge<'a>{
     ptr : &'a mut MutListItem,
     a : bool,
+
 }
 impl<'a> Hoge<'a>{
     pub fn get_a(&self) -> bool{
@@ -168,13 +169,6 @@ impl<'a> Hoge<'a>{
 
     pub fn new(ptr : &mut MutListItem) -> Hoge{ Hoge{ ptr, a : false }}
 }
-impl<'a, 'b : 'a> From<&'b mut MutListItem> for Hoge<'a>{
-    fn from(ptr : &'b mut MutListItem) -> Self {
-        Hoge{ ptr, a : false }
-    }
-}
-
-
 
 #[test]
 fn test() {
