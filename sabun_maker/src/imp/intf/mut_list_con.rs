@@ -96,46 +96,70 @@ impl<'a, V : From<&'a MutListItem>> MutConIter<'a, V>{
     }
 }
 
-
-struct Hoge{
-    ptr : *mut MutListItem,
-}
-impl Hoge{
-    pub fn get_a(&self) -> bool{
-        true
-        //super::mut_list_item::get_bool(self.ptr, "a").unwrap().into_value().unwrap()
-    }
-
-    pub fn set_a(&mut self, b : bool){
-        //super::mut_list_item::set_bool(self.ptr, "a", Qv::Val(b));
-    }
-}
-
-struct HogeCon<'a>{
-    hoge : Hoge,
-    phantom : PhantomData<&'a u64>,
-}
-impl<'a> From<&'a MutListItem> for HogeCon<'a>{
-    fn from(item : &'a MutListItem) -> Self {
-        HogeCon{ hoge : Hoge{ ptr : item as *const _ as *mut _ }, phantom : PhantomData }
-    }
-}
-impl<'a> Deref for HogeCon<'a>{
-    type Target = Hoge;
-
-    fn deref(&self) -> &Self::Target {
-        &self.hoge
-    }
-}
-
-#[test]
-fn test(){
-
-
-    let mut map : LinkedMap<MutListItem> = LinkedMap::new();
-    map.insert(MutListItem::new());
-    let con : MutListCon<HogeCon> = MutListCon::new(&map);
-    let item = con.first().unwrap();
-    let last = con.last().unwrap();
-    println!("poyppoyo {} {}", item.get_a(), last.get_a());
-}
+//
+// struct Hoge{
+//     ptr : *mut MutListItem,
+// }
+// impl Hoge{
+//     pub fn get_a(&self) -> bool{
+//         true
+//         //super::mut_list_item::get_bool(self.ptr, "a").unwrap().into_value().unwrap()
+//     }
+//
+//     pub fn set_a(&mut self, b : bool){
+//         //super::mut_list_item::set_bool(self.ptr, "a", Qv::Val(b));
+//     }
+// }
+//
+// struct HogeCon<'a>{
+//     hoge : Hoge,
+//     phantom : PhantomData<&'a u64>,
+// }
+// impl<'a> From<&'a MutListItem> for HogeCon<'a>{
+//     fn from(item : &'a MutListItem) -> Self {
+//         HogeCon{ hoge : Hoge{ ptr : item as *const _ as *mut _ }, phantom : PhantomData }
+//     }
+// }
+// impl<'a> Deref for HogeCon<'a>{
+//     type Target = Hoge;
+//
+//     fn deref(&self) -> &Self::Target {
+//         &self.hoge
+//     }
+// }
+//
+// struct Unti<'a>{
+//     x : &'a mut String,
+// }
+//
+// struct UntiMut<'a, 'b : 'a>{
+//     a : &'a mut Unti<'b>
+// }
+//
+// impl<'a> Unti<'a>{
+//     pub fn get<'b>(&'b mut self) -> UntiMut<'b, 'a>{
+//         UntiMut{ a : self }
+//     }
+// }
+//
+// impl<'a, 'b : 'a> UntiMut<'a, 'b>{
+//     pub fn read(&self) -> &str{ self.a.x }
+//     pub fn write(&mut self, val : String){ self.a.x.clear(); self.a.x.push_str(&val) }
+//     pub fn consume(self){}
+// }
+//
+// #[test]
+// fn test(){
+//     let mut s = "hoge".to_string();
+//     let mut unti = Unti{ x : &mut s };
+//     let mut um = unti.get();
+//     println!("um {}", um.read());
+//     um.write("huga".to_string());
+//     println!("um {}", um.read());
+//     um.write("huga2".to_string());
+//     println!("um {}", um.read());
+//
+//     let mut um2 = unti.get();
+//     println!("um2 {}", um2.read())
+//
+// }
