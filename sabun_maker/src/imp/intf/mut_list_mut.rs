@@ -4,13 +4,13 @@
 // use std::ops::{Deref, DerefMut};
 //
 // #[repr(C)]
-// pub struct MutListMut<'a>{
+// pub struct MutListMut<'a : 'b, 'b, V : From<&'b mut MutListItem>>{
 //     map : &'a mut LinkedMap<MutListItem>,
-//     phantom : PhantomData<*const V>,
+//     phantom : PhantomData<&'b V>,
 // }
 //
 //
-// impl<'a, V> MutListMut<'a, V>{
+// impl<'a : 'b, 'b, V : From<&'b mut MutListItem>> MutListMut<'a,'b, V>{
 //     pub fn new(map : &mut LinkedMap<MutListItem>)
 //     -> MutListMut<V>{ MutListMut{ map , phantom : PhantomData } }
 //
@@ -19,7 +19,7 @@
 //     //     let map = unsafe{ &mut *self.map };
 //     //     map.first_mut().map(|v| fun(&mut V::from(v)));
 //     // }
-// 
+//
 //     fn huga(&mut self) -> V{
 //         V::new(self.map.first_mut().unwrap())
 //         //Hoge{ ptr : self.map.first_mut().unwrap(), a : false }
@@ -154,7 +154,6 @@
 // struct Hoge<'a>{
 //     ptr : &'a mut MutListItem,
 //     a : bool,
-//
 // }
 // impl<'a> Hoge<'a>{
 //     pub fn get_a(&self) -> bool{
@@ -166,6 +165,12 @@
 //     }
 //
 //     pub fn new(ptr : &mut MutListItem) -> Hoge{ Hoge{ ptr, a : false }}
+// }
+//
+// impl<'b> From<&'b mut MutListItem> for Hoge<'b>{
+//     fn from(ptr: &'b mut MutListItem) -> Self {
+//         Hoge::new(ptr)
+//     }
 // }
 //
 //
