@@ -55,6 +55,7 @@ impl MutList{
     }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
     pub(crate) fn list(&self) -> &LinkedMap<MutListItem>{ self.list.as_ref() }
+    pub(crate) fn list_mut(&mut self) -> &mut LinkedMap<MutListItem>{ self.list.as_mut() }
     //pub(crate) fn distribute_mut(&mut self) -> (&mut ListDefObj, &mut LinkedMap<MutListItem>, &mut HashS<String>){ (self.default.as_mut(), self.list.as_mut(), self.compatible.as_mut()) }
     pub(crate) fn next_id(&self) -> u64{ self.list.as_ref().next_id() }
     //pub(crate) fn list_mut(&mut self) -> &mut LinkedHashM<u64, MutListItem>{ self.list.as_mut() }
@@ -89,6 +90,7 @@ impl InnerMutList{
     pub(crate) fn new(list : LinkedMap<MutListItem>,) -> InnerMutList{ InnerMutList{ list : Box::new(list) } }
     pub(crate) fn deconstruct(self) -> LinkedMap<MutListItem>{ *self.list }
     pub(crate) fn list(&self) -> &LinkedMap<MutListItem>{ self.list.as_ref() }
+    pub(crate) fn list_mut(&mut self) -> &mut LinkedMap<MutListItem>{ self.list.as_mut() }
     //pub(crate) fn next_id(&self) -> u64{ self.next_id }
 }
 
@@ -147,6 +149,7 @@ impl MutListItem{
     pub(crate) fn deconstruct(self) -> (HashM<String, ListSabValue>, HashM<String, RefSabValue>){ (*self.values, *self.refs) }
     //pub(crate) fn id(&self) -> u64{ self.id }
     pub(crate) fn values(&self) -> &HashM<String, ListSabValue>{ self.values.as_ref() }
+    pub(crate) fn values_mut(&mut self) -> &mut HashM<String, ListSabValue>{ self.values.as_mut() }
     pub(crate) fn refs(&self) -> &HashM<String, RefSabValue>{ self.refs.as_ref() }
     pub(crate) fn set_sabun(&mut self, def :&ListDefObj, name : String, param : RustParam) -> Result<Option<RustParam>, SetSabunError> {
         let (p, vt) =

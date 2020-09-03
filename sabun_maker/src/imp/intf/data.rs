@@ -17,10 +17,10 @@ use crate::imp::structs::root_obj::RootObject;
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct ConstDataPtr{
     ptr : *const ConstData,
-    root : *const RootObject,
+    root : *mut RootObject,
 }
 impl ConstDataPtr{
-    pub fn new(ptr : *const ConstData, root : *const RootObject) -> ConstDataPtr{ ConstDataPtr{ ptr, root } }
+    pub fn new(ptr : *const ConstData, root : *mut RootObject) -> ConstDataPtr{ ConstDataPtr{ ptr, root } }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -65,7 +65,7 @@ pub fn get_value(data : ConstDataPtr, id : &str) -> Option<ListItemPtr>{
     get_value_impl(d.list(), d.default(), id, data.root)
 }
 
-pub fn get_value_impl(data : &HashM<String, ListItem>, list_def : &ListDefObj, id : &str, root : *const RootObject) -> Option<ListItemPtr>{
+pub fn get_value_impl(data : &HashM<String, ListItem>, list_def : &ListDefObj, id : &str, root : *mut RootObject) -> Option<ListItemPtr>{
     data.get(id).map(|i| ListItemPtr::new(i, list_def, root))
 }
 

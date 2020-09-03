@@ -5,6 +5,7 @@ use crate::imp::structs::qv::Qv;
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
+use crate::imp::intf::mut_list_ptr::MutListPtr;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -23,15 +24,17 @@ impl MutListItemPtr {
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
 }
 
-// pub fn get_inner_data(ps : MutListItemPtrs, name : &str) -> Option<InnerDataPtr>{
-//     let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
-//     if let Some(ListDefValue::InnerDataDef(def)) = list_def.default().get(name){
-//         if let Some(ListSabValue::InnerData(data)) = item.values().get(name){
-//             return Some(InnerDataPtr::new(data, def, ps.root))
-//         }
-//     }
-//     None
-// }
+pub fn get_inner_mut<T : From<*mut MutListItem>>(ps : MutListItemPtr, name : &str) -> Option<Option<MutListPtr<T>>> {
+    let (item, _list_def) = unsafe { (ps.item.as_mut().unwrap(), ps.list_def.as_ref().unwrap()) };
+    if let Some(ListSabValue::InnerMut(data)) = item.values_mut().get_mut(name) {
+        if let Some(inner) = data {
+            return Some(Some(MutListPtr::new(inner.list_mut())))
+        } else {
+            return Some(None)
+        }
+    }
+    return None
+}
 
 pub fn get_bool(ps : MutListItemPtr, name : &str) -> Option<Qv<bool>>{
     let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };

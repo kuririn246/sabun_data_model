@@ -8,10 +8,10 @@ use crate::imp::intf::list::{get_len_impl, get_value_impl};
 pub struct InnerListPtr{
     ptr : *const InnerList,
     def : *const ListDefObj,
-    root : *const RootObject,
+    root : *mut RootObject,
 }
 impl InnerListPtr{
-    pub fn new(ptr : *const InnerList, def : *const ListDefObj, root : *const RootObject) -> InnerListPtr{ InnerListPtr{ ptr, def, root } }
+    pub fn new(ptr : *const InnerList, def : *const ListDefObj, root : *mut RootObject) -> InnerListPtr{ InnerListPtr{ ptr, def, root } }
 }
 
 pub fn get_len(list: InnerListPtr) -> usize{

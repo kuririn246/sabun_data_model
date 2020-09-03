@@ -58,8 +58,8 @@ fn to_key_items(kvs : &DataKVs) -> Vec<KeyItem>{
     kvs.items().iter().map(|a| KeyItem::new(a.id().to_string(), a.is_old())).collect()
 }
 
-pub fn get_member_desc(root : *const RootObject) -> Vec<MemberDesc>{
-    let root = unsafe{ root.as_ref().unwrap() };
+pub fn get_member_desc(root_ptr : *mut RootObject) -> Vec<MemberDesc>{
+    let root = unsafe{ root_ptr.as_ref().unwrap() };
     let mut vec : Vec<MemberDesc> = Vec::with_capacity(root.default().len());
     for (k,val) in root.default(){
         let mem = k.to_string();
@@ -71,7 +71,7 @@ pub fn get_member_desc(root : *const RootObject) -> Vec<MemberDesc>{
             RootValue::Data(d) =>{
                 let children = get_list_def_desc(d.default());
                 let refs = get_ref_def_desc(d.default().refs());
-                let kvs = get_kvs(ConstDataPtr::new(d, root));
+                let kvs = get_kvs(ConstDataPtr::new(d, root_ptr));
                 let descs = MemberDescs::with_keys(children, refs, to_key_items(&kvs));
                 vec.push(MemberDesc::new(mem, VarType::Normal, RustMemberType::Data, is_old, Some(descs)))
             },

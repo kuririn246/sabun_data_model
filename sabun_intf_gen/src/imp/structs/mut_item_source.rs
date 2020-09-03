@@ -51,7 +51,8 @@ impl MutItemSource {
             }
         }
         for r in self.refs() {
-            sb.push_without_newline(1, &r.get("mut_list_item"))
+            sb.push_without_newline(1, &r.get("mut_list_item"));
+            sb.push_without_newline(1, &r.set("mut_list_item"));
         }
         sb.push(0, "}");
 

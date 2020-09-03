@@ -16,10 +16,10 @@ use crate::imp::structs::root_obj::RootObject;
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct ConstListPtr{
     ptr : *const ConstList,
-    root : *const RootObject,
+    root : *mut RootObject,
 }
 impl ConstListPtr{
-    pub fn new(ptr : *const ConstList, root : *const RootObject) -> ConstListPtr{ ConstListPtr{ ptr, root } }
+    pub fn new(ptr : *const ConstList, root : *mut RootObject) -> ConstListPtr{ ConstListPtr{ ptr, root } }
 }
 
 pub fn get_len(list: ConstListPtr) -> usize{
@@ -38,7 +38,7 @@ pub fn get_value(list: ConstListPtr, idx : usize) -> Option<ListItemPtr>{
     get_value_impl(d.list(), d.default(), idx, list.root)
 }
 
-pub fn get_value_impl(vec: *const Vec<ListItem>, list_def : *const ListDefObj, idx : usize, root : *const RootObject) -> Option<ListItemPtr>{
+pub fn get_value_impl(vec: *const Vec<ListItem>, list_def : *const ListDefObj, idx : usize, root : *mut RootObject) -> Option<ListItemPtr>{
     let vec = unsafe{ vec.as_ref().unwrap() };
     vec.get(idx).map(|item| ListItemPtr::new(item, list_def, root))
 }

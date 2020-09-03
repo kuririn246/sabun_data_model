@@ -13,11 +13,11 @@ use crate::imp::intf::inner_list::InnerListPtr;
 pub struct ListItemPtr {
     item : *const ListItem,
     list_def : *const ListDefObj,
-    root : *const RootObject,
+    root : *mut RootObject,
 }
 
 impl ListItemPtr {
-    pub fn new(item : *const ListItem, list_def : *const ListDefObj, root : *const RootObject) -> ListItemPtr { ListItemPtr { item, list_def, root }}
+    pub fn new(item : *const ListItem, list_def : *const ListDefObj, root : *mut RootObject) -> ListItemPtr { ListItemPtr { item, list_def, root }}
     pub fn item(&self) -> *const ListItem{ self.item }
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
 }

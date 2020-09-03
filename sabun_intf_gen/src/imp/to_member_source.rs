@@ -11,6 +11,7 @@ pub enum MemberSource{
     Data(DataSource),
     List(ListSource),
     InnerList(InnerListSource),
+    InnerMut(InnerMutSource),
 }
 
 pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
