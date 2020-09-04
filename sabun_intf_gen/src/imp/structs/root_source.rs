@@ -22,24 +22,32 @@ unsafe impl Send for RootIntf{}
 #[derive(Debug, PartialEq)]
 pub struct RootIntf{
     root : Box<RootObject>,
+    ptr : RootObjectPtr,
 }
 impl RootIntf{
-    pub fn new(obj : RootObject) -> RootIntf{ RootIntf{ root : Box::new(obj) } }
-    pub(crate) fn ptr(&self) -> RootObjectPtr{ RootObjectPtr::new(self.root.as_ref()) }
+    pub fn new(obj : RootObject) -> RootIntf{
+		let mut root = Box::new(obj);
+		let ptr = RootObjectPtr::new(root.as_mut());
+		RootIntf { root, ptr }
+	}
 ");
         for mem in self.members() {
             match mem{
                 MemberSource::Param(param) =>{
-                    sb.push_without_newline(1, &param.get("root", "self.ptr()"));
-                    sb.push_without_newline(1, &param.set("root", "self.ptr()"));
+                    sb.push_without_newline(1, &param.get("root", "self.ptr"));
+                    sb.push_without_newline(1, &param.set("root", "self.ptr"));
                 },
                 MemberSource::Data(data) =>{
-                    sb.push_without_newline(1, &data.get("root", "self.ptr()", ));
+                    sb.push_without_newline(1, &data.get("root", "self.ptr", ));
                 },
                 MemberSource::List(l) =>{
-                    sb.push_without_newline(1, &l.get("root", "self.ptr()"));
+                    sb.push_without_newline(1, &l.get("root", "self.ptr"));
+                },
+                MemberSource::Mut(m) =>{
+                    sb.push_without_newline(1, &m.get("root", "self.ptr"));
                 },
                 MemberSource::InnerList(_) =>{},
+                MemberSource::InnerMut(_) =>{},
             }
         }
         sb.push(0, "}");
@@ -52,8 +60,12 @@ impl RootIntf{
                 MemberSource::List(l) =>{
                     sb.push(0, &l.to_string())
                 },
+                MemberSource::Mut(m) =>{
+                    sb.push(0, &m.to_string())
+                },
                 MemberSource::Param(_) =>{},
                 MemberSource::InnerList(_) =>{},
+                MemberSource::InnerMut(_)=>{},
             }
         }
 

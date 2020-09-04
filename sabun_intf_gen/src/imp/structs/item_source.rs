@@ -45,9 +45,11 @@ impl ItemSource{
                 },
                 MemberSource::Data(_) =>{},
                 MemberSource::List(_) =>{},
+                MemberSource::Mut(_) =>{},
                 MemberSource::InnerList(l) =>{
                     sb.push_without_newline(1, &l.get("list_item", "self.ptr"));
-                }
+                },
+                MemberSource::InnerMut(_) =>{},
             }
         }
         for r in self.refs() {
@@ -62,7 +64,9 @@ impl ItemSource{
                 },
                 MemberSource::List(_) =>{},
                 MemberSource::Data(_) =>{},
+                MemberSource::Mut(_) =>{},
                 MemberSource::Param(_) =>{},
+                MemberSource::InnerMut(_) =>{},
             }
         }
 

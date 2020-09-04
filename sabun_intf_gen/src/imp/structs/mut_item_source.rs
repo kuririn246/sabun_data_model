@@ -45,8 +45,12 @@ impl MutItemSource {
                 },
                 MemberSource::Data(_) =>{},
                 MemberSource::List(_) =>{},
-                MemberSource::InnerList(l) =>{
-                    sb.push_without_newline(1, &l.get("mut_list_item", "self.ptr"));
+                MemberSource::Mut(_) =>{},
+                MemberSource::InnerList(_l) =>{
+                    //sb.push_without_newline(1, &l.get("mut_list_item", "self.ptr"));
+                },
+                MemberSource::InnerMut(m) =>{
+                    sb.push_without_newline(1, &m.get("mut_list_item", "self.ptr"));
                 }
             }
         }
@@ -58,12 +62,16 @@ impl MutItemSource {
 
         for mem in &self.members{
             match mem{
-                MemberSource::InnerList(l) =>{
-                    sb.push_without_newline(0, &l.to_string());
+                MemberSource::InnerList(_l) =>{
+
                 },
                 MemberSource::List(_) =>{},
                 MemberSource::Data(_) =>{},
+                MemberSource::Mut(_) =>{},
                 MemberSource::Param(_) =>{},
+                MemberSource::InnerMut(m) =>{
+                    sb.push_without_newline(0, &m.to_string());
+                },
             }
         }
 

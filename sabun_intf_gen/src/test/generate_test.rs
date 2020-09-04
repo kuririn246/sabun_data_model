@@ -9,10 +9,10 @@ mod tests {
 
     #[test]
     fn it_works() {
-        match json_dir_to_rust("src/json_dir/test", true) {
-            Ok(a) => {
+        match json_dir_to_rust("src/json_dir/test/mut", true) {
+            Ok(mut a) => {
                 //println!("{:?}", a);
-                let ans = generate_interface(&a);
+                let ans = generate_interface(&mut a);
                 let source = ans.to_string();
                 write_file("src/compile_test.rs", &source);
             },

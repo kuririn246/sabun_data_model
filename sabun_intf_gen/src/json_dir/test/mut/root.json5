@@ -1,0 +1,43 @@
+{
+  bu : false,
+
+	mutList : ["__ViolatedList",
+		[{
+			nakabu : true,
+//			innerList : ["InnerListDef",
+//			[{
+//				innerMem : 10,
+//			}]
+//			],
+//			Ref : {
+//				"refed" : "",
+//			}
+		}],
+		{
+			nakabu : false,
+//			innerList : ["InnerList",
+//				{
+//					innerMem : 20,
+//				},
+//				{
+//					innerMem : 30,
+//				},
+//			],
+//			Ref : {
+//				"refed" : "second",
+//			}
+		}
+	],
+	"refed" : ["Data",
+		[{
+			mem : 0
+		}],
+		{
+			ID : "first",
+			mem : 1,
+		},
+		{
+			ID : "second",
+			mem : 2
+		}]
+}
