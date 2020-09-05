@@ -23,3 +23,5 @@ pub use list::ConstListPtr as ConstListPtr;
 pub use inner_list::InnerListPtr as InnerListPtr;
 pub use c_qv_str::StrPtr as RustStrPtr;
 pub use general_iter::GeneralIter as GeneralIter;
+pub use mut_list_ptr::MutListPtr as MutListPtr;
+pub use mut_list_item::MutListItemPtr as MutListItemPtr;

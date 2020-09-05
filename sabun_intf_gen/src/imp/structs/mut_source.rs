@@ -28,16 +28,15 @@ impl MutSource {
     pub fn is_old(&self) -> bool{ self.is_old }
     pub fn item_source(&self) -> &MutItemSource{ &self.item_source }
 
-    pub fn get(&self, mod_name : &str, ptr_exp : &str) -> String{
+    pub fn get(&self) -> String{
         let mut sb = SourceBuilder::new();
 
         let id = self.stem();
         let snake_name = to_snake_name(id);
         let is_old = self.is_old();
         let item_type_name = to_item_type_name(id);
-        sb.push(0,&format!("pub fn {}(&self) -> {}{{", with_old(&snake_name, is_old), &item_type_name));
-        sb.push(1,&format!("let ans = {}::get_mut_list({}, \"{}\").unwrap();", &mod_name, ptr_exp, id));
-        sb.push(1,&format!("MutListPtr::new(ans)"));
+        sb.push(0,&format!("pub fn {}(&self) -> MutListPtr<{}>{{", with_old(&snake_name, is_old), &item_type_name));
+        sb.push(1,&format!("root::get_mut_list(self.ptr, \"{}\").unwrap()", id));
         sb.push(0,"}");
         sb.to_string()
     }

@@ -36,7 +36,7 @@ impl RustValue{
             RustValue::Param(p,v) => RootValue::Param(p,v),
             RustValue::Data(d) => RootValue::Data(d),
             RustValue::List(l) => RootValue::List(l),
-            RustValue::Mut(m) => RootValue::Mut(m),
+            RustValue::Mut(m) => RootValue::MutList(m),
             _ =>{ return Err(self.type_string()); },
         };
         Ok(v)

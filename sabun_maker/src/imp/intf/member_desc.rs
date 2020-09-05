@@ -81,7 +81,7 @@ pub fn get_member_desc(root_ptr : *mut RootObject) -> Vec<MemberDesc>{
                 let descs = MemberDescs::new(children, refs);
                 vec.push(MemberDesc::new(mem, VarType::Normal, RustMemberType::List, is_old, Some(descs)))
             },
-            RootValue::Mut(m) =>{
+            RootValue::MutList(m) =>{
                 let children = get_list_def_desc(m.default());
                 let refs = get_ref_def_desc(m.default().refs());
                 let descs = MemberDescs::new(children, refs);

@@ -66,19 +66,16 @@ impl RefedItem {
 pub struct MutableListItem {
 	ptr : MutListItemPtr,
 }
-impl From<MutListItemPtr> for MutableListItem {
-	fn from(p : MutListItemPtr) -> Self {
-		MutableListItem::new(p)
-	}
-}
 impl MutableListItem {
 	pub fn new(ptr : MutListItemPtr) -> MutableListItem{ MutableListItem{ ptr } } 
 	pub fn nakabu(&self) -> bool{
 		let qv = mut_list_item::get_bool(self.ptr, "nakabu").unwrap();
 		qv.into_value().unwrap()
 	}
-	pub fn set_nakabu(&mut self, nakabu : bool){
-		mut_list_item::set_bool(self.ptr, "nakabu", Qv::Val(nakabu));
-	}
 }
 
+impl From<MutListItemPtr> for MutableListItem{
+	fn from(p : MutListItemPtr) -> Self {
+		MutableListItem::new(p)
+	}
+}

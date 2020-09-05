@@ -17,18 +17,18 @@ pub struct MutListItemPtr {
 
 impl MutListItemPtr {
     ///getだけなら &MutListItemからのポインタでもOKである。その場合setするとundefined behaviorなので、&mut からのポインタを得る必要がある
-    pub fn new(item : *const MutListItem, list_def : *const ListDefObj, root : *const RootObject) -> MutListItemPtr {
-        MutListItemPtr { item : item as *mut MutListItem, list_def, root : root as *mut RootObject  }
+    pub fn new(item : *mut MutListItem, list_def : *const ListDefObj, root : *mut RootObject) -> MutListItemPtr {
+        MutListItemPtr { item, list_def, root }
     }
-    pub fn item(&self) -> *const MutListItem{ self.item }
+    pub fn item(&self) -> *mut MutListItem{ self.item }
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
 }
 
-pub fn get_inner_mut<T : From<*mut MutListItem>>(ps : MutListItemPtr, name : &str) -> Option<Option<MutListPtr<T>>> {
-    let (item, _list_def) = unsafe { (ps.item.as_mut().unwrap(), ps.list_def.as_ref().unwrap()) };
+pub fn get_inner_mut<T : From<MutListItemPtr>>(ps : MutListItemPtr, name : &str) -> Option<Option<MutListPtr<T>>> {
+    let item = unsafe { ps.item.as_mut().unwrap() };
     if let Some(ListSabValue::InnerMut(data)) = item.values_mut().get_mut(name) {
         if let Some(inner) = data {
-            return Some(Some(MutListPtr::new(inner.list_mut())))
+            return Some(Some(MutListPtr::new(inner.list_mut(), ps.list_def, ps.root)))
         } else {
             return Some(None)
         }

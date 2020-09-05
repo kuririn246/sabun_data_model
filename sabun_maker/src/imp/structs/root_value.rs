@@ -9,7 +9,7 @@ pub enum RootValue{
     Param(RustParam, VarType),
     Data(ConstData),
     List(ConstList),
-    Mut(MutList),
+    MutList(MutList),
 }
 
 impl RootValue{
@@ -17,7 +17,7 @@ impl RootValue{
         match self {
             RootValue::Data(d) => Some(d.default()),
             RootValue::List(d) => Some(d.default()),
-            RootValue::Mut(d) => Some(d.default()),
+            RootValue::MutList(d) => Some(d.default()),
             _ => None,
         }
     }
@@ -28,7 +28,7 @@ impl RootValue{
             RootValue::Param(p,v) => RustValue::Param(p,v),
             RootValue::Data(d) => RustValue::Data(d),
             RootValue::List(l) => RustValue::List(l),
-            RootValue::Mut(m) => RustValue::Mut(m),
+            RootValue::MutList(m) => RustValue::Mut(m),
         }
     }
 }

@@ -45,6 +45,10 @@ pub fn to_data_type_name(stem : &str) -> String{
     format!("{}Data", to_type_name(stem))
 }
 
+pub fn to_ids_type_name(stem : &str) -> String{
+    format!("{}IDs", to_type_name(stem))
+}
+
 pub fn to_list_type_name(stem : &str) -> String{
     format!("{}List", to_type_name(stem))
 }

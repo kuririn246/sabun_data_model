@@ -1,7 +1,7 @@
 {
   bu : false,
 
-	mutList : ["__ViolatedList",
+	mutableList : ["__ViolatedList",
 		[{
 			nakabu : true,
 //			innerList : ["InnerListDef",

@@ -44,7 +44,7 @@ impl RootIntf{
                     sb.push_without_newline(1, &l.get("root", "self.ptr"));
                 },
                 MemberSource::Mut(m) =>{
-                    sb.push_without_newline(1, &m.get("root", "self.ptr"));
+                    sb.push_without_newline(1, &m.get());
                 },
                 MemberSource::InnerList(_) =>{},
                 MemberSource::InnerMut(_) =>{},

@@ -3,8 +3,7 @@ use crate::imp::structs::qv::Qv;
 use crate::HashM;
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::rust_param::RustParam;
-use crate::imp::structs::rust_list::{ MutListItem};
-use crate::imp::intf::ConstDataPtr;
+use crate::imp::intf::{ConstDataPtr, MutListItemPtr};
 use crate::imp::structs::rust_string::RustString;
 use crate::imp::intf::list::ConstListPtr;
 use crate::imp::intf::mut_list_ptr::MutListPtr;
@@ -71,10 +70,10 @@ pub fn get_list(root_ptr : RootObjectPtr, name : &str) -> Option<ConstListPtr>{
     } else{ None }
 }
 
-pub fn get_mut<T : From<*mut MutListItem>>(root : *mut RootObject, name : &str) -> Option<MutListPtr<T>>{
-    let root = unsafe{ root.as_mut().unwrap() };
-    if let Some(RootValue::Mut(l)) = root.default_mut().get_mut(name){
-        Some(MutListPtr::new(l.list_mut()))
+pub fn get_mut_list<T : From<MutListItemPtr>>(root : RootObjectPtr, name : &str) -> Option<MutListPtr<T>>{
+    let root = unsafe{ root.ptr.as_mut().unwrap() };
+    if let Some(RootValue::MutList(l)) = root.default_mut().get_mut(name){
+        Some(MutListPtr::new(l.list_mut(), l.default(), root))
     } else{ None }
 }
 

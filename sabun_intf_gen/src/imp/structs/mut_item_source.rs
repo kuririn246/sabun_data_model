@@ -35,6 +35,11 @@ impl MutItemSource {
         sb.push(0,&format!("pub struct {} {{", &item_type_name));
         sb.push(1,"ptr : MutListItemPtr,");
         sb.push(0,"}");
+        sb.push(0, &format!("impl From<MutListItemPtr> for {} {{", &item_type_name));
+        sb.push(1, &format!("fn from(p : MutListItemPtr) -> Self {{"));
+        sb.push(2, &format!("{}::new(p)", &item_type_name));
+        sb.push(1, "}");
+        sb.push(0,"}");
         sb.push(0, &format!("impl {} {{", &item_type_name));
         sb.push(1, &format!("pub fn new(ptr : MutListItemPtr) -> {}{{ {}{{ ptr }} }} ",
                             &item_type_name, &item_type_name));
@@ -42,6 +47,7 @@ impl MutItemSource {
             match mem{
                 MemberSource::Param(param) =>{
                     sb.push_without_newline(1, &param.get("mut_list_item", "self.ptr"));
+                    sb.push_without_newline(1, &param.set("mut_list_item", "self.ptr"));
                 },
                 MemberSource::Data(_) =>{},
                 MemberSource::List(_) =>{},

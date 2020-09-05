@@ -48,7 +48,7 @@ pub fn validate_root(root : &RootObject, can_use_old: bool) -> Result<()>{
                 validate_list_def(list.default(), root, can_use_old, false, names)?;
                 validate_list(list.default(), list.list(), root, can_use_old, names)?
             },
-            RootValue::Mut(m) =>{
+            RootValue::MutList(m) =>{
                 validate_compatible(m.default(), m.compatible(), root, can_use_old, names)?;
                 validate_list_def(m.default(), root, can_use_old, true, names)?;
                 validate_mut_list(m.default(), m.list(),  root, can_use_old, names)?

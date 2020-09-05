@@ -28,14 +28,14 @@ pub fn adjust_versions(new : RootObject, old : RootObject, validation : bool) ->
                 }
                 new_map.insert(def_key,RootValue::Param(p,v));
             },
-            RootValue::Mut(m) =>{
-                if let Some(RootValue::Mut(old_m)) = old_def.remove(&def_key){
+            RootValue::MutList(m) =>{
+                if let Some(RootValue::MutList(old_m)) = old_def.remove(&def_key){
                     let new_m = adjust_mut_list(m, old_m, &Names::new(&def_key))?;
-                    new_map.insert(def_key, RootValue::Mut(new_m));
+                    new_map.insert(def_key, RootValue::MutList(new_m));
                 } else{
-                    new_map.insert(def_key, RootValue::Mut(m));
+                    new_map.insert(def_key, RootValue::MutList(m));
                 }
-            },
+            }
             _ =>{
                 //MutとParam以外にadjustする対象はないはず
                 new_map.insert(def_key, def_value);
