@@ -30,7 +30,7 @@ pub fn validate_list_def(def : &ListDefObj, root : &RootObject, can_use_old : bo
                 validate_compatible(d.list_def(), d.compatible(), root, can_use_old, names)?;
                 validate_list_def(d.list_def(), root, can_use_old, is_mut, names)?;
             },
-            ListDefValue::InnerListDef(d) => {
+            ListDefValue::InnerTempDef(d) => {
                 if is_mut {
                     Err(format!("{} {} MutList can't have InnerList", names, name))?;
                 }

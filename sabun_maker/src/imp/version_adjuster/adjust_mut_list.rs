@@ -2,21 +2,21 @@ use crate::error::Result;
 use crate::imp::version_adjuster::adjust_mut_list_item_sabun::adjust_mut_list_item_sabun;
 use crate::imp::json_to_rust::names::Names;
 use crate::imp::version_adjuster::adjust_mut_list_item_ref::adjust_mut_list_item_ref;
-use crate::imp::structs::rust_list::{MutListItem, MutList, InnerMutList};
+use crate::imp::structs::rust_list::{MutItem, MutList, InnerMutList};
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::linked_m::LinkedMap;
 
 
-pub fn adjust_mut(def : &ListDefObj, old_list : LinkedMap<MutListItem>, names : &Names) -> Result<LinkedMap<MutListItem>>{
+pub fn adjust_mut(def : &ListDefObj, old_list : LinkedMap<MutItem>, names : &Names) -> Result<LinkedMap<MutItem>>{
     //let mut counter : u64 = 0;
     //let mut result : HashM<u64, Box<MutListItem>> = HashMt::with_capacity(old_list.len());
-    let mut result : Vec<(u64, MutListItem)> = Vec::with_capacity(old_list.len());
+    let mut result : Vec<(u64, MutItem)> = Vec::with_capacity(old_list.len());
     let next_id = old_list.next_id();
     for (id, value) in old_list{
         let (sabun, refs) = value.deconstruct();
         let new_sabun = adjust_mut_list_item_sabun(def, sabun, names)?;
         let new_refs = adjust_mut_list_item_ref(def.refs(), refs, names)?;
-        result.push((id, MutListItem::construct(new_sabun, new_refs)));
+        result.push((id, MutItem::construct(new_sabun, new_refs)));
 
     }
     return Ok(LinkedMap::construct(result, next_id));

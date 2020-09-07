@@ -2,7 +2,7 @@ use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
 use crate::{HashM, HashS, HashSt, HashMt};
 use json5_parser::Span;
 use crate::error::Result;
-use crate::imp::structs::rust_list::{ConstList, InnerList, ConstData, MutList, InnerMutList, ListItem, MutListItem};
+use crate::imp::structs::rust_list::{ConstTemplate, InnerTemplate, ConstTable, MutList, InnerMutList, ConstItem, MutItem};
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
 use crate::imp::structs::linked_m::LinkedMap;
@@ -22,7 +22,7 @@ impl TmpList{
         TmpList{ vec : Vec::with_capacity(capacity), old : None, default : None, compatible : None, next_id : None, span }
     }
 
-    pub fn into_const_list(self) -> Result<ConstList>{
+    pub fn into_const_list(self) -> Result<ConstTemplate>{
         if self.compatible.is_some(){
             Err(format!("{} Compatible is not needed for a List {}", self.span.line_str(), self.span.slice()))?
         }
@@ -36,12 +36,12 @@ impl TmpList{
             Err(format!("{} NextID must not be defined {}", self.span.line_str(), self.span.slice()))?
         }
 
-        Ok(ConstList::new(self.default.unwrap(),to_list_items(self.vec)?))
+        Ok(ConstTemplate::new(self.default.unwrap(), to_list_items(self.vec)?))
     }
 
 
 
-    pub fn into_inner_list(self) -> Result<InnerList>{
+    pub fn into_inner_list(self) -> Result<InnerTemplate>{
         if self.compatible.is_some(){
             Err(format!("{} Compatible is not needed for InnerList {}", self.span.line_str(), self.span.slice()))?
         }
@@ -55,10 +55,10 @@ impl TmpList{
             Err(format!("{} NextID must not be defined for InnerList {}", self.span.line_str(), self.span.slice()))?
         }
 
-        Ok(InnerList::new(to_list_items(self.vec)?))
+        Ok(InnerTemplate::new(to_list_items(self.vec)?))
     }
 
-    pub fn into_const_data(self) -> Result<ConstData>{
+    pub fn into_const_data(self) -> Result<ConstTable>{
         if self.compatible.is_some(){
             Err(format!("{} Compatible is not needed for Data {}", self.span.line_str(), self.span.slice()))?
         }
@@ -70,7 +70,7 @@ impl TmpList{
         }
         let old = self.old.unwrap_or_else(|| HashSt::new());
 
-        Ok(ConstData::new(self.default.unwrap(), to_data_items(self.vec)?,  old))
+        Ok(ConstTable::new(self.default.unwrap(), to_data_items(self.vec)?, old))
     }
     // pub fn into_inner_data(self) -> Result<InnerData>{
     //     if self.compatible.is_some(){
@@ -200,16 +200,16 @@ impl TmpList{
 }
 
 
-fn to_list_items(vec : Vec<TmpObj>) -> Result<Vec<ListItem>>{
-    let mut result : Vec<ListItem> = Vec::with_capacity(vec.len());
+fn to_list_items(vec : Vec<TmpObj>) -> Result<Vec<ConstItem>>{
+    let mut result : Vec<ConstItem> = Vec::with_capacity(vec.len());
     for item in vec{
         result.push(item.into_list_item()?);
     }
     return Ok(result);
 }
 
-fn to_data_items(vec : Vec<TmpObj>) -> Result<HashM<String, ListItem>>{
-    let mut result : HashM<String, ListItem> = HashMt::with_capacity(vec.len());
+fn to_data_items(vec : Vec<TmpObj>) -> Result<HashM<String, ConstItem>>{
+    let mut result : HashM<String, ConstItem> = HashMt::with_capacity(vec.len());
     for item in vec{
         let (s,m) = item.into_list_item_with_id()?;
         result.insert(s, m);
@@ -217,8 +217,8 @@ fn to_data_items(vec : Vec<TmpObj>) -> Result<HashM<String, ListItem>>{
     return Ok(result);
 }
 
-fn to_violated_list_items(vec : Vec<TmpObj>, next_id : u64) -> Result<LinkedMap<MutListItem>>{
-    let mut result : Vec<(u64, MutListItem)> = Vec::with_capacity(vec.len());
+fn to_violated_list_items(vec : Vec<TmpObj>, next_id : u64) -> Result<LinkedMap<MutItem>>{
+    let mut result : Vec<(u64, MutItem)> = Vec::with_capacity(vec.len());
     for (idx, tmp_item) in vec.into_iter().enumerate(){
         //let span = tmp_item.span.clone();
         let pair = tmp_item.into_violated_list_item(idx)?;

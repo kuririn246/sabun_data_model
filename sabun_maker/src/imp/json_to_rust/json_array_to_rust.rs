@@ -29,24 +29,24 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : VarType, span : &Span
         InnerMutUndefined =>{
             Ok(RustValue::InnerMut(None))
         },
-        NotDefined =>{ Err(format!(r#"{} Array must be "...Array", "List", "Data", "MutList", "InnerData", "InnerList", "InnerMut", "InnderDataDef", "InnerListDef", "InnerMutDef", "Int", "Float", "Str" or "Bool" {}"#, span.line_str(), names))? },
-        List | Data | MutList | InnerList | //InnerData |
-        InnerMut | InnerListDef | //InnerDataDef |
+        NotDefined =>{ Err(format!(r#"{} Array must be "...Array", "Template", "Table", "MutList", "InnerTemp", "InnerMut", "InnerTempDef", "InnerMutDef", "Int", "Float", "Str" or "Bool" {}"#, span.line_str(), names))? },
+        Template | Table | MutList | InnerTemp | //InnerData |
+        InnerMut | InnerTempDef | //InnerDataDef |
         InnerMutDef | ViolatedList | InnerViolatedList | InnerViolatedListDef =>{
             match value_type{
                 VarType::Normal =>{
                     let tmp = json_list_to_rust(&array[1..], span, names)?;
                     match gat{
-                        List => Ok(RustValue::List(tmp.into_const_list()?)),
-                        Data => Ok(RustValue::Data(tmp.into_const_data()?)),
-                        MutList => Ok(RustValue::Mut(tmp.into_mut_list()?)),
-                        InnerList => Ok(RustValue::InnerList(tmp.into_inner_list()?)),
+                        Template => Ok(RustValue::Template(tmp.into_const_list()?)),
+                        Table => Ok(RustValue::Table(tmp.into_const_data()?)),
+                        MutList => Ok(RustValue::MutList(tmp.into_mut_list()?)),
+                        InnerTemp => Ok(RustValue::InnerTemp(tmp.into_inner_list()?)),
                         //InnerData => Ok(RustValue::InnerData(tmp.into_inner_data()?)),
                         InnerMut => Ok(RustValue::InnerMut(Some(tmp.into_inner_mut_list()?))),
-                        InnerListDef => Ok(RustValue::InnerListDef(tmp.into_inner_def()?)),
+                        InnerTempDef => Ok(RustValue::InnerTempDef(tmp.into_inner_def()?)),
                         //InnerDataDef => Ok(RustValue::InnerDataDef(tmp.into_inner_def()?)),
                         InnerMutDef => Ok(RustValue::InnerMutDef(tmp.into_inner_mut_def(false)?)),
-                        ViolatedList =>{ Ok(RustValue::Mut(tmp.into_violated_list()?)) },
+                        ViolatedList =>{ Ok(RustValue::MutList(tmp.into_violated_list()?)) },
                         InnerViolatedList => Ok(RustValue::InnerMut(Some(tmp.into_inner_violated_list()?))),
                         InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.into_inner_mut_def(false)?)),
                         _ => unreachable!() ,
@@ -73,14 +73,12 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : VarType, span : &Span
 
 pub enum GatResult{
     AT(ArrayType),
-    List,
-    Data,
+    Template,
+    Table,
     MutList,
-    InnerList,
-   // InnerData,
+    InnerTemp,
     InnerMut,
-    InnerListDef,
-    //InnerDataDef,
+    InnerTempDef,
     InnerMutDef,
     ViolatedList,
     InnerViolatedList,
@@ -102,20 +100,16 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
                 return match s.as_str(){
                     "IntArray" =>{ AT(ArrayType::Int) },
                     "FloatArray" =>{ AT(ArrayType::Float) },
-                    //"StrArray" =>{ AT(ArrayType::String) },
-                    //"Num2Array" =>{ AT(ArrayType::Num2) },
                     "Int" =>{ Int },
                     "Float" =>{ Float },
                     "Str" =>{ Str },
                     "Bool" =>{ Bool },
-                    "List" => { GatResult::List },
-                    "Data" => { GatResult::Data },
+                    "Template" => { GatResult::Template },
+                    "Table" => { GatResult::Table },
                     "MutList" => { GatResult::MutList },
-                    "InnerList" => { GatResult::InnerList },
-                    //"InnerData" => { GatResult::InnerData },
+                    "InnerTemp" => { GatResult::InnerTemp },
                     "InnerMut" =>{ GatResult::InnerMut },
-                    "InnerListDef" => { GatResult::InnerListDef },
-                    //"InnerDataDef" => { GatResult::InnerDataDef },
+                    "InnerTempDef" => { GatResult::InnerTempDef },
                     "InnerMutDef" =>{ GatResult::InnerMutDef },
                     "__ViolatedList" => { GatResult::ViolatedList },
                     "__InnerViolatedList" => { GatResult::InnerViolatedList },

@@ -51,16 +51,16 @@ pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
                 mem.is_old(),
             ))
         },
-        RustMemberType::Data =>{
+        RustMemberType::Table =>{
             MemberSource::Data(DataSource::from(mem))
-        },
-        RustMemberType::List =>{
+        }
+        RustMemberType::Template =>{
             MemberSource::List(ListSource::from(mem))
-        },
-        RustMemberType::InnerList =>{
+        }
+        RustMemberType::InnerTemp =>{
             MemberSource::InnerList(InnerListSource::from(mem))
-        },
-        RustMemberType::Mut =>{
+        }
+        RustMemberType::MutList =>{
             MemberSource::Mut(MutSource::from(mem))
         }
         _ => unreachable!(),

@@ -1,7 +1,7 @@
 use crate::{HashM, HashS};
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
-use crate::imp::structs::rust_list::ListItem;
+use crate::imp::structs::rust_list::ConstItem;
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::list_def_obj::ListDefMap;
 use crate::imp::structs::ref_def_obj::RefDefMap;
@@ -33,7 +33,7 @@ pub fn validate_old_ref_def(old : &HashS<String>, ref_def : &RefDefMap, names : 
     Ok(())
 }
 
-pub fn validate_old_data_id(old : &HashS<String>, data_map : &HashM<String, ListItem>, names : &Names) -> Result<()> {
+pub fn validate_old_data_id(old : &HashS<String>, data_map : &HashM<String, ConstItem>, names : &Names) -> Result<()> {
     for name in old{
         if data_map.contains_key(name) == false{
             Err(format!("{} Old's ID {} does not exist in the Data", names, name))?

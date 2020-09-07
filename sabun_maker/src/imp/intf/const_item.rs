@@ -1,4 +1,4 @@
-use crate::imp::structs::rust_list::{ListItem};
+use crate::imp::structs::rust_list::{ConstItem};
 use crate::imp::structs::list_value::{ListDefValue, ListSabValue};
 //use crate::imp::intf::inner_data::InnerDataPtr;
 use crate::imp::structs::rust_param::RustParam;
@@ -6,61 +6,61 @@ use crate::imp::structs::qv::Qv;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::intf::RootObjectPtr;
-use crate::imp::intf::inner_list::InnerListPtr;
+use crate::imp::intf::inner_temp::InnerTempPtr;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
-pub struct ListItemPtr {
-    item : *const ListItem,
+pub struct ConstItemPtr {
+    item : *const ConstItem,
     list_def : *const ListDefObj,
     root : *mut RootObject,
 }
 
-impl ListItemPtr {
-    pub fn new(item : *const ListItem, list_def : *const ListDefObj, root : *mut RootObject) -> ListItemPtr { ListItemPtr { item, list_def, root }}
-    pub fn item(&self) -> *const ListItem{ self.item }
+impl ConstItemPtr {
+    pub fn new(item : *const ConstItem, list_def : *const ListDefObj, root : *mut RootObject) -> ConstItemPtr { ConstItemPtr { item, list_def, root }}
+    pub fn item(&self) -> *const ConstItem { self.item }
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
 }
 
-pub fn get_inner_list(ps : ListItemPtr, name : &str) -> Option<InnerListPtr>{
+pub fn get_inner_list(ps : ConstItemPtr, name : &str) -> Option<InnerTempPtr>{
     let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
-    if let Some(ListDefValue::InnerListDef(def)) = list_def.default().get(name){
-        if let Some(ListSabValue::InnerList(data)) = item.values().get(name){
-            return Some(InnerListPtr::new(data, def, ps.root))
+    if let Some(ListDefValue::InnerTempDef(def)) = list_def.default().get(name){
+        if let Some(ListSabValue::InnerTemp(data)) = item.values().get(name){
+            return Some(InnerTempPtr::new(data, def, ps.root))
         }
     }
     None
 }
 
-pub fn get_bool(ps : ListItemPtr, name : &str) -> Option<Qv<bool>>{
+pub fn get_bool(ps : ConstItemPtr, name : &str) -> Option<Qv<bool>>{
     let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     if let Some(RustParam::Bool(b)) = get_param(item, list_def, name){
         Some(b.clone())
     } else{ None }
 }
 
-pub fn get_float(ps : ListItemPtr, name : &str) -> Option<Qv<f64>>{
+pub fn get_float(ps : ConstItemPtr, name : &str) -> Option<Qv<f64>>{
     let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     if let Some(RustParam::Float(b)) = get_param(item, list_def, name){
         Some(b.clone())
     } else{ None }
 }
 
-pub fn get_int(ps : ListItemPtr, name : &str) -> Option<Qv<i64>>{
+pub fn get_int(ps : ConstItemPtr, name : &str) -> Option<Qv<i64>>{
     let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     if let Some(RustParam::Int(b)) = get_param(item, list_def, name){
         Some(b.clone())
     } else{ None }
 }
 
-pub fn get_str(ps : ListItemPtr, name : &str) -> Option<Qv<String>>{
+pub fn get_str(ps : ConstItemPtr, name : &str) -> Option<Qv<String>>{
     let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     if let Some(RustParam::String(b)) = get_param(item, list_def, name){
         Some(b.map(|s| s.str().to_string()))
     } else{ None }
 }
 
-pub fn get_param<'a>(item : &'a ListItem, def : &'a ListDefObj, name : &str) -> Option<&'a RustParam>{
+pub fn get_param<'a>(item : &'a ConstItem, def : &'a ListDefObj, name : &str) -> Option<&'a RustParam>{
     if let Some(ListSabValue::Param(p)) = item.values().get(name){
         Some(p)
     } else if let Some(ListDefValue::Param(p, _)) = def.default().get(name){
@@ -70,7 +70,7 @@ pub fn get_param<'a>(item : &'a ListItem, def : &'a ListDefObj, name : &str) -> 
     }
 }
 
-pub fn get_ref(ps : ListItemPtr, list_name : &str) -> Option<Qv<ListItemPtr>>{
+pub fn get_ref(ps : ConstItemPtr, list_name : &str) -> Option<Qv<ConstItemPtr>>{
     let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     let qv = if let Some(sab) = item.refs().get(list_name){
         sab.value()
@@ -81,6 +81,6 @@ pub fn get_ref(ps : ListItemPtr, list_name : &str) -> Option<Qv<ListItemPtr>>{
     };
     qv.opt_map(|id|{
         let data = super::root::get_data(RootObjectPtr::new(ps.root), list_name).unwrap();
-        super::data::get_value(data, id)
+        super::table::get_value(data, id)
     })
 }

@@ -1,5 +1,5 @@
 use crate::imp::structs::linked_m::{LinkedMap, LinkedMapUnsafeIter};
-use crate::imp::structs::rust_list::MutListItem;
+use crate::imp::structs::rust_list::MutItem;
 use std::marker::PhantomData;
 use crate::imp::intf::{MutListItemPtr};
 use crate::imp::structs::list_def_obj::ListDefObj;
@@ -10,16 +10,16 @@ use crate::imp::structs::root_obj::RootObject;
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct MutListPtr<V : From<MutListItemPtr>>{
-    map : *mut LinkedMap<MutListItem>,
+    map : *mut LinkedMap<MutItem>,
     list_def : *const ListDefObj,
     root : *mut RootObject,
     phantom : PhantomData<*const V>,
 }
 
 impl<V : From<MutListItemPtr>> MutListPtr<V>{
-    pub fn new(map : *mut LinkedMap<MutListItem>, list_def : *const ListDefObj, root : *mut RootObject) -> MutListPtr<V>{ MutListPtr{ map, list_def, root, phantom : PhantomData } }
+    pub fn new(map : *mut LinkedMap<MutItem>, list_def : *const ListDefObj, root : *mut RootObject) -> MutListPtr<V>{ MutListPtr{ map, list_def, root, phantom : PhantomData } }
 
-    fn from(&self, item : *mut MutListItem) -> V{
+    fn from(&self, item : *mut MutItem) -> V{
         V::from(MutListItemPtr::new(item, self.list_def, self.root))
     }
 
@@ -68,12 +68,12 @@ impl<V : From<MutListItemPtr>> MutListPtr<V>{
 
     pub fn insert_last(&mut self) -> V{
         let map = unsafe{ &mut *self.map };
-        let id = map.insert_last(MutListItem::new());
+        let id = map.insert_last(MutItem::new());
         self.from_id(id).unwrap()
     }
     pub fn insert_first(&mut self) -> V{
         let map = unsafe{ &mut *self.map };
-        let id = map.insert_first(MutListItem::new());
+        let id = map.insert_first(MutItem::new());
         self.from_id(id).unwrap()
     }
 
@@ -128,7 +128,7 @@ impl<V : From<MutListItemPtr>> MutListPtr<V>{
 }
 
 pub struct MutPtrIter<V : From<MutListItemPtr>>{
-    iter : LinkedMapUnsafeIter<MutListItem>,
+    iter : LinkedMapUnsafeIter<MutItem>,
     list_def : *const ListDefObj,
     root : *mut RootObject,
     phantom : PhantomData<*const V>,
@@ -141,11 +141,11 @@ impl<V : From<MutListItemPtr>> Iterator for MutPtrIter<V>{
     }
 }
 impl<V : From<MutListItemPtr>> MutPtrIter<V>{
-    pub(crate) fn new(iter : LinkedMapUnsafeIter<MutListItem>, list_def : *const ListDefObj, root : *mut RootObject) -> MutPtrIter<V>{
+    pub(crate) fn new(iter : LinkedMapUnsafeIter<MutItem>, list_def : *const ListDefObj, root : *mut RootObject) -> MutPtrIter<V>{
         MutPtrIter{ iter, list_def, root, phantom : PhantomData }
     }
 
-    fn from(&self, item : *mut MutListItem) -> V{
+    fn from(&self, item : *mut MutItem) -> V{
         V::from(MutListItemPtr::new(item, self.list_def, self.root))
     }
     ///現在のカーソルにあるアイテムを返し、カーソルを進める

@@ -4,7 +4,7 @@ use crate::error::Result;
 use crate::imp::structs::rust_value::{RustValue};
 use crate::imp::structs::ref_value::{RefValue, RefSabValue};
 use crate::imp::structs::ref_def_obj::{RefDefObj};
-use crate::imp::structs::rust_list::{ListItem, MutListItem};
+use crate::imp::structs::rust_list::{ConstItem, MutItem};
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
@@ -88,7 +88,7 @@ impl TmpObj{
         self.default.insert(s, v);
     }
 
-    pub fn into_list_item(self) -> Result<ListItem>{
+    pub fn into_list_item(self) -> Result<ConstItem>{
 
         if self.id.is_some(){
             Err(format!("{} ID is not needed for a list item {}", self.span.line_str(), self.span.slice()))?
@@ -100,10 +100,10 @@ impl TmpObj{
             Err(format!("{} Old is not needed for a list item {}", self.refs.span.line_str(), self.refs.span.slice()))?
         }
 
-        Ok(ListItem::new(to_list_sab_map(self.default, &self.span)?, to_ref_sab_map(self.refs.map)))
+        Ok(ConstItem::new(to_list_sab_map(self.default, &self.span)?, to_ref_sab_map(self.refs.map)))
     }
 
-    pub fn into_list_item_with_id(self) -> Result<(String, ListItem)>{
+    pub fn into_list_item_with_id(self) -> Result<(String, ConstItem)>{
         if self.id.is_none(){
             Err(format!("{} ID must be defined {}", self.span.line_str(), self.span.slice()))?
         }
@@ -115,7 +115,7 @@ impl TmpObj{
         }
         match self.id.unwrap(){
             IdValue::Str(s) =>{
-                Ok((s, ListItem::new(to_list_sab_map(self.default, &self.span)?,to_ref_sab_map(self.refs.map))))
+                Ok((s, ConstItem::new(to_list_sab_map(self.default, &self.span)?, to_ref_sab_map(self.refs.map))))
             },
             IdValue::Num(_) =>{
                 Err(format!("{} ID must be a string {}", self.span.line_str(), self.span.slice()))?
@@ -123,7 +123,7 @@ impl TmpObj{
         }
     }
 
-    pub fn into_violated_list_item(self, id : usize) -> Result<(u64, MutListItem)>{
+    pub fn into_violated_list_item(self, id : usize) -> Result<(u64, MutItem)>{
         let id = match self.id {
             Some(IdValue::Num(id)) => id,
             Some(_) =>{
@@ -139,7 +139,7 @@ impl TmpObj{
             Err(format!("{} Old is not needed for a violated list item {}", self.refs.span.line_str(), self.refs.span.slice()))?
         }
 
-        Ok((id, MutListItem::construct(to_list_sab_map(self.default, &self.span)?, to_ref_sab_map(self.refs.map))))
+        Ok((id, MutItem::construct(to_list_sab_map(self.default, &self.span)?, to_ref_sab_map(self.refs.map))))
     }
 }
 

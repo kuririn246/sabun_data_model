@@ -1,4 +1,4 @@
-use crate::imp::structs::rust_list::MutListItem;
+use crate::imp::structs::rust_list::MutItem;
 //use crate::imp::intf::inner_data::InnerDataPtr;
 use crate::imp::structs::list_value::{ListDefValue, ListSabValue};
 use crate::imp::structs::qv::Qv;
@@ -10,17 +10,17 @@ use crate::imp::intf::mut_list_ptr::MutListPtr;
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct MutListItemPtr {
-    item : *mut MutListItem,
+    item : *mut MutItem,
     list_def : *const ListDefObj,
     root : *mut RootObject,
 }
 
 impl MutListItemPtr {
     ///getだけなら &MutListItemからのポインタでもOKである。その場合setするとundefined behaviorなので、&mut からのポインタを得る必要がある
-    pub fn new(item : *mut MutListItem, list_def : *const ListDefObj, root : *mut RootObject) -> MutListItemPtr {
+    pub fn new(item : *mut MutItem, list_def : *const ListDefObj, root : *mut RootObject) -> MutListItemPtr {
         MutListItemPtr { item, list_def, root }
     }
-    pub fn item(&self) -> *mut MutListItem{ self.item }
+    pub fn item(&self) -> *mut MutItem { self.item }
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
 }
 
@@ -43,7 +43,7 @@ pub fn get_bool(ps : MutListItemPtr, name : &str) -> Option<Qv<bool>>{
     } else{ None }
 }
 
-pub fn get_param<'a>(item : &'a MutListItem, def : &'a ListDefObj, name : &str) -> Option<&'a RustParam>{
+pub fn get_param<'a>(item : &'a MutItem, def : &'a ListDefObj, name : &str) -> Option<&'a RustParam>{
     if let Some(ListSabValue::Param(p)) = item.values().get(name){
         Some(p)
     } else if let Some(ListDefValue::Param(p, _)) = def.default().get(name){

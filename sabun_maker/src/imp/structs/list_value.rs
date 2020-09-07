@@ -1,5 +1,5 @@
 use crate::imp::structs::rust_param::RustParam;
-use crate::imp::structs::rust_list::{InnerList, InnerMutList};
+use crate::imp::structs::rust_list::{InnerTemplate, InnerMutList};
 use crate::imp::structs::rust_value::{RustValue, RustMemberType};
 use crate::imp::structs::var_type::VarType;
 use crate::imp::structs::qv::QvType;
@@ -10,7 +10,7 @@ use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
 pub enum ListDefValue{
     Param(RustParam, VarType),
     //InnerDataDef(ListDefObj),
-    InnerListDef(ListDefObj),
+    InnerTempDef(ListDefObj),
     InnerMutDef(InnerMutDefObj),
 }
 
@@ -18,7 +18,7 @@ pub enum ListDefValue{
 pub enum ListSabValue{
     Param(RustParam),
     //InnerData(InnerData),
-    InnerList(InnerList),
+    InnerTemp(InnerTemplate),
     ///InnerMutListだけundefinedになりうる
     InnerMut(Option<InnerMutList>),
 }
@@ -28,7 +28,7 @@ impl ListDefValue{
         match self{
             ListDefValue::Param(p,v) => RustValue::Param(p,v),
             //ListDefValue::InnerDataDef(d) => RustValue::InnerDataDef(d),
-            ListDefValue::InnerListDef(l) => RustValue::InnerListDef(l),
+            ListDefValue::InnerTempDef(l) => RustValue::InnerTempDef(l),
             ListDefValue::InnerMutDef(m) => RustValue::InnerMutDef(m),
         }
     }
@@ -66,7 +66,7 @@ impl ListDefValue{
         match self{
             ListDefValue::Param(param, _) => param.type_num(),
             //ListDefValue::InnerDataDef(_) => InnerData,
-            ListDefValue::InnerListDef(_) => InnerList,
+            ListDefValue::InnerTempDef(_) => InnerTemp,
             ListDefValue::InnerMutDef(_) => InnerMut,
         }
     }
@@ -74,7 +74,7 @@ impl ListDefValue{
     pub(crate) fn inner_def(&self) -> Option<&ListDefObj>{
         match self{
             //ListDefValue::InnerDataDef(d) => Some(d),
-            ListDefValue::InnerListDef(d) => Some(d),
+            ListDefValue::InnerTempDef(d) => Some(d),
             ListDefValue::InnerMutDef(obj) => Some(obj.list_def()),
             _ => None,
         }
@@ -89,7 +89,7 @@ impl ListSabValue{
         match self{
             ListSabValue::Param(param) => param.type_num(),
             //ListSabValue::InnerData(_) => InnerData,
-            ListSabValue::InnerList(_) => InnerList,
+            ListSabValue::InnerTemp(_) => InnerTemp,
             ListSabValue::InnerMut(_) => InnerMut,
         }
     }
@@ -102,7 +102,7 @@ impl ListSabValue{
             //value側は名前に?とか!とかつけなくてよいのでValueType::Normal
             ListSabValue::Param(p) => RustValue::Param(p, VarType::Normal),
             //ListSabValue::InnerData(d) => RustValue::InnerData(d),
-            ListSabValue::InnerList(l) => RustValue::InnerList(l),
+            ListSabValue::InnerTemp(l) => RustValue::InnerTemp(l),
             ListSabValue::InnerMut(m) => RustValue::InnerMut(m),
         }
     }

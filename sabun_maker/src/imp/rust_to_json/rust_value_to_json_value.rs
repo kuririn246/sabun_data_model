@@ -14,11 +14,11 @@ pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> (String, Value){
         RustValue::Param(param, vt) => {
             return (name_with_suffix(name, *vt), get_param(param))
         },
-        RustValue::Data(l) => { rust_list_to_json(&TmpJsonList::from_const_data(l), ListType::Data) },
-        RustValue::List(l) => { rust_list_to_json(&TmpJsonList::from_const_list(l), ListType::List) },
-        RustValue::Mut(l) => { rust_list_to_json(&TmpJsonList::from_mut_list(l), ListType::Mut) },
+        RustValue::Table(l) => { rust_list_to_json(&TmpJsonList::from_const_data(l), ListType::Data) },
+        RustValue::Template(l) => { rust_list_to_json(&TmpJsonList::from_const_list(l), ListType::List) },
+        RustValue::MutList(l) => { rust_list_to_json(&TmpJsonList::from_mut_list(l), ListType::Mut) },
         //RustValue::InnerData(l) => { rust_list_to_json(&TmpJsonList::from_inner_data(l), ListType::InnerData) },
-        RustValue::InnerList(l) => { rust_list_to_json(&TmpJsonList::from_inner_list(l), ListType::InnerList) },
+        RustValue::InnerTemp(l) => { rust_list_to_json(&TmpJsonList::from_inner_list(l), ListType::InnerList) },
         RustValue::InnerMut(l) => {
             match l {
                 Some(l) => { rust_list_to_json(&TmpJsonList::from_inner_mut(l), ListType::InnerMut) },
@@ -26,7 +26,7 @@ pub fn rust_value_to_json_value(v : &RustValue, name : &str) -> (String, Value){
             }
         },
         //RustValue::InnerDataDef(d) =>{ inner_def_to_json(d, ListType::InnderDataDef) },
-        RustValue::InnerListDef(d) =>{ inner_def_to_json(d, ListType::InnerListDef) },
+        RustValue::InnerTempDef(d) =>{ inner_def_to_json(d, ListType::InnerListDef) },
         RustValue::InnerMutDef(obj) =>{
             let val = inner_mut_def_to_json(obj);
             if obj.undefinable(){

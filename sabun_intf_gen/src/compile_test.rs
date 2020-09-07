@@ -30,16 +30,16 @@ impl RootIntf{
 }
 #[derive(Debug, PartialEq)]
 pub struct RefedData {
-	ptr : ConstDataPtr,
+	ptr : ConstTablePtr,
 }
 impl RefedData {
-	pub fn new(ptr : ConstDataPtr) -> RefedData{ RefedData{ ptr } } 
+	pub fn new(ptr : ConstTablePtr) -> RefedData{ RefedData{ ptr } }
 	pub fn first(&self) -> RefedItem {
-		let ptr = data::get_value(self.ptr, "first").unwrap();
+		let ptr = table::get_value(self.ptr, "first").unwrap();
 		RefedItem::new(ptr)
 	}
 	pub fn second(&self) -> RefedItem {
-		let ptr = data::get_value(self.ptr, "second").unwrap();
+		let ptr = table::get_value(self.ptr, "second").unwrap();
 		RefedItem::new(ptr)
 	}
 	pub fn from_id(&self, id : &str) -> Option<RefedItem>{
@@ -52,12 +52,12 @@ impl RefedData {
 }
 #[derive(Debug, PartialEq)]
 pub struct RefedItem {
-	ptr : ListItemPtr,
+	ptr : ConstItemPtr,
 }
 impl RefedItem {
-	pub fn new(ptr : ListItemPtr) -> RefedItem{ RefedItem{ ptr } } 
+	pub fn new(ptr : ConstItemPtr) -> RefedItem{ RefedItem{ ptr } }
 	pub fn mem(&self) -> i64{
-		let qv = list_item::get_int(self.ptr, "mem").unwrap();
+		let qv = const_item::get_int(self.ptr, "mem").unwrap();
 		qv.into_value().unwrap()
 	}
 }

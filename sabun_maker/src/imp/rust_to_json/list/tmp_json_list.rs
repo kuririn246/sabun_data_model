@@ -2,7 +2,7 @@ use crate::imp::json_to_rust::tmp::tmp_obj::{ IdValue};
 use crate::{HashM, HashS};
 use std::collections::{BTreeSet, BTreeMap};
 use crate::imp::structs::rust_value::RustValue;
-use crate::imp::structs::rust_list::{ListItem, MutListItem, ConstData, ConstList, MutList, InnerList, InnerMutList};
+use crate::imp::structs::rust_list::{ConstItem, MutItem, ConstTable, ConstTemplate, MutList, InnerTemplate, InnerMutList};
 use crate::imp::structs::ref_value::RefValue;
 use crate::imp::structs::list_def_obj::ListDefObj;
 
@@ -22,7 +22,7 @@ pub struct TmpJsonObj{
 }
 
 impl TmpJsonObj{
-    pub fn from_list_item(l : &ListItem, id : Option<&String>) -> TmpJsonObj{
+    pub fn from_list_item(l : &ConstItem, id : Option<&String>) -> TmpJsonObj{
         let value_map : HashM<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().into_rust_value_for_json())).collect();
         let ref_map : HashM<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().into_ref_value_for_json())).collect();
         TmpJsonObj{ default : btree_map(&value_map),
@@ -30,7 +30,7 @@ impl TmpJsonObj{
             id : id.map(|s| IdValue::Str(s.to_string())), old : None }
     }
 
-    pub fn from_mut_list_item(l : &MutListItem, id : u64) -> TmpJsonObj{
+    pub fn from_mut_list_item(l : &MutItem, id : u64) -> TmpJsonObj{
         let value_map : HashM<String, RustValue> = l.values().iter().map(|(k,v)| (k.to_string(), v.clone().into_rust_value_for_json())).collect();
         let ref_map : HashM<String, RefValue> = l.refs().iter().map(|(k,v)| (k.to_string(), v.clone().into_ref_value_for_json())).collect();
         TmpJsonObj{
@@ -69,13 +69,13 @@ fn get_from_set(set : &HashS<String>) -> Option<BTreeSet<String>>{
 }
 
 impl TmpJsonList{
-    pub fn from_const_data(l : &ConstData) -> TmpJsonList{
+    pub fn from_const_data(l : &ConstTable) -> TmpJsonList{
         //最近のハッシュマップは中身の順番がランダム化されるようなので、btree_mapにうつして順番を揃える
          TmpJsonList{ vec: btree_map(l.list()).iter().map(|(id,item)| TmpJsonObj::from_list_item(item, Some(id))).collect(),
              compatible : None, next_id: None, old : get_from_set(l.old()), default : Some(l.default().clone()) }
     }
 
-    pub fn from_const_list(l : &ConstList) -> TmpJsonList{
+    pub fn from_const_list(l : &ConstTemplate) -> TmpJsonList{
         TmpJsonList{ vec: l.list().iter().map(|item| TmpJsonObj::from_list_item(item, None)).collect(),
             compatible : None, next_id: None, old : None, default : Some(l.default().clone()) }
     }
@@ -90,7 +90,7 @@ impl TmpJsonList{
     //         compatible : None, next_id: None, old : get_from_set(l.old()), default : None }
     // }
 
-    pub fn from_inner_list(l : &InnerList) -> TmpJsonList{
+    pub fn from_inner_list(l : &InnerTemplate) -> TmpJsonList{
         TmpJsonList{ vec : l.list().iter().map(|item| TmpJsonObj::from_list_item(item, None)).collect(),
             compatible : None, next_id: None, old : None, default : None }
     }

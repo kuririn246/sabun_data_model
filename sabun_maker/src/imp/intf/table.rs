@@ -1,6 +1,6 @@
-use crate::imp::structs::rust_list::{ConstData, ListItem};
+use crate::imp::structs::rust_list::{ConstTable, ConstItem};
 use crate::{HashM, HashS};
-use crate::imp::intf::list_item::ListItemPtr;
+use crate::imp::intf::const_item::ConstItemPtr;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
 
@@ -15,26 +15,26 @@ use crate::imp::structs::root_obj::RootObject;
 // }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
-pub struct ConstDataPtr{
-    ptr : *const ConstData,
+pub struct ConstTablePtr {
+    ptr : *const ConstTable,
     root : *mut RootObject,
 }
-impl ConstDataPtr{
-    pub fn new(ptr : *const ConstData, root : *mut RootObject) -> ConstDataPtr{ ConstDataPtr{ ptr, root } }
+impl ConstTablePtr {
+    pub fn new(ptr : *const ConstTable, root : *mut RootObject) -> ConstTablePtr { ConstTablePtr { ptr, root } }
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct DataKV {
     is_old : bool,
     id : String,
-    item : *const ListItem,
+    item : *const ConstItem,
 }
 
 impl DataKV {
-    pub(crate) fn new(is_old : bool, id : String, item : *const ListItem) -> DataKV { DataKV { is_old, id, item }}
+    pub(crate) fn new(is_old : bool, id : String, item : *const ConstItem) -> DataKV { DataKV { is_old, id, item }}
     pub fn is_old(&self) -> bool { self.is_old }
     pub fn id(&self) -> &str{ self.id.as_str() }
-    pub fn item(&self) -> *const ListItem{ self.item }
+    pub fn item(&self) -> *const ConstItem { self.item }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -49,23 +49,23 @@ impl DataKVs {
     pub fn def(&self) -> *const ListDefObj{ self.list_def }
 }
 
-pub fn get_kvs(data : ConstDataPtr) -> DataKVs {
+pub fn get_kvs(data : ConstTablePtr) -> DataKVs {
     let data = unsafe{ data.ptr.as_ref().unwrap() };
     get_kvs_impl(data.default(), data.list(), data.old())
 }
 
-pub fn get_kvs_impl(list_def : &ListDefObj, data : &HashM<String, ListItem>, old : &HashS<String>) -> DataKVs {
+pub fn get_kvs_impl(list_def : &ListDefObj, data : &HashM<String, ConstItem>, old : &HashS<String>) -> DataKVs {
     DataKVs::new(data.iter().map(|(k,v)|
         DataKV::new(old.contains(k), k.to_string(), v)).collect(),
                  list_def)
 }
 
-pub fn get_value(data : ConstDataPtr, id : &str) -> Option<ListItemPtr>{
+pub fn get_value(data : ConstTablePtr, id : &str) -> Option<ConstItemPtr>{
     let d = unsafe{data.ptr.as_ref().unwrap()};
     get_value_impl(d.list(), d.default(), id, data.root)
 }
 
-pub fn get_value_impl(data : &HashM<String, ListItem>, list_def : &ListDefObj, id : &str, root : *mut RootObject) -> Option<ListItemPtr>{
-    data.get(id).map(|i| ListItemPtr::new(i, list_def, root))
+pub fn get_value_impl(data : &HashM<String, ConstItem>, list_def : &ListDefObj, id : &str, root : *mut RootObject) -> Option<ConstItemPtr>{
+    data.get(id).map(|i| ConstItemPtr::new(i, list_def, root))
 }
 

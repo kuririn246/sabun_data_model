@@ -10,33 +10,33 @@ use crate::imp::structs::linked_m::LinkedMap;
 
 ///アイテムごとにIDをもち、Refで参照することが可能である
 #[derive(Debug, PartialEq, Clone)]
-pub struct ConstData{
+pub struct ConstTable {
     default : Box<ListDefObj>,
-    list : Box<HashM<String, ListItem>>,
+    list : Box<HashM<String, ConstItem>>,
     ///oldに設定されたIDはjsonから参照出来ない。変数名の末尾に"_Old"をつけないとプログラムからも使えない。
     old : Box<HashS<String>>,
 }
 
-impl ConstData{
-    pub(crate) fn new(default : ListDefObj, list : HashM<String, ListItem>, old : HashS<String>) -> ConstData{
-        ConstData{ default : Box::new(default), list : Box::new(list), old : Box::new(old) }
+impl ConstTable {
+    pub(crate) fn new(default : ListDefObj, list : HashM<String, ConstItem>, old : HashS<String>) -> ConstTable {
+        ConstTable { default : Box::new(default), list : Box::new(list), old : Box::new(old) }
     }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
-    pub(crate) fn list(&self) -> &HashM<String, ListItem>{ self.list.as_ref() }
+    pub(crate) fn list(&self) -> &HashM<String, ConstItem>{ self.list.as_ref() }
     pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
 }
 
 ///IDを持たず、参照できない。MutListの初期値を書くのが主な使い道か。IDは必要ないけど単にデータを書いておきたい場合もあるだろう。
 #[derive(Debug, PartialEq, Clone)]
-pub struct ConstList{
+pub struct ConstTemplate {
     default : Box<ListDefObj>,
-    list : Box<Vec<ListItem>>,
+    list : Box<Vec<ConstItem>>,
 }
 
-impl ConstList{
-    pub(crate) fn new(default : ListDefObj, list : Vec<ListItem>) -> ConstList{ ConstList{ default : Box::new(default), list : Box::new(list) } }
+impl ConstTemplate {
+    pub(crate) fn new(default : ListDefObj, list : Vec<ConstItem>) -> ConstTemplate { ConstTemplate { default : Box::new(default), list : Box::new(list) } }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
-    pub(crate) fn list(&self) -> &Vec<ListItem>{ self.list.as_ref() }
+    pub(crate) fn list(&self) -> &Vec<ConstItem>{ self.list.as_ref() }
 }
 
 ///追加、削除、順番の変更等ができるリスト。初期値を持てず最初は必ず空リストである。これはバージョン違いを読み出す時に問題を単純化するために必要。
@@ -45,17 +45,17 @@ impl ConstList{
 #[derive(Debug, PartialEq, Clone)]
 pub struct MutList{
     default : Box<ListDefObj>,
-    list : Box<LinkedMap<MutListItem>>,
+    list : Box<LinkedMap<MutItem>>,
     compatible : Box<HashS<String>>,
 }
 
 impl MutList{
-    pub(crate) fn new(default : ListDefObj, list : LinkedMap<MutListItem>, compatible : HashS<String>) -> MutList{
+    pub(crate) fn new(default : ListDefObj, list : LinkedMap<MutItem>, compatible : HashS<String>) -> MutList{
         MutList{ default : Box::new(default), list : Box::new(list), compatible : Box::new(compatible) }
     }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
-    pub(crate) fn list(&self) -> &LinkedMap<MutListItem>{ self.list.as_ref() }
-    pub(crate) fn list_mut(&mut self) -> &mut LinkedMap<MutListItem>{ self.list.as_mut() }
+    pub(crate) fn list(&self) -> &LinkedMap<MutItem>{ self.list.as_ref() }
+    pub(crate) fn list_mut(&mut self) -> &mut LinkedMap<MutItem>{ self.list.as_mut() }
     //pub(crate) fn distribute_mut(&mut self) -> (&mut ListDefObj, &mut LinkedMap<MutListItem>, &mut HashS<String>){ (self.default.as_mut(), self.list.as_mut(), self.compatible.as_mut()) }
     pub(crate) fn next_id(&self) -> u64{ self.list.as_ref().next_id() }
     //pub(crate) fn list_mut(&mut self) -> &mut LinkedHashM<u64, MutListItem>{ self.list.as_mut() }
@@ -65,46 +65,45 @@ impl MutList{
     // }
 
     pub(crate) fn compatible(&self) -> &HashS<String>{ self.compatible.as_ref() }
-    pub(crate) fn deconstruct(self) -> (ListDefObj, LinkedMap<MutListItem>, HashS<String>){
+    pub(crate) fn deconstruct(self) -> (ListDefObj, LinkedMap<MutItem>, HashS<String>){
         (*self.default, *self.list, *self.compatible)
     }
 }
 
 ///Data or Listの内部に作るList。ListDefObjの内部にはDefaultだけ書き、ListItemの内部にはItemのみを書く。
 #[derive(Debug, PartialEq, Clone)]
-pub struct InnerList{
-    list : Vec<ListItem>,
+pub struct InnerTemplate {
+    list : Vec<ConstItem>,
 }
 
-impl InnerList{
-    pub(crate) fn new(list : Vec<ListItem>) -> InnerList{ InnerList { list }}
-    pub(crate) fn list(&self) -> &Vec<ListItem>{ &self.list }
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct InnerMutList{
-    list : Box<LinkedMap<MutListItem>>,
-}
-
-impl InnerMutList{
-    pub(crate) fn new(list : LinkedMap<MutListItem>,) -> InnerMutList{ InnerMutList{ list : Box::new(list) } }
-    pub(crate) fn deconstruct(self) -> LinkedMap<MutListItem>{ *self.list }
-    pub(crate) fn list(&self) -> &LinkedMap<MutListItem>{ self.list.as_ref() }
-    pub(crate) fn list_mut(&mut self) -> &mut LinkedMap<MutListItem>{ self.list.as_mut() }
-    //pub(crate) fn next_id(&self) -> u64{ self.next_id }
+impl InnerTemplate {
+    pub(crate) fn new(list : Vec<ConstItem>) -> InnerTemplate { InnerTemplate { list }}
+    pub(crate) fn list(&self) -> &Vec<ConstItem>{ &self.list }
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct ListItem{
+pub struct InnerMutList {
+    list : Box<LinkedMap<MutItem>>,
+}
+
+impl InnerMutList {
+    pub(crate) fn new(list : LinkedMap<MutItem>,) -> InnerMutList { InnerMutList { list : Box::new(list) } }
+    pub(crate) fn deconstruct(self) -> LinkedMap<MutItem>{ *self.list }
+    pub(crate) fn list(&self) -> &LinkedMap<MutItem>{ self.list.as_ref() }
+    pub(crate) fn list_mut(&mut self) -> &mut LinkedMap<MutItem>{ self.list.as_mut() }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ConstItem {
     ///ListItemの値は常にDefaultからの差分である
     values : Box<HashM<String, ListSabValue>>,
     ///ListItemの値はRefも常にDefaultからの差分である
     refs : Box<HashM<String, RefSabValue>>,
 }
 
-impl ListItem{
-    pub(crate) fn new(values : HashM<String, ListSabValue>, refs : HashM<String, RefSabValue>) -> ListItem{
-        ListItem{ values : Box::new(values), refs : Box::new(refs) }
+impl ConstItem {
+    pub(crate) fn new(values : HashM<String, ListSabValue>, refs : HashM<String, RefSabValue>) -> ConstItem {
+        ConstItem { values : Box::new(values), refs : Box::new(refs) }
     }
     pub(crate) fn values(&self) -> &HashM<String, ListSabValue>{ self.values.as_ref() }
     pub(crate) fn refs(&self) -> &HashM<String, RefSabValue>{ self.refs.as_ref() }
@@ -130,24 +129,21 @@ impl ListItem{
 /// Relationとパラメータ範囲での検索が効率的にできるシステムが作れる。ただそれは外部に作ればいいので、このシステム自体の守備範囲ではない
 /// それが出来る土台として、idとLinkedHashMで出来たMutListがある
 #[derive(Debug, PartialEq, Clone)]
-pub struct MutListItem{
-    /////アイテムごとにidが振られ、これによって削除や順番の変更を検出できる
-    //id : u64,
+pub struct MutItem {
     ///ListItemの値は常にDefaultからの差分である
     values : Box<HashM<String, ListSabValue>>,
     ///ListItemの値はRefでも常にDefaultからの差分である
     refs : Box<HashM<String, RefSabValue>>,
 }
 
-impl MutListItem{
-    pub(crate) fn construct(values : HashM<String, ListSabValue>, refs : HashM<String, RefSabValue>) -> MutListItem{
-        MutListItem{ values : Box::new(values), refs : Box::new(refs) }
+impl MutItem {
+    pub(crate) fn construct(values : HashM<String, ListSabValue>, refs : HashM<String, RefSabValue>) -> MutItem {
+        MutItem { values : Box::new(values), refs : Box::new(refs) }
     }
-    pub(crate) fn new() -> MutListItem{
-        MutListItem{ values : Box::new(HashMt::new()), refs : Box::new(HashMt::new()) }
+    pub(crate) fn new() -> MutItem {
+        MutItem { values : Box::new(HashMt::new()), refs : Box::new(HashMt::new()) }
     }
     pub(crate) fn deconstruct(self) -> (HashM<String, ListSabValue>, HashM<String, RefSabValue>){ (*self.values, *self.refs) }
-    //pub(crate) fn id(&self) -> u64{ self.id }
     pub(crate) fn values(&self) -> &HashM<String, ListSabValue>{ self.values.as_ref() }
     pub(crate) fn values_mut(&mut self) -> &mut HashM<String, ListSabValue>{ self.values.as_mut() }
     pub(crate) fn refs(&self) -> &HashM<String, RefSabValue>{ self.refs.as_ref() }

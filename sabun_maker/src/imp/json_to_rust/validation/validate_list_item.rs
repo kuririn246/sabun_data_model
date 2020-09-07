@@ -34,8 +34,8 @@ pub fn validate_list_item(def : &ListDefObj, sabun_values : &HashM<String, ListS
             //         unreachable!();
             //     }
             // },
-            ListDefValue::InnerListDef(def) => {
-                if let ListSabValue::InnerList(list) = val {
+            ListDefValue::InnerTempDef(def) => {
+                if let ListSabValue::InnerTemp(list) = val {
                     validate_list(def, list.list(), root, can_use_old, &names.append(name))?
                 } else { unreachable!(); }
             },
