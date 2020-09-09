@@ -58,5 +58,5 @@ pub fn to_const_list_type_name(stem : &str) -> String{
 pub fn to_mut_list_type_name(stem : &str) -> String{
     format!("{}MList", to_type_name(stem))
 }
-pub fn to_const_vec_name(stem : &str) -> String{ format!("{}CVec", to_type_name(stem)) }
+pub fn to_const_vec_type_name(stem : &str) -> String{ format!("{}CVec", to_type_name(stem)) }
 pub fn to_mut_vec_type_name(stem : &str) -> String{ format!("{}MVec", to_type_name(stem)) }
