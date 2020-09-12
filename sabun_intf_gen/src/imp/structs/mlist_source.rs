@@ -1,5 +1,5 @@
 use crate::imp::structs::source_builder::SourceBuilder;
-use crate::imp::util::to_type_name::{to_snake_name, to_item_type_name};
+use crate::imp::util::to_type_name::{to_snake_name, to_mitem_type_name};
 use crate::imp::util::with_old::with_old;
 use sabun_maker::intf::member_desc::{MemberDesc};
 use crate::imp::structs::mitem_source::MItemSource;
@@ -34,7 +34,7 @@ impl MListSource {
         let id = self.stem();
         let snake_name = to_snake_name(id);
         let is_old = self.is_old();
-        let item_type_name = to_item_type_name(id);
+        let item_type_name = to_mitem_type_name(id);
         sb.push(0,&format!("pub fn {}(&self) -> MutListPtr<{}>{{", with_old(&snake_name, is_old), &item_type_name));
         sb.push(1,&format!("root::get_mut_list(self.ptr, \"{}\").unwrap()", id));
         sb.push(0,"}");

@@ -1,9 +1,9 @@
 use crate::imp::to_member_source::{MemberSource, to_member_source};
 use crate::imp::structs::source_builder::SourceBuilder;
-use crate::imp::util::to_type_name::to_item_type_name;
 use crate::imp::structs::ref_source::RefSource;
 use sabun_maker::intf::member_desc::MemberDesc;
 use sabun_maker::intf::ref_desc::RefDescs;
+use crate::imp::util::to_type_name::to_mitem_type_name;
 
 #[derive(Debug, PartialEq)]
 pub struct MItemSource {
@@ -29,7 +29,7 @@ impl MItemSource {
         let mut sb = SourceBuilder::new();
 
         let id = self.stem();
-        let item_type_name = to_item_type_name(id);
+        let item_type_name = to_mitem_type_name(id);
 
         sb.push(0,&format!("#[derive(Debug, PartialEq)]"));
         sb.push(0,&format!("pub struct {} {{", &item_type_name));
@@ -46,8 +46,8 @@ impl MItemSource {
         for mem in self.members() {
             match mem{
                 MemberSource::Param(param) =>{
-                    sb.push_without_newline(1, &param.get("mut_list_item", "self.ptr"));
-                    sb.push_without_newline(1, &param.set("mut_list_item", "self.ptr"));
+                    sb.push_without_newline(1, &param.get("mitem"));
+                    sb.push_without_newline(1, &param.set("mitem"));
                 },
                 MemberSource::Table(_) =>{},
                 MemberSource::CList(_) =>{},
@@ -56,13 +56,13 @@ impl MItemSource {
                     //sb.push_without_newline(1, &l.get("mut_list_item", "self.ptr"));
                 },
                 MemberSource::Mil(m) =>{
-                    sb.push_without_newline(1, &m.get("mut_list_item", "self.ptr"));
+                    sb.push_without_newline(1, &m.get());
                 }
             }
         }
         for r in self.refs() {
-            sb.push_without_newline(1, &r.get("mut_list_item"));
-            sb.push_without_newline(1, &r.set("mut_list_item"));
+            sb.push_without_newline(1, &r.get(false));
+            sb.push_without_newline(1, &r.set("mitem"));
         }
         sb.push(0, "}");
 

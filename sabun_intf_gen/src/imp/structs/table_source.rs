@@ -1,5 +1,5 @@
 use crate::imp::structs::source_builder::SourceBuilder;
-use crate::imp::util::to_type_name::{to_snake_name, to_table_type_name, to_item_type_name, to_ids_type_name};
+use crate::imp::util::to_type_name::{to_snake_name, to_table_type_name, to_ids_type_name, to_citem_type_name};
 use crate::imp::util::with_old::with_old;
 use crate::imp::structs::citem_source::CItemSource;
 use sabun_maker::intf::member_desc::{MemberDesc, KeyItem};
@@ -65,7 +65,7 @@ impl TableSource {
         let mut sb = SourceBuilder::new();
         let id = self.stem();
         let data_type_name = to_table_type_name(id);
-        let item_type_name = to_item_type_name(id);
+        let item_type_name = to_citem_type_name(id);
         let ids_type_name = to_ids_type_name(id);
 
         sb.push(0,&format!("#[derive(Debug, PartialEq)]"));

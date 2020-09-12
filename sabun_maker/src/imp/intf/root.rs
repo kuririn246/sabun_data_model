@@ -5,9 +5,9 @@ use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_string::RustString;
 use crate::imp::intf::clist::CListPtr;
-use crate::imp::intf::mlist_ptr::MListPtr;
+use crate::imp::intf::mlist::MListPtr;
 use crate::imp::intf::table::TablePtr;
-use crate::imp::intf::mut_item::MItemPtr;
+use crate::imp::intf::mitem::MItemPtr;
 use crate::imp::intf::citem::CItemPtr;
 
 #[derive(Debug, PartialEq, Clone, Copy)]

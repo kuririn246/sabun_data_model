@@ -1,6 +1,6 @@
 use sabun_maker::structs::{VarType};
 use crate::imp::structs::source_builder::SourceBuilder;
-use crate::imp::util::to_type_name::{to_snake_name, to_item_type_name};
+use crate::imp::util::to_type_name::{to_snake_name, to_citem_type_name, to_mitem_type_name};
 use crate::imp::util::with_old::with_old;
 use crate::imp::util::with_var::with_var;
 use crate::imp::util::var_type_name::var_type_name;
@@ -33,14 +33,15 @@ impl RefSource{
     }
     pub fn is_old(&self) -> bool{ self.is_old }
 
-    pub fn get(&self, mod_name : &str) -> String{
+    pub fn get(&self, from_citem : bool) -> String{
         let mut sb = SourceBuilder::new();
 
         let id = self.name();
         let snake_name = to_snake_name(id);
         let is_old = self.is_old();
         let var_type = self.var_type();
-        let item_type_name = to_item_type_name(id);
+        let item_type_name = if from_citem{ to_citem_type_name(id) } else{ to_mitem_type_name(id) };
+        let mod_name = if from_citem{ "citem" } else{ "mitem" };
         let var_type_name = var_type_name(var_type);
         sb.push(0, &format!("pub fn ref_{}(&self) -> {}{{", with_old(&snake_name, is_old), with_var(&item_type_name, var_type)));
         sb.push(1,&format!("let qv = {}::get_ref(self.ptr, \"{}\").unwrap();", mod_name, id));

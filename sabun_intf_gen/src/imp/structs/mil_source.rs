@@ -1,5 +1,5 @@
 use crate::imp::structs::source_builder::SourceBuilder;
-use crate::imp::util::to_type_name::{to_snake_name, to_item_type_name, to_list_type_name};
+use crate::imp::util::to_type_name::{to_snake_name, to_mitem_type_name};
 use crate::imp::util::with_old::with_old;
 use sabun_maker::intf::member_desc::{MemberDesc};
 use crate::imp::structs::mitem_source::MItemSource;
@@ -34,37 +34,15 @@ impl MilSource {
         let id = self.stem();
         let snake_name = to_snake_name(id);
         let is_old = self.is_old();
-        let list_type_name = to_list_type_name(id);
-        sb.push(0,&format!("pub fn {}(&self) -> {}{{", with_old(&snake_name, is_old), &list_type_name));
-        sb.push(1,&format!("let ans = mut_item::get_inner_mut_list(self.ptr, \"{}\").unwrap();", id));
-        sb.push(1,&format!("{}::new(ans)", &list_type_name));
+        let item_type_name = to_mitem_type_name(id);
+        sb.push(0,&format!("pub fn {}(&self) -> MListPtr<{}>{{", with_old(&snake_name, is_old), &item_type_name));
+        sb.push(1,&format!("let ans = mitem::get_mil(self.ptr, \"{}\").unwrap();", id));
+        sb.push(1,&format!("MListPtr::new(ans)"));
         sb.push(0,"}");
         sb.to_string()
     }
     pub fn to_string(&self) -> String{
         let mut sb = SourceBuilder::new();
-        let id = self.stem();
-        let list_type_name = to_list_type_name(id);
-        let item_type_name = to_item_type_name(id);
-
-        sb.push(0,&format!("#[derive(Debug, PartialEq)]"));
-        sb.push(0,&format!("pub struct {} {{", &list_type_name));
-        sb.push(1,"ptr : InnerListPtr,");
-        sb.push(0,"}");
-        sb.push(0, &format!("impl {} {{", &list_type_name));
-        sb.push(1, &format!("pub fn new(ptr : InnerListPtr) -> {}{{ {}{{ ptr }} }} ",
-                           &list_type_name, &list_type_name));
-
-        sb.push(1, &format!("pub fn len(&self) -> usize{{ inner_list::get_len(self.ptr) }}"));
-        sb.push(1, &format!("pub fn index(&self, idx : usize) -> {}{{", item_type_name));
-        sb.push(2, &format!("let val = inner_list::get_value(self.ptr, idx).unwrap();"));
-        sb.push(2, &format!("{}::new(val)", item_type_name));
-        sb.push(1, "}");
-        sb.push(1, &format!("pub fn iter(&self) -> GeneralIter<{}, {}>{{", &list_type_name, &item_type_name));
-        sb.push(2, &format!("GeneralIter::new(self.len(), self, {}::index)", &list_type_name));
-        sb.push(1, "}");
-        sb.push(0, "}");
-
         sb.push_without_newline(0, &self.item_source.to_string());
         sb.to_string()
     }

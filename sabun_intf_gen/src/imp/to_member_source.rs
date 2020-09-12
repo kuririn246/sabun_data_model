@@ -54,13 +54,13 @@ pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
         RustMemberType::Table =>{
             MemberSource::Table(TableSource::from(mem))
         }
-        RustMemberType::Template =>{
+        RustMemberType::CList =>{
             MemberSource::CList(CListSource::from(mem))
         }
-        RustMemberType::InnerTemp =>{
+        RustMemberType::Cil =>{
             MemberSource::Cil(CilSource::from(mem))
         }
-        RustMemberType::MutList =>{
+        RustMemberType::MList =>{
             MemberSource::MList(MListSource::from(mem))
         }
         _ => unreachable!(),

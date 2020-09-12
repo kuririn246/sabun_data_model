@@ -34,14 +34,14 @@ impl RootIntf{
         for mem in self.members() {
             match mem{
                 MemberSource::Param(param) =>{
-                    sb.push_without_newline(1, &param.get("root", "self.ptr"));
-                    sb.push_without_newline(1, &param.set("root", "self.ptr"));
+                    sb.push_without_newline(1, &param.get("root"));
+                    sb.push_without_newline(1, &param.set("root"));
                 },
                 MemberSource::Table(data) =>{
-                    sb.push_without_newline(1, &data.get("root", "self.ptr", ));
+                    sb.push_without_newline(1, &data.get());
                 },
                 MemberSource::CList(l) =>{
-                    sb.push_without_newline(1, &l.get("root", "self.ptr"));
+                    sb.push_without_newline(1, &l.get());
                 },
                 MemberSource::MList(m) =>{
                     sb.push_without_newline(1, &m.get());

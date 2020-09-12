@@ -1,9 +1,9 @@
 use crate::imp::to_member_source::{MemberSource, to_member_source};
 use crate::imp::structs::source_builder::SourceBuilder;
-use crate::imp::util::to_type_name::to_item_type_name;
 use crate::imp::structs::ref_source::RefSource;
 use sabun_maker::intf::member_desc::MemberDesc;
 use sabun_maker::intf::ref_desc::RefDescs;
+use crate::imp::util::to_type_name::to_citem_type_name;
 
 #[derive(Debug, PartialEq)]
 pub struct CItemSource {
@@ -29,7 +29,7 @@ impl CItemSource {
         let mut sb = SourceBuilder::new();
 
         let id = self.stem();
-        let item_type_name = to_item_type_name(id);
+        let item_type_name = to_citem_type_name(id);
 
         sb.push(0,&format!("#[derive(Debug, PartialEq)]"));
         sb.push(0,&format!("pub struct {} {{", &item_type_name));
@@ -41,19 +41,19 @@ impl CItemSource {
         for mem in self.members() {
             match mem{
                 MemberSource::Param(param) =>{
-                    sb.push_without_newline(1, &param.get("list_item", "self.ptr"));
+                    sb.push_without_newline(1, &param.get("citem"));
                 },
                 MemberSource::Table(_) =>{},
                 MemberSource::CList(_) =>{},
                 MemberSource::MList(_) =>{},
                 MemberSource::Cil(l) =>{
-                    sb.push_without_newline(1, &l.get("list_item", "self.ptr"));
+                    sb.push_without_newline(1, &l.get());
                 },
                 MemberSource::Mil(_) =>{},
             }
         }
         for r in self.refs() {
-            sb.push_without_newline(1, &r.get("list_item"))
+            sb.push_without_newline(1, &r.get(true))
         }
         sb.push(0, "}");
 

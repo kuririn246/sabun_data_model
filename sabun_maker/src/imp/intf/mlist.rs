@@ -3,7 +3,7 @@ use crate::imp::structs::rust_list::MutItem;
 use std::marker::PhantomData;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
-use crate::imp::intf::mut_item::MItemPtr;
+use crate::imp::intf::mitem::MItemPtr;
 
 ///&mut LinkedMapからしか使えない。
 /// &LinkedMapをas *const _ as *mut _ でキャストして、書き換えないように&selfのメソッドだけ呼び出す、というようなことは出来ない。

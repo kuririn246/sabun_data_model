@@ -5,7 +5,7 @@ use crate::imp::structs::qv::Qv;
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
-use crate::imp::intf::mlist_ptr::MListPtr;
+use crate::imp::intf::mlist::MListPtr;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]

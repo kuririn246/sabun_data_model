@@ -37,10 +37,10 @@ pub fn to_snake_name(s : &str) -> String{
     r
 }
 
-pub fn to_const_item_type_name(stem : &str) -> String{
+pub fn to_citem_type_name(stem : &str) -> String{
     format!("{}CItem", to_type_name(stem))
 }
-pub fn to_mut_item_type_name(stem : &str) -> String{
+pub fn to_mitem_type_name(stem : &str) -> String{
     format!("{}MItem", to_type_name(stem))
 }
 
@@ -52,11 +52,6 @@ pub fn to_ids_type_name(stem : &str) -> String{
     format!("{}ID", to_type_name(stem))
 }
 
-pub fn to_const_list_type_name(stem : &str) -> String{
-    format!("{}CList", to_type_name(stem))
-}
-pub fn to_mut_list_type_name(stem : &str) -> String{
-    format!("{}MList", to_type_name(stem))
-}
-pub fn to_cil_type_name(stem : &str) -> String{ format!("{}Cil", to_type_name(stem)) }
-pub fn to_mil_type_name(stem : &str) -> String{ format!("{}Mil", to_type_name(stem)) }
+//pub fn to_clist_type_name(stem : &str) -> String{ format!("{}CList", to_type_name(stem)) }
+//pub fn to_cil_type_name(stem : &str) -> String{ format!("{}Cil", to_type_name(stem)) }
+//pub fn to_mil_type_name(stem : &str) -> String{ format!("{}Mil", to_type_name(stem)) }
