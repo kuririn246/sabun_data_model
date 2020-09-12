@@ -49,7 +49,7 @@ pub fn to_table_type_name(stem : &str) -> String{
 }
 
 pub fn to_ids_type_name(stem : &str) -> String{
-    format!("{}IDs", to_type_name(stem))
+    format!("{}ID", to_type_name(stem))
 }
 
 pub fn to_const_list_type_name(stem : &str) -> String{
@@ -58,5 +58,5 @@ pub fn to_const_list_type_name(stem : &str) -> String{
 pub fn to_mut_list_type_name(stem : &str) -> String{
     format!("{}MList", to_type_name(stem))
 }
-pub fn to_const_vec_type_name(stem : &str) -> String{ format!("{}CVec", to_type_name(stem)) }
-pub fn to_mut_vec_type_name(stem : &str) -> String{ format!("{}MVec", to_type_name(stem)) }
+pub fn to_cil_type_name(stem : &str) -> String{ format!("{}Cil", to_type_name(stem)) }
+pub fn to_mil_type_name(stem : &str) -> String{ format!("{}Mil", to_type_name(stem)) }

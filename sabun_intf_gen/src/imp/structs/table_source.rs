@@ -1,15 +1,15 @@
 use crate::imp::structs::source_builder::SourceBuilder;
 use crate::imp::util::to_type_name::{to_snake_name, to_table_type_name, to_item_type_name, to_ids_type_name};
 use crate::imp::util::with_old::with_old;
-use crate::imp::structs::item_source::ItemSource;
+use crate::imp::structs::citem_source::CItemSource;
 use sabun_maker::intf::member_desc::{MemberDesc, KeyItem};
 
 #[derive(Debug, PartialEq)]
-pub struct DataSource{
+pub struct TableSource {
     stem : String,
     is_old : bool,
     keys : Vec<KeySource>,
-    item_source : ItemSource,
+    item_source : CItemSource,
 }
 #[derive(Debug, PartialEq)]
 pub struct KeySource{
@@ -25,30 +25,30 @@ impl KeySource{
         if self.is_old{ format!("{}_old", to_snake_name(&self.key)) } else{ to_snake_name(&self.key) }
     }
 }
-impl DataSource{
-    pub fn new(stem : String, is_old : bool, keys : Vec<KeySource>, item_source : ItemSource) -> DataSource{
-        DataSource{ stem, is_old, keys, item_source }
+impl TableSource {
+    pub fn new(stem : String, is_old : bool, keys : Vec<KeySource>, item_source : CItemSource) -> TableSource {
+        TableSource { stem, is_old, keys, item_source }
     }
-    pub fn from(desc : &MemberDesc) -> DataSource {
+    pub fn from(desc : &MemberDesc) -> TableSource {
         let mut keys: Vec<KeySource> = vec![];
         let cs = desc.child_descs().unwrap();
         for key in cs.keys() {
             keys.push(KeySource::from(key))
         }
-        DataSource::new(
+        TableSource::new(
             desc.name().to_string(),
             desc.is_old(),
             keys,
-            ItemSource::from(desc.name().to_string(), cs.items(), cs.refs())
+            CItemSource::from(desc.name().to_string(), cs.items(), cs.refs())
         )
     }
 
     pub fn stem(&self) -> &str{ &self.stem }
     pub fn is_old(&self) -> bool{ self.is_old }
     pub fn keys(&self) -> &[KeySource]{ &self.keys }
-    pub fn item_source(&self) -> &ItemSource{ &self.item_source }
+    pub fn item_source(&self) -> &CItemSource { &self.item_source }
 
-    pub fn get(&self, mod_name : &str, ptr_exp : &str) -> String{
+    pub fn get(&self) -> String{
         let mut sb = SourceBuilder::new();
 
         let id = self.stem();
@@ -56,7 +56,7 @@ impl DataSource{
         let is_old = self.is_old();
         let data_type_name = to_table_type_name(id);
         sb.push(0,&format!("pub fn {}(&self) -> {}{{", with_old(&snake_name, is_old), &data_type_name));
-        sb.push(1,&format!("let ans = {}::get_data({}, \"{}\").unwrap();", &mod_name, ptr_exp, id));
+        sb.push(1,&format!("let ans = root::get_data(self.ptr, \"{}\").unwrap();", id));
         sb.push(1,&format!("{}::new(ans)", &data_type_name));
         sb.push(0,"}");
         sb.to_string()

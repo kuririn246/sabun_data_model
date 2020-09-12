@@ -6,7 +6,7 @@ use crate::imp::structs::qv::Qv;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::intf::RootObjectPtr;
-use crate::imp::intf::const_inner_list::CilPtr;
+use crate::imp::intf::clist::CListPtr;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -22,11 +22,11 @@ impl CItemPtr {
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
 }
 
-pub fn get_cil(ps : CItemPtr, name : &str) -> Option<CilPtr>{
+pub fn get_cil<T : From<CItemPtr>>(ps : CItemPtr, name : &str) -> Option<CListPtr<T>>{
     let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     if let Some(ListDefValue::CilDef(def)) = list_def.default().get(name){
         if let Some(ListSabValue::Cil(data)) = item.values().get(name){
-            return Some(CilPtr::new(data, def, ps.root))
+            return Some(CListPtr::new(data.list(), def, ps.root))
         }
     }
     None
@@ -80,7 +80,7 @@ pub fn get_ref(ps : CItemPtr, list_name : &str) -> Option<Qv<CItemPtr>>{
         } else{ return None; }
     };
     qv.opt_map(|id|{
-        let data = super::root::get_data(RootObjectPtr::new(ps.root), list_name).unwrap();
+        let data = super::root::get_table(RootObjectPtr::new(ps.root), list_name).unwrap();
         super::table::get_value(data, id)
     })
 }

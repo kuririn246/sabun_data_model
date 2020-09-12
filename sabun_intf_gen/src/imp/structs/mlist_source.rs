@@ -2,31 +2,31 @@ use crate::imp::structs::source_builder::SourceBuilder;
 use crate::imp::util::to_type_name::{to_snake_name, to_item_type_name};
 use crate::imp::util::with_old::with_old;
 use sabun_maker::intf::member_desc::{MemberDesc};
-use crate::imp::structs::mut_item_source::MutItemSource;
+use crate::imp::structs::mitem_source::MItemSource;
 
 #[derive(Debug, PartialEq)]
-pub struct MutSource {
+pub struct MListSource {
     stem : String,
     is_old : bool,
-    item_source : MutItemSource,
+    item_source : MItemSource,
 }
-impl MutSource {
-    pub fn new(stem : String, is_old : bool, item_source : MutItemSource) -> MutSource {
-        MutSource { stem, is_old, item_source }
+impl MListSource {
+    pub fn new(stem : String, is_old : bool, item_source : MItemSource) -> MListSource {
+        MListSource { stem, is_old, item_source }
     }
-    pub fn from(desc : &MemberDesc) -> MutSource {
+    pub fn from(desc : &MemberDesc) -> MListSource {
         let cs = desc.child_descs().unwrap();
 
-        MutSource::new(
+        MListSource::new(
             desc.name().to_string(),
             desc.is_old(),
-            MutItemSource::from(desc.name().to_string(), cs.items(), cs.refs())
+            MItemSource::from(desc.name().to_string(), cs.items(), cs.refs())
         )
     }
 
     pub fn stem(&self) -> &str{ &self.stem }
     pub fn is_old(&self) -> bool{ self.is_old }
-    pub fn item_source(&self) -> &MutItemSource{ &self.item_source }
+    pub fn item_source(&self) -> &MItemSource { &self.item_source }
 
     pub fn get(&self) -> String{
         let mut sb = SourceBuilder::new();

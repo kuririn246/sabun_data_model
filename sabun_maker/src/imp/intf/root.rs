@@ -4,10 +4,11 @@ use crate::HashM;
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::rust_string::RustString;
-use crate::imp::intf::temp::ConstListPtr;
-use crate::imp::intf::mut_list_ptr::MutListPtr;
-use crate::imp::intf::table::ConstTablePtr;
+use crate::imp::intf::clist::CListPtr;
+use crate::imp::intf::mlist_ptr::MListPtr;
+use crate::imp::intf::table::TablePtr;
 use crate::imp::intf::mut_item::MItemPtr;
+use crate::imp::intf::citem::CItemPtr;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct RootObjectPtr{
@@ -54,27 +55,27 @@ pub fn get_str(root : RootObjectPtr, name : &str) -> Option<Qv<String>>{
     }
 }
 
-pub fn get_data(root_ptr : RootObjectPtr, name : &str) -> Option<ConstTablePtr>{
+pub fn get_table(root_ptr : RootObjectPtr, name : &str) -> Option<TablePtr>{
     let root = unsafe{ root_ptr.ptr.as_ref().unwrap() };
     if let Some(RootValue::Table(d)) = root.default().get(name){
-        Some(ConstTablePtr::new(d, root_ptr.ptr))
+        Some(TablePtr::new(d, root_ptr.ptr))
     } else{ None }
 }
 // pub fn get_data2(root : *const RootObject, name : &str) -> Option<ConstDataPtr>{
 //     get_data(RootObjectPtr::new(root as *mut RootObject), name)
 // }
 
-pub fn get_list(root_ptr : RootObjectPtr, name : &str) -> Option<ConstListPtr>{
+pub fn get_clist<T : From<CItemPtr>>(root_ptr : RootObjectPtr, name : &str) -> Option<CListPtr<T>>{
     let root = unsafe{ root_ptr.ptr.as_ref().unwrap() };
     if let Some(RootValue::CList(l)) = root.default().get(name){
-        Some(ConstListPtr::new(l, root_ptr.ptr))
+        Some(CListPtr::new(l.list(),l.default(), root_ptr.ptr))
     } else{ None }
 }
 
-pub fn get_mut_list<T : From<MItemPtr>>(root : RootObjectPtr, name : &str) -> Option<MutListPtr<T>>{
+pub fn get_mlist<T : From<MItemPtr>>(root : RootObjectPtr, name : &str) -> Option<MListPtr<T>>{
     let root = unsafe{ root.ptr.as_mut().unwrap() };
     if let Some(RootValue::MList(l)) = root.default_mut().get_mut(name){
-        Some(MutListPtr::new(l.list_mut(), l.default(), root))
+        Some(MListPtr::new(l.list_mut(), l.default(), root))
     } else{ None }
 }
 

@@ -5,7 +5,7 @@ use crate::imp::structs::qv::Qv;
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
-use crate::imp::intf::mut_list_ptr::MutListPtr;
+use crate::imp::intf::mlist_ptr::MListPtr;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -24,11 +24,11 @@ impl MItemPtr {
     pub fn list_def(&self) -> *const ListDefObj{ self.list_def }
 }
 
-pub fn get_mil<T : From<MItemPtr>>(ps : MItemPtr, name : &str) -> Option<Option<MutListPtr<T>>> {
+pub fn get_mil<T : From<MItemPtr>>(ps : MItemPtr, name : &str) -> Option<Option<MListPtr<T>>> {
     let item = unsafe { ps.item.as_mut().unwrap() };
     if let Some(ListSabValue::Mil(data)) = item.values_mut().get_mut(name) {
         if let Some(inner) = data {
-            return Some(Some(MutListPtr::new(inner.list_mut(), ps.list_def, ps.root)))
+            return Some(Some(MListPtr::new(inner.list_mut(), ps.list_def, ps.root)))
         } else {
             return Some(None)
         }

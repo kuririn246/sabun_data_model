@@ -1,20 +1,20 @@
 use sabun_maker::intf::member_desc::MemberDesc;
 use crate::imp::structs::param_source::ParamSource;
 use sabun_maker::structs::{RustMemberType, ParamType};
-use crate::imp::structs::data_source::DataSource;
-use crate::imp::structs::list_source::ListSource;
-use crate::imp::structs::inner_list_source::InnerListSource;
-use crate::imp::structs::inner_mut_source::InnerMutSource;
-use crate::imp::structs::mut_source::MutSource;
+use crate::imp::structs::table_source::TableSource;
+use crate::imp::structs::clist_source::CListSource;
+use crate::imp::structs::cil_source::CilSource;
+use crate::imp::structs::mil_source::MilSource;
+use crate::imp::structs::mlist_source::MListSource;
 
 #[derive(Debug, PartialEq)]
 pub enum MemberSource{
     Param(ParamSource),
-    Data(DataSource),
-    List(ListSource),
-    Mut(MutSource),
-    InnerList(InnerListSource),
-    InnerMut(InnerMutSource),
+    Table(TableSource),
+    CList(CListSource),
+    MList(MListSource),
+    Cil(CilSource),
+    Mil(MilSource),
 }
 
 pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
@@ -52,16 +52,16 @@ pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
             ))
         },
         RustMemberType::Table =>{
-            MemberSource::Data(DataSource::from(mem))
+            MemberSource::Table(TableSource::from(mem))
         }
         RustMemberType::Template =>{
-            MemberSource::List(ListSource::from(mem))
+            MemberSource::CList(CListSource::from(mem))
         }
         RustMemberType::InnerTemp =>{
-            MemberSource::InnerList(InnerListSource::from(mem))
+            MemberSource::Cil(CilSource::from(mem))
         }
         RustMemberType::MutList =>{
-            MemberSource::Mut(MutSource::from(mem))
+            MemberSource::MList(MListSource::from(mem))
         }
         _ => unreachable!(),
     }

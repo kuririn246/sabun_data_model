@@ -29,7 +29,7 @@ impl ParamSource{
     }
     pub fn is_old(&self) -> bool{ self.is_old }
 
-    pub fn get(&self, mod_name : &str, ptr_exp : &str) -> String{
+    pub fn get(&self, mod_name : &str) -> String{
         let mut sb = SourceBuilder::new();
 
         let id = self.name();
@@ -39,7 +39,7 @@ impl ParamSource{
         let pt = self.param_type();
 
         sb.push(0,&format!("pub fn {}(&self) -> {}{{", with_old(&snake_name, is_old), with_var(pt.typename(), var_type)));
-        sb.push(1,&format!("let qv = {}::get_{}({}, \"{}\").unwrap();", mod_name, pt.nickname(), ptr_exp, id));
+        sb.push(1,&format!("let qv = {}::get_{}(self.ptr, \"{}\").unwrap();", mod_name, pt.nickname(), id));
         match &var_type {
             VarType::Normal => {
                 sb.push(1,&format!("qv.into_value().unwrap()"));
@@ -57,7 +57,7 @@ impl ParamSource{
         sb.push(0,"}");
         sb.to_string()
     }
-    pub fn set(&self, mod_name : &str, ptr_exp : &str) -> String {
+    pub fn set(&self, mod_name : &str) -> String {
         let mut sb = SourceBuilder::new();
 
         let id = self.name();
@@ -74,7 +74,7 @@ impl ParamSource{
             format!("{}.into_qv()", snake_name)
         };
 
-        sb.push(1, &format!("{}::set_{}({}, \"{}\", {});", mod_name, pt.nickname(), ptr_exp, id, &param));
+        sb.push(1, &format!("{}::set_{}(self.ptr, \"{}\", {});", mod_name, pt.nickname(), id, &param));
         sb.push(0, "}");
         sb.to_string()
     }

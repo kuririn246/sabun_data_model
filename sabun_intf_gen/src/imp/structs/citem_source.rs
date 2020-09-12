@@ -6,15 +6,15 @@ use sabun_maker::intf::member_desc::MemberDesc;
 use sabun_maker::intf::ref_desc::RefDescs;
 
 #[derive(Debug, PartialEq)]
-pub struct ItemSource {
+pub struct CItemSource {
     stem : String,
     members : Vec<MemberSource>,
     refs : Vec<RefSource>,
 }
-impl ItemSource{
-    pub fn new(members : Vec<MemberSource>, refs : Vec<RefSource>, stem : String) -> ItemSource{ ItemSource{ members, refs, stem } }
-    pub fn from(stem : String, mems : &[MemberDesc], refs : &RefDescs) -> ItemSource{
-        ItemSource{
+impl CItemSource {
+    pub fn new(members : Vec<MemberSource>, refs : Vec<RefSource>, stem : String) -> CItemSource { CItemSource { members, refs, stem } }
+    pub fn from(stem : String, mems : &[MemberDesc], refs : &RefDescs) -> CItemSource {
+        CItemSource {
             stem,
             members : mems.iter().map(to_member_source).collect(),
             refs : refs.items().iter().map(RefSource::from).collect()
@@ -43,13 +43,13 @@ impl ItemSource{
                 MemberSource::Param(param) =>{
                     sb.push_without_newline(1, &param.get("list_item", "self.ptr"));
                 },
-                MemberSource::Data(_) =>{},
-                MemberSource::List(_) =>{},
-                MemberSource::Mut(_) =>{},
-                MemberSource::InnerList(l) =>{
+                MemberSource::Table(_) =>{},
+                MemberSource::CList(_) =>{},
+                MemberSource::MList(_) =>{},
+                MemberSource::Cil(l) =>{
                     sb.push_without_newline(1, &l.get("list_item", "self.ptr"));
                 },
-                MemberSource::InnerMut(_) =>{},
+                MemberSource::Mil(_) =>{},
             }
         }
         for r in self.refs() {
@@ -59,14 +59,14 @@ impl ItemSource{
 
         for mem in &self.members{
             match mem{
-                MemberSource::InnerList(l) =>{
+                MemberSource::Cil(l) =>{
                     sb.push_without_newline(0, &l.to_string());
                 },
-                MemberSource::List(_) =>{},
-                MemberSource::Data(_) =>{},
-                MemberSource::Mut(_) =>{},
+                MemberSource::CList(_) =>{},
+                MemberSource::Table(_) =>{},
+                MemberSource::MList(_) =>{},
                 MemberSource::Param(_) =>{},
-                MemberSource::InnerMut(_) =>{},
+                MemberSource::Mil(_) =>{},
             }
         }
 

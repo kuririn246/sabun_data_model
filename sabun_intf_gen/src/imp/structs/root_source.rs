@@ -37,35 +37,35 @@ impl RootIntf{
                     sb.push_without_newline(1, &param.get("root", "self.ptr"));
                     sb.push_without_newline(1, &param.set("root", "self.ptr"));
                 },
-                MemberSource::Data(data) =>{
+                MemberSource::Table(data) =>{
                     sb.push_without_newline(1, &data.get("root", "self.ptr", ));
                 },
-                MemberSource::List(l) =>{
+                MemberSource::CList(l) =>{
                     sb.push_without_newline(1, &l.get("root", "self.ptr"));
                 },
-                MemberSource::Mut(m) =>{
+                MemberSource::MList(m) =>{
                     sb.push_without_newline(1, &m.get());
                 },
-                MemberSource::InnerList(_) =>{},
-                MemberSource::InnerMut(_) =>{},
+                MemberSource::Cil(_) =>{},
+                MemberSource::Mil(_) =>{},
             }
         }
         sb.push(0, "}");
 
         for mem in self.members(){
             match mem{
-                MemberSource::Data(data) =>{
+                MemberSource::Table(data) =>{
                     sb.push(0, &data.to_string())
                 },
-                MemberSource::List(l) =>{
+                MemberSource::CList(l) =>{
                     sb.push(0, &l.to_string())
                 },
-                MemberSource::Mut(m) =>{
+                MemberSource::MList(m) =>{
                     sb.push(0, &m.to_string())
                 },
                 MemberSource::Param(_) =>{},
-                MemberSource::InnerList(_) =>{},
-                MemberSource::InnerMut(_)=>{},
+                MemberSource::Cil(_) =>{},
+                MemberSource::Mil(_)=>{},
             }
         }
 

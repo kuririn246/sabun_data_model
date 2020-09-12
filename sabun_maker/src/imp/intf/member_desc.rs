@@ -4,7 +4,7 @@ use crate::imp::structs::list_value::ListDefValue;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::structs::root_value::RootValue;
-use crate::imp::intf::table::{get_kvs, DataKVs, ConstTablePtr};
+use crate::imp::intf::table::{get_kvs, DataKVs, TablePtr};
 use crate::imp::intf::ref_desc::{RefDescs, get_ref_def_desc};
 
 #[derive(Debug, PartialEq, Clone)]
@@ -71,7 +71,7 @@ pub fn get_member_desc(root_ptr : *mut RootObject) -> Vec<MemberDesc>{
             RootValue::Table(d) =>{
                 let children = get_list_def_desc(d.default());
                 let refs = get_ref_def_desc(d.default().refs());
-                let kvs = get_kvs(ConstTablePtr::new(d, root_ptr));
+                let kvs = get_kvs(TablePtr::new(d, root_ptr));
                 let descs = MemberDescs::with_keys(children, refs, to_key_items(&kvs));
                 vec.push(MemberDesc::new(mem, VarType::Normal, RustMemberType::Table, is_old, Some(descs)))
             },
