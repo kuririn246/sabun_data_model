@@ -1,33 +1,31 @@
 use crate::imp::structs::var_type::VarType;
-use crate::imp::structs::rust_list::{ConstTable, ConstTemplate, MutList, InnerTemplate, InnerMutList};
+use crate::imp::structs::rust_list::{ConstTable, ConstList, MutList, ConstInnerList, MutInnerList};
 use crate::imp::structs::root_value::RootValue;
 use crate::imp::structs::list_value::{ListDefValue, ListSabValue};
 use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::list_def_obj::ListDefObj;
-use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
+use crate::imp::structs::mil_def_obj::MilDefObj;
 
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum RustValue{
     Param(RustParam, VarType),
     Table(ConstTable),
-    Template(ConstTemplate),
-    MutList(MutList),
-    //InnerData(InnerData),
-    InnerTemp(InnerTemplate),
-    ///InnerMutListだけundefinedになりうる
-    InnerMut(Option<InnerMutList>),
+    CList(ConstList),
+    MList(MutList),
+    Cil(ConstInnerList),
+    ///MutInnerListだけundefinedになりうる
+    Mil(Option<MutInnerList>),
     //InnerDataDef(ListDefObj),
-    InnerTempDef(ListDefObj),
-    InnerMutDef(InnerMutDefObj),
+    CilDef(ListDefObj),
+    MilDef(MilDefObj),
 }
 
 #[repr(u64)]
 #[derive(Debug, PartialEq, Clone)]
 pub enum RustMemberType {
     Bool, Float, Int, Str, IntArray, FloatArray,
-    Table, Template, MutList,
-    InnerTemp, InnerMut
+    Table, CList, MList, Cil, Mil
 }
 
 impl RustValue{
@@ -35,8 +33,8 @@ impl RustValue{
         let v = match self{
             RustValue::Param(p,v) => RootValue::Param(p,v),
             RustValue::Table(d) => RootValue::Table(d),
-            RustValue::Template(l) => RootValue::Template(l),
-            RustValue::MutList(m) => RootValue::List(m),
+            RustValue::CList(l) => RootValue::CList(l),
+            RustValue::MList(m) => RootValue::MList(m),
             _ =>{ return Err(self.type_string()); },
         };
         Ok(v)
@@ -53,8 +51,8 @@ impl RustValue{
         let v = match self{
             RustValue::Param(p,v) => ListDefValue::Param(p,v),
             //RustValue::InnerDataDef(d) => ListDefValue::InnerDataDef(d),
-            RustValue::InnerTempDef(l) => ListDefValue::InnerTempDef(l),
-            RustValue::InnerMutDef(m) => ListDefValue::InnerMutDef(m),
+            RustValue::CilDef(l) => ListDefValue::CilDef(l),
+            RustValue::MilDef(m) => ListDefValue::MilDef(m),
             _ =>{ return Err(self.type_string()); },
         };
         Ok(v)
@@ -65,8 +63,8 @@ impl RustValue{
         let v = match self{
             RustValue::Param(p,_v) => ListSabValue::Param(p),
             //RustValue::InnerData(d) => ListSabValue::InnerData(d),
-            RustValue::InnerTemp(l) => ListSabValue::InnerTemp(l),
-            RustValue::InnerMut(m) => ListSabValue::InnerMut(m),
+            RustValue::Cil(l) => ListSabValue::Cil(l),
+            RustValue::Mil(m) => ListSabValue::Mil(m),
             _ =>{ return Err(self.type_string()); },
         };
         Ok(v)
@@ -76,13 +74,12 @@ impl RustValue{
         let s = match self{
             RustValue::Param(_, _) => "Param",
             RustValue::Table(_) => "Table",
-            RustValue::Template(_) => "Template",
-            RustValue::MutList(_) => "MutList",
-           // RustValue::InnerData(_) => "InnerData",
-            RustValue::InnerTemp(_) => "InnerTemp",
-            RustValue::InnerMut(_) => "InnerMut",
-            RustValue::InnerTempDef(_) => "InnerTempDef",
-            RustValue::InnerMutDef(_) => "InnerMutDef",
+            RustValue::CList(_) => "CList",
+            RustValue::MList(_) => "MList",
+            RustValue::Cil(_) => "Cil",
+            RustValue::Mil(_) => "Mil",
+            RustValue::CilDef(_) => "CilDef",
+            RustValue::MilDef(_) => "MilDef",
         };
         s.to_string()
     }

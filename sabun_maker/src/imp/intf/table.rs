@@ -1,6 +1,6 @@
 use crate::imp::structs::rust_list::{ConstTable, ConstItem};
 use crate::{HashM, HashS};
-use crate::imp::intf::const_item::ConstItemPtr;
+use crate::imp::intf::const_item::CItemPtr;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
 
@@ -60,12 +60,12 @@ pub fn get_kvs_impl(list_def : &ListDefObj, data : &HashM<String, ConstItem>, ol
                  list_def)
 }
 
-pub fn get_value(data : ConstTablePtr, id : &str) -> Option<ConstItemPtr>{
+pub fn get_value(data : ConstTablePtr, id : &str) -> Option<CItemPtr>{
     let d = unsafe{data.ptr.as_ref().unwrap()};
     get_value_impl(d.list(), d.default(), id, data.root)
 }
 
-pub fn get_value_impl(data : &HashM<String, ConstItem>, list_def : &ListDefObj, id : &str, root : *mut RootObject) -> Option<ConstItemPtr>{
-    data.get(id).map(|i| ConstItemPtr::new(i, list_def, root))
+pub fn get_value_impl(data : &HashM<String, ConstItem>, list_def : &ListDefObj, id : &str, root : *mut RootObject) -> Option<CItemPtr>{
+    data.get(id).map(|i| CItemPtr::new(i, list_def, root))
 }
 

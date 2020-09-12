@@ -54,21 +54,21 @@ impl VarType {
         }
     }
 
-    pub(crate) fn compatible(&self, other : &Self) -> bool{
-        match self{
-            VarType::Normal => match other{
-                VarType::Normal => true,
-                _ => false,
-            },
-            VarType::Nullable => match other{
-                VarType::Normal | VarType::Nullable => true,
-                _ => false,
-            }
-            VarType::Undefiable => match other{
-                VarType::Normal | VarType::Undefiable => true,
-                _ => false,
-            }
-            VarType::UndefNullable => true,
-        }
-    }
+    // pub(crate) fn compatible(&self, other : &Self) -> bool{
+    //     match self{
+    //         VarType::Normal => match other{
+    //             VarType::Normal => true,
+    //             _ => false,
+    //         },
+    //         VarType::Nullable => match other{
+    //             VarType::Normal | VarType::Nullable => true,
+    //             _ => false,
+    //         }
+    //         VarType::Undefiable => match other{
+    //             VarType::Normal | VarType::Undefiable => true,
+    //             _ => false,
+    //         }
+    //         VarType::UndefNullable => true,
+    //     }
+    // }
 }

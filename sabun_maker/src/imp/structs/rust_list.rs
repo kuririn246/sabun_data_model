@@ -26,32 +26,33 @@ impl ConstTable {
     pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
 }
 
-///IDを持たず、参照できない。MutListの初期値を書くのが主な使い道か。IDは必要ないけど単にデータを書いておきたい場合もあるだろう。
+///IDを持たず、参照できない。バージョン違い読み出し時の動作の違いが一番大きな違いで、それが存在理由。
+/// MutListは旧バージョンのアイテムが残り新バージョンの初期値が消えるが、ConstListでは新バージョンのアイテムが残り旧バージョンは消える。
+/// Constなので当然といえるだろう・・・
 #[derive(Debug, PartialEq, Clone)]
-pub struct ConstTemplate {
+pub struct ConstList {
     default : Box<ListDefObj>,
     list : Box<Vec<ConstItem>>,
 }
 
-impl ConstTemplate {
-    pub(crate) fn new(default : ListDefObj, list : Vec<ConstItem>) -> ConstTemplate { ConstTemplate { default : Box::new(default), list : Box::new(list) } }
+impl ConstList {
+    pub(crate) fn new(default : ListDefObj, list : Vec<ConstItem>) -> ConstList { ConstList { default : Box::new(default), list : Box::new(list) } }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
     pub(crate) fn list(&self) -> &Vec<ConstItem>{ self.list.as_ref() }
 }
 
-///追加、削除、順番の変更等ができるリスト。初期値を持てず最初は必ず空リストである。これはバージョン違いを読み出す時に問題を単純化するために必要。
+///追加、削除、順番の変更等ができるリスト
 /// ConstListとMutListはstruct定義を見ると近い存在なので、まとめてもいいように思うかもしれないけれど、意味が全く別ものなので型を分けたほうが混乱が少ない。
-/// 順序を変えなければidでソートされたSortedListになるのでPrimaryKeyを持ったTableとしても使えないこともないか
 #[derive(Debug, PartialEq, Clone)]
 pub struct MutList{
     default : Box<ListDefObj>,
     list : Box<LinkedMap<MutItem>>,
-    compatible : Box<HashS<String>>,
+    //compatible : Box<HashS<String>>,
 }
 
 impl MutList{
-    pub(crate) fn new(default : ListDefObj, list : LinkedMap<MutItem>, compatible : HashS<String>) -> MutList{
-        MutList{ default : Box::new(default), list : Box::new(list), compatible : Box::new(compatible) }
+    pub(crate) fn new(default : ListDefObj, list : LinkedMap<MutItem>) -> MutList{
+        MutList{ default : Box::new(default), list : Box::new(list) }
     }
     pub(crate) fn default(&self) -> &ListDefObj{ self.default.as_ref() }
     pub(crate) fn list(&self) -> &LinkedMap<MutItem>{ self.list.as_ref() }
@@ -64,30 +65,30 @@ impl MutList{
     //     self.list.insert(MutListItem::construct(HashMt::new(), HashMt::new()))
     // }
 
-    pub(crate) fn compatible(&self) -> &HashS<String>{ self.compatible.as_ref() }
-    pub(crate) fn deconstruct(self) -> (ListDefObj, LinkedMap<MutItem>, HashS<String>){
-        (*self.default, *self.list, *self.compatible)
+    //pub(crate) fn compatible(&self) -> &HashS<String>{ self.compatible.as_ref() }
+    pub(crate) fn deconstruct(self) -> (ListDefObj, LinkedMap<MutItem>){
+        (*self.default, *self.list)
     }
 }
 
-///Data or Listの内部に作るList。ListDefObjの内部にはDefaultだけ書き、ListItemの内部にはItemのみを書く。
+///Table or CListの内部に作るList。ListDefObjの内部にはDefaultだけ書き、CItemの内部にはListのItemの羅列のみを書く。
 #[derive(Debug, PartialEq, Clone)]
-pub struct InnerTemplate {
+pub struct ConstInnerList {
     list : Vec<ConstItem>,
 }
 
-impl InnerTemplate {
-    pub(crate) fn new(list : Vec<ConstItem>) -> InnerTemplate { InnerTemplate { list }}
+impl ConstInnerList {
+    pub(crate) fn new(list : Vec<ConstItem>) -> ConstInnerList { ConstInnerList { list }}
     pub(crate) fn list(&self) -> &Vec<ConstItem>{ &self.list }
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct InnerMutList {
+pub struct MutInnerList {
     list : Box<LinkedMap<MutItem>>,
 }
 
-impl InnerMutList {
-    pub(crate) fn new(list : LinkedMap<MutItem>,) -> InnerMutList { InnerMutList { list : Box::new(list) } }
+impl MutInnerList {
+    pub(crate) fn new(list : LinkedMap<MutItem>,) -> MutInnerList { MutInnerList { list : Box::new(list) } }
     pub(crate) fn deconstruct(self) -> LinkedMap<MutItem>{ *self.list }
     pub(crate) fn list(&self) -> &LinkedMap<MutItem>{ self.list.as_ref() }
     pub(crate) fn list_mut(&mut self) -> &mut LinkedMap<MutItem>{ self.list.as_mut() }

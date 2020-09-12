@@ -27,36 +27,36 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : VarType, span : &Span
             array_null_or_undefined(&array[1..], gat, value_type, span, names)
         },
         InnerMutUndefined =>{
-            Ok(RustValue::InnerMut(None))
+            Ok(RustValue::Mil(None))
         },
-        NotDefined =>{ Err(format!(r#"{} Array must be "...Array", "Template", "Table", "MutList", "InnerTemp", "InnerMut", "InnerTempDef", "InnerMutDef", "Int", "Float", "Str" or "Bool" {}"#, span.line_str(), names))? },
-        ConstList | Table | MutList | ConstItems | //InnerData |
-        MutItems | ConstDef | //InnerDataDef |
-        MutDef | ViolatedList | InnerViolatedList | InnerViolatedListDef =>{
+        NotDefined =>{ Err(format!(r#"{} Array must be "...Array", "Clist", "Table", "MList", "Cil", "Mil", "CilDef", "MilDef", "Int", "Float", "Str" or "Bool" {}"#, span.line_str(), names))? },
+        CList | Table | MList | Cil | //InnerData |
+        Mil | CilDef | //InnerDataDef |
+        MilDef  =>{
             match value_type{
                 VarType::Normal =>{
                     let tmp = json_list_to_rust(&array[1..], span, names)?;
                     match gat{
-                        ConstList => Ok(RustValue::Template(tmp.into_const_list()?)),
+                        CList => Ok(RustValue::CList(tmp.into_const_list()?)),
                         Table => Ok(RustValue::Table(tmp.into_const_data()?)),
-                        MutList => Ok(RustValue::MutList(tmp.into_mut_list()?)),
-                        ConstItems => Ok(RustValue::InnerTemp(tmp.into_inner_list()?)),
+                        MList => Ok(RustValue::MList(tmp.into_mut_list()?)),
+                        Cil => Ok(RustValue::Cil(tmp.into_inner_list()?)),
                         //InnerData => Ok(RustValue::InnerData(tmp.into_inner_data()?)),
-                        MutItems => Ok(RustValue::InnerMut(Some(tmp.into_inner_mut_list()?))),
-                        ConstDef => Ok(RustValue::InnerTempDef(tmp.into_inner_def()?)),
+                        Mil => Ok(RustValue::Mil(Some(tmp.into_mut_inner_list()?))),
+                        CilDef => Ok(RustValue::CilDef(tmp.into_inner_def()?)),
                         //InnerDataDef => Ok(RustValue::InnerDataDef(tmp.into_inner_def()?)),
-                        MutDef => Ok(RustValue::InnerMutDef(tmp.into_inner_mut_def(false)?)),
-                        ViolatedList =>{ Ok(RustValue::MutList(tmp.into_violated_list()?)) },
-                        InnerViolatedList => Ok(RustValue::InnerMut(Some(tmp.into_inner_violated_list()?))),
-                        InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.into_inner_mut_def(false)?)),
+                        MilDef => Ok(RustValue::MilDef(tmp.into_inner_mut_def(false)?)),
+                        //ViolatedList =>{ Ok(RustValue::MList(tmp.into_violated_list()?)) },
+                        //InnerViolatedList => Ok(RustValue::Mil(Some(tmp.into_inner_violated_list()?))),
+                        //InnerViolatedListDef => Ok(RustValue::MilDef(tmp.into_inner_mut_def(false)?)),
                         _ => unreachable!() ,
                     }
                 },
                 VarType::Undefiable =>{
                     let tmp = json_list_to_rust(&array[1..], span, names)?;
                     match gat {
-                        MutDef => Ok(RustValue::InnerMutDef(tmp.into_inner_mut_def(true)?)),
-                        InnerViolatedListDef => Ok(RustValue::InnerMutDef(tmp.into_inner_mut_def(true)?)),
+                        MilDef => Ok(RustValue::MilDef(tmp.into_inner_mut_def(true)?)),
+                        //InnerViolatedListDef => Ok(RustValue::MilDef(tmp.into_inner_mut_def(true)?)),
                         _ =>{
                             Err(format!(r#"{} Lists can't be undefined {} except for InnerMut"#, span.line_str(), names))?
                         }
@@ -73,13 +73,13 @@ pub fn json_array_to_rust(array : &Vec<JVal>, value_type : VarType, span : &Span
 
 pub enum GatResult{
     AT(ArrayType),
-    ConstList,
+    CList,
     Table,
-    MutList,
-    ConstItems,
-    MutItems,
-    ConstDef,
-    MutDef,
+    MList,
+    Cil,
+    Mil,
+    CilDef,
+    MilDef,
     //ViolatedList,
     //InnerViolatedList,
     //InnerViolatedListDef,
@@ -104,13 +104,13 @@ fn get_array_type(a : &Vec<JVal>) -> GatResult{
                     "Float" =>{ Float },
                     "Str" =>{ Str },
                     "Bool" =>{ Bool },
-                    "ConstList" => { GatResult::ConstList },
+                    "CList" => { GatResult::CList },
                     "Table" => { GatResult::Table },
-                    "MutList" => { GatResult::MutList },
-                    "ConstItems" => { GatResult::ConstItems },
-                    "MutItems" =>{ GatResult::MutItems },
-                    "ConstDef" => { GatResult::ConstDef },
-                    "MutDef" =>{ GatResult::MutDef },
+                    "MList" => { GatResult::MList },
+                    "Cil" => { GatResult::Cil },
+                    "Mil" =>{ GatResult::Mil },
+                    "CilDef" => { GatResult::CilDef },
+                    "MilDef" =>{ GatResult::MilDef },
                     //"__ViolatedList" => { GatResult::ViolatedList },
                     //"__InnerViolatedList" => { GatResult::InnerViolatedList },
                     //"__InnerViolatedListDef" => { GatResult::InnerViolatedListDef },

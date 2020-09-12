@@ -26,13 +26,13 @@ pub fn json_list_to_rust(array : &[JVal],  span : &Span, names : &Names) -> Resu
                             Err(format!(r#"{} {} Old is defined multiple times {}"#, span.line_str(), span.slice(), names))?
                         }
                     }
-                    ListAttribute::Compatible(compatible) =>{
-                        if result.compatible.is_none() {
-                            result.compatible = Some(compatible);
-                        } else{
-                            Err(format!(r#"{} {} Compatible is defined multiple times {}"#, span.line_str(), span.slice(), names))?
-                        }
-                    },
+                    // ListAttribute::Compatible(compatible) =>{
+                    //     if result.compatible.is_none() {
+                    //         result.compatible = Some(compatible);
+                    //     } else{
+                    //         Err(format!(r#"{} {} Compatible is defined multiple times {}"#, span.line_str(), span.slice(), names))?
+                    //     }
+                    // },
                     ListAttribute::NextID(next_id) =>{
                         if result.next_id.is_none() {
                             result.next_id = Some(next_id);

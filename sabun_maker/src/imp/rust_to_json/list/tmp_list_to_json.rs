@@ -9,11 +9,11 @@ use crate::imp::structs::list_type::ListType;
 pub fn rust_list_to_json(l : &TmpJsonList, list_type : ListType) -> Value{
    let mut result : Vec<Value> = vec![];
 
-   result.push(val_s(list_type_to_string(&list_type, l.vec.len() != 0)));
+   result.push(val_s(list_type_to_string(&list_type)));
 
-   if let Some(compatible) = &l.compatible{
-      result.push(string_set_to_json("Compatible", compatible));
-   }
+   // if let Some(compatible) = &l.compatible{
+   //    result.push(string_set_to_json("Compatible", compatible));
+   // }
    if let Some(old) = &l.old{
       result.push(string_set_to_json("Old", old));
    }

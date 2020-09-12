@@ -21,19 +21,19 @@ impl ListDefObj{
     pub(crate) fn refs(&self) -> &RefDefObj{ self.refs.as_ref() }
     pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
 
-    pub(crate) fn compatible(&self, other : &Self) -> bool{
-        for (k,v) in self.default(){
-            match other.default.get(k){
-                Some(v2) =>{
-                    if v.compatible(v2) == false{
-                        return false;
-                    }
-                },
-                None =>{ return false; }
-            }
-        }
-        return self.refs.compatible(other.refs())
-    }
+    // pub(crate) fn compatible(&self, other : &Self) -> bool{
+    //     for (k,v) in self.default(){
+    //         match other.default.get(k){
+    //             Some(v2) =>{
+    //                 if v.compatible(v2) == false{
+    //                     return false;
+    //                 }
+    //             },
+    //             None =>{ return false; }
+    //         }
+    //     }
+    //     return self.refs.compatible(other.refs())
+    // }
 }
 
 #[derive(Debug, PartialEq, Clone)]

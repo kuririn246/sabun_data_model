@@ -1,6 +1,6 @@
 pub mod linked_m;
 pub mod param_type;
-pub mod inner_mut_def_obj;
+pub mod mil_def_obj;
 pub mod list_def_obj;
 pub mod array_type;
 pub mod var_type;

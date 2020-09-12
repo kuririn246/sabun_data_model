@@ -2,9 +2,9 @@ use crate::imp::json_to_rust::tmp::tmp_obj::TmpObj;
 use crate::{HashM, HashS, HashSt, HashMt};
 use json5_parser::Span;
 use crate::error::Result;
-use crate::imp::structs::rust_list::{ConstTemplate, InnerTemplate, ConstTable, MutList, InnerMutList, ConstItem, MutItem};
+use crate::imp::structs::rust_list::{ConstList, ConstInnerList, ConstTable, MutList, MutInnerList, ConstItem, MutItem};
 use crate::imp::structs::list_def_obj::ListDefObj;
-use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
+use crate::imp::structs::mil_def_obj::MilDefObj;
 use crate::imp::structs::linked_m::LinkedMap;
 
 pub struct TmpList{
@@ -12,20 +12,20 @@ pub struct TmpList{
     ///複数回定義のエラーを検出したいのでOptionにする
     pub old : Option<HashS<String>>,
     pub default : Option<ListDefObj>,
-    pub compatible : Option<HashS<String>>,
+    //pub compatible : Option<HashS<String>>,
     pub next_id : Option<u64>,
     pub span : Span,
 }
 
 impl TmpList{
     pub fn new(capacity : usize, span : Span) -> TmpList{
-        TmpList{ vec : Vec::with_capacity(capacity), old : None, default : None, compatible : None, next_id : None, span }
+        TmpList{ vec : Vec::with_capacity(capacity), old : None, default : None,  next_id : None, span }
     }
 
-    pub fn into_const_list(self) -> Result<ConstTemplate>{
-        if self.compatible.is_some(){
-            Err(format!("{} Compatible is not needed for a List {}", self.span.line_str(), self.span.slice()))?
-        }
+    pub fn into_const_list(self) -> Result<ConstList>{
+        // if self.compatible.is_some(){
+        //     Err(format!("{} Compatible is not needed for a List {}", self.span.line_str(), self.span.slice()))?
+        // }
         if self.old.is_some(){
             Err(format!("{} Old is not needed for a List {}", self.span.line_str(), self.span.slice()))?
         }
@@ -36,15 +36,15 @@ impl TmpList{
             Err(format!("{} NextID must not be defined {}", self.span.line_str(), self.span.slice()))?
         }
 
-        Ok(ConstTemplate::new(self.default.unwrap(), to_list_items(self.vec)?))
+        Ok(ConstList::new(self.default.unwrap(), to_list_items(self.vec)?))
     }
 
 
 
-    pub fn into_inner_list(self) -> Result<InnerTemplate>{
-        if self.compatible.is_some(){
-            Err(format!("{} Compatible is not needed for InnerList {}", self.span.line_str(), self.span.slice()))?
-        }
+    pub fn into_inner_list(self) -> Result<ConstInnerList>{
+        // if self.compatible.is_some(){
+        //     Err(format!("{} Compatible is not needed for InnerList {}", self.span.line_str(), self.span.slice()))?
+        // }
         if self.old.is_some(){
             Err(format!("{} Old is not needed for InnerList {}", self.span.line_str(), self.span.slice()))?
         }
@@ -55,13 +55,13 @@ impl TmpList{
             Err(format!("{} NextID must not be defined for InnerList {}", self.span.line_str(), self.span.slice()))?
         }
 
-        Ok(InnerTemplate::new(to_list_items(self.vec)?))
+        Ok(ConstInnerList::new(to_list_items(self.vec)?))
     }
 
     pub fn into_const_data(self) -> Result<ConstTable>{
-        if self.compatible.is_some(){
-            Err(format!("{} Compatible is not needed for Data {}", self.span.line_str(), self.span.slice()))?
-        }
+        // if self.compatible.is_some(){
+        //     Err(format!("{} Compatible is not needed for Data {}", self.span.line_str(), self.span.slice()))?
+        // }
         if self.default.is_none(){
             Err(format!("{} Default must be defined {}", self.span.line_str(), self.span.slice()))?
         }
@@ -87,68 +87,67 @@ impl TmpList{
     //     Ok(InnerData::new(to_data_items(self.vec)?, old))
     // }
 
+    // pub fn into_mut_list(self) -> Result<MutList>{
+    //     if self.old.is_some(){
+    //         Err(format!("{} Old is not needed for MutList {}", self.span.line_str(), self.span.slice()))?
+    //     }
+    //     if self.default.is_none(){
+    //         Err(format!("{} Default must be defined {}", self.span.line_str(), self.span.slice()))?
+    //     }
+    //     // mut_listのときだけnext_idを消す処理が難しいしめんどいので無視してしまう・・・
+    //     //if self.next_id.is_some(){
+    //       //  Err(format!("{} NextID is not needed for MutList {}", self.span.line_str(), self.span.slice()))?
+    //     //}
+    //     if self.vec.len() != 0{
+    //         Err(format!("{} MutList must not have items {}", self.span.line_str(), self.span.slice()))?
+    //     }
+    //     let compatible = self.compatible.unwrap_or_else(|| HashSt::new());
+    //     Ok(MutList::new(self.default.unwrap(),LinkedMap::new(), compatible))
+    // }
+    //
+    // pub fn into_inner_mut_list(self) -> Result<MutInnerList>{
+    //     if self.compatible.is_some(){
+    //         Err(format!("{} Compatible is not needed for InnerMutList {}", self.span.line_str(), self.span.slice()))?
+    //     }
+    //     if self.old.is_some(){
+    //         Err(format!("{} Old is not needed for InnerMutList {}", self.span.line_str(), self.span.slice()))?
+    //     }
+    //     if self.default.is_some(){
+    //         Err(format!("{} Default must not be defined {}", self.span.line_str(), self.span.slice()))?
+    //     }
+    //     if self.next_id.is_some(){
+    //         Err(format!("{} NextID is not needed for InnerMutList {}", self.span.line_str(), self.span.slice()))?
+    //     }
+    //     if self.vec.len() != 0{
+    //         Err(format!("{} InnerMutList must not have items {}", self.span.line_str(), self.span.slice()))?
+    //     }
+    //     Ok(MutInnerList::new(LinkedMap::new()))
+    // }
+
+
     pub fn into_mut_list(self) -> Result<MutList>{
+
         if self.old.is_some(){
             Err(format!("{} Old is not needed for MutList {}", self.span.line_str(), self.span.slice()))?
         }
         if self.default.is_none(){
             Err(format!("{} Default must be defined {}", self.span.line_str(), self.span.slice()))?
         }
-        // mut_listのときだけnext_idを消す処理が難しいしめんどいので無視してしまう・・・
-        //if self.next_id.is_some(){
-          //  Err(format!("{} NextID is not needed for MutList {}", self.span.line_str(), self.span.slice()))?
-        //}
-        if self.vec.len() != 0{
-            Err(format!("{} MutList must not have items {}", self.span.line_str(), self.span.slice()))?
-        }
-        let compatible = self.compatible.unwrap_or_else(|| HashSt::new());
-        Ok(MutList::new(self.default.unwrap(),LinkedMap::new(), compatible))
-    }
-
-    pub fn into_inner_mut_list(self) -> Result<InnerMutList>{
-        if self.compatible.is_some(){
-            Err(format!("{} Compatible is not needed for InnerMutList {}", self.span.line_str(), self.span.slice()))?
-        }
-        if self.old.is_some(){
-            Err(format!("{} Old is not needed for InnerMutList {}", self.span.line_str(), self.span.slice()))?
-        }
-        if self.default.is_some(){
-            Err(format!("{} Default must not be defined {}", self.span.line_str(), self.span.slice()))?
-        }
-        if self.next_id.is_some(){
-            Err(format!("{} NextID is not needed for InnerMutList {}", self.span.line_str(), self.span.slice()))?
-        }
-        if self.vec.len() != 0{
-            Err(format!("{} InnerMutList must not have items {}", self.span.line_str(), self.span.slice()))?
-        }
-        Ok(InnerMutList::new(LinkedMap::new()))
-    }
-
-    ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
-    pub fn into_violated_list(self) -> Result<MutList>{
-
-        if self.old.is_some(){
-            Err(format!("{} Old is not needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
-        }
-        if self.default.is_none(){
-            Err(format!("{} Default must be defined {}", self.span.line_str(), self.span.slice()))?
-        }
 
         let next_id = self.next_id.unwrap_or(self.vec.len() as u64);
 
-        let items = to_violated_list_items(self.vec, next_id)?;
-        let compatible = self.compatible.unwrap_or_else(|| HashSt::new());
+        let items = to_mut_list_items(self.vec, next_id)?;
+        //let compatible = self.compatible.unwrap_or_else(|| HashSt::new());
 
-        Ok(MutList::new(self.default.unwrap(), items , compatible))
+        Ok(MutList::new(self.default.unwrap(), items))
     }
 
-    ///MutListは中身があってはいけないのだが、そのルールを破壊する裏道が用意されている。
-    pub fn into_inner_violated_list(self) -> Result<InnerMutList>{
-        if self.compatible.is_some(){
-            Err(format!("{} Compatible is not needed for InnerViolatedList {}", self.span.line_str(), self.span.slice()))?
-        }
+    pub fn into_mut_inner_list(self) -> Result<MutInnerList>{
+        // if self.compatible.is_some(){
+        //     Err(format!("{} Compatible is not needed for MutInnerList {}", self.span.line_str(), self.span.slice()))?
+        // }
         if self.old.is_some(){
-            Err(format!("{} Old is not needed for ViolatedList {}", self.span.line_str(), self.span.slice()))?
+            Err(format!("{} Old is not needed for MutInnerList {}", self.span.line_str(), self.span.slice()))?
         }
         if self.default.is_some(){
             Err(format!("{} Default must not be defined {}", self.span.line_str(), self.span.slice()))?
@@ -156,15 +155,15 @@ impl TmpList{
 
         let next_id = self.next_id.unwrap_or(self.vec.len() as u64);
 
-        let items = to_violated_list_items(self.vec, next_id)?;
+        let items = to_mut_list_items(self.vec, next_id)?;
 
-        Ok(InnerMutList::new(items))
+        Ok(MutInnerList::new(items))
     }
 
     pub fn into_inner_def(self) -> Result<ListDefObj>{
-        if self.compatible.is_some(){
-            Err(format!("{} Compatible is not needed for InnerDef {}", self.span.line_str(), self.span.slice()))?
-        }
+        // if self.compatible.is_some(){
+        //     Err(format!("{} Compatible is not needed for InnerDef {}", self.span.line_str(), self.span.slice()))?
+        // }
         if self.old.is_some(){
             Err(format!("{} Old is not needed for InnerDef {}", self.span.line_str(), self.span.slice()))?
         }
@@ -181,7 +180,7 @@ impl TmpList{
         Ok(self.default.unwrap())
     }
 
-    pub fn into_inner_mut_def(self, undefinable : bool) -> Result<InnerMutDefObj>{
+    pub fn into_inner_mut_def(self, undefinable : bool) -> Result<MilDefObj>{
         if self.old.is_some(){
             Err(format!("{} Old is not needed for InnerDef {}", self.span.line_str(), self.span.slice()))?
         }
@@ -194,8 +193,8 @@ impl TmpList{
         if self.vec.len() != 0{
             Err(format!("{} InnerDef must not have items {}", self.span.line_str(), self.span.slice()))?
         }
-        let compatible = self.compatible.unwrap_or_else(|| HashSt::new());
-        Ok(InnerMutDefObj::new(self.default.unwrap(), undefinable, compatible))
+        //let compatible = self.compatible.unwrap_or_else(|| HashSt::new());
+        Ok(MilDefObj::new(self.default.unwrap(), undefinable))
     }
 }
 
@@ -217,11 +216,11 @@ fn to_data_items(vec : Vec<TmpObj>) -> Result<HashM<String, ConstItem>>{
     return Ok(result);
 }
 
-fn to_violated_list_items(vec : Vec<TmpObj>, next_id : u64) -> Result<LinkedMap<MutItem>>{
+fn to_mut_list_items(vec : Vec<TmpObj>, next_id : u64) -> Result<LinkedMap<MutItem>>{
     let mut result : Vec<(u64, MutItem)> = Vec::with_capacity(vec.len());
     for (idx, tmp_item) in vec.into_iter().enumerate(){
         //let span = tmp_item.span.clone();
-        let pair = tmp_item.into_violated_list_item(idx)?;
+        let pair = tmp_item.into_mut_list_item(idx)?;
         result.push(pair);
     }
     return Ok(LinkedMap::construct(result, next_id));

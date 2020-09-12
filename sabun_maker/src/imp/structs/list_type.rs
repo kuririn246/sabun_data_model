@@ -1,5 +1,8 @@
 pub enum ListType{
-    Data, List, Mut, //InnerData,
-    InnerList, InnerMut, //InnderDataDef,
-    InnerListDef, //InnerMutDef,
+    Table,
+    CList,
+    MList, //InnerData,
+    Cil,
+    Mil, //InnderDataDef,
+    CilDef, //InnerMutDef,
 }

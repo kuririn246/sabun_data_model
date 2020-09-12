@@ -30,10 +30,10 @@ impl RefValue{
         self.value_type().acceptable(&other.value.qv_type())
     }
 
-    ///右が取りうる値すべてが左に代入できるか
-    pub(crate) fn compatible(&self, other : &Self) -> bool{
-        self.value_type().compatible(&other.value_type())
-    }
+    // ///右が取りうる値すべてが左に代入できるか
+    // pub(crate) fn compatible(&self, other : &Self) -> bool{
+    //     self.value_type().compatible(&other.value_type())
+    // }
 
 
 }

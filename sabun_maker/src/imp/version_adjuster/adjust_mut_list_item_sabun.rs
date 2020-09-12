@@ -1,7 +1,7 @@
 use crate::{HashM, HashMt};
 use crate::error::Result;
 use crate::imp::json_to_rust::names::Names;
-use crate::imp::version_adjuster::adjust_mut_list::adjust_inner_mut_list;
+use crate::imp::version_adjuster::adjust_mut_list::adjust_mut_inner_list;
 use crate::imp::structs::list_value::{ListSabValue, ListDefValue};
 use crate::imp::structs::list_def_obj::ListDefObj;
 
@@ -28,15 +28,15 @@ pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashM<String, L
                         continue;
                     }
                 },
-                ListDefValue::InnerMutDef(mut_def) =>{
+                ListDefValue::MilDef(mut_def) =>{
                     if mut_def.undefinable(){
-                        ListSabValue::InnerMut(None)
+                        ListSabValue::Mil(None)
                     } else{
                         continue;
                     }
                 },
                 _ =>{
-                    Err(format!("{} {} mut list's default item can only have Param or InnerMutDef", names, def_key))?
+                    Err(format!("{} {} mut list's default item can only have Param or MilDef", names, def_key))?
                 }
             }
         };
@@ -45,18 +45,18 @@ pub fn adjust_mut_list_item_sabun(def : &ListDefObj, old_sabun : HashM<String, L
                 //型チェックめんどいからなしでいいかな・・・？
                 result.insert(def_key.to_string(), ListSabValue::Param(p));
             },
-            ListSabValue::InnerMut(op) =>{
+            ListSabValue::Mil(op) =>{
                 match op{
                     Some(im) =>{
-                        let new = adjust_inner_mut_list(def, im, &names.append(def_key))?;
-                        result.insert(def_key.to_string(), ListSabValue::InnerMut(Some(new)));
+                        let new = adjust_mut_inner_list(def, im, &names.append(def_key))?;
+                        result.insert(def_key.to_string(), ListSabValue::Mil(Some(new)));
                     },
                     None =>{
-                        result.insert(def_key.to_string(), ListSabValue::InnerMut(None));
+                        result.insert(def_key.to_string(), ListSabValue::Mil(None));
                     }
                 }
             },
-            _ =>{ Err(format!("{} {} mut list items can only have Param or InnerMut", names, def_key))? }
+            _ =>{ Err(format!("{} {} mut list items can only have Param or Mil", names, def_key))? }
         }
     }
     Ok(result)

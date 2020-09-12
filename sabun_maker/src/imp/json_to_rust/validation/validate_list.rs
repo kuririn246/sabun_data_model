@@ -5,7 +5,7 @@ use crate::imp::structs::rust_list::ConstItem;
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::structs::list_def_obj::ListDefObj;
 
-pub fn validate_list(def : &ListDefObj, data_vec : &Vec<ConstItem>, root : &RootObject, can_use_old: bool, names : &Names) -> Result<()>{
+pub fn validate_const_list(def : &ListDefObj, data_vec : &Vec<ConstItem>, root : &RootObject, can_use_old: bool, names : &Names) -> Result<()>{
     for (idx, val) in data_vec.iter().enumerate(){
         let idx = idx.to_string();
         let names = &names.append(&idx);

@@ -42,7 +42,7 @@
   "newName2!" : 100,
 
   unkoList : [
-	"Data", //オブジェクトのコレクションを作るためにはList,Data,MutListのどれかを使う必要がある。DataはIDによる参照が可能である
+	"Table", //オブジェクトのコレクションを作るためにはList,Data,MutListのどれかを使う必要がある。DataはIDによる参照が可能である
 	["Default", {
 		hogeInt : 0,
 		hogeString : "hoge"
@@ -60,7 +60,7 @@
 
 
   usable : [
-    "Data",
+    "Table",
     //Defaultを省略する
     [{ num : 0 }],
     {
@@ -74,7 +74,7 @@
   ],
 
   weapon : [
-    "Data",
+    "Table",
     ["Default", { atk : 0 }],
     {
       ID : "katana",
@@ -87,7 +87,7 @@
   ],
 
   iniItemList : [
-    "List",
+    "CList",
     ["Default",{
       "atk?" : ["Int", null],
       "Ref": { weapon : "" }, //Refの基本の形、なにか入れないとエラーになる。
@@ -99,7 +99,7 @@
   ],
 
   hogeList : [
-    "Data",
+    "Table",
     ["Default",{ mem : "" }],
     {
       ID : "hogehoge",
@@ -108,7 +108,7 @@
   ],
 
   hugaList: [
-    "Data",
+    "Table",
     ["Default",{}],
     {
       ID : "hugahuga"
@@ -116,7 +116,7 @@
   ],
 
   hegoList: [
-    "Data",
+    "Table",
     ["Default", {
         mem : "",
     }],
@@ -131,7 +131,7 @@
   ],
 
   itemList3 : [
-    "List",
+    "CList",
     ["Default",{
       "memOverride?" : ["Str", null],
       "Ref" : { hogeList : "", "hugaList?" : null, hegoList : "" },
@@ -146,7 +146,7 @@
   ],
 
   dim2List : [
-    "Data", [{
+    "Table", [{
       dataMem : 3,
 
     }],
@@ -165,10 +165,10 @@
   ],
 
   mut1 : [
-    "MutList",
+    "MList",
     ["Default",{
       innerMutList : [
-        "InnerMutDef",
+        "MilDef",
 
         ["Default",{
           Ref : { hegoList :  "" },
@@ -182,7 +182,7 @@
 
 
   enumList : [
-    "List",
+    "CList",
     ["Default",{
       Enum :{
         "hogeList?" : null, "hugaList?" : null, "hegoList?" : null //enumはどれか一つだけ参照し、プログラムからはmatchでアクセスできる
@@ -202,13 +202,13 @@
   ],
 
   mut2 : [
-    "MutList",
+    "MList",
     ["Default",{
       Enum :{
         "hogeList?" : null, "hugaList?" : null, "hegoList?" : null //enumはどれか一つだけ参照し、プログラムからはmatchでアクセスできる
       },
       mem : "unti",
     }],
-    ["Compatible","enumList"]
+
   ]
 }

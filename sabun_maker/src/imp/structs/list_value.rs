@@ -1,26 +1,26 @@
 use crate::imp::structs::rust_param::RustParam;
-use crate::imp::structs::rust_list::{InnerTemplate, InnerMutList};
+use crate::imp::structs::rust_list::{ConstInnerList, MutInnerList};
 use crate::imp::structs::rust_value::{RustValue, RustMemberType};
 use crate::imp::structs::var_type::VarType;
 use crate::imp::structs::qv::QvType;
 use crate::imp::structs::list_def_obj::ListDefObj;
-use crate::imp::structs::inner_mut_def_obj::InnerMutDefObj;
+use crate::imp::structs::mil_def_obj::MilDefObj;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ListDefValue{
     Param(RustParam, VarType),
     //InnerDataDef(ListDefObj),
-    InnerTempDef(ListDefObj),
-    InnerMutDef(InnerMutDefObj),
+    CilDef(ListDefObj),
+    MilDef(MilDefObj),
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ListSabValue{
     Param(RustParam),
     //InnerData(InnerData),
-    InnerTemp(InnerTemplate),
-    ///InnerMutListだけundefinedになりうる
-    InnerMut(Option<InnerMutList>),
+    Cil(ConstInnerList),
+    ///MutInnerListだけundefinedになりうる
+    Mil(Option<MutInnerList>),
 }
 
 impl ListDefValue{
@@ -28,8 +28,8 @@ impl ListDefValue{
         match self{
             ListDefValue::Param(p,v) => RustValue::Param(p,v),
             //ListDefValue::InnerDataDef(d) => RustValue::InnerDataDef(d),
-            ListDefValue::InnerTempDef(l) => RustValue::InnerTempDef(l),
-            ListDefValue::InnerMutDef(m) => RustValue::InnerMutDef(m),
+            ListDefValue::CilDef(l) => RustValue::CilDef(l),
+            ListDefValue::MilDef(m) => RustValue::MilDef(m),
         }
     }
 
@@ -42,55 +42,53 @@ impl ListDefValue{
         false
     }
 
-    pub(crate) fn compatible(&self, other : &ListDefValue) -> bool{
-        if self.type_num() == other.type_num(){
-            if self.value_type().compatible(&other.value_type()){
-                return true;
-            }
-        }
-        false
-    }
+    // pub(crate) fn compatible(&self, other : &ListDefValue) -> bool{
+    //     if self.type_num() == other.type_num(){
+    //         if self.value_type().compatible(&other.value_type()){
+    //             return true;
+    //         }
+    //     }
+    //     false
+    // }
 
 
     pub(crate) fn value_type(&self) -> VarType {
         match self{
             ListDefValue::Param(_param, vt) => vt.clone(),
-            ListDefValue::InnerMutDef(obj) => if obj.undefinable() { VarType::Undefiable } else{ VarType::Normal }
+            ListDefValue::MilDef(obj) => if obj.undefinable() { VarType::Undefiable } else{ VarType::Normal }
             _ => VarType::Normal,
         }
     }
 
-    ///この数値は仮
     pub(crate) fn type_num(&self) -> RustMemberType {
         use RustMemberType::*;
         match self{
             ListDefValue::Param(param, _) => param.type_num(),
             //ListDefValue::InnerDataDef(_) => InnerData,
-            ListDefValue::InnerTempDef(_) => InnerTemp,
-            ListDefValue::InnerMutDef(_) => InnerMut,
+            ListDefValue::CilDef(_) => Cil,
+            ListDefValue::MilDef(_) => Mil,
         }
     }
 
-    pub(crate) fn inner_def(&self) -> Option<&ListDefObj>{
-        match self{
-            //ListDefValue::InnerDataDef(d) => Some(d),
-            ListDefValue::InnerTempDef(d) => Some(d),
-            ListDefValue::InnerMutDef(obj) => Some(obj.list_def()),
-            _ => None,
-        }
-    }
+    // pub(crate) fn inner_def(&self) -> Option<&ListDefObj>{
+    //     match self{
+    //         //ListDefValue::InnerDataDef(d) => Some(d),
+    //         ListDefValue::CilDef(d) => Some(d),
+    //         ListDefValue::MilDef(obj) => Some(obj.list_def()),
+    //         _ => None,
+    //     }
+    // }
 }
 
 impl ListSabValue{
-    ///この数値は仮
     pub(crate) fn type_num(&self) -> RustMemberType {
         use RustMemberType::*;
 
         match self{
             ListSabValue::Param(param) => param.type_num(),
             //ListSabValue::InnerData(_) => InnerData,
-            ListSabValue::InnerTemp(_) => InnerTemp,
-            ListSabValue::InnerMut(_) => InnerMut,
+            ListSabValue::Cil(_) => Cil,
+            ListSabValue::Mil(_) => Mil,
         }
     }
 
@@ -102,15 +100,15 @@ impl ListSabValue{
             //value側は名前に?とか!とかつけなくてよいのでValueType::Normal
             ListSabValue::Param(p) => RustValue::Param(p, VarType::Normal),
             //ListSabValue::InnerData(d) => RustValue::InnerData(d),
-            ListSabValue::InnerTemp(l) => RustValue::InnerTemp(l),
-            ListSabValue::InnerMut(m) => RustValue::InnerMut(m),
+            ListSabValue::Cil(l) => RustValue::Cil(l),
+            ListSabValue::Mil(m) => RustValue::Mil(m),
         }
     }
 
     pub(crate) fn qv_type(&self) -> QvType{
         match self{
             ListSabValue::Param(p) => p.qv_type(),
-            ListSabValue::InnerMut(m) => if m.is_some(){ QvType::Val } else{ QvType::Undefined },
+            ListSabValue::Mil(m) => if m.is_some(){ QvType::Val } else{ QvType::Undefined },
             _ => QvType::Val,
         }
     }

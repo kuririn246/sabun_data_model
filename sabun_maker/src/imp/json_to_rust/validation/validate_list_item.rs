@@ -1,7 +1,7 @@
 use crate::HashM;
 use crate::imp::json_to_rust::names::Names;
 use crate::error::Result;
-use crate::imp::json_to_rust::validation::validate_list::validate_list;
+use crate::imp::json_to_rust::validation::validate_list::validate_const_list;
 use crate::imp::json_to_rust::validation::validate_refs::validate_refs;
 use crate::imp::json_to_rust::validation::validate_mut_list::validate_mut_list;
 use crate::imp::structs::ref_value::RefSabValue;
@@ -34,13 +34,13 @@ pub fn validate_list_item(def : &ListDefObj, sabun_values : &HashM<String, ListS
             //         unreachable!();
             //     }
             // },
-            ListDefValue::InnerTempDef(def) => {
-                if let ListSabValue::InnerTemp(list) = val {
-                    validate_list(def, list.list(), root, can_use_old, &names.append(name))?
+            ListDefValue::CilDef(def) => {
+                if let ListSabValue::Cil(list) = val {
+                    validate_const_list(def, list.list(), root, can_use_old, &names.append(name))?
                 } else { unreachable!(); }
             },
-            ListDefValue::InnerMutDef(def) => {
-                let list = if let ListSabValue::InnerMut(list) = val { list } else { unreachable!() };
+            ListDefValue::MilDef(def) => {
+                let list = if let ListSabValue::Mil(list) = val { list } else { unreachable!() };
                 match list {
                     Some(list) => {
                         validate_mut_list(def.list_def(), list.list(), root, can_use_old, &names.append(name))?

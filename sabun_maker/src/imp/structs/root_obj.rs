@@ -12,7 +12,7 @@ pub struct RootObject{
     sabun : Box<HashM<String, RustParam>>,
 
     ///oldに設定されたメンバは、_Oldを付けなければプログラムから使用できず、
-    ///ConstDataである場合、jsonで Refできない
+    ///ConstTableである場合、jsonで Refできない
     old : Box<HashS<String>>,
 }
 

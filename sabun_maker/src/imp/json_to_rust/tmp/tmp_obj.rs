@@ -123,20 +123,20 @@ impl TmpObj{
         }
     }
 
-    pub fn into_violated_list_item(self, id : usize) -> Result<(u64, MutItem)>{
+    pub fn into_mut_list_item(self, id : usize) -> Result<(u64, MutItem)>{
         let id = match self.id {
             Some(IdValue::Num(id)) => id,
             Some(_) =>{
-                Err(format!("{} Violated List's item's ID must be a number {}", self.span.line_str(), self.span.slice()))?
+                Err(format!("{} Mut List's item's ID must be a number {}", self.span.line_str(), self.span.slice()))?
             },
             None => id as u64,
         };
 
         if self.old.len() != 0{
-            Err(format!("{} Old is not needed for a violated list item {}", self.span.line_str(), self.span.slice()))?
+            Err(format!("{} Old is not needed for a mut item {}", self.span.line_str(), self.span.slice()))?
         }
         if self.refs.old.len() != 0{
-            Err(format!("{} Old is not needed for a violated list item {}", self.refs.span.line_str(), self.refs.span.slice()))?
+            Err(format!("{} Old is not needed for a mut item {}", self.refs.span.line_str(), self.refs.span.slice()))?
         }
 
         Ok((id, MutItem::construct(to_list_sab_map(self.default, &self.span)?, to_ref_sab_map(self.refs.map))))

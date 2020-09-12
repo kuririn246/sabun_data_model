@@ -3,14 +3,13 @@ use super::super::names::Names;
 use super::get_default::get_default;
 use crate::error::Result;
 use crate::imp::json_to_rust::get_old::get_old;
-use crate::imp::json_to_rust::get_compatible::get_compatible;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::HashS;
 
 pub enum ListAttribute{
     Default(ListDefObj),
     Old(HashS<String>),
-    Compatible(HashS<String>),
+    //Compatible(HashS<String>),
     NextID(u64),
 }
 
@@ -32,10 +31,10 @@ pub(crate) fn list_attribute(array : &Vec<JVal>, span : &Span, names : &Names) -
                     let old = get_old(&array[1..], names)?;
                     Ok(ListAttribute::Old(old))
                 },
-                "Compatible" =>{
-                    let compatible = get_compatible(&array[1..], names)?;
-                    Ok(ListAttribute::Compatible(compatible))
-                },
+                // "Compatible" =>{
+                //     let compatible = get_compatible(&array[1..], names)?;
+                //     Ok(ListAttribute::Compatible(compatible))
+                // },
                 "NextID" =>{
                     if array.len() == 2{
                         match array[1]{

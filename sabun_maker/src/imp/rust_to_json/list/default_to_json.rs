@@ -24,7 +24,7 @@ pub fn default_to_json(obj : &ListDefObj) -> Value{
 
 pub fn inner_def_to_json(obj : &ListDefObj, lt : ListType) -> Value{
     let mut result = vec![];
-    result.push(Value::String(list_type_to_string(&lt, false)));
+    result.push(Value::String(list_type_to_string(&lt)));
     result.push(Value::Array(vec![default_to_json(obj)]));
     return Value::Array(result);
 }

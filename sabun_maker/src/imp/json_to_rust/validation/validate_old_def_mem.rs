@@ -33,7 +33,7 @@ pub fn validate_old_ref_def(old : &HashS<String>, ref_def : &RefDefMap, names : 
     Ok(())
 }
 
-pub fn validate_old_data_id(old : &HashS<String>, data_map : &HashM<String, ConstItem>, names : &Names) -> Result<()> {
+pub fn validate_old_table_id(old : &HashS<String>, data_map : &HashM<String, ConstItem>, names : &Names) -> Result<()> {
     for name in old{
         if data_map.contains_key(name) == false{
             Err(format!("{} Old's ID {} does not exist in the Data", names, name))?

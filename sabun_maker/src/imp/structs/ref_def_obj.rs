@@ -9,7 +9,7 @@ pub struct RefDefObj {
     /// Enum とRefの二通りの定義の仕方があり、Enumの場合は Ref のうち一つだけ値があり、ほかは全部nullにしなきゃいけない。
     /// プログラムからはmatch でアクセス出来る。値があるRefをキャストしてゲットする。
     is_enum : bool,
-    ///oldに設定されたメンバは、defaultでの初期値を覗いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
+    ///oldに設定されたメンバは、defaultでの初期値を除いてjsonで値を入れられず、プログラムからも_Oldを付けないとアクセスできない
     old : Box<HashS<String>>,
 }
 
@@ -21,19 +21,19 @@ impl RefDefObj{
     pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
     pub(crate) fn is_enum(&self) -> bool{ self.is_enum }
 
-    pub(crate) fn compatible(&self, other : &Self) -> bool{
-        for (k,v) in self.refs(){
-            match other.refs.get(k){
-                Some(v2) =>{
-                    if v.compatible(v2) == false{
-                        return false;
-                    }
-                },
-                None =>{ return false; }
-            }
-        }
-        return true;
-    }
+    // pub(crate) fn compatible(&self, other : &Self) -> bool{
+    //     for (k,v) in self.refs(){
+    //         match other.refs.get(k){
+    //             Some(v2) =>{
+    //                 if v.compatible(v2) == false{
+    //                     return false;
+    //                 }
+    //             },
+    //             None =>{ return false; }
+    //         }
+    //     }
+    //     return true;
+    // }
 }
 
 #[derive(Debug, PartialEq, Clone)]
