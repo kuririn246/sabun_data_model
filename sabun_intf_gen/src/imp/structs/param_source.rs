@@ -3,6 +3,7 @@ use crate::imp::structs::source_builder::SourceBuilder;
 use crate::imp::util::to_type_name::to_snake_name;
 use crate::imp::util::with_old::with_old;
 use crate::imp::util::with_var::with_var;
+use crate::imp::util::into_qv::into_qv;
 
 #[repr(C)] #[derive(Debug, PartialEq)]
 pub struct ParamSource{
@@ -67,14 +68,7 @@ impl ParamSource{
         let pt = self.param_type();
 
         sb.push(0, &format!("pub fn set_{}(&mut self, {} : {}){{", with_old(&snake_name, is_old), &snake_name, with_var(pt.typename(), var_type)));
-
-        let param = if var_type == VarType::Normal {
-            format!("Qv::Val({})", snake_name)
-        } else {
-            format!("{}.into_qv()", snake_name)
-        };
-
-        sb.push(1, &format!("{}::set_{}(self.ptr, \"{}\", {});", mod_name, pt.nickname(), id, &param));
+        sb.push(1, &format!("{}::set_{}(self.ptr, \"{}\", {});", mod_name, pt.nickname(), id, &into_qv(&snake_name, var_type)));
         sb.push(0, "}");
         sb.to_string()
     }

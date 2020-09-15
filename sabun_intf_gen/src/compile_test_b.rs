@@ -3,19 +3,19 @@ use sabun_maker::structs::*;
 unsafe impl Send for RootIntf{}
 #[derive(Debug, PartialEq)]
 pub struct RootIntf{
-    root : Box<RootObject>,
-    ptr : RootObjectPtr,
+	root : Box<RootObject>,
+	ptr : RootObjectPtr,
 }
 impl RootIntf{
-    pub fn new(obj : RootObject) -> RootIntf{
+	pub fn new(obj : RootObject) -> RootIntf{
 		let mut root = Box::new(obj);
 		let ptr = RootObjectPtr::new(root.as_mut());
 		RootIntf { root, ptr }
 	}
 
-	pub fn refed(&self) -> RefedData{
-		let ans = root::get_data(self.ptr, "refed").unwrap();
-		RefedData::new(ans)
+	pub fn refed(&self) -> RefedTable{
+		let ans = root::get_table(self.ptr, "refed").unwrap();
+		RefedTable::new(ans)
 	}
 	pub fn bu(&self) -> bool{
 		let qv = root::get_bool(self.ptr, "bu").unwrap();
@@ -24,58 +24,92 @@ impl RootIntf{
 	pub fn set_bu(&mut self, bu : bool){
 		root::set_bool(self.ptr, "bu", Qv::Val(bu));
 	}
-	pub fn mutable_list(&self) -> MutListPtr<MutableListItem>{
-		root::get_mut_list(self.ptr, "mutableList").unwrap()
+	pub fn mutable_list(&self) -> MListPtr<MutableListMItem>{
+		root::get_mlist(self.ptr, "mutableList").unwrap()
 	}
 }
 #[derive(Debug, PartialEq)]
-pub struct RefedData {
-	ptr : ConstDataPtr,
+pub struct RefedTable {
+	ptr : TablePtr,
 }
-impl RefedData {
-	pub fn new(ptr : ConstDataPtr) -> RefedData{ RefedData{ ptr } } 
-	pub fn first(&self) -> RefedItem {
-		let ptr = data::get_value(self.ptr, "first").unwrap();
-		RefedItem::new(ptr)
+impl RefedTable {
+	pub fn new(ptr : TablePtr) -> RefedTable{ RefedTable{ ptr } }
+	pub fn first(&self) -> RefedCItem {
+		let ptr = table::get_value(self.ptr, "first").unwrap();
+		RefedCItem::from(ptr)
 	}
-	pub fn second(&self) -> RefedItem {
-		let ptr = data::get_value(self.ptr, "second").unwrap();
-		RefedItem::new(ptr)
+	pub fn second(&self) -> RefedCItem {
+		let ptr = table::get_value(self.ptr, "second").unwrap();
+		RefedCItem::from(ptr)
 	}
-	pub fn from_id(&self, id : &str) -> Option<RefedItem>{
+	pub fn from_id(&self, id : RefedTableID) -> RefedCItem{
 		match id{
-			"first" => Some(self.first()),
-			"second" => Some(self.second()),
-			_ =>{ None },
+			RefedTableID::First => self.first(),
+			RefedTableID::Second => self.second(),
 		}
 	}
 }
-#[derive(Debug, PartialEq)]
-pub struct RefedItem {
-	ptr : ListItemPtr,
+#[repr(u64)] pub enum RefedTableID{ First, Second, }
+impl RefedTableID{
+	pub fn from_str(id : &str) -> Option<Self>{
+		match id{
+			"first" => Some(Self::First),
+			"second" => Some(Self::Second),
+			_ =>{ None }
+		}
+	}
+	pub fn to_str(&self) -> &str{
+		match self{
+			RefedTableID::First => "first",
+			RefedTableID::Second => "second",
+		}
+	}
+	pub fn from_num(id : u64) -> Option<Self>{
+		match id{
+			0 => Some(Self::First),
+			1 => Some(Self::Second),
+			_ =>{ None }
+		}
+	}
+	pub fn len() -> u64{ 2 }
 }
-impl RefedItem {
-	pub fn new(ptr : ListItemPtr) -> RefedItem{ RefedItem{ ptr } } 
+#[derive(Debug, PartialEq)]
+pub struct RefedCItem {
+	ptr : CItemPtr,
+}
+impl From<CItemPtr> for RefedCItem {
+	fn from(ptr : CItemPtr) -> Self { Self{ ptr } }
+}
+impl RefedCItem {
 	pub fn mem(&self) -> i64{
-		let qv = list_item::get_int(self.ptr, "mem").unwrap();
+		let qv = citem::get_int(self.ptr, "mem").unwrap();
 		qv.into_value().unwrap()
 	}
 }
 
 #[derive(Debug, PartialEq)]
-pub struct MutableListItem {
-	ptr : MutListItemPtr,
+pub struct MutableListMItem {
+	ptr : MItemPtr,
 }
-impl MutableListItem {
-	pub fn new(ptr : MutListItemPtr) -> MutableListItem{ MutableListItem{ ptr } } 
+impl From<MItemPtr> for MutableListMItem {
+	fn from(ptr : MItemPtr) -> Self {
+		Self{ ptr }
+	}
+}
+impl MutableListMItem {
 	pub fn nakabu(&self) -> bool{
-		let qv = mut_list_item::get_bool(self.ptr, "nakabu").unwrap();
+		let qv = mitem::get_bool(self.ptr, "nakabu").unwrap();
 		qv.into_value().unwrap()
+	}
+	pub fn set_nakabu(&mut self, nakabu : bool){
+		mitem::set_bool(self.ptr, "nakabu", Qv::Val(nakabu));
+	}
+	pub fn ref_refed(&self) -> RefedCItem{
+		let qv = mitem::get_ref(self.ptr, "refed").unwrap();
+		if let Qv::Val(v) = qv{ RefedCItem::from(v) } else { unreachable!() }
+	}
+	pub fn set_ref_refed(&self, id : RefedTableID) {
+		mitem::set_ref(self.ptr, id.to_str());
 	}
 }
 
-impl From<MutListItemPtr> for MutableListItem{
-	fn from(p : MutListItemPtr) -> Self {
-		MutableListItem::new(p)
-	}
-}

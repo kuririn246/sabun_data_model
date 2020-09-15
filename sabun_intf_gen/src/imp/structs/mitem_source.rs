@@ -33,16 +33,15 @@ impl MItemSource {
 
         sb.push(0,&format!("#[derive(Debug, PartialEq)]"));
         sb.push(0,&format!("pub struct {} {{", &item_type_name));
-        sb.push(1,"ptr : MutListItemPtr,");
+        sb.push(1,"ptr : MItemPtr,");
         sb.push(0,"}");
-        sb.push(0, &format!("impl From<MutListItemPtr> for {} {{", &item_type_name));
-        sb.push(1, &format!("fn from(p : MutListItemPtr) -> Self {{"));
-        sb.push(2, &format!("{}::new(p)", &item_type_name));
+        sb.push(0, &format!("impl From<MItemPtr> for {} {{", &item_type_name));
+        sb.push(1, &format!("fn from(ptr : MItemPtr) -> Self {{"));
+        sb.push(2, &format!("Self{{ ptr }}"));
         sb.push(1, "}");
         sb.push(0,"}");
         sb.push(0, &format!("impl {} {{", &item_type_name));
-        sb.push(1, &format!("pub fn new(ptr : MutListItemPtr) -> {}{{ {}{{ ptr }} }} ",
-                            &item_type_name, &item_type_name));
+
         for mem in self.members() {
             match mem{
                 MemberSource::Param(param) =>{

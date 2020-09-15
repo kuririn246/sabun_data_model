@@ -1,7 +1,7 @@
 {
   bu : false,
 
-	mutableList : ["__ViolatedList",
+	mutableList : ["MList",
 		[{
 			nakabu : true,
 //			innerList : ["InnerListDef",
@@ -9,9 +9,9 @@
 //				innerMem : 10,
 //			}]
 //			],
-//			Ref : {
-//				"refed" : "",
-//			}
+			Ref : {
+				"refed?" : "",
+			}
 		}],
 		{
 			nakabu : false,
@@ -23,12 +23,12 @@
 //					innerMem : 30,
 //				},
 //			],
-//			Ref : {
-//				"refed" : "second",
-//			}
+			Ref : {
+				"refed" : "second",
+			}
 		}
 	],
-	"refed" : ["Data",
+	"refed" : ["Table",
 		[{
 			mem : 0
 		}],

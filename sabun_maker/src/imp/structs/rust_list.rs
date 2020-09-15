@@ -148,6 +148,7 @@ impl MutItem {
     pub(crate) fn values(&self) -> &HashM<String, ListSabValue>{ self.values.as_ref() }
     pub(crate) fn values_mut(&mut self) -> &mut HashM<String, ListSabValue>{ self.values.as_mut() }
     pub(crate) fn refs(&self) -> &HashM<String, RefSabValue>{ self.refs.as_ref() }
+    pub(crate) fn refs_mut(&mut self) -> &mut HashM<String, RefSabValue>{ self.refs.as_mut() }
     pub(crate) fn set_sabun(&mut self, def :&ListDefObj, name : String, param : RustParam) -> Result<Option<RustParam>, SetSabunError> {
         let (p, vt) =
             if let Some(ListDefValue::Param(p, vt)) = def.default().get(&name) {

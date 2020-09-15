@@ -1,4 +1,4 @@
-use sabun_maker::structs::VarType;
+use sabun_maker::structs::{VarType};
 
 pub fn with_var(t : &str, vt : VarType) -> String{
     match vt{
@@ -8,3 +8,4 @@ pub fn with_var(t : &str, vt : VarType) -> String{
         VarType::UndefNullable => format!("Qv<{}>", t),
     }
 }
+

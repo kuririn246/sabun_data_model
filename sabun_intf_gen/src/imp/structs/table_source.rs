@@ -116,15 +116,22 @@ impl TableSource {
         sb.push(3, "_ =>{ None }");
         sb.push(2, "}");
         sb.push(1, "}");
-        sb.push(1, &format!("pub fn from_num(id : u64) -> Option<Self>{{"));
+        sb.push(1, &format!("pub fn from_num(id : u64) -> Self{{"));
         sb.push(2, &format!("match id{{"));
         for (id, key) in self.keys.iter().enumerate() {
-            sb.push(3, &format!("{} => Some(Self::{}),", id, key.enum_name()));
+            sb.push(3, &format!("{} => Self::{},", id, key.enum_name()));
         }
-            sb.push(3, "_ =>{ None }");
-            sb.push(2, "}");
+        sb.push(3, &format!("_ => panic!(\"invalid ID num {{}} {}\", id),", &ids_type_name));
+        sb.push(2, "}");
         sb.push(1, "}");
         sb.push(1, &format!("pub fn len() -> u64{{ {} }}", self.keys.len()));
+        sb.push(1, &format!("pub fn to_str(&self) -> &str{{"));
+        sb.push(2, &format!("match self{{"));
+        for key in &self.keys {
+            sb.push(3, &format!(r#"{}::{} => "{}","#, &ids_type_name, &key.enum_name(), &key.key));
+        }
+        sb.push(2, "}");
+        sb.push(1, "}");
         sb.push(0,"}");
 
         sb.push_without_newline(0, &self.item_source.to_string());

@@ -6,6 +6,8 @@ use crate::imp::structs::rust_param::RustParam;
 use crate::imp::structs::list_def_obj::ListDefObj;
 use crate::imp::structs::root_obj::RootObject;
 use crate::imp::intf::mlist::MListPtr;
+use crate::imp::intf::{CItemPtr, RootObjectPtr};
+use crate::imp::structs::ref_value::RefSabValue;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -61,15 +63,27 @@ pub fn set_bool(ps : MItemPtr, name : &str, val : Qv<bool>) -> bool{
     }
 }
 
-// pub fn set_ref(ps : MutListItemPtr, list_name : &str, id : &str){
-//     let item= unsafe{ ps.item.as_mut().unwrap() };
-//     item.refs()
-//     let qv = if let Some(sab) = item.refs().get(list_name){
-//         sab.value()
-//     } else{
-//         if let Some(d) = list_def.refs().refs().get(list_name){
-//             d.value()
-//         } else{ return None; }
-//     };
-//     Some(qv)
-// }
+pub fn set_ref(ps : MItemPtr, list_name : &str, id : Qv<String>) -> bool{
+    let (item, _def)= unsafe{ (ps.item.as_mut().unwrap(), ps.list_def.as_ref().unwrap()) };
+
+    //if def.refs().refs().contains_key(list_name) == false{ return false; }
+
+    item.refs_mut().insert(list_name.to_string(), RefSabValue::new(id));
+    return true;
+}
+
+
+pub fn get_ref(ps : MItemPtr, list_name : &str) -> Option<Qv<CItemPtr>>{
+    let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
+    let qv = if let Some(sab) = item.refs().get(list_name){
+        sab.value()
+    } else{
+        if let Some(d) = list_def.refs().refs().get(list_name){
+            d.value()
+        } else{ return None; }
+    };
+    qv.opt_map(|id|{
+        let data = super::root::get_table(RootObjectPtr::new(ps.root), list_name).unwrap();
+        super::table::get_value(data, id)
+    })
+}

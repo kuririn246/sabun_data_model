@@ -1,9 +1,8 @@
 use sabun_maker::structs::{VarType};
 use crate::imp::structs::source_builder::SourceBuilder;
-use crate::imp::util::to_type_name::{to_snake_name, to_citem_type_name, to_mitem_type_name};
+use crate::imp::util::to_type_name::{to_snake_name, to_citem_type_name, to_ids_type_name};
 use crate::imp::util::with_old::with_old;
 use crate::imp::util::with_var::with_var;
-use crate::imp::util::var_type_name::var_type_name;
 use sabun_maker::intf::ref_desc::RefDesc;
 
 #[repr(C)] #[derive(Debug, PartialEq)]
@@ -40,20 +39,17 @@ impl RefSource{
         let snake_name = to_snake_name(id);
         let is_old = self.is_old();
         let var_type = self.var_type();
-        let item_type_name = if from_citem{ to_citem_type_name(id) } else{ to_mitem_type_name(id) };
+        let item_type_name = to_citem_type_name(id);
         let mod_name = if from_citem{ "citem" } else{ "mitem" };
-        let var_type_name = var_type_name(var_type);
         sb.push(0, &format!("pub fn ref_{}(&self) -> {}{{", with_old(&snake_name, is_old), with_var(&item_type_name, var_type)));
         sb.push(1,&format!("let qv = {}::get_ref(self.ptr, \"{}\").unwrap();", mod_name, id));
-        if var_type != VarType::Normal {
-            sb.push(1, &format!("let ptr = match qv{{"));
-            sb.push(2, &format!("Qv::None =>{{ return {}::Null; }},", &var_type_name));
-            sb.push(2, &format!("Qv::Undefined =>{{ return {}::Undefined; }},", &var_type_name));
-            sb.push(2, &format!("Qv::Val(id) => {}::Val(id)", &var_type_name));
-            sb.push(1, "}");
-        } else {
-            sb.push(1, &format!("if let Qv::Val(v) = qv{{ {}::from(v) }} else {{ unreachable!() }}", &item_type_name));
-        }
+        let s = match var_type{
+            VarType::Normal => format!("{}::from(qv.into_value().unwrap())", item_type_name),
+            VarType::Nullable => format!("NullOr::from_qv(qv).unwrap().map(|p| {}::from(*p))", item_type_name),
+            VarType::Undefiable => format!("UndefOr::from_qv(qv).unwrap().map(|p| {}::from(*p))", item_type_name),
+            VarType::UndefNullable => format!("qv.map(|p| {}::from(*p))", item_type_name),
+        };
+        sb.push(1, &s);
         sb.push(0, "}");
         sb.to_string()
     }
@@ -61,9 +57,18 @@ impl RefSource{
         let mut sb = SourceBuilder::new();
         let id = self.name();
         let snake_name = to_snake_name(id);
+        let ids_type_name = to_ids_type_name(id);
         let is_old = self.is_old();
-        sb.push(0, &format!("pub fn set_ref_{}(&self, ref_id : Qv<String>){{\n", with_old(&snake_name, is_old)));
-        sb.push(1,&format!("{}::set_ref(self.ptr, ref_id);", mod_name));
+        let var_type = self.var_type;
+        sb.push(0, &format!("pub fn set_ref_{}(&self, id : {}){{", with_old(&snake_name, is_old), with_var(&ids_type_name, var_type)));
+
+        let exp = if var_type == VarType::Normal {
+            format!("Qv::Val(id.to_str().to_string())")
+        } else {
+            format!("id.into_qv().map(|v| v.to_str().to_string())")
+        };
+        sb.push(1,&format!("{}::set_ref(self.ptr, \"{}\", {});", mod_name, id, exp));
+        sb.push(0,"}");
         sb.to_string()
     }
     pub fn c_get(&self) -> Option<&str>{
@@ -73,3 +78,8 @@ impl RefSource{
         unimplemented!()
     }
 }
+
+// pub fn var_from_qv(vt : VarType, exp : &str, item_type : &str) -> String{
+//     NullOr::from_qv(qv).unwrap().map(|p| RefedCItem::from(*p))
+//
+// }
