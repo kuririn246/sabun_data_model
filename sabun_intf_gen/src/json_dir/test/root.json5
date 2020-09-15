@@ -2,10 +2,10 @@
 	bu : false,
 	str : "sutoringu",
 
-	list : ["List",
+	testList : ["CList",
 		[{
 			nakabu : true,
-			innerList : ["InnerListDef",
+			innerTestList : ["CilDef",
 			[{
 				innerMem : 10,
 			}]
@@ -16,7 +16,7 @@
 		}],
 		{
 			nakabu : false,
-			innerList : ["InnerList",
+			innerTestList : ["Cil",
 				{
 					innerMem : 20,
 				},
@@ -29,7 +29,7 @@
 			}
 		}
 	],
-	"refed" : ["Data",
+	"refed" : ["Table",
 		[{
 			mem : 0
 		}],

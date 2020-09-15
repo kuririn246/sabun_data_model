@@ -36,7 +36,7 @@ impl CilSource {
         let is_old = self.is_old();
         let item_type_name = to_citem_type_name(id);
         sb.push(0,&format!("pub fn {}(&self) -> CListPtr<{}>{{", with_old(&snake_name, is_old), &item_type_name));
-        sb.push(1,&format!("citem::get_cil(self.ptr, \"{}\").unwrap();", id));
+        sb.push(1,&format!("citem::get_cil(self.ptr, \"{}\").unwrap()", id));
         sb.push(0,"}");
         sb.to_string()
     }

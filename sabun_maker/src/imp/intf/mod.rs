@@ -16,11 +16,10 @@ pub mod member_desc;
 pub mod root;
 
 pub use root::RootObjectPtr as RootObjectPtr;
-pub use table::TablePtr as ConstDataPtr;
-pub use citem::CItemPtr as ListItemPtr;
-pub use clist::CListPtr as ConstListPtr;
+pub use table::TablePtr as TablePtr;
+pub use citem::CItemPtr as CItemPtr;
+pub use clist::CListPtr as CListPtr;
 //pub use cil::CilPtr as InnerListPtr;
 pub use c_qv_str::StrPtr as RustStrPtr;
-pub use general_iter::GeneralIter as GeneralIter;
-pub use mlist::MListPtr as MutListPtr;
-pub use mitem::MItemPtr as MutListItemPtr;
+pub use mlist::MListPtr as MListPtr;
+pub use mitem::MItemPtr as MItemPtr;

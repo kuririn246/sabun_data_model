@@ -49,7 +49,7 @@ pub fn to_table_type_name(stem : &str) -> String{
 }
 
 pub fn to_ids_type_name(stem : &str) -> String{
-    format!("{}ID", to_type_name(stem))
+    format!("{}TableID", to_type_name(stem))
 }
 
 //pub fn to_clist_type_name(stem : &str) -> String{ format!("{}CList", to_type_name(stem)) }

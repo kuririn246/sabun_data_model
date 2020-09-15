@@ -21,6 +21,11 @@ impl SourceBuilder{
         }
 
     }
+
+    pub(crate) fn append(&mut self, s : &str) {
+        self.s.push_str(s);
+    }
+
     pub(crate) fn to_string(&self) -> String{
         self.s.to_string()
     }

@@ -1,5 +1,5 @@
 use crate::imp::structs::source_builder::SourceBuilder;
-use crate::imp::util::to_type_name::{to_snake_name, to_table_type_name, to_ids_type_name, to_citem_type_name};
+use crate::imp::util::to_type_name::{to_snake_name, to_table_type_name, to_ids_type_name, to_citem_type_name, to_type_name};
 use crate::imp::util::with_old::with_old;
 use crate::imp::structs::citem_source::CItemSource;
 use sabun_maker::intf::member_desc::{MemberDesc, KeyItem};
@@ -23,6 +23,9 @@ impl KeySource{
     }
     pub fn key_name(&self) -> String{
         if self.is_old{ format!("{}_old", to_snake_name(&self.key)) } else{ to_snake_name(&self.key) }
+    }
+    pub fn enum_name(&self) -> String{
+        if self.is_old{ format!("{}Old", to_type_name(&self.key)) } else{ to_type_name(&self.key) }
     }
 }
 impl TableSource {
@@ -56,7 +59,7 @@ impl TableSource {
         let is_old = self.is_old();
         let data_type_name = to_table_type_name(id);
         sb.push(0,&format!("pub fn {}(&self) -> {}{{", with_old(&snake_name, is_old), &data_type_name));
-        sb.push(1,&format!("let ans = root::get_data(self.ptr, \"{}\").unwrap();", id));
+        sb.push(1,&format!("let ans = root::get_table(self.ptr, \"{}\").unwrap();", id));
         sb.push(1,&format!("{}::new(ans)", &data_type_name));
         sb.push(0,"}");
         sb.to_string()
@@ -70,34 +73,59 @@ impl TableSource {
 
         sb.push(0,&format!("#[derive(Debug, PartialEq)]"));
         sb.push(0,&format!("pub struct {} {{", &data_type_name));
-        sb.push(1,"ptr : ConstDataPtr,");
+        sb.push(1,"ptr : TablePtr,");
         sb.push(0,"}");
         sb.push(0, &format!("impl {} {{", &data_type_name));
-        sb.push(1, &format!("pub fn new(ptr : ConstDataPtr) -> {}{{ {}{{ ptr }} }} ",
+        sb.push(1, &format!("pub fn new(ptr : TablePtr) -> {}{{ {}{{ ptr }} }} ",
                            &data_type_name, &data_type_name));
 
         for key in &self.keys {
             let key_name = key.key_name();
             sb.push(1,&format!("pub fn {}(&self) -> {} {{", &key_name, &item_type_name));
-            sb.push(2,&format!("let ptr = data::get_value(self.ptr, \"{}\").unwrap();", &key.key));
+            sb.push(2,&format!("let ptr = table::get_value(self.ptr, \"{}\").unwrap();", &key.key));
 
-            sb.push(2, &format!("{}::new(ptr)", &item_type_name));
+            sb.push(2, &format!("{}::from(ptr)", &item_type_name));
             sb.push(1, "}");
         }
 
         if self.keys.len() != 0 {
-            sb.push(1,&format!("pub fn from_id(&self, id : &str) -> Option<{}>{{", &item_type_name));
+            sb.push(1,&format!("pub fn from_id(&self, id : {}) -> {}{{", &ids_type_name, &item_type_name));
             sb.push(2,"match id{");
 
             for key in &self.keys {
-                 sb.push(3,&format!("\"{}\" => Some(self.{}()),", &key.key, &key.key_name()));
+                 sb.push(3,&format!("{}::{} => self.{}(),", &ids_type_name, &key.enum_name(), &key.key_name()));
             }
-
-            sb.push(3, &format!("_ =>{{ None }},"));
             sb.push(2, "}");
         }
         sb.push(1, "}");
         sb.push(0, "}");
+
+
+        sb.append(&format!("#[repr(u64)] pub enum {}{{ ", &ids_type_name));
+        for key in &self.keys{
+            sb.append(&format!("{}, ", &key.enum_name()))
+        }
+        sb.push(0, "}");
+        sb.push(0, &format!("impl {}{{", &ids_type_name));
+        sb.push(1, &format!("pub fn from_str(id : &str) -> Option<Self>{{"));
+        sb.push(2, &format!("match id{{"));
+        for key in &self.keys {
+            sb.push(3, &format!(r#""{}" => Some(Self::{}),"#, &key.key, &key.enum_name()));
+        }
+
+        sb.push(3, "_ =>{ None }");
+        sb.push(2, "}");
+        sb.push(1, "}");
+        sb.push(1, &format!("pub fn from_num(id : u64) -> Option<Self>{{"));
+        sb.push(2, &format!("match id{{"));
+        for (id, key) in self.keys.iter().enumerate() {
+            sb.push(3, &format!("{} => Some(Self::{}),", id, key.enum_name()));
+        }
+            sb.push(3, "_ =>{ None }");
+            sb.push(2, "}");
+        sb.push(1, "}");
+        sb.push(1, &format!("pub fn len() -> u64{{ {} }}", self.keys.len()));
+        sb.push(0,"}");
 
         sb.push_without_newline(0, &self.item_source.to_string());
         sb.to_string()

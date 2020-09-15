@@ -52,7 +52,7 @@ impl RefSource{
             sb.push(2, &format!("Qv::Val(id) => {}::Val(id)", &var_type_name));
             sb.push(1, "}");
         } else {
-            sb.push(1, &format!("if let Qv::Val(v) = qv{{ {}::new(v) }} else {{ unreachable!() }}", &item_type_name));
+            sb.push(1, &format!("if let Qv::Val(v) = qv{{ {}::from(v) }} else {{ unreachable!() }}", &item_type_name));
         }
         sb.push(0, "}");
         sb.to_string()

@@ -33,11 +33,13 @@ impl CItemSource {
 
         sb.push(0,&format!("#[derive(Debug, PartialEq)]"));
         sb.push(0,&format!("pub struct {} {{", &item_type_name));
-        sb.push(1,"ptr : ListItemPtr,");
+        sb.push(1,"ptr : CItemPtr,");
         sb.push(0,"}");
+        sb.push(0, &format!("impl From<CItemPtr> for {} {{", &item_type_name));
+        sb.push(1, &format!("fn from(ptr : CItemPtr) -> Self {{ Self{{ ptr }} }}"));
+        sb.push(0, &format!("}}"));
         sb.push(0, &format!("impl {} {{", &item_type_name));
-        sb.push(1, &format!("pub fn new(ptr : ListItemPtr) -> {}{{ {}{{ ptr }} }} ",
-                            &item_type_name, &item_type_name));
+
         for mem in self.members() {
             match mem{
                 MemberSource::Param(param) =>{
