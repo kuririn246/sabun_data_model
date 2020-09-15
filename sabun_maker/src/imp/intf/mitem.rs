@@ -44,6 +44,26 @@ pub fn get_bool(ps : MItemPtr, name : &str) -> Option<Qv<bool>>{
         Some(b.clone())
     } else{ None }
 }
+pub fn set_bool(ps : MItemPtr, name : &str, val : Qv<bool>) -> bool{
+    let (item,def) = unsafe{ (ps.item.as_mut().unwrap(),ps.list_def.as_ref().unwrap()) };
+    match item.set_sabun(def, name.to_string(), RustParam::Bool(val)) {
+        Ok(_) => true,
+        Err(_) => false,
+    }
+}
+pub fn get_int(ps : MItemPtr, name : &str) -> Option<Qv<i64>>{
+    let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
+    if let Some(RustParam::Int(b)) = get_param(item, list_def, name){
+        Some(b.clone())
+    } else{ None }
+}
+pub fn set_int(ps : MItemPtr, name : &str, val : Qv<i64>) -> bool{
+    let (item, def) = unsafe{ (ps.item.as_mut().unwrap(), ps.list_def.as_ref().unwrap()) };
+    match item.set_sabun(def,name.to_string(), RustParam::Int(val)){
+        Ok(_) => true,
+        Err(_) => false,
+    }
+}
 
 pub fn get_param<'a>(item : &'a MutItem, def : &'a ListDefObj, name : &str) -> Option<&'a RustParam>{
     if let Some(ListSabValue::Param(p)) = item.values().get(name){
@@ -55,13 +75,7 @@ pub fn get_param<'a>(item : &'a MutItem, def : &'a ListDefObj, name : &str) -> O
     }
 }
 
-pub fn set_bool(ps : MItemPtr, name : &str, val : Qv<bool>) -> bool{
-    let (item,def) = unsafe{ (ps.item.as_mut().unwrap(),ps.list_def.as_ref().unwrap()) };
-    match item.set_sabun(def, name.to_string(), RustParam::Bool(val)) {
-        Ok(_) => true,
-        Err(_) => false,
-    }
-}
+
 
 pub fn set_ref(ps : MItemPtr, list_name : &str, id : Qv<String>) -> bool{
     let (item, _def)= unsafe{ (ps.item.as_mut().unwrap(), ps.list_def.as_ref().unwrap()) };

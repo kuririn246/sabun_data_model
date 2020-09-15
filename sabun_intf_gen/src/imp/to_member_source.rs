@@ -62,7 +62,10 @@ pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
         }
         RustMemberType::MList =>{
             MemberSource::MList(MListSource::from(mem))
-        }
+        },
+        RustMemberType::Mil =>{
+            MemberSource::Mil(MilSource::from(mem))
+        },
         _ => unreachable!(),
     }
 }

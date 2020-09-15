@@ -4,25 +4,34 @@
 	mutableList : ["MList",
 		[{
 			nakabu : true,
-//			innerList : ["InnerListDef",
-//			[{
-//				innerMem : 10,
-//			}]
-//			],
+			mutInnList : ["MilDef",
+			[{
+				innerMem : 10,
+				Ref : {
+					refed : "",
+				}
+			}]
+			],
 			Ref : {
-				"refed?" : "",
+				"refed" : "",
 			}
 		}],
 		{
 			nakabu : false,
-//			innerList : ["InnerList",
-//				{
-//					innerMem : 20,
-//				},
-//				{
-//					innerMem : 30,
-//				},
-//			],
+			mutInnList : ["Mil",
+				{
+					innerMem : 20,
+					Ref : {
+						refed : "first",
+					}
+				},
+				{
+					innerMem : 30,
+					Ref : {
+						refed : "second",
+					}
+				},
+			],
 			Ref : {
 				"refed" : "second",
 			}

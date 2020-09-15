@@ -97,6 +97,9 @@ impl From<MItemPtr> for MutableListMItem {
 	}
 }
 impl MutableListMItem {
+	pub fn mut_inn_list(&self) -> MListPtr<MutInnListMItem>{
+		mitem::get_mil(self.ptr, "mutInnList").unwrap().unwrap()
+	}
 	pub fn nakabu(&self) -> bool{
 		let qv = mitem::get_bool(self.ptr, "nakabu").unwrap();
 		qv.into_value().unwrap()
@@ -104,12 +107,37 @@ impl MutableListMItem {
 	pub fn set_nakabu(&mut self, nakabu : bool){
 		mitem::set_bool(self.ptr, "nakabu", Qv::Val(nakabu));
 	}
-	pub fn ref_refed(&self) -> NullOr<RefedCItem>{
+	pub fn ref_refed(&self) -> RefedCItem{
 		let qv = mitem::get_ref(self.ptr, "refed").unwrap();
-		NullOr::from_qv(qv).unwrap().map(|p| RefedCItem::from(*p))
+		RefedCItem::from(qv.into_value().unwrap())
 	}
-	pub fn set_ref_refed(&self, id : NullOr<RefedTableID>){
-		mitem::set_ref(self.ptr, "refed", id.into_qv().map(|v| v.to_str().to_string()));
+	pub fn set_ref_refed(&self, id : RefedTableID){
+		mitem::set_ref(self.ptr, "refed", Qv::Val(id.to_str().to_string()));
+	}
+}
+#[derive(Debug, PartialEq)]
+pub struct MutInnListMItem {
+	ptr : MItemPtr,
+}
+impl From<MItemPtr> for MutInnListMItem {
+	fn from(ptr : MItemPtr) -> Self {
+		Self{ ptr }
+	}
+}
+impl MutInnListMItem {
+	pub fn inner_mem(&self) -> i64{
+		let qv = mitem::get_int(self.ptr, "innerMem").unwrap();
+		qv.into_value().unwrap()
+	}
+	pub fn set_inner_mem(&mut self, inner_mem : i64){
+		mitem::set_int(self.ptr, "innerMem", Qv::Val(inner_mem));
+	}
+	pub fn ref_refed(&self) -> RefedCItem{
+		let qv = mitem::get_ref(self.ptr, "refed").unwrap();
+		RefedCItem::from(qv.into_value().unwrap())
+	}
+	pub fn set_ref_refed(&self, id : RefedTableID){
+		mitem::set_ref(self.ptr, "refed", Qv::Val(id.to_str().to_string()));
 	}
 }
 
