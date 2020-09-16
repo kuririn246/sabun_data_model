@@ -4,26 +4,27 @@ use crate::imp::structs::ref_source::RefSource;
 use sabun_maker::intf::member_desc::MemberDesc;
 use sabun_maker::intf::ref_desc::RefDescs;
 use crate::imp::util::to_type_name::to_citem_type_name;
+use crate::imp::structs::refs_source::RefsSource;
 
 #[derive(Debug, PartialEq)]
 pub struct CItemSource {
     stem : String,
     members : Vec<MemberSource>,
-    refs : Vec<RefSource>,
+    refs : RefsSource,
 }
 impl CItemSource {
-    pub fn new(members : Vec<MemberSource>, refs : Vec<RefSource>, stem : String) -> CItemSource { CItemSource { members, refs, stem } }
+    pub fn new(members : Vec<MemberSource>, refs : RefsSource, stem : String) -> CItemSource { CItemSource { members, refs, stem } }
     pub fn from(stem : String, mems : &[MemberDesc], refs : &RefDescs) -> CItemSource {
         CItemSource {
             stem,
             members : mems.iter().map(to_member_source).collect(),
-            refs : refs.items().iter().map(RefSource::from).collect()
+            refs : RefsSource::new(refs.items().iter().map(RefSource::from).collect(), refs.is_enum()),
         }
     }
 
     pub fn stem(&self) -> &str{ &self.stem }
     pub fn members(&self) -> &[MemberSource]{ &self.members }
-    pub fn refs(&self) -> &[RefSource]{ &self.refs }
+    pub fn refs(&self) -> &RefsSource{ &self.refs }
 
     pub fn to_string(&self) -> String{
         let mut sb = SourceBuilder::new();
@@ -54,9 +55,8 @@ impl CItemSource {
                 MemberSource::Mil(_) =>{},
             }
         }
-        for r in self.refs() {
-            sb.push_without_newline(1, &r.get(true))
-        }
+
+        sb.push_without_newline(1, &self.refs.get());
         sb.push(0, "}");
 
         for mem in &self.members{

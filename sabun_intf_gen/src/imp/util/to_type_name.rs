@@ -52,6 +52,6 @@ pub fn to_ids_type_name(stem : &str) -> String{
     format!("{}TableID", to_type_name(stem))
 }
 
-//pub fn to_clist_type_name(stem : &str) -> String{ format!("{}CList", to_type_name(stem)) }
-//pub fn to_cil_type_name(stem : &str) -> String{ format!("{}Cil", to_type_name(stem)) }
-//pub fn to_mil_type_name(stem : &str) -> String{ format!("{}Mil", to_type_name(stem)) }
+pub fn to_enum_type_name(stem : &str) -> String{ format!("{}Enum", to_type_name(stem)) }
+
+pub fn to_eval_type_name(stem : &str) -> String{ format!("{}EVal", to_type_name(stem)) }
