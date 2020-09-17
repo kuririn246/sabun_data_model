@@ -39,7 +39,7 @@ impl RefsSource{
             sb.append(&format!("{}({}), ", &item_type, &item_type));
         }
         sb.append("}\n");
-        
+
 
 
         sb.to_string()
