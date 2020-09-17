@@ -56,7 +56,7 @@ impl CItemSource {
             }
         }
 
-        sb.push_without_newline(1, &self.refs.get());
+        sb.push_without_newline(1, &self.refs.get(self.stem(), "citem"));
         sb.push(0, "}");
 
         for mem in &self.members{
@@ -70,6 +70,9 @@ impl CItemSource {
                 MemberSource::Param(_) =>{},
                 MemberSource::Mil(_) =>{},
             }
+        }
+        if let Some(s) = self.refs.to_string(self.stem()) {
+            sb.push_without_newline(1, &s);
         }
 
         sb.to_string()

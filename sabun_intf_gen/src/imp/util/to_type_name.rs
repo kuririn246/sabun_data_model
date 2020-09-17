@@ -54,4 +54,4 @@ pub fn to_ids_type_name(stem : &str) -> String{
 
 pub fn to_enum_type_name(stem : &str) -> String{ format!("{}Enum", to_type_name(stem)) }
 
-pub fn to_eval_type_name(stem : &str) -> String{ format!("{}EVal", to_type_name(stem)) }
+pub fn to_kind_type_name(stem : &str) -> String{ format!("{}Kind", to_type_name(stem)) }

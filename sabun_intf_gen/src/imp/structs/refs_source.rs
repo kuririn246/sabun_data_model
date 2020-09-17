@@ -15,10 +15,15 @@ impl RefsSource{
     pub fn is_enum(&self) -> bool{ self.is_enum }
     pub fn refs(&self) -> &[RefSource]{ &self.refs }
 
-    pub fn get(&self) -> String{
+    pub fn get(&self, stem : &str, mod_name : &str) -> String{
         let mut sb = SourceBuilder::new();
         if self.is_enum {
-
+            let enum_type_name = to_enum_type_name(stem);
+            sb.push(0, &format!("pub fn get_enum(&self) -> {}{{", &enum_type_name));
+            sb.push(1, &format!("let (list_name, _) = {}::get_enum(self.ptr).unwrap();", &mod_name));
+            sb.push(1, &format!("let p = if let Qv::Val(p) = {}::get_ref(self.ptr, &list_name).unwrap(){{ p }} else {{ unreachable!() }};", mod_name));
+            sb.push(1, &format!("{}::new(&list_name,p)", &enum_type_name));
+            sb.push(0, "}");
         } else {
             for r in &self.refs {
                 sb.push_without_newline(0, &r.get(true))
@@ -28,19 +33,30 @@ impl RefsSource{
     }
 
     pub fn to_string(&self, stem : &str) -> Option<String>{
-        if self.is_enum{ Some(self.get_enum_soutce()) } else{ None }
+        if self.is_enum{ Some(self.get_enum_soutce(stem)) } else{ None }
     }
     fn get_enum_soutce(&self, stem : &str) -> String{
         let mut sb = SourceBuilder::new();
 
         sb.append(&format!("pub enum {}{{ ", to_enum_type_name(stem)));
-        for r in self.refs{
+        for r in &self.refs{
             let item_type = to_citem_type_name(r.name());
             sb.append(&format!("{}({}), ", &item_type, &item_type));
         }
         sb.append("}\n");
 
-
+        let enum_type_name = to_enum_type_name(stem);
+        sb.push(0, &format!("impl {}{{", &enum_type_name));
+        sb.push(1, &format!("pub fn new(list_name : &str, ptr : CItemPtr) -> {}{{", &enum_type_name));
+        sb.push(2, &format!("match list_name{{"));
+        for r in &self.refs {
+            let item_type = to_citem_type_name(r.name());
+            sb.push(3, &format!(r#""{}" => {}::{}({}::from(ptr)),"#, r.name(), &enum_type_name, &item_type, &item_type));
+        }
+        sb.push(3, &format!(r#"_ => panic!("{} there's no enum type named {{}}", &list_name),"#, &enum_type_name));
+        sb.push(2, "}");
+        sb.push(1, "}");
+        sb.push(0, "}");
 
         sb.to_string()
     }
