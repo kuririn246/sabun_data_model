@@ -1,6 +1,6 @@
 {
 	bu : false,
-	enumTestList : ["CList",
+	enumTestList : ["MList",
 		[{
 			nakabu : true,
 			Enum : {

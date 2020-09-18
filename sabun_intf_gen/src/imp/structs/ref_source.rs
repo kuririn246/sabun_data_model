@@ -53,7 +53,7 @@ impl RefSource{
         sb.push(0, "}");
         sb.to_string()
     }
-    pub fn set(&self, mod_name : &str) -> String {
+    pub fn set(&self) -> String {
         let mut sb = SourceBuilder::new();
         let id = self.name();
         let snake_name = to_snake_name(id);
@@ -67,7 +67,7 @@ impl RefSource{
         } else {
             format!("id.into_qv().map(|v| v.to_str().to_string())")
         };
-        sb.push(1,&format!("{}::set_ref(self.ptr, \"{}\", {});", mod_name, id, exp));
+        sb.push(1,&format!("mitem::set_ref(self.ptr, \"{}\", {});", id, exp));
         sb.push(0,"}");
         sb.to_string()
     }

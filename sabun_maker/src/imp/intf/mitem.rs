@@ -8,6 +8,7 @@ use crate::imp::structs::root_obj::RootObject;
 use crate::imp::intf::mlist::MListPtr;
 use crate::imp::intf::{CItemPtr, RootObjectPtr};
 use crate::imp::structs::ref_value::RefSabValue;
+use crate::imp::intf::citem::get_enum_impl;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -100,4 +101,13 @@ pub fn get_ref(ps : MItemPtr, list_name : &str) -> Option<Qv<CItemPtr>>{
         let data = super::root::get_table(RootObjectPtr::new(ps.root), list_name).unwrap();
         super::table::get_value(data, id)
     })
+}
+
+pub fn get_enum(ps : MItemPtr) -> Option<(String, String)>{
+    let item = unsafe{ ps.item.as_ref().unwrap() };
+    get_enum_impl(item.refs())
+}
+
+pub fn set_enum(ps : MItemPtr, list_name : &str, id : &str) -> bool{
+    set_ref(ps, list_name, Qv::Val(id.to_string()))
 }

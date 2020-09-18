@@ -13,8 +13,8 @@ impl RootIntf{
 		RootIntf { root, ptr }
 	}
 
-	pub fn enum_test_list(&self) -> CListPtr<EnumTestListCItem>{
-		root::get_clist(self.ptr, "enumTestList").unwrap()
+	pub fn enum_test_list(&self) -> MListPtr<EnumTestListMItem>{
+		root::get_mlist(self.ptr, "enumTestList").unwrap()
 	}
 	pub fn refed1(&self) -> Refed1Table{
 		let ans = root::get_table(self.ptr, "refed1").unwrap();
@@ -33,33 +33,51 @@ impl RootIntf{
 	}
 }
 #[derive(Debug, PartialEq)]
-pub struct EnumTestListCItem {
-	ptr : CItemPtr,
+pub struct EnumTestListMItem {
+	ptr : MItemPtr,
 }
-impl From<CItemPtr> for EnumTestListCItem {
-	fn from(ptr : CItemPtr) -> Self { Self{ ptr } }
+impl From<MItemPtr> for EnumTestListMItem {
+	fn from(ptr : MItemPtr) -> Self {
+		Self{ ptr }
+	}
 }
-impl EnumTestListCItem {
+impl EnumTestListMItem {
 	pub fn nakabu(&self) -> bool{
-		let qv = citem::get_bool(self.ptr, "nakabu").unwrap();
+		let qv = mitem::get_bool(self.ptr, "nakabu").unwrap();
 		qv.into_value().unwrap()
 	}
+	pub fn set_nakabu(&mut self, nakabu : bool){
+		mitem::set_bool(self.ptr, "nakabu", Qv::Val(nakabu));
+	}
 	pub fn get_enum(&self) -> EnumTestListEnum{
-		let (list_name, _) = citem::get_enum(self.ptr).unwrap();
-		let p = if let Qv::Val(p) = citem::get_ref(self.ptr, &list_name).unwrap(){ p } else { unreachable!() };
+		let (list_name, _) = mitem::get_enum(self.ptr).unwrap();
+		let p = if let Qv::Val(p) = mitem::get_ref(self.ptr, &list_name).unwrap(){ p } else { unreachable!() };
 		EnumTestListEnum::new(&list_name,p)
 	}
+	pub fn set_enum(&self, kind : EnumTestListKind){
+		let (list_name, id) = kind.id();
+		mitem::set_enum(self.ptr, &list_name, &id);
+	}
 }
-	pub enum EnumTestListEnum{ Refed2CItem(Refed2CItem), Refed1CItem(Refed1CItem), }
-	impl EnumTestListEnum{
-		pub fn new(list_name : &str, ptr : CItemPtr) -> EnumTestListEnum{
-			match list_name{
-				"refed2" => EnumTestListEnum::Refed2CItem(Refed2CItem::from(ptr)),
-				"refed1" => EnumTestListEnum::Refed1CItem(Refed1CItem::from(ptr)),
-				_ => panic!("EnumTestListEnum there's no enum type named {}", &list_name),
-			}
+pub enum EnumTestListEnum{ Refed2(Refed2CItem), Refed1(Refed1CItem), }
+impl EnumTestListEnum{
+	pub fn new(list_name : &str, ptr : CItemPtr) -> EnumTestListEnum{
+		match list_name{
+			"refed2" => EnumTestListEnum::Refed2(Refed2CItem::from(ptr)),
+			"refed1" => EnumTestListEnum::Refed1(Refed1CItem::from(ptr)),
+			_ => panic!("EnumTestListEnum there's no enum type named {}", &list_name),
 		}
 	}
+}
+pub enum EnumTestListKind{ Refed2(Refed2TableID), Refed1(Refed1TableID), }
+impl EnumTestListKind{
+	pub fn id(&self) -> (String, String){
+		match self{
+			EnumTestListKind::Refed2(v) => ("refed2".to_string(), v.to_str().to_string()),
+			EnumTestListKind::Refed1(v) => ("refed1".to_string(), v.to_str().to_string()),
+		}
+	}
+}
 
 #[derive(Debug, PartialEq)]
 pub struct Refed1Table {
