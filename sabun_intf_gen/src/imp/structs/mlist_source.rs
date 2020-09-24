@@ -35,7 +35,7 @@ impl MListSource {
         let snake_name = to_snake_name(id);
         let is_old = self.is_old();
         let item_type_name = to_mitem_type_name(id);
-        sb.push(0,&format!("pub fn {}(&self) -> MListPtr<{}>{{", with_old(&snake_name, is_old), &item_type_name));
+        sb.push(0,&format!("pub fn {}(&mut self) -> MListPtr<{}>{{", with_old(&snake_name, is_old), &item_type_name));
         sb.push(1,&format!("root::get_mlist(self.ptr, \"{}\").unwrap()", id));
         sb.push(0,"}");
         sb.to_string()

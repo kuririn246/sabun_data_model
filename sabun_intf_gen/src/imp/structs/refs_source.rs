@@ -25,6 +25,9 @@ impl RefsSource{
             sb.push(1, &format!("let p = if let Qv::Val(p) = {}::get_ref(self.ptr, &list_name).unwrap(){{ p }} else {{ unreachable!() }};", mod_name));
             sb.push(1, &format!("{}::new(&list_name,p)", &enum_type_name));
             sb.push(0, "}");
+            sb.push(0, &format!("pub fn get_enum_ids(&self) -> (String,String){{"));
+            sb.push(1, &format!("{}::get_enum(self.ptr).unwrap()", &mod_name));
+            sb.push(0, "}");
         } else {
             for r in &self.refs {
                 sb.push_without_newline(0, &r.get(from_citem));

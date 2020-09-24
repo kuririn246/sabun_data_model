@@ -8,7 +8,8 @@ use crate::imp::structs::root_obj::RootObject;
 use crate::imp::intf::mlist::MListPtr;
 use crate::imp::intf::{CItemPtr, RootObjectPtr};
 use crate::imp::structs::ref_value::RefSabValue;
-use crate::imp::intf::citem::get_enum_impl;
+use crate::imp::intf::citem::{get_enum_impl, get_ref_id_imol};
+use crate::imp::structs::util::set_sabun::SetSabunError;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -28,12 +29,14 @@ impl MItemPtr {
 }
 
 pub fn get_mil<T : From<MItemPtr>>(ps : MItemPtr, name : &str) -> Option<Option<MListPtr<T>>> {
-    let item = unsafe { ps.item.as_mut().unwrap() };
-    if let Some(ListSabValue::Mil(data)) = item.values_mut().get_mut(name) {
-        if let Some(inner) = data {
-            return Some(Some(MListPtr::new(inner.list_mut(), ps.list_def, ps.root)))
-        } else {
-            return Some(None)
+    let (item, list_def) = unsafe { (&mut *ps.item, &*ps.list_def) };
+    if let Some(ListDefValue::MilDef(md)) = list_def.default().get(name) {
+        if let Some(ListSabValue::Mil(data)) = item.values_mut().get_mut(name) {
+            if let Some(inner) = data {
+                return Some(Some(MListPtr::new(inner.list_mut(), md.list_def(), ps.root)))
+            } else {
+                return Some(None)
+            }
         }
     }
     return None
@@ -61,8 +64,12 @@ pub fn get_int(ps : MItemPtr, name : &str) -> Option<Qv<i64>>{
 pub fn set_int(ps : MItemPtr, name : &str, val : Qv<i64>) -> bool{
     let (item, def) = unsafe{ (ps.item.as_mut().unwrap(), ps.list_def.as_ref().unwrap()) };
     match item.set_sabun(def,name.to_string(), RustParam::Int(val)){
-        Ok(_) => true,
-        Err(_) => false,
+        Ok(_) =>{ true },
+        Err(e) => match e{
+            SetSabunError::ParamNotFound =>{ false },
+            SetSabunError::ParamTypeMismatch =>{ false },
+            SetSabunError::QvTypeMismatch =>{ false },
+        },
     }
 }
 
@@ -89,19 +96,21 @@ pub fn set_ref(ps : MItemPtr, list_name : &str, id : Qv<String>) -> bool{
 
 
 pub fn get_ref(ps : MItemPtr, list_name : &str) -> Option<Qv<CItemPtr>>{
-    let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
-    let qv = if let Some(sab) = item.refs().get(list_name){
-        sab.value()
-    } else{
-        if let Some(d) = list_def.refs().refs().get(list_name){
-            d.value()
-        } else{ return None; }
-    };
+    let qv = get_ref_id(ps, list_name)?;
     qv.opt_map(|id|{
         let data = super::root::get_table(RootObjectPtr::new(ps.root), list_name).unwrap();
         super::table::get_value(data, id)
     })
 }
+
+pub fn get_ref_id(ps : MItemPtr, list_name : &str) -> Option<Qv<String>>{
+    let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
+    get_ref_id_imol(item.refs(), list_def, list_name)
+}
+
+
+
+
 
 pub fn get_enum(ps : MItemPtr) -> Option<(String, String)>{
     let item = unsafe{ ps.item.as_ref().unwrap() };
@@ -109,5 +118,7 @@ pub fn get_enum(ps : MItemPtr) -> Option<(String, String)>{
 }
 
 pub fn set_enum(ps : MItemPtr, list_name : &str, id : &str) -> bool{
+    let item = unsafe{ &mut *ps.item };
+    item.refs_mut().clear();
     set_ref(ps, list_name, Qv::Val(id.to_string()))
 }

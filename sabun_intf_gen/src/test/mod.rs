@@ -6,3 +6,4 @@ mod test_intf;
 mod generate_test;
 mod write_file;
 mod enum_test;
+mod mut_test;

@@ -51,6 +51,16 @@ impl RefSource{
         };
         sb.push(1, &s);
         sb.push(0, "}");
+        sb.push(0, &format!("pub fn ref_id_{}(&self) -> {}{{", with_old(&snake_name, is_old), with_var("String", var_type)));
+        sb.push(1,&format!("let qv = {}::get_ref_id(self.ptr, \"{}\").unwrap();", mod_name, id));
+        let s = match var_type{
+            VarType::Normal => format!("qv.into_value().unwrap()"),
+            VarType::Nullable => format!("NullOr::from_qv(qv).unwrap()"),
+            VarType::Undefiable => format!("UndefOr::from_qv(qv).unwrap()"),
+            VarType::UndefNullable => format!("qv"),
+        };
+        sb.push(1, &s);
+        sb.push(0, "}");
         sb.to_string()
     }
     pub fn set(&self) -> String {

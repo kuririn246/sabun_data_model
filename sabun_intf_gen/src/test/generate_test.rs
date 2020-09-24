@@ -9,7 +9,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        match json_dir_to_rust("src/json_dir/test/enum", true) {
+        match json_dir_to_rust("src/json_dir/test/mut", true) {
             Ok(mut a) => {
                 //println!("{:?}", a);
                 let ans = generate_interface(&mut a);

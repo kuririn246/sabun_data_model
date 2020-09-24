@@ -41,11 +41,11 @@ impl MilSource {
         let is_old = self.is_old();
         let item_type_name = to_mitem_type_name(id);
         if self.undefiable{
-            sb.push(0, &format!("pub fn {}(&self) -> Option<MListPtr<{}>>{{", with_old(&snake_name, is_old), &item_type_name));
+            sb.push(0, &format!("pub fn {}(&mut self) -> Option<MListPtr<{}>>{{", with_old(&snake_name, is_old), &item_type_name));
             sb.push(1, &format!("mitem::get_mil(self.ptr, \"{}\").unwrap()", id));
             sb.push(0, "}");
         } else {
-            sb.push(0, &format!("pub fn {}(&self) -> MListPtr<{}>{{", with_old(&snake_name, is_old), &item_type_name));
+            sb.push(0, &format!("pub fn {}(&mut self) -> MListPtr<{}>{{", with_old(&snake_name, is_old), &item_type_name));
             sb.push(1, &format!("mitem::get_mil(self.ptr, \"{}\").unwrap().unwrap()", id));
             sb.push(0, "}");
         }

@@ -73,18 +73,27 @@ pub fn get_param<'a>(item : &'a ConstItem, def : &'a ListDefObj, name : &str) ->
 }
 
 pub fn get_ref(ps : CItemPtr, list_name : &str) -> Option<Qv<CItemPtr>>{
+    let qv = get_ref_id(ps, list_name)?;
+    qv.opt_map(|id|{
+        let data = super::root::get_table(RootObjectPtr::new(ps.root), list_name).unwrap();
+        super::table::get_value(data, id)
+    })
+}
+
+pub fn get_ref_id(ps : CItemPtr, list_name : &str) -> Option<Qv<String>>{
     let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
-    let qv = if let Some(sab) = item.refs().get(list_name){
+    get_ref_id_imol(item.refs(), list_def, list_name)
+}
+
+pub fn get_ref_id_imol(refs : &HashM<String, RefSabValue>, list_def : &ListDefObj, list_name : &str) -> Option<Qv<String>>{
+    let qv = if let Some(sab) = refs.get(list_name){
         sab.value()
     } else{
         if let Some(d) = list_def.refs().refs().get(list_name){
             d.value()
         } else{ return None; }
     };
-    qv.opt_map(|id|{
-        let data = super::root::get_table(RootObjectPtr::new(ps.root), list_name).unwrap();
-        super::table::get_value(data, id)
-    })
+    return Some(qv.clone());
 }
 
 pub fn get_enum(ps : CItemPtr) -> Option<(String, String)>{
