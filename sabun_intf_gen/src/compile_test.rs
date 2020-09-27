@@ -13,9 +13,16 @@ impl RootIntf{
 		RootIntf { root, ptr }
 	}
 
-	pub fn refed(&self) -> RefedTable{
-		let ans = root::get_table(self.ptr, "refed").unwrap();
-		RefedTable::new(ans)
+	pub fn enum_test_list(&mut self) -> MListPtr<EnumTestListMItem>{
+		root::get_mlist(self.ptr, "enumTestList").unwrap()
+	}
+	pub fn refed1(&self) -> Refed1Table{
+		let ans = root::get_table(self.ptr, "refed1").unwrap();
+		Refed1Table::new(ans)
+	}
+	pub fn refed2(&self) -> Refed2Table{
+		let ans = root::get_table(self.ptr, "refed2").unwrap();
+		Refed2Table::new(ans)
 	}
 	pub fn bu(&self) -> bool{
 		let qv = root::get_bool(self.ptr, "bu").unwrap();
@@ -24,33 +31,80 @@ impl RootIntf{
 	pub fn set_bu(&mut self, bu : bool){
 		root::set_bool(self.ptr, "bu", Qv::Val(bu));
 	}
-	pub fn mutable_list(&mut self) -> MListPtr<MutableListMItem>{
-		root::get_mlist(self.ptr, "mutableList").unwrap()
-	}
 }
 #[derive(Debug, PartialEq)]
-pub struct RefedTable {
-	ptr : TablePtr,
+pub struct EnumTestListMItem {
+	ptr : MItemPtr,
 }
-impl RefedTable {
-	pub fn new(ptr : TablePtr) -> RefedTable{ RefedTable{ ptr } } 
-	pub fn first(&self) -> RefedCItem {
-		let ptr = table::get_value(self.ptr, "first").unwrap();
-		RefedCItem::from(ptr)
+impl From<MItemPtr> for EnumTestListMItem {
+	fn from(ptr : MItemPtr) -> Self {
+		Self{ ptr }
 	}
-	pub fn second(&self) -> RefedCItem {
-		let ptr = table::get_value(self.ptr, "second").unwrap();
-		RefedCItem::from(ptr)
+}
+impl EnumTestListMItem {
+	pub fn nakabu(&self) -> bool{
+		let qv = mitem::get_bool(self.ptr, "nakabu").unwrap();
+		qv.into_value().unwrap()
 	}
-	pub fn from_id(&self, id : RefedTableID) -> RefedCItem{
-		match id{
-			RefedTableID::First => self.first(),
-			RefedTableID::Second => self.second(),
+	pub fn set_nakabu(&mut self, nakabu : bool){
+		mitem::set_bool(self.ptr, "nakabu", Qv::Val(nakabu));
+	}
+	pub fn get_enum(&self) -> EnumTestListEnum{
+		let (list_name, _) = mitem::get_enum(self.ptr).unwrap();
+		let p = if let Qv::Val(p) = mitem::get_ref(self.ptr, &list_name).unwrap(){ p } else { unreachable!() };
+		EnumTestListEnum::new(&list_name,p)
+	}
+	pub fn get_enum_ids(&self) -> (String,String){
+		mitem::get_enum(self.ptr).unwrap()
+	}
+	pub fn set_enum(&self, kind : EnumTestListKind){
+		let (list_name, id) = kind.id();
+		mitem::set_enum(self.ptr, list_name, id);
+	}
+}
+pub enum EnumTestListEnum{ Refed2(Refed2CItem), Refed1(Refed1CItem), }
+impl EnumTestListEnum{
+	pub fn new(list_name : &str, ptr : CItemPtr) -> EnumTestListEnum{
+		match list_name{
+			"refed2" => EnumTestListEnum::Refed2(Refed2CItem::from(ptr)),
+			"refed1" => EnumTestListEnum::Refed1(Refed1CItem::from(ptr)),
+			_ => panic!("EnumTestListEnum there's no enum type named {}", &list_name),
 		}
 	}
 }
-#[repr(u64)] pub enum RefedTableID{ First, Second, }
-impl RefedTableID{
+pub enum EnumTestListKind{ Refed2(Refed2TableID), Refed1(Refed1TableID), }
+impl EnumTestListKind{
+	pub fn id(&self) -> (&'static str, &'static str){
+		match self{
+			EnumTestListKind::Refed2(v) => ("refed2", v.to_str()),
+			EnumTestListKind::Refed1(v) => ("refed1", v.to_str()),
+		}
+	}
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Refed1Table {
+	ptr : TablePtr,
+}
+impl Refed1Table {
+	pub fn new(ptr : TablePtr) -> Refed1Table{ Refed1Table{ ptr } } 
+	pub fn first(&self) -> Refed1CItem {
+		let ptr = table::get_value(self.ptr, "first").unwrap();
+		Refed1CItem::from(ptr)
+	}
+	pub fn second(&self) -> Refed1CItem {
+		let ptr = table::get_value(self.ptr, "second").unwrap();
+		Refed1CItem::from(ptr)
+	}
+	pub fn from_id(&self, id : Refed1TableID) -> Refed1CItem{
+		match id{
+			Refed1TableID::First => self.first(),
+			Refed1TableID::Second => self.second(),
+		}
+	}
+}
+#[repr(u64)] pub enum Refed1TableID{ First, Second, }
+impl Refed1TableID{
 	pub fn from_str(id : &str) -> Option<Self>{
 		match id{
 			"first" => Some(Self::First),
@@ -58,29 +112,35 @@ impl RefedTableID{
 			_ =>{ None }
 		}
 	}
-	pub fn from_num(id : u64) -> Self{
+	pub fn from_num(id : usize) -> Self{
 		match id{
 			0 => Self::First,
 			1 => Self::Second,
-			_ => panic!("invalid ID num {} RefedTableID", id),
+			_ => panic!("invalid ID num {} Refed1TableID", id),
 		}
 	}
-	pub fn len() -> u64{ 2 }
-	pub fn to_str(&self) -> &str{
+	pub fn len() -> usize{ 2 }
+	pub fn to_num(&self) -> usize{
 		match self{
-			RefedTableID::First => "first",
-			RefedTableID::Second => "second",
+			Refed1TableID::First => 0,
+			Refed1TableID::Second => 1,
 		}
+	}
+	pub fn metadata() -> &'static [&'static str]{
+		&["first", "second", ]
+	}
+	pub fn to_str(&self) -> &'static str{
+		Self::metadata()[self.to_num()]
 	}
 }
 #[derive(Debug, PartialEq)]
-pub struct RefedCItem {
+pub struct Refed1CItem {
 	ptr : CItemPtr,
 }
-impl From<CItemPtr> for RefedCItem {
+impl From<CItemPtr> for Refed1CItem {
 	fn from(ptr : CItemPtr) -> Self { Self{ ptr } }
 }
-impl RefedCItem {
+impl Refed1CItem {
 	pub fn mem(&self) -> i64{
 		let qv = citem::get_int(self.ptr, "mem").unwrap();
 		qv.into_value().unwrap()
@@ -89,64 +149,68 @@ impl RefedCItem {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct MutableListMItem {
-	ptr : MItemPtr,
+pub struct Refed2Table {
+	ptr : TablePtr,
 }
-impl From<MItemPtr> for MutableListMItem {
-	fn from(ptr : MItemPtr) -> Self {
-		Self{ ptr }
+impl Refed2Table {
+	pub fn new(ptr : TablePtr) -> Refed2Table{ Refed2Table{ ptr } } 
+	pub fn a(&self) -> Refed2CItem {
+		let ptr = table::get_value(self.ptr, "a").unwrap();
+		Refed2CItem::from(ptr)
+	}
+	pub fn b(&self) -> Refed2CItem {
+		let ptr = table::get_value(self.ptr, "b").unwrap();
+		Refed2CItem::from(ptr)
+	}
+	pub fn from_id(&self, id : Refed2TableID) -> Refed2CItem{
+		match id{
+			Refed2TableID::A => self.a(),
+			Refed2TableID::B => self.b(),
+		}
 	}
 }
-impl MutableListMItem {
-	pub fn mut_inn_list(&mut self) -> MListPtr<MutInnListMItem>{
-		mitem::get_mil(self.ptr, "mutInnList").unwrap().unwrap()
+#[repr(u64)] pub enum Refed2TableID{ A, B, }
+impl Refed2TableID{
+	pub fn from_str(id : &str) -> Option<Self>{
+		match id{
+			"a" => Some(Self::A),
+			"b" => Some(Self::B),
+			_ =>{ None }
+		}
 	}
-	pub fn nakabu(&self) -> bool{
-		let qv = mitem::get_bool(self.ptr, "nakabu").unwrap();
-		qv.into_value().unwrap()
+	pub fn from_num(id : usize) -> Self{
+		match id{
+			0 => Self::A,
+			1 => Self::B,
+			_ => panic!("invalid ID num {} Refed2TableID", id),
+		}
 	}
-	pub fn set_nakabu(&mut self, nakabu : bool){
-		mitem::set_bool(self.ptr, "nakabu", Qv::Val(nakabu));
+	pub fn len() -> usize{ 2 }
+	pub fn to_num(&self) -> usize{
+		match self{
+			Refed2TableID::A => 0,
+			Refed2TableID::B => 1,
+		}
 	}
-	pub fn ref_refed(&self) -> RefedCItem{
-		let qv = mitem::get_ref(self.ptr, "refed").unwrap();
-		RefedCItem::from(qv.into_value().unwrap())
+	pub fn metadata() -> &'static [&'static str]{
+		&["a", "b", ]
 	}
-	pub fn ref_id_refed(&self) -> String{
-		let qv = mitem::get_ref_id(self.ptr, "refed").unwrap();
-		qv.into_value().unwrap()
-	}
-	pub fn set_ref_refed(&self, id : RefedTableID){
-		mitem::set_ref(self.ptr, "refed", Qv::Val(id.to_str().to_string()));
+	pub fn to_str(&self) -> &'static str{
+		Self::metadata()[self.to_num()]
 	}
 }
 #[derive(Debug, PartialEq)]
-pub struct MutInnListMItem {
-	ptr : MItemPtr,
+pub struct Refed2CItem {
+	ptr : CItemPtr,
 }
-impl From<MItemPtr> for MutInnListMItem {
-	fn from(ptr : MItemPtr) -> Self {
-		Self{ ptr }
-	}
+impl From<CItemPtr> for Refed2CItem {
+	fn from(ptr : CItemPtr) -> Self { Self{ ptr } }
 }
-impl MutInnListMItem {
-	pub fn inner_mem(&self) -> i64{
-		let qv = mitem::get_int(self.ptr, "innerMem").unwrap();
+impl Refed2CItem {
+	pub fn mem(&self) -> i64{
+		let qv = citem::get_int(self.ptr, "mem").unwrap();
 		qv.into_value().unwrap()
 	}
-	pub fn set_inner_mem(&mut self, inner_mem : i64){
-		mitem::set_int(self.ptr, "innerMem", Qv::Val(inner_mem));
-	}
-	pub fn ref_refed(&self) -> RefedCItem{
-		let qv = mitem::get_ref(self.ptr, "refed").unwrap();
-		RefedCItem::from(qv.into_value().unwrap())
-	}
-	pub fn ref_id_refed(&self) -> String{
-		let qv = mitem::get_ref_id(self.ptr, "refed").unwrap();
-		qv.into_value().unwrap()
-	}
-	pub fn set_ref_refed(&self, id : RefedTableID){
-		mitem::set_ref(self.ptr, "refed", Qv::Val(id.to_str().to_string()));
-	}
+	
 }
 

@@ -42,7 +42,7 @@ impl RefsSource{
         if self.is_enum {
             sb.push(0, &format!("pub fn set_enum(&self, kind : {}){{", &to_kind_type_name(stem)));
             sb.push(1, &format!("let (list_name, id) = kind.id();"));
-            sb.push(1, &format!("mitem::set_enum(self.ptr, &list_name, &id);"));
+            sb.push(1, &format!("mitem::set_enum(self.ptr, list_name, id);"));
             sb.push(0, "}");
         } else{
             for r in &self.refs {
@@ -89,14 +89,16 @@ impl RefsSource{
             sb.append("}\n");
 
             sb.push(0, &format!("impl {}{{", kind_type_name));
-            sb.push(1, &format!("pub fn id(&self) -> (String, String){{"));
+            sb.push(1, &format!("pub fn id(&self) -> (&'static str, &'static str){{"));
             sb.push(2, &format!("match self{{"));
             for r in &self.refs {
-                sb.push(3,&format!("{}::{}(v) => (\"{}\".to_string(), v.to_str().to_string()),",
+                sb.push(3,&format!("{}::{}(v) => (\"{}\", v.to_str()),",
                                    &kind_type_name, &to_type_name(r.name()), r.name()));
             }
             sb.push(2, "}");
             sb.push(1, "}");
+            //sb.push(1, &format!("pub fn metadata(&self) -> {{"));
+
             sb.push(0, "}");
         }
         sb.to_string()
