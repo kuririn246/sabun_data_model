@@ -56,7 +56,7 @@ pub fn get_str(root : RootObjectPtr, name : &str) -> Option<Qv<String>>{
     }
 }
 
-pub fn get_iarray(root : RootObjectPtr, name : &str) -> Option<Qv<Vec<i64>>>{
+pub fn get_int_array(root : RootObjectPtr, name : &str) -> Option<Qv<Vec<i64>>>{
     let root = unsafe{ &*root.ptr };
     if let Some(RustParam::IntArray(b)) = get_param(root.default(), root.sabun(), name){
         Some(b.map(|s| s.vec().clone()))
@@ -65,7 +65,7 @@ pub fn get_iarray(root : RootObjectPtr, name : &str) -> Option<Qv<Vec<i64>>>{
     }
 }
 
-pub fn get_farray(root : RootObjectPtr, name : &str) -> Option<Qv<Vec<f64>>>{
+pub fn get_float_array(root : RootObjectPtr, name : &str) -> Option<Qv<Vec<f64>>>{
     let root = unsafe{ &*root.ptr };
     if let Some(RustParam::FloatArray(b)) = get_param(root.default(), root.sabun(), name){
         Some(b.map(|s| s.vec().clone()))
@@ -134,14 +134,14 @@ pub fn set_str(root : RootObjectPtr, name : &str, val : Qv<String>) -> bool{
         Err(_) => false,
     }
 }
-pub fn set_iarray(root : RootObjectPtr, name : &str, val : Qv<Vec<i64>>) -> bool{
+pub fn set_int_array(root : RootObjectPtr, name : &str, val : Qv<Vec<i64>>) -> bool{
     let root = unsafe{ &mut *root.ptr };
     match root.set_sabun(name.to_string(), RustParam::IntArray(val.into_map(|s| RustIntArray::new(s)))){
         Ok(_) => true,
         Err(_) => false,
     }
 }
-pub fn set_farray(root : RootObjectPtr, name : &str, val : Qv<Vec<f64>>) -> bool{
+pub fn set_float_array(root : RootObjectPtr, name : &str, val : Qv<Vec<f64>>) -> bool{
     let root = unsafe{ &mut *root.ptr };
     match root.set_sabun(name.to_string(), RustParam::FloatArray(val.into_map(|s| RustFloatArray::new(s)))){
         Ok(_) => true,

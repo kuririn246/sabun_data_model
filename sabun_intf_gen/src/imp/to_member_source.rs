@@ -51,6 +51,22 @@ pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
                 mem.is_old(),
             ))
         },
+        RustMemberType::IntArray =>{
+            MemberSource::Param(ParamSource::new(
+                mem.name().to_string(),
+                mem.var_type(),
+                ParamType::IntArray,
+                mem.is_old(),
+            ))
+        },
+        RustMemberType::FloatArray =>{
+            MemberSource::Param(ParamSource::new(
+                mem.name().to_string(),
+                mem.var_type(),
+                ParamType::FloatArray,
+                mem.is_old(),
+            ))
+        },
         RustMemberType::Table =>{
             MemberSource::Table(TableSource::from(mem))
         }
@@ -66,6 +82,6 @@ pub fn to_member_source(mem : &MemberDesc) -> MemberSource{
         RustMemberType::Mil =>{
             MemberSource::Mil(MilSource::from(mem))
         },
-        _ => unreachable!(),
+        //_ => unreachable!(),
     }
 }

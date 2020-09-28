@@ -62,6 +62,24 @@ pub fn get_str(ps : CItemPtr, name : &str) -> Option<Qv<String>>{
     } else{ None }
 }
 
+pub fn get_int_array(ps : CItemPtr, name : &str) -> Option<Qv<Vec<i64>>>{
+    let (item,list_def) = unsafe{ (&*ps.item, &*ps.list_def) };
+    if let Some(RustParam::IntArray(b)) = get_param(item, list_def, name){
+        Some(b.map(|s| s.vec().clone()))
+    } else{
+        None
+    }
+}
+
+pub fn get_float_array(ps : CItemPtr, name : &str) -> Option<Qv<Vec<f64>>>{
+    let (item,list_def) = unsafe{ (&*ps.item, &*ps.list_def) };
+    if let Some(RustParam::FloatArray(b)) = get_param(item, list_def, name){
+        Some(b.map(|s| s.vec().clone()))
+    } else{
+        None
+    }
+}
+
 pub fn get_param<'a>(item : &'a ConstItem, def : &'a ListDefObj, name : &str) -> Option<&'a RustParam>{
     if let Some(ListSabValue::Param(p)) = item.values().get(name){
         Some(p)

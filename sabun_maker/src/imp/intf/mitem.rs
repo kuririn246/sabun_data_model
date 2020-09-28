@@ -10,6 +10,8 @@ use crate::imp::intf::{CItemPtr, RootObjectPtr};
 use crate::imp::structs::ref_value::RefSabValue;
 use crate::imp::intf::citem::{get_enum_impl, get_ref_id_imol};
 use crate::imp::structs::util::set_sabun::SetSabunError;
+use crate::imp::structs::rust_string::RustString;
+use crate::imp::structs::rust_array::{RustIntArray, RustFloatArray};
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -48,18 +50,52 @@ pub fn get_bool(ps : MItemPtr, name : &str) -> Option<Qv<bool>>{
         Some(b.clone())
     } else{ None }
 }
+
+pub fn get_int(ps : MItemPtr, name : &str) -> Option<Qv<i64>>{
+    let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
+    if let Some(RustParam::Int(b)) = get_param(item, list_def, name){
+        Some(b.clone())
+    } else{ None }
+}
+
+pub fn get_float(ps : MItemPtr, name : &str) -> Option<Qv<f64>>{
+    let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
+    if let Some(RustParam::Float(b)) = get_param(item, list_def, name){
+        Some(b.clone())
+    } else{ None }
+}
+
+pub fn get_str(ps : MItemPtr, name : &str) -> Option<Qv<String>>{
+    let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
+    if let Some(RustParam::String(b)) = get_param(item, list_def, name){
+        Some(b.map(|s| s.str().to_string()))
+    } else{ None }
+}
+
+pub fn get_int_array(ps : MItemPtr, name : &str) -> Option<Qv<Vec<i64>>>{
+    let (item,list_def) = unsafe{ (&*ps.item, &*ps.list_def) };
+    if let Some(RustParam::IntArray(b)) = get_param(item, list_def, name){
+        Some(b.map(|s| s.vec().clone()))
+    } else{
+        None
+    }
+}
+
+pub fn get_float_array(ps : MItemPtr, name : &str) -> Option<Qv<Vec<f64>>>{
+    let (item,list_def) = unsafe{ (&*ps.item, &*ps.list_def) };
+    if let Some(RustParam::FloatArray(b)) = get_param(item, list_def, name){
+        Some(b.map(|s| s.vec().clone()))
+    } else{
+        None
+    }
+}
+
 pub fn set_bool(ps : MItemPtr, name : &str, val : Qv<bool>) -> bool{
     let (item,def) = unsafe{ (ps.item.as_mut().unwrap(),ps.list_def.as_ref().unwrap()) };
     match item.set_sabun(def, name.to_string(), RustParam::Bool(val)) {
         Ok(_) => true,
         Err(_) => false,
     }
-}
-pub fn get_int(ps : MItemPtr, name : &str) -> Option<Qv<i64>>{
-    let (item,list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
-    if let Some(RustParam::Int(b)) = get_param(item, list_def, name){
-        Some(b.clone())
-    } else{ None }
 }
 pub fn set_int(ps : MItemPtr, name : &str, val : Qv<i64>) -> bool{
     let (item, def) = unsafe{ (ps.item.as_mut().unwrap(), ps.list_def.as_ref().unwrap()) };
@@ -72,6 +108,51 @@ pub fn set_int(ps : MItemPtr, name : &str, val : Qv<i64>) -> bool{
         },
     }
 }
+pub fn set_float(ps : MItemPtr, name : &str, val : Qv<f64>) -> bool{
+    let (item, def) = unsafe{ (ps.item.as_mut().unwrap(), ps.list_def.as_ref().unwrap()) };
+    match item.set_sabun(def,name.to_string(), RustParam::Float(val)){
+        Ok(_) =>{ true },
+        Err(e) => match e{
+            SetSabunError::ParamNotFound =>{ false },
+            SetSabunError::ParamTypeMismatch =>{ false },
+            SetSabunError::QvTypeMismatch =>{ false },
+        },
+    }
+}
+pub fn set_str(ps : MItemPtr, name : &str, val : Qv<String>) -> bool{
+    let (item, def) = unsafe{ (ps.item.as_mut().unwrap(), ps.list_def.as_ref().unwrap()) };
+    match item.set_sabun(def,name.to_string(), RustParam::String(val.into_map(|s| RustString::new(s)))){
+        Ok(_) =>{ true },
+        Err(e) => match e{
+            SetSabunError::ParamNotFound =>{ false },
+            SetSabunError::ParamTypeMismatch =>{ false },
+            SetSabunError::QvTypeMismatch =>{ false },
+        },
+    }
+}
+pub fn set_int_array(ps : MItemPtr, name : &str, val : Qv<Vec<i64>>) -> bool{
+    let (item, def) = unsafe{ (ps.item.as_mut().unwrap(), ps.list_def.as_ref().unwrap()) };
+    match item.set_sabun(def,name.to_string(), RustParam::IntArray(val.into_map(|s| RustIntArray::new(s)))){
+        Ok(_) =>{ true },
+        Err(e) => match e{
+            SetSabunError::ParamNotFound =>{ false },
+            SetSabunError::ParamTypeMismatch =>{ false },
+            SetSabunError::QvTypeMismatch =>{ false },
+        },
+    }
+}
+pub fn set_float_array(ps : MItemPtr, name : &str, val : Qv<Vec<f64>>) -> bool{
+    let (item, def) = unsafe{ (ps.item.as_mut().unwrap(), ps.list_def.as_ref().unwrap()) };
+    match item.set_sabun(def,name.to_string(), RustParam::FloatArray(val.into_map(|s| RustFloatArray::new(s)))){
+        Ok(_) =>{ true },
+        Err(e) => match e{
+            SetSabunError::ParamNotFound =>{ false },
+            SetSabunError::ParamTypeMismatch =>{ false },
+            SetSabunError::QvTypeMismatch =>{ false },
+        },
+    }
+}
+
 
 pub fn get_param<'a>(item : &'a MutItem, def : &'a ListDefObj, name : &str) -> Option<&'a RustParam>{
     if let Some(ListSabValue::Param(p)) = item.values().get(name){
@@ -107,10 +188,6 @@ pub fn get_ref_id(ps : MItemPtr, list_name : &str) -> Option<Qv<String>>{
     let (item, list_def) = unsafe{ (ps.item.as_ref().unwrap(), ps.list_def.as_ref().unwrap()) };
     get_ref_id_imol(item.refs(), list_def, list_name)
 }
-
-
-
-
 
 pub fn get_enum(ps : MItemPtr) -> Option<(String, String)>{
     let item = unsafe{ ps.item.as_ref().unwrap() };
