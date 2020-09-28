@@ -53,9 +53,9 @@ impl RefsSource{
     }
 
     pub fn to_string(&self, stem : &str, from_citem : bool) -> Option<String>{
-        if self.is_enum{ Some(self.get_enum_soutce(stem, from_citem)) } else{ None }
+        if self.is_enum{ Some(self.get_enum_source(stem, from_citem)) } else{ None }
     }
-    fn get_enum_soutce(&self, stem : &str, from_citem : bool) -> String{
+    fn get_enum_source(&self, stem : &str, from_citem : bool) -> String{
         let mut sb = SourceBuilder::new();
 
         let enum_type_name = to_enum_type_name(stem);

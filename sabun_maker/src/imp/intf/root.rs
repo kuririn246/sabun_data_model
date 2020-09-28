@@ -9,6 +9,7 @@ use crate::imp::intf::mlist::MListPtr;
 use crate::imp::intf::table::TablePtr;
 use crate::imp::intf::mitem::MItemPtr;
 use crate::imp::intf::citem::CItemPtr;
+use crate::imp::structs::rust_array::{RustIntArray, RustFloatArray};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct RootObjectPtr{
@@ -19,7 +20,7 @@ impl RootObjectPtr {
 }
 
 pub fn get_bool(root : RootObjectPtr, name : &str) -> Option<Qv<bool>>{
-    let root = unsafe{ root.ptr.as_ref().unwrap() };
+    let root = unsafe{ &*root.ptr };
     if let Some(RustParam::Bool(b)) = get_param(root.default(), root.sabun(), name){
         Some(b.clone())
     } else{
@@ -28,7 +29,7 @@ pub fn get_bool(root : RootObjectPtr, name : &str) -> Option<Qv<bool>>{
 }
 
 pub fn get_float(root : RootObjectPtr, name : &str) -> Option<Qv<f64>>{
-    let root = unsafe{ root.ptr.as_ref().unwrap() };
+    let root = unsafe{ &*root.ptr };
     if let Some(RustParam::Float(b)) = get_param(root.default(), root.sabun(), name){
         Some(b.clone())
     } else{
@@ -37,7 +38,7 @@ pub fn get_float(root : RootObjectPtr, name : &str) -> Option<Qv<f64>>{
 }
 
 pub fn get_int(root : RootObjectPtr, name : &str) -> Option<Qv<i64>>{
-    let root = unsafe{ root.ptr.as_ref().unwrap() };
+    let root = unsafe{ &*root.ptr };
     if let Some(RustParam::Int(b)) = get_param(root.default(), root.sabun(), name){
         Some(b.clone())
     } else{
@@ -47,7 +48,7 @@ pub fn get_int(root : RootObjectPtr, name : &str) -> Option<Qv<i64>>{
 
 
 pub fn get_str(root : RootObjectPtr, name : &str) -> Option<Qv<String>>{
-    let root = unsafe{ root.ptr.as_ref().unwrap() };
+    let root = unsafe{ &*root.ptr };
     if let Some(RustParam::String(b)) = get_param(root.default(), root.sabun(), name){
         Some(b.map(|s| s.str().to_string()))
     } else{
@@ -55,25 +56,41 @@ pub fn get_str(root : RootObjectPtr, name : &str) -> Option<Qv<String>>{
     }
 }
 
+pub fn get_iarray(root : RootObjectPtr, name : &str) -> Option<Qv<Vec<i64>>>{
+    let root = unsafe{ &*root.ptr };
+    if let Some(RustParam::IntArray(b)) = get_param(root.default(), root.sabun(), name){
+        Some(b.map(|s| s.vec().clone()))
+    } else{
+        None
+    }
+}
+
+pub fn get_farray(root : RootObjectPtr, name : &str) -> Option<Qv<Vec<f64>>>{
+    let root = unsafe{ &*root.ptr };
+    if let Some(RustParam::FloatArray(b)) = get_param(root.default(), root.sabun(), name){
+        Some(b.map(|s| s.vec().clone()))
+    } else{
+        None
+    }
+}
+
 pub fn get_table(root_ptr : RootObjectPtr, name : &str) -> Option<TablePtr>{
-    let root = unsafe{ root_ptr.ptr.as_ref().unwrap() };
+    let root = unsafe{ &*root_ptr.ptr };
     if let Some(RootValue::Table(d)) = root.default().get(name){
         Some(TablePtr::new(d, root_ptr.ptr))
     } else{ None }
 }
-// pub fn get_data2(root : *const RootObject, name : &str) -> Option<ConstDataPtr>{
-//     get_data(RootObjectPtr::new(root as *mut RootObject), name)
-// }
+
 
 pub fn get_clist<T : From<CItemPtr>>(root_ptr : RootObjectPtr, name : &str) -> Option<CListPtr<T>>{
-    let root = unsafe{ root_ptr.ptr.as_ref().unwrap() };
+    let root = unsafe{ &*root_ptr.ptr };
     if let Some(RootValue::CList(l)) = root.default().get(name){
         Some(CListPtr::new(l.list(),l.default(), root_ptr.ptr))
     } else{ None }
 }
 
 pub fn get_mlist<T : From<MItemPtr>>(root : RootObjectPtr, name : &str) -> Option<MListPtr<T>>{
-    let root = unsafe{ root.ptr.as_mut().unwrap() };
+    let root = unsafe{ &mut *root.ptr };
     if let Some(RootValue::MList(l)) = root.default_mut().get_mut(name){
         Some(MListPtr::new(l.list_mut(), l.default(), root))
     } else{ None }
@@ -90,29 +107,43 @@ pub fn get_param<'a>(def : &'a HashM<String, RootValue>, sab : &'a HashM<String,
 }
 
 pub fn set_bool(root : RootObjectPtr, name : &str, val : Qv<bool>) -> bool{
-    let root = unsafe{ root.ptr.as_mut().unwrap() };
+    let root = unsafe{ &mut *root.ptr };
     match root.set_sabun(name.to_string(), RustParam::Bool(val)){
         Ok(_) => true,
         Err(_) => false,
     }
 }
 pub fn set_float(root : RootObjectPtr, name : &str, val : Qv<f64>) -> bool{
-    let root = unsafe{ root.ptr.as_mut().unwrap() };
+    let root = unsafe{ &mut *root.ptr };
     match root.set_sabun(name.to_string(), RustParam::Float(val)){
         Ok(_) => true,
         Err(_) => false,
     }
 }
 pub fn set_int(root : RootObjectPtr, name : &str, val : Qv<i64>) -> bool{
-    let root = unsafe{ root.ptr.as_mut().unwrap() };
+    let root = unsafe{ &mut *root.ptr };
     match root.set_sabun(name.to_string(), RustParam::Int(val)){
         Ok(_) => true,
         Err(_) => false,
     }
 }
 pub fn set_str(root : RootObjectPtr, name : &str, val : Qv<String>) -> bool{
-    let root = unsafe{ root.ptr.as_mut().unwrap() };
-    match root.set_sabun(name.to_string(), RustParam::String(val.map(|s| RustString::new(s.to_string())))){
+    let root = unsafe{ &mut *root.ptr };
+    match root.set_sabun(name.to_string(), RustParam::String(val.into_map(|s| RustString::new(s)))){
+        Ok(_) => true,
+        Err(_) => false,
+    }
+}
+pub fn set_iarray(root : RootObjectPtr, name : &str, val : Qv<Vec<i64>>) -> bool{
+    let root = unsafe{ &mut *root.ptr };
+    match root.set_sabun(name.to_string(), RustParam::IntArray(val.into_map(|s| RustIntArray::new(s)))){
+        Ok(_) => true,
+        Err(_) => false,
+    }
+}
+pub fn set_farray(root : RootObjectPtr, name : &str, val : Qv<Vec<f64>>) -> bool{
+    let root = unsafe{ &mut *root.ptr };
+    match root.set_sabun(name.to_string(), RustParam::FloatArray(val.into_map(|s| RustFloatArray::new(s)))){
         Ok(_) => true,
         Err(_) => false,
     }
