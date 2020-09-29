@@ -14,7 +14,7 @@ mod tests {
                 //println!("{:?}", a);
                 let ans = generate_interface(&mut a);
                 let source = ans.to_string();
-                write_file("src/compile_test.rs", &source);
+                write_file("src/test_generated/siyou.rs", &source);
             },
             Err(e) => { println!("val 1 {}", e.message) }
         }

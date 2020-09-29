@@ -1,0 +1,10 @@
+[package]
+name = "nougami_diff"
+version = "0.1.0"
+authors = ["massive-spoiler <reddit_chan@outlook.jp>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+sabun_maker = { path = "../sabun_maker"}

@@ -20,10 +20,10 @@ impl RootObject{
     pub(crate) fn new(default : HashM<String, RootValue>, sabun : HashM<String, RustParam>, old : HashS<String>) -> RootObject{
         RootObject{ default: Box::new(default), sabun : Box::new(sabun), old : Box::new(old) }
     }
-    pub(crate) fn default(&self) -> &HashM<String, RootValue>{ self.default.as_ref() }
+    pub fn default(&self) -> &HashM<String, RootValue>{ self.default.as_ref() }
     pub(crate) fn default_mut(&mut self) -> &mut HashM<String, RootValue>{ self.default.as_mut() }
     pub(crate) fn deconstruct(self) -> (HashM<String, RootValue>, HashM<String, RustParam>, HashS<String>){ (*self.default, *self.sabun, *self.old) }
-    pub(crate) fn sabun(&self) -> &HashM<String, RustParam>{ self.sabun.as_ref() }
+    pub fn sabun(&self) -> &HashM<String, RustParam>{ self.sabun.as_ref() }
     pub(crate) fn old(&self) -> &HashS<String>{ self.old.as_ref() }
     pub(crate) fn set_sabun(&mut self, name : String, param : RustParam) -> Result<Option<RustParam>, SetSabunError> {
         let (p, vt) = if let Some(RootValue::Param(p, vt)) = self.default().get(&name) { (p, vt) } else {
